@@ -9,8 +9,10 @@ from uop.user.errors import user_errors
 
 user_api = Api(user_blueprint, errors=user_errors)
 
+
 class UserRegister(Resource):
-    def post(self):
+    @classmethod
+    def post(cls):
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str)
         parser.add_argument('first_name', type=str)
@@ -27,14 +29,14 @@ class UserRegister(Resource):
             "code": 200,
             "result": {
                 "res": "success",
-                 "msg": "test info"
-           }
+                "msg": "test info"
+            }
         }
         return res, 200
 
-    def get(self):
+    @classmethod
+    def get(cls):
         return "test info", 409
-
 
 
 user_api.add_resource(UserRegister, '/users')

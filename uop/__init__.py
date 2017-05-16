@@ -4,6 +4,7 @@ from config import configs
 from models import db
 from uop.user import user_blueprint
 
+
 def create_app(config_name):
     app = Flask(__name__)
 
