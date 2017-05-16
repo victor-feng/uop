@@ -70,7 +70,6 @@ class AdminUserList(Resource):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-        # is_admin = data.get('is_admin')
         user = UserInfo.objects.get(username=username)
         if user:
             if user.password == password:
@@ -99,4 +98,5 @@ class AdminUserDetail(Resource):
 
 user_api.add_resource(UserRegister, '/users')
 user_api.add_resource(UserList, '/userlist')
-user_api.add_resource(AdminUserDetail, '/userdetail/<name>')
+user_api.add_resource(AdminUserList, '/adminlist')
+user_api.add_resource(AdminUserDetail, '/admindetail/<name>')
