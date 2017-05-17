@@ -1,4 +1,4 @@
-# _*_coding:utf-8_*_
+# -*- coding: utf-8 -*-
 import json
 from flask import request
 from flask import redirect
