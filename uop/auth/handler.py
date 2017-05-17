@@ -5,7 +5,7 @@ from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.user import user_blueprint
-from uop.models import User, UserInfo
+from uop.models import UserInfo
 from uop.user.errors import user_errors
 
 
