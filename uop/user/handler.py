@@ -14,6 +14,7 @@ user_api = Api(user_blueprint, errors=user_errors)
 
 class UserRegister(Resource):
     def post(self):
+        import ipdb;ipdb.set_trace()
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str)
         parser.add_argument('first_name', type=str)
@@ -38,4 +39,4 @@ class UserRegister(Resource):
     def get(self):
         return "test info", 200
 
-
+user_api.add_resource(UserRegister, '/users')
