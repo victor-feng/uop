@@ -9,6 +9,7 @@ app.debug = True
 
 app.config['LDAP_HOST'] = '172.28.4.103'
 app.config['LDAP_PORT'] = 389
+app.config['LDAP_USE_SSL'] = True
 app.config['LDAP_BASE_DN'] = "OU=syswin,dc=syswin,dc=com"
 app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=syswin,DC=syswin,DC=com'
 app.config['LDAP_PASSWORD'] = 'syswin#'

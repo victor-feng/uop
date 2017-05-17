@@ -6,6 +6,9 @@ LDAP_PORT = 389
 USER = 'cn=crm_test1,dc=syswin,dc=com'
 PASSWORD = 'syswin#'
 BASE_DN = 'dc=syswin,dc=com'
+ldap.set_option(ldap.OPT_REFERRALS, 0)
+l = ldap.initialize('ldap://172.28.4.103:389')
+l.set_option(ldap.OPT_REFERRALS, 0)
 
 
 class LDAPTool:
@@ -22,6 +25,7 @@ class LDAPTool:
         try:
             self.ldapconn = ldap.open(ldap_host)
             self.ldapconn.simple_bind(user, password)
+            self.ldapconn.set_option(ldap.OPT_REFERRALS, 0)
         except ldap.LDAPError, e:
             print e
 
@@ -56,4 +60,5 @@ if __name__ == '__main__':
     user = '147749'
     password = 'syswin1~'
     l = LDAPTool(user=user, password=password)
+    # l.set_option(ldap.OPT_REFERRALS, 0)
     l.ldap_search_dn(uid=user)
