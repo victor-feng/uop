@@ -13,6 +13,6 @@ def create_app(config_name):
     db.init_app(app)
 
     # blueprint
-    app.register_blueprint(user_blueprint, url_prefix='/user')
+    app.register_blueprint(user_blueprint, url_prefix='/api/user')
 
     return app
