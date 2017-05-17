@@ -30,8 +30,8 @@ class UserRegister(Resource):
             "code": 200,
             "result": {
                 "res": "success",
-                 "msg": "test info"
-           }
+                "msg": "test info"
+                }
         }
         return res, 200
 
@@ -66,7 +66,7 @@ class UserList(Resource):
                     "msg": ""
                     }
                 }
-        return json.dumps(res)
+        return res, code
 
 
 class AdminUserList(Resource):
