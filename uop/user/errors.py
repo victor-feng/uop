@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 user_errors = {
     'UserAlreadyExistsError': {
         'message': "A user with that username already exists.",
