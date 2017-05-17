@@ -9,4 +9,9 @@ user_errors = {
         'status': 410,
         'extra': "Any extra information you want.",
     },
+    'LoginSuccess': {
+        'message': "The user login successfully.",
+        'status': 200,
+        'extra': "",
+        }
 }
