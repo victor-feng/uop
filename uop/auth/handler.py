@@ -4,12 +4,12 @@ from flask import request
 from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
-from uop.user import user_blueprint
-from uop.models import UserInfo
-from uop.user.errors import user_errors
+from uop.auth import auth_blueprint
+from uop.models import UserInfo, User
+from uop.auth.errors import user_errors
 
 
-user_api = Api(user_blueprint, errors=user_errors)
+auth_api = Api(auth_blueprint, errors=user_errors)
 
 
 class UserRegister(Resource):
@@ -41,9 +41,13 @@ class UserRegister(Resource):
 
 class UserList(Resource):
     def post(self):
-        data = json.loads(request.data)
-        username = data.get('username')
-        password = data.get('password')
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('password', type=str)
+        args = parser.parse_args()
+
+        username = args.username
+        password = args.password
         user = UserInfo.objects.get(username=username)
         if user:
             if user.password == password:
@@ -75,11 +79,21 @@ class AdminUserList(Resource):
             if user.password == password:
                 if user.is_admin:
                     res = '管理员登录成功'
+                    code = 200
                 else:
                     res = '您没有管理员权限'
+                    code = 405
         else:
             res = '用户不存在'
-            pass
+            code = 404
+        res = {
+                'code': code,
+                'result': {
+                    'res': res,
+                    'msg': ''
+                    }
+                }
+        return json.dumps(res)
 
 
 class AdminUserDetail(Resource):
@@ -96,7 +110,7 @@ class AdminUserDetail(Resource):
         pass
 
 
-user_api.add_resource(UserRegister, '/users')
-user_api.add_resource(UserList, '/userlist')
-user_api.add_resource(AdminUserList, '/adminlist')
-user_api.add_resource(AdminUserDetail, '/admindetail/<name>')
+auth_api.add_resource(UserRegister, '/users')
+auth_api.add_resource(UserList, '/userlist')
+auth_api.add_resource(AdminUserList, '/adminlist')
+auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
