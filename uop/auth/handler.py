@@ -7,6 +7,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
+from wtforms import ValidationError
 
 
 auth_api = Api(auth_blueprint, errors=user_errors)
@@ -15,25 +16,28 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 class UserRegister(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('email', type=str)
-        parser.add_argument('first_name', type=str)
-        parser.add_argument('last_name', type=str)
+        parser.add_argument('password', type=str)
         args = parser.parse_args()
 
-        email = args.email
-        first_name = args.first_name
-        last_name = args.first_name
+        username = args.username
+        password = args.password
 
-        User(email=email, first_name=first_name, last_name=last_name).save()
+        try:
+            UserInfo(username=username, password=password).save()
+            code = 200
+            res = '注册成功'
+        except ValidationError:
+            code = 501
+            res = '用户名或者密码不能为空'
 
         res = {
-            "code": 200,
+            "code": code,
             "result": {
-                "res": "success",
+                "res": res,
                 "msg": "test info"
                 }
         }
-        return res, 200
+        return res, code
 
     def get(self):
         return "test info", 200
@@ -107,10 +111,31 @@ class AdminUserDetail(Resource):
     def delete(self, name):
         user = UserInfo.objects.get(username=name)
         user.delete()
-        pass
+        code = 200
+        res = '删除用户成功'
+        res = {
+                'code': code,
+                'result': {
+                    'res': res,
+                    'msg': ''
+                    }
+                }
+        return res, 200
 
 
-auth_api.add_resource(UserRegister, '/users')
-auth_api.add_resource(UserList, '/userlist')
+class AllUserList(Resource):
+    def get(self):
+        all_user = []
+        users = UserInfo.objects.all()
+        for i in users:
+            all_user.append(i.username)
+        return all_user
+
+
+# admin user
 auth_api.add_resource(AdminUserList, '/adminlist')
 auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
+# common user
+auth_api.add_resource(UserRegister, '/users')
+auth_api.add_resource(UserList, '/userlist')
+auth_api.add_resource(AllUserList, '/all_user')
