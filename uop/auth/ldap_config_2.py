@@ -1,6 +1,5 @@
 #-*- coding: UTF-8 -*-
 import sys,ldap
-import ldap
 LDAP_HOST = '172.28.4.103'
 LDAP_PORT = 389
 USER = 'cn=crm_test1,dc=syswin,dc=com'
