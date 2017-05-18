@@ -1,8 +1,14 @@
+#Flask
 Flask==0.12.1
-pymongo==3.3.0
-mongoengine==0.10.6
-flask-mongoengine==0.9.3
 flask-restful-swagger==0.19
 Flask-RESTful==0.3.5
 requests==2.10.0
+
+#Database
+pymongo==3.3.0
+mongoengine==0.10.6
+flask-mongoengine==0.9.3
 ldap3
+
+#Runtime
+gunicorn==19.7.1
