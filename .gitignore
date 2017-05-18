@@ -2,5 +2,8 @@
 __pycache__/
 *.py[cod]
 *.swp
+<<<<<<< HEAD
 .idea/
 
+=======
+>>>>>>> 79f706d2f314c3bba42d13aa2e181e25c09882b5

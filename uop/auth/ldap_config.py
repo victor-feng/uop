@@ -7,11 +7,20 @@ app = Flask(__name__)
 app.secret_key = 'dev key'
 app.debug = True
 
+<<<<<<< HEAD
 app.config['LDAP_HOST'] = '172.28.4.103'
 app.config['LDAP_PORT'] = 389
 app.config['LDAP_USE_SSL'] = True
 app.config['LDAP_BASE_DN'] = "OU=syswin,dc=syswin,dc=com"
 app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=syswin,DC=syswin,DC=com'
+=======
+app.config['LDAP_HOST'] = '172.28.2.100'
+app.config['LDAP_PORT'] = 389
+app.config['LDAP_USE_SSL'] = False
+app.config['LDAP_BASE_DN'] = "dc=syswin,dc=com"
+# app.config['LDAP_USERNAME'思源集团N=crm_test1,OU=syswin,DC=syswin,DC=com'
+app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
+>>>>>>> 79f706d2f314c3bba42d13aa2e181e25c09882b5
 app.config['LDAP_PASSWORD'] = 'syswin#'
 app.config['LDAP_CUSTOM_OPTIONS'] = {l.OPT_REFERRALS: 0}
 
@@ -36,6 +45,10 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+<<<<<<< HEAD
+=======
+    import ipdb;ipdb.set_trace()
+>>>>>>> 79f706d2f314c3bba42d13aa2e181e25c09882b5
     if g.user:
         return redirect(url_for('index'))
     if request.method == 'POST':
