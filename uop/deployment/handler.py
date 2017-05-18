@@ -60,7 +60,7 @@ class DeploymentListAPI(Resource):
             "code": 200,
             "result": {
                 "res": "success",
-                "msg": "test info"
+                "msg": "create deployment success"
             }
         }
         return res, 200
