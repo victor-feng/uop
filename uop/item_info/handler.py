@@ -14,19 +14,21 @@ class ItemInfo(Resource):
     @classmethod
     def get(cls,item_id):
         ret = {}
+        code = 200
         try:
             parser = reqparse.RequestParser()
             args = parser.parse_args()
             res = requests.get(url + "repo_detail/" + item_id + "/")
             ret = eval(res.content)
         except Exception as e:
-            code = 2011
+            code = 500
 
-        return ret, 200
+        return ret, code
 
     @classmethod
     def put(cls,item_id):
         ret = {}
+        code = 200
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('property_list', type=list, required=True, location='json')
@@ -39,26 +41,28 @@ class ItemInfo(Resource):
             res = requests.put(url + "repo/" + item_id + "/",data = data_str)
             ret = eval(res.content)
         except Exception as e:
-            code = 2011
+            code = 500
 
-        return ret, 200
+        return ret, code
 
     @classmethod
     def delete(cls, item_id):
         ret = {}
+        code = 200
         try:
             res = requests.delete(url + "repo_delete/" + item_id + "/")
             ret = eval(res.content)
         except Exception as e:
-            code = 2011
+            code = 500
 
-        return ret, 200
+        return ret, code
 
 class ItemPostInfo(Resource):
     @classmethod
     def post(cls):
         # req = request
         ret = {}
+        code = 200
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('property_list', type=list, required=True, location='json')
@@ -79,9 +83,9 @@ class ItemPostInfo(Resource):
             res = requests.post(url + "repo/", data=data_str)
             ret = eval(res.content)
         except Exception as e:
-            code = 2011
+            code = 500
 
-        return ret, 200
+        return ret, code
 
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
