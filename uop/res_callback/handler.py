@@ -8,7 +8,7 @@ from uop.res_callback import res_callback_blueprint
 from uop.models import User
 from uop.res_callback.errors import res_callback_errors
 
-user_api = Api(res_callback_blueprint, errors=res_callback_errors)
+res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
 
 
 class UserRegister(Resource):
@@ -43,4 +43,4 @@ class UserRegister(Resource):
         return "test info", 409
 
 
-user_api.add_resource(UserRegister, '/users')
+res_callback_api.add_resource(UserRegister, '/users')
