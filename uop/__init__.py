@@ -8,6 +8,7 @@ from uop.auth import auth_blueprint
 from uop.res_callback import res_callback_blueprint
 from uop.item_info import iteminfo_blueprint
 from uop.deployment import deployment_blueprint
+from uop.resources import resources_blueprint
 
 
 def create_app(config_name):
@@ -26,4 +27,6 @@ def create_app(config_name):
     app.register_blueprint(res_callback_blueprint, url_prefix='/api/res_callback')
     app.register_blueprint(iteminfo_blueprint,url_prefix='/api/iteminfo')
     app.register_blueprint(deployment_blueprint, url_prefix='/api/deployment')
+    app.register_blueprint(resources_blueprint, url_prefix='/api/resource')
+
     return app
