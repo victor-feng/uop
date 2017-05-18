@@ -21,6 +21,13 @@ class DevelopmentConfig(BaseConfig):
 
 class TestingConfig(BaseConfig):
     TESTING = True
+    MONGODB_SETTINGS = {
+            'db': 'uop',
+            'host': '172.28.20.124',
+            'port': 27017,
+            'username': 'uop',
+            'password': 'uop',
+            }
 
 
 configs = {
