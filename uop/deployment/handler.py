@@ -3,9 +3,9 @@ import uuid
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.deployment import deployment_blueprint
 from uop.models import Deployment
-from uop.user.errors import user_errors
+from uop.deployment.errors import deploy_errors
 
-deployment_api = Api(deployment_blueprint, errors=user_errors)
+deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
 
 class DeploymentListAPI(Resource):

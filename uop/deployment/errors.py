@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-user_errors = {
+deploy_errors = {
     'UserAlreadyExistsError': {
         'message': "A user with that username already exists.",
         'status': 409,
@@ -9,4 +9,8 @@ user_errors = {
         'status': 410,
         'extra': "Any extra information you want.",
     },
+    'DeploymentNotFound': {
+        'message': "Deployment Not Found",
+        'status': 404,
+    }
 }
