@@ -18,15 +18,17 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 class UserRegister(Resource):
     def post(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('id', type=str)
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
         args = parser.parse_args()
 
+        id = args.id
         username = args.username
         password = args.password
 
         try:
-            UserInfo(username=username, password=password).save()
+            UserInfo(id=id, username=username, password=password).save()
             code = 200
             res = '注册成功'
         except NotUniqueError:
@@ -118,9 +120,9 @@ class UserList(Resource):
 class AdminUserList(Resource):
     def post(self):
         data = json.loads(request.body)
-        username = data.get('username')
+        id = data.get('id')
         password = data.get('password')
-        user = UserInfo.objects.get(username=username)
+        user = UserInfo.objects.get(id=id)
         if user:
             if user.password == password:
                 if user.is_admin:

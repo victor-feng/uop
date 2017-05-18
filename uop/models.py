@@ -11,7 +11,8 @@ class User(db.Document):
 
 
 class UserInfo(db.Document):
-    username = db.StringField(required=True, max_length=50, unique=True)
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    username = db.StringField(required=True, max_length=50)
     password = db.StringField(required=True, max_length=50)
     is_admin = db.BooleanField(required=False, default=False)
 
