@@ -5,6 +5,9 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 iteminfo_api = Api(iteminfo_blueprint, errors=user_errors)
 
