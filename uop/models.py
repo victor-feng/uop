@@ -108,3 +108,26 @@ class ResourceModel(db.DynamicDocument):
             ],
         'index_background': True
         }
+
+
+class Approval(db.DynamicDocument):
+    approval_id = db.StringField(required=True, max_length=50, unique=True)
+    resource_id = db.StringField(required=True, unique=True)
+    department_id = db.StringField(required=True)
+    creator_id = db.StringField(required=True)
+    create_date = db.DateTimeField(default=datetime.datetime.now)
+    approve_uid = db.StringField(required=False)
+    approve_date = db.DateTimeField(required=False)
+    # processing/success/failed
+    approval_status = db.StringField(required=True)
+    annotation = db.StringField(max_length=50, required=False)
+    meta = {
+        'collection': 'approval',
+        'index': [
+            {
+                'fields': ['resource_id', 'approval_status'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+    }
