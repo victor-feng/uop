@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from flask_mongoengine import MongoEngine
-
+import datetime
 db = MongoEngine()
 
 
@@ -51,6 +51,22 @@ class ComputeIns(db.EmbeddedDocument):
     url = db.StringField(required=False)
     meta = {
         'collection': 'compute_ins',
+
+
+class ResComputeIns(db.EmbeddedDocument):
+    username = db.StringField(required=True)
+    password = db.StringField(required=True)
+    ip = db.StringField(required=True)
+    port = db.IntField()
+
+    ins_name = db.StringField(required=True)
+    ins_id = db.StringField(required=True, unique=True)
+    cpu = db.IntField(required=False)
+    mem = db.IntField(required=False)
+    url = db.StringField(required=False)
+    meta = {
+        'collection': 'res_compute_ins',
+>>>>>>> Stashed changes
         'index': [
             {
                 'fields': ['ins_name', 'ins_id'],
@@ -61,7 +77,16 @@ class ComputeIns(db.EmbeddedDocument):
         }
 
 
+<<<<<<< Updated upstream
 class DBIns(db.EmbeddedDocument):
+=======
+class ResDBIns(db.EmbeddedDocument):
+    username = db.StringField(required=True)
+    password = db.StringField(required=True)
+    ip = db.StringField(required=True)
+    port = db.StringField()
+
+>>>>>>> Stashed changes
     ins_name = db.StringField(required=True)
     ins_id = db.StringField(required=True, unique=True)
     ins_type = db.StringField(required=False)
@@ -71,7 +96,11 @@ class DBIns(db.EmbeddedDocument):
     quantity = db.IntField(required=False, default_value=0)
     version = db.StringField(required=False)
     meta = {
+<<<<<<< Updated upstream
         'collection': 'db_ins',
+=======
+        'collection': 'res_db_ins',
+>>>>>>> Stashed changes
         'index': [
             {
                 'fields': ['ins_name', 'ins_id'],
@@ -82,7 +111,11 @@ class DBIns(db.EmbeddedDocument):
         }
 
 
+<<<<<<< Updated upstream
 class ResourceModel(db.DynamicDocument):
+=======
+class ResResourceModel(db.DynamicDocument):
+>>>>>>> Stashed changes
     resource_name = db.StringField(required=True, unique=True)
     project = db.StringField(required=True)
     department = db.StringField(required=True)
@@ -90,6 +123,7 @@ class ResourceModel(db.DynamicDocument):
     res_id = db.StringField(required=True, unique=True)
     user_name = db.StringField(required=False)
     user_id = db.StringField(required=False)
+<<<<<<< Updated upstream
     created_date = db.DateTimeField(default=datetime.datetime.now())
     domain = db.StringField(required=False)
     env = db.StringField(required=False)
@@ -100,6 +134,17 @@ class ResourceModel(db.DynamicDocument):
 
     meta = {
         'collection': 'resources',
+=======
+    domain = db.StringField(required=False)
+    env = db.StringField(required=False)
+    application_status = db.StringField(required=False)
+    resource_list = db.ListField(db.EmbeddedDocumentField('ResDBIns'))
+    compute_list = db.ListField(db.EmbeddedDocumentField('ResComputeIns'))
+    created_date = db.DateTimeField(default=datetime.datetime.now())
+
+    meta = {
+        'collection': 'res_resources',
+>>>>>>> Stashed changes
         'index': [
             {
                 'fields': ['resource_name', 'res_id'],
@@ -108,6 +153,7 @@ class ResourceModel(db.DynamicDocument):
             ],
         'index_background': True
         }
+<<<<<<< Updated upstream
 
 
 class Approval(db.DynamicDocument):
@@ -131,3 +177,5 @@ class Approval(db.DynamicDocument):
             ],
         'index_background': True
     }
+=======
+>>>>>>> Stashed changes

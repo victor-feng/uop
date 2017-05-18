@@ -2,6 +2,9 @@
 import ldap as l
 from flask import Flask, g, request, session, redirect, url_for
 from flask_simpleldap import LDAP
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 """
     main: # 'main' is the GitLab 'provider ID' of this LDAP server
