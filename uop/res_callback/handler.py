@@ -10,7 +10,7 @@ from uop.res_callback.errors import res_callback_errors
 import requests
 
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
-cmdb_url = 'http://cmdb-test.syswin.com'
+cmdb_url = 'http://cmdb-test.syswin.com/cmdb/api/'
 
 
 class UserRegister(Resource):
@@ -47,9 +47,18 @@ class UserRegister(Resource):
 
 class ResCallback(Resource):
     def post(self):
+        data = {}
         parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str)
-        parser.add_argument('password', type=str)
+        parser.add_argument('project_name', type=dict, required=True, location='json')
+        parser.add_argument('project_id', type=str)
+        args = parser.parse_args()
+        project_name = args.project_name
+        project_id = args.project_id
+        data['project_id'] = project_id
+        data['project_name'] = project_name
+        res = requests.post(cmdb_url + 'items', data=json.dumps(data))
+
+        return res
 
 
 res_callback_api.add_resource(UserRegister, '/users')

@@ -29,7 +29,7 @@ app.debug = True
 app.config['LDAP_HOST'] = '172.28.4.103'
 app.config['LDAP_PORT'] = 389
 app.config['LDAP_USE_SSL'] = True
-app.config['LDAP_BASE_DN'] = "OU=syswin,dc=syswin,dc=com"
+app.config['LDAP_BASE_DN'] = "OU=思源集团,dc=syswin,dc=com"
 app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
 # app.config['LDAP_USERNAME'思源集团N=crm_test1,OU=syswin,DC=syswin,DC=com'
 app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
@@ -57,7 +57,6 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    import ipdb;ipdb.set_trace()
     if g.user:
         return redirect(url_for('index'))
     if request.method == 'POST':
