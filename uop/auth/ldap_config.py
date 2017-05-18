@@ -3,6 +3,22 @@ import ldap as l
 from flask import Flask, g, request, session, redirect, url_for
 from flask_simpleldap import LDAP
 
+"""
+    main: # 'main' is the GitLab 'provider ID' of this LDAP server
+    label: 'LDAP'
+    host: '172.28.2.100'
+    port: 389
+    uid: 'sAMAccountName'
+    method: 'plain' # "tls" or "ssl" or "plain"
+    bind_dn: 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
+    password: 'syswin#'
+    active_directory: true
+    allow_username_or_email_login: false
+    block_auto_created_users: false
+    base: 'DC=syswin,DC=com'
+    user_filter: ''
+"""
+
 app = Flask(__name__)
 app.secret_key = 'dev key'
 app.debug = True
@@ -11,7 +27,7 @@ app.config['LDAP_HOST'] = '172.28.4.103'
 app.config['LDAP_PORT'] = 389
 app.config['LDAP_USE_SSL'] = True
 app.config['LDAP_BASE_DN'] = "OU=syswin,dc=syswin,dc=com"
-app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=syswin,DC=syswin,DC=com'
+app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
 # app.config['LDAP_USERNAME'思源集团N=crm_test1,OU=syswin,DC=syswin,DC=com'
 app.config['LDAP_USERNAME'] = 'CN=crm_test1,OU=TEST,OU=Service Account,DC=syswin,DC=com'
 app.config['LDAP_PASSWORD'] = 'syswin#'
