@@ -4,6 +4,7 @@ from flask import request
 from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from mongoengine import NotUniqueError
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
@@ -17,6 +18,7 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 class UserRegister(Resource):
     def post(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
         args = parser.parse_args()
 
@@ -27,9 +29,9 @@ class UserRegister(Resource):
             UserInfo(username=username, password=password).save()
             code = 200
             res = '注册成功'
-        except ValidationError:
+        except NotUniqueError:
             code = 501
-            res = '用户名或者密码不能为空'
+            res = '用户名已经存在'
 
         res = {
             "code": code,
