@@ -1,10 +1,11 @@
-#-*- coding: UTF-8 -*-
-import sys,ldap
+# -*- coding:utf-8 -*-
+import sys
+import ldap
 LDAP_HOST = '172.28.4.103'
 LDAP_PORT = 389
 USER = 'cn=crm_test1,dc=syswin,dc=com'
 PASSWORD = 'syswin#'
-BASE_DN = 'dc=syswin,dc=com'
+BASE_DN = 'ou="思源集团",dc=syswin,dc=com'
 ldap.set_option(ldap.OPT_REFERRALS, 0)
 l = ldap.initialize('ldap://172.28.4.103:389')
 l.set_option(ldap.OPT_REFERRALS, 0)
