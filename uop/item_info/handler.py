@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import requests
+import datetime
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
@@ -45,7 +46,7 @@ class ItemInfo(Resource):
             data_str = json.dumps(data)
 
             res = requests.put(url + "repo/" + item_id + "/",data = data_str)
-            ret = eval(res.content)
+            ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
 
@@ -57,7 +58,7 @@ class ItemInfo(Resource):
         code = 200
         try:
             res = requests.delete(url + "repo_delete/" + item_id + "/")
-            ret = eval(res.content)
+            ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
 
@@ -83,11 +84,13 @@ class ItemPostInfo(Resource):
             data["layer_id"] = "business"
             data["group_id"] = "BusinessLine"
             data["item_id"] = "project_item"
+
+            args.property_list.append({"type" : "datetime","name" : "创建日期","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
             data["property_list"] = args.property_list
             data_str = json.dumps(data)
 
             res = requests.post(url + "repo/", data=data_str)
-            ret = eval(res.content)
+            ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
 
