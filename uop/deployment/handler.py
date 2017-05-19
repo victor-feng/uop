@@ -69,6 +69,9 @@ class DeploymentListAPI(Resource):
 class DeploymentDetailAPI(Resource):
 
     def get(self, initiator):
+        """
+        按发起人查询
+        """
         data = []
         try:
             deploy_res = Deployment.objects.filter(initiator=initiator)
@@ -86,20 +89,38 @@ class DeploymentDetailAPI(Resource):
                         'created_time': str(i.created_time)
                     }
                     )
-            # code = 200
-            # msg = '请求成功'
             res = data
         except Deployment.DoesNotExist:
-            # code = 404
-            # msg = '无部署历史'
             res = None
-        # res = {
-        #         "code": code,
-        #         "result": {
-        #             "res": res,
-        #             "msg": msg,
-        #             }
-        #         }
+        return res
+
+
+class DeploymentTimeApi(Resource):
+
+    def get(self, start_time, end_time):
+        """
+        按时间查询
+        """
+        data = []
+        try:
+            deploy_res = Deployment.objects.filter(created_time__gte=start_time, created_time__lt=end_time)
+            for i in deploy_res:
+                data.append(
+                    {
+                        'deploy_id': i.deploy_id,
+                        'deploy_name': i.deploy_name,
+                        'initiator': i.initiator,
+                        'project_name': i.project_name,
+                        'environment': i.environment,
+                        'exec_tag': i.exec_tag,
+                        'exec_context': i.exec_context,
+                        'app_image': i.app_image,
+                        'created_time': str(i.created_time)
+                    }
+                    )
+            res = data
+        except Deployment.DoesNotExist:
+            res = None
         return res
 
 
@@ -117,3 +138,4 @@ class DeploymentAPI(Resource):
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
 deployment_api.add_resource(DeploymentDetailAPI, '/deploy_detail/<initiator>')
+deployment_api.add_resource(DeploymentTimeApi, '/deploy_time/<start_time>/<end_time>')
