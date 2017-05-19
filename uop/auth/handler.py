@@ -102,11 +102,13 @@ class UserList(Resource):
                 if user.password == password:
                     res = '登录成功'
                     code = 200
-                    msg = user.username
                 else:
                     res = '密码错误'
                     code = 304
-                    msg = ''
+                msg = {
+                        'username': user.username,
+                        'user_id': id
+                        }
         except UserInfo.DoesNotExist:
             code = 305
             res = '用户不存在'
