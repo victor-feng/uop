@@ -71,20 +71,21 @@ class DeploymentDetailAPI(Resource):
     def get(self, initiator):
         data = []
         try:
-            deploy_res = Deployment.objects.get(initiator=initiator)
-            data.append(
-                {
-                    'deploy_id': deploy_res.deploy_id,
-                    'deploy_name': deploy_res.deploy_name,
-                    'initiator': deploy_res.initiator,
-                    'project_name': deploy_res.project_name,
-                    'environment': deploy_res.environment,
-                    'exec_tag': deploy_res.exec_tag,
-                    'exec_context': deploy_res.exec_context,
-                    'app_image': deploy_res.app_image,
-                    'created_time': str(deploy_res.created_time)
-                }
-                )
+            deploy_res = Deployment.objects.filter(initiator=initiator)
+            for i in deploy_res:
+                data.append(
+                    {
+                        'deploy_id': i.deploy_id,
+                        'deploy_name': i.deploy_name,
+                        'initiator': i.initiator,
+                        'project_name': i.project_name,
+                        'environment': i.environment,
+                        'exec_tag': i.exec_tag,
+                        'exec_context': i.exec_context,
+                        'app_image': i.app_image,
+                        'created_time': str(i.created_time)
+                    }
+                    )
             code = 200
             msg = '请求成功'
             res = data
