@@ -27,8 +27,8 @@ class UserInfo(db.Document):
 
 
 class Deployment(db.Document):
-    deploy_id = db.StringField(max_length=100)
-    deploy_name = db.StringField(max_length=50)
+    deploy_id = db.StringField(max_length=100, unique=True)
+    deploy_name = db.StringField(max_length=50, unique=True)
     initiator = db.StringField(max_length=50)
     project_name = db.StringField(max_length=50)
     created_time = db.DateTimeField(default=datetime.datetime.now())
@@ -36,6 +36,16 @@ class Deployment(db.Document):
     exec_tag = db.StringField(max_length=50)
     exec_context = db.StringField(max_length=5000)
     app_image = db.StringField(max_length=100)
+    meta = {
+        'collection': 'deployment',
+        'index': [
+            {
+                'fields': ['initiator', 'project_name', 'deploy_name', 'created_time'],
+                'sparse': True,
+            }
+        ],
+        'index_background': True
+    }
 
 
 class ComputeIns(db.EmbeddedDocument):

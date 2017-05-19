@@ -58,7 +58,8 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('deploy_name', type=str, location='json')
+        parser.add_argument('deploy_name', type=str, required=True,
+                            help='No deploy name provided', location='json')
         parser.add_argument('initiator', type=str, location='json')
         parser.add_argument('project_name', type=str, location='json')
         parser.add_argument('environment', type=str, location='json')
@@ -85,6 +86,9 @@ class DeploymentListAPI(Resource):
                 exec_tag=exec_tag,
                 exec_context=exec_context,
                 app_image=app_image).save()
+
+            # TODO：deploy to CRP
+
         except Exception as e:
             res = {
                 "code": 400,
