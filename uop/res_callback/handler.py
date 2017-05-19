@@ -49,8 +49,8 @@ class ResCallback(Resource):
     def post(self):
         data = {}
         parser = reqparse.RequestParser()
-        parser.add_argument('project_name', type=dict, required=True, location='json')
-        parser.add_argument('project_id', type=str)
+        parser.add_argument('project_name', type=list, required=True, location='json')
+        parser.add_argument('project_id', type=int)
         args = parser.parse_args()
         project_name = args.project_name
         project_id = args.project_id
