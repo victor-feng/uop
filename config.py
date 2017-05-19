@@ -23,10 +23,10 @@ class TestingConfig(BaseConfig):
     TESTING = True
     MONGODB_SETTINGS = {
             'db': 'uop',
-            'host': '172.28.11.111',
+            'host': '172.28.20.124',
             'port': 27017,
-            'username': 'yuan',
-            'password': 'yuan',
+            'username': 'uop',
+            'password': 'uop',
             }
 
 
