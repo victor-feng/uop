@@ -66,6 +66,28 @@ class DeploymentListAPI(Resource):
         return res, 200
 
 
+class DeploymentDetailAPI(Resource):
+
+    def get(self, initiator):
+        try:
+            deploy_res = Deployment.objects.get(initiator=initiator)
+            code = 200
+            msg = '请求成功'
+            res = deploy_res
+        except Deployment.DoesNotExist:
+            code = 404
+            msg = '无部署历史'
+            res = None
+        res = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg,
+                    }
+                }
+        return res
+
+
 class DeploymentAPI(Resource):
 
     def delete(self, deploy_id):
@@ -79,3 +101,4 @@ class DeploymentAPI(Resource):
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
+deployment_api.add_resource(DeploymentDetailAPI, '/deploy_detail/<initiator>')
