@@ -86,20 +86,20 @@ class DeploymentDetailAPI(Resource):
                         'created_time': str(i.created_time)
                     }
                     )
-            code = 200
-            msg = '请求成功'
+            # code = 200
+            # msg = '请求成功'
             res = data
         except Deployment.DoesNotExist:
-            code = 404
-            msg = '无部署历史'
+            # code = 404
+            # msg = '无部署历史'
             res = None
-        res = {
-                "code": code,
-                "result": {
-                    "res": res,
-                    "msg": msg,
-                    }
-                }
+        # res = {
+        #         "code": code,
+        #         "result": {
+        #             "res": res,
+        #             "msg": msg,
+        #             }
+        #         }
         return res
 
 
