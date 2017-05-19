@@ -69,11 +69,25 @@ class DeploymentListAPI(Resource):
 class DeploymentDetailAPI(Resource):
 
     def get(self, initiator):
+        data = []
         try:
             deploy_res = Deployment.objects.get(initiator=initiator)
+            data.append(
+                {
+                    'deploy_id': deploy_res.deploy_id,
+                    'deploy_name': deploy_res.deploy_name,
+                    'initiator': deploy_res.initiator,
+                    'project_name': deploy_res.project_name,
+                    'environment': deploy_res.environment,
+                    'exec_tag': deploy_res.exec_tag,
+                    'exec_context': deploy_res.exec_context,
+                    'app_image': deploy_res.app_image,
+                    'created_time': str(deploy_res.created_time)
+                }
+                )
             code = 200
             msg = '请求成功'
-            res = deploy_res
+            res = data
         except Deployment.DoesNotExist:
             code = 404
             msg = '无部署历史'
