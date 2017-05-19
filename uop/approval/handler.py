@@ -53,6 +53,7 @@ class ApprovalList(Resource):
 class ApprovalInfo(Resource):
     def put(self, res_id):
         code = 200
+        tmp_res = ""
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('approve_uid', type=str)
