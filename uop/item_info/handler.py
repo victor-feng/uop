@@ -25,7 +25,7 @@ class ItemInfo(Resource):
             parser = reqparse.RequestParser()
             args = parser.parse_args()
             res = requests.get(url + "repo_detail/" + item_id + "/")
-            ret = eval(res.content)
+            ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
 
