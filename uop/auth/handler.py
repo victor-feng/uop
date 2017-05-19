@@ -90,13 +90,13 @@ class UserLogin(Resource):
 class UserList(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str)
+        parser.add_argument('id', type=str)
         parser.add_argument('password', type=str)
         args = parser.parse_args()
 
-        username = args.username
+        id = args.id
         password = args.password
-        user = UserInfo.objects.get(username=username)
+        user = UserInfo.objects.get(id=id)
         if user:
             if user.password == password:
                 res = '登录成功'

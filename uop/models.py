@@ -13,14 +13,14 @@ class User(db.Document):
 
 class UserInfo(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
-    username = db.StringField(required=True, max_length=50)
+    username = db.StringField(required=False, max_length=50)
     password = db.StringField(required=True, max_length=50)
     is_admin = db.BooleanField(required=False, default=False)
 
     meta = {
             "collection": "uop_userinfo",
             "index": [{
-                'fields': ['username'],
+                'fields': ['username', id],
                 'unique': True,
                 }]
             }
