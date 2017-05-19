@@ -115,7 +115,7 @@ class UserList(Resource):
                     "msg": ""
                     }
                 }
-        return res, code
+        return res
 
 
 class AdminUserList(Resource):
