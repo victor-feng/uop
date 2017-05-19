@@ -23,10 +23,10 @@ class ApprovalList(Resource):
             resource_id = args.resource_id
             department_id = args.department_id
             creator_id = args.creator_id
-            create_date = str(datetime.datetime.now)
+            create_date = str(datetime.datetime.now())
             # approve_uid
             # approve_date
-            # annotation
+            # annotations
             approval_status = 'porcessing'
 
             models.Approval(approval_id=approval_id, resource_id=resource_id,
@@ -53,19 +53,19 @@ class ApprovalList(Resource):
 class ApprovalInfo(Resource):
     def put(self, res_id):
         code = 200
-        tmp_res = ""
+        tmp_res = ''
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
-            parser.add_argument('annotation', type=str)
+            parser.add_argument('annotations', type=str)
             args = parser.parse_args()
 
             approval = models.Approval.objects.get(resource_id=res_id)
             if approval:
                 approval.approve_uid = args.approve_uid
-                approval.approve_date = str(datetime.datetime.now)
-                approval.annotation = args.annotation
+                approval.approve_date = str(datetime.datetime.now())
+                approval.annotations = args.annotations
                 if args.agree:
                     approval.approval_status = "success"
                 else:
@@ -75,8 +75,8 @@ class ApprovalInfo(Resource):
                 code = 410
                 tmp_res = "A resource with that ID no longer exists"
         except Exception as e:
-            code = 410
-            tmp_res = "A resource with that ID no longer exists"
+            code = 500
+            tmp_res = ""
 
         res = {
             "code": code,
@@ -102,7 +102,7 @@ class ApprovalInfo(Resource):
                 if status == "success" or status == "failed":
                     msg["approve_uid"] = approval.approve_uid
                     msg["approve_date"] = str(approval.approve_date)
-                    msg["annotation"] = approval.annotation
+                    msg["annotations"] = approval.annotations
             else:
                 code = 410
                 tmp_res = "A resource with that ID no longer exists"
