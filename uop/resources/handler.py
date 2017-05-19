@@ -105,6 +105,7 @@ class ResourceApplication(Resource):
             'result': {
                 'res': 'success',
                 'msg': 'Create resource application success.',
+                'res_id': res_id,
                 'res_name': resource_name
             }
         }
@@ -113,7 +114,58 @@ class ResourceApplication(Resource):
 
     @classmethod
     def get(cls):
-        return "test info", 409
+        parser = reqparse.RequestParser()
+        parser.add_argument('user_id', type=str, location='args')
+        parser.add_argument('resource_name', type=str, location='args')
+        parser.add_argument('project', type=str, location='args')
+        parser.add_argument('start_time', type=str, location='args')
+        parser.add_argument('end_time', type=str, location='args')
+
+        args = parser.parse_args()
+        condition = {}
+        if args.user_id:
+            condition['user_id'] = args.user_id
+        if args.resource_name:
+            condition['resource_name'] = args.resource_name
+        if args.project:
+            condition['project'] = args.project
+        if args.start_time and args.end_time:
+            condition['created_date__gte'] = args.start_time
+            condition['created_date__lt'] = args.end_time
+
+        result_list = []
+        try:
+            resources = ResourceModel.objects.filter(**condition)
+        except Exception as e:
+            print e
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret
+        if len(resources):
+            for res in resources:
+                result = dict()
+                result['name'] = res.user_name
+                result['date'] = str(res.created_date)
+                result['resource'] = res.resource_name
+                result['formStatus'] = res.application_status
+                result['project'] = res.project
+                result['id'] = res.res_id
+                result_list.append(result)
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': result_list
+            }
+        }
+        return ret, code
 
 
 class ResourceDetail(Resource):
@@ -321,6 +373,7 @@ class ResourceDetail(Resource):
                         'msg': 'Resource not found.'
                     }
                 }
+                return ret, 200
         except Exception as e:
             print e
             ret = {
@@ -341,6 +394,44 @@ class ResourceDetail(Resource):
         return ret, 200
 
 
+class ResourceRecord(Resource):
+    @classmethod
+    def get(cls, user_id):
+        result_list = []
+        try:
+            resources = ResourceModel.objects.filter(user_id=user_id)
+        except Exception as e:
+            print e
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret
+        if len(resources):
+            for res in resources:
+                result = dict()
+                result['name'] = res.user_name
+                result['date'] = res.created_date
+                result['resource'] = res.resource_name
+                result['formStatus'] = res.application_status
+                result['project'] = res.project
+                result['id'] = res.res_id
+                result_list.append(result)
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': result_list
+            }
+        }
+        return ret, code
+
+
 
 
 
@@ -354,4 +445,5 @@ class ResourceDetail(Resource):
 
 
 resources_api.add_resource(ResourceApplication, '/')
-resources_api.add_resource(ResourceDetail, '/<string:res_id>')
+resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
+resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
