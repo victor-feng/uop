@@ -39,7 +39,7 @@ class LdapConn(object):
 
     def verify_user(self, id, password):
         result = []
-        con = self.conn_ldap
+        con = self.conn_ldap()
         filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
         for i in con.search_s(base_dn, scope, filter, None):
