@@ -158,7 +158,7 @@ class ItemInformation(db.DynamicDocument):
         'collection': 'item_information',
         'index': [
             {
-                'fields': ['user_id'],
+                'fields': ['item_id'],
                 'sparse': True,
                 }
             ],
