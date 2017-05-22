@@ -33,7 +33,7 @@ class LdapConn(object):
         self.flag = flag,
 
     def conn_ldap(self):
-        conn = ldap.initialize(self.server)
+        conn = ldap.initialize(self.server[0])
         conn.simple_bind_s(self.name, self.passwd)
         return conn
 
