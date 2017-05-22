@@ -25,7 +25,7 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 
 class LdapConn(object):
     def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None):
-        self.server = ldap_server,
+        self.server = server,
         self.name = admin_name,
         self.passwd = admin_pass,
         self.base_dn = base_dn,
