@@ -24,7 +24,7 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 
 
 class LdapConn(object):
-    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag, cn=None, result=[]):
+    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None, result=[]):
         self.server = server,
         self.name = admin_name,
         self.passwd = admin_pass,
@@ -125,8 +125,8 @@ class UserList(Resource):
         id = args.id
         password = args.password
 
-        conn = LdapConn()
-        verify_code, verify_res = LdapConn.verify_user(id, password)
+        conn = LdapConn(ldap_server, username, password, base_dn, scope)
+        verify_code, verify_res = conn.verify_user(id, password)
         if verify_code:
             res = '登录成功'
             code = 200
