@@ -25,7 +25,7 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 
 class LdapConn(object):
     def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None):
-        self.server = server,
+        self.server = ldap_server,
         self.name = admin_name,
         self.passwd = admin_pass,
         self.base_dn = base_dn,
@@ -39,7 +39,7 @@ class LdapConn(object):
 
     def verify_user(self, id, password):
         result = []
-        con = self.conn_ldap()
+        con = self.conn_ldap
         filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
         for i in con.search_s(base_dn, scope, filter, None):
