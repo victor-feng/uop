@@ -30,7 +30,8 @@ class LdapConn(object):
         self.passwd = admin_pass,
         self.base_dn = base_dn,
         self.scope = scope,
-        self.flag = flag
+        self.flag = flag,
+        self.result = result,
 
     def conn_ldap(self):
         conn = ldap.initialize(self.server)
@@ -59,6 +60,12 @@ class LdapConn(object):
                 self.result.append(d)
                 self.cn = d.get('distinguishedName', '')
                 print self.cn
+                id = d.get('sAMAccountName', '')
+                mail = d.get('mail', '')
+                name = d.get('givenName', '')
+                mobile = d.get('mobile', '')
+                department = d.get('department', '')
+                field_value = [id, mail, name, mobile, department]
         print '共找到结果 %s 条' % (len(self.result))
         for d in self.result:
             print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
@@ -72,7 +79,7 @@ class LdapConn(object):
         except ldap.INVALID_CREDENTIALS, e:
             print e
             self.flag = 0
-        return self.flag, self.result
+        return self.flag, field_value
 
 
 class UserRegister(Resource):
