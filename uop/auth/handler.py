@@ -24,14 +24,14 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 
 
 class LdapConn(object):
-    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None, result=[]):
+    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None):
         self.server = server,
         self.name = admin_name,
         self.passwd = admin_pass,
         self.base_dn = base_dn,
         self.scope = scope,
         self.flag = flag,
-        self.result = result,
+        self.result = [],
 
     def conn_ldap(self):
         conn = ldap.initialize(self.server)
