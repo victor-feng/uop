@@ -63,10 +63,17 @@ class LdapConn(object):
                 print self.cn
                 id = d.get('sAMAccountName', '')
                 mail = d.get('mail', '')
-                name = d.get('givenName', '')
+                name = d.get('cn', '')
                 mobile = d.get('mobile', '')
                 department = d.get('department', '')
-                field_value = [id, mail, name, mobile, department]
+                field_value = {
+                        'id': id,
+                        'mail': mail,
+                        'name': name,
+                        'mobile': mobile,
+                        'department': department
+                        }
+                print d
         print '共找到结果 %s 条' % (len(result))
         for d in result:
             print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
@@ -127,13 +134,23 @@ class UserList(Resource):
         password = args.password
         conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
         verify_code, verify_res = conn.verify_user(id, password)
+
+        verify_res_name = verify_res.get('name')
+        verify_res_department = verify_res.get('department')
+        user = verify_res_name.decode('utf-8')
+        department = verify_res_department.decode('utf-8')
+
         if verify_code:
             res = '登录成功'
             code = 200
+            msg = {
+                    'username': user,
+                    'department': department
+                    }
         else:
             res = '登录失败'
             code = 304
-        msg = ''
+            msg = ''
         # try:
         #     user = UserInfo.objects.get(id=id)
         #     if user:
