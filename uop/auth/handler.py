@@ -24,14 +24,13 @@ auth_api = Api(auth_blueprint, errors=user_errors)
 
 
 class LdapConn(object):
-    def __init__(self, server, admin_name, admin_pass, base_dn, scope, res, flag=None, cn=None):
+    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag=None, cn=None):
         self.server = server,
         self.name = admin_name,
         self.passwd = admin_pass,
         self.base_dn = base_dn,
         self.scope = scope,
         self.flag = flag,
-        self.result = res,
 
     def conn_ldap(self):
         conn = ldap.initialize(self.server)
@@ -39,6 +38,7 @@ class LdapConn(object):
         return conn
 
     def verify_user(self, id, password):
+        result = []
         con = self.conn_ldap()
         filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
@@ -57,7 +57,7 @@ class LdapConn(object):
                     d['sn'] = ''
                 if 'givenName' not in d:
                     d['givenName'] = ''
-                self.result.append(d)
+                result.append(d)
                 self.cn = d.get('distinguishedName', '')
                 print self.cn
                 id = d.get('sAMAccountName', '')
@@ -66,8 +66,8 @@ class LdapConn(object):
                 mobile = d.get('mobile', '')
                 department = d.get('department', '')
                 field_value = [id, mail, name, mobile, department]
-        print '共找到结果 %s 条' % (len(self.result))
-        for d in self.result:
+        print '共找到结果 %s 条' % (len(result))
+        for d in result:
             print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
         try:
             if con.simple_bind_s(self.cn, password):
@@ -125,7 +125,7 @@ class UserList(Resource):
         id = args.id
         password = args.password
 
-        conn = LdapConn(ldap_server, username, password, base_dn, scope, [])
+        conn = LdapConn(ldap_server, username, password, base_dn, scope)
         verify_code, verify_res = conn.verify_user(id, password)
         if verify_code:
             res = '登录成功'
