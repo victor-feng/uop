@@ -18,7 +18,7 @@ base_dn = 'dc=syswin,dc=com'
 scope = ldap.SCOPE_SUBTREE
 ldap_server = 'ldap://172.28.4.103:389'
 username = 'crm_test1'
-password = 'syswin#'
+passwd_admin = 'syswin#'
 
 auth_api = Api(auth_blueprint, errors=user_errors)
 
@@ -126,7 +126,7 @@ class UserList(Resource):
         password = args.password
 
         conn = LdapConn(ldap_server, username, password, base_dn, scope)
-        verify_code, verify_res = conn.verify_user(id, password)
+        verify_code, verify_res = conn.verify_user(id, passwd_admin)
         if verify_code:
             res = '登录成功'
             code = 200
