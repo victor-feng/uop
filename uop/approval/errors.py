@@ -10,3 +10,18 @@ approval_errors = {
         'extra': "Any extra information you want.",
     },
 }
+
+#reservation_errors = {
+#    'ApprovalIsProcessing': {
+#        "code": 400,
+#        "result": {
+#            "res": "failed",
+#            "msg": ""
+#        }
+#    },
+#    'ResourceDoesNotExist': {
+#        'message': "A resource with that ID no longer exists.",
+#        'status': 410,
+#        'extra': "Any extra information you want.",
+#    },
+#}

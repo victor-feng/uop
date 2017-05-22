@@ -122,11 +122,12 @@ class ResourceModel(db.DynamicDocument):
 class Approval(db.DynamicDocument):
     approval_id = db.StringField(required=True, max_length=50, unique=True)
     resource_id = db.StringField(required=True, unique=True)
+    project_id = db.StringField(required=True)
     department_id = db.StringField(required=True)
     creator_id = db.StringField(required=True)
-    create_date = db.StringField(default=datetime.datetime.now())
+    create_date = db.DateTimeField(default=datetime.datetime.now())
     approve_uid = db.StringField(required=False)
-    approve_date = db.StringField(required=False)
+    approve_date = db.DateTimeField(required=False)
     # processing/success/failed
     approval_status = db.StringField(required=True)
     annotations = db.StringField(max_length=50, required=False)
