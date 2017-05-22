@@ -5,7 +5,7 @@ import datetime
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
-
+from uop.models import ItemInformation
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -38,15 +38,42 @@ class ItemInfo(Resource):
         code = 200
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('property_list', type=list, required=True, location='json')
+            parser.add_argument('user_id', type=str)
+            parser.add_argument('user_name', type=str)
+            parser.add_argument('item_name', type=str)
+            parser.add_argument('item_code', type=str)
+            parser.add_argument('item_department', type=str)
+            parser.add_argument('item_description', type=str)
             args = parser.parse_args()
 
             data = {}
-            data["property_list"] = args.property_list
+            property_list = []
+
+            if args.item_code:
+                property_list.append({"type": "string", "name": "项目编号", "value": args.item_code})
+            if args.item_name:
+                property_list.append({"type": "string", "name": "项目名称", "value": args.item_name})
+            if args.item_department:
+                property_list.append({"type": "string", "name": "归属部门", "value": args.item_department})
+            if args.item_description:
+                property_list.append({"type": "string", "name": "项目描述", "value": args.item_description})
+            data["property_list"] = property_list
             data_str = json.dumps(data)
 
             res = requests.put(url + "repo/" + item_id + "/",data = data_str)
             ret = eval(res.content.decode('unicode_escape'))
+            if res.status_code == 200:
+                item = ItemInformation.objects.get(item_id=item_id)
+                if args.item_code:
+                    item.item_code = args.item_code
+                if args.item_name:
+                    item.item_name = args.item_name
+                if args.item_department:
+                    item.item_depart = args.item_department
+                if args.item_description:
+                    item.item_description = args.item_description
+                item.save()
+
         except Exception as e:
             code = 500
 
@@ -58,43 +85,99 @@ class ItemInfo(Resource):
         code = 200
         try:
             res = requests.delete(url + "repo_delete/" + item_id + "/")
-            ret = eval(res.content.decode('unicode_escape'))
+            #ret = eval(res.content.decode('unicode_escape'))
+
+            items = ItemInformation.objects.filter(item_id=item_id)
+            for item in items:
+                item.delete()
         except Exception as e:
             code = 500
 
+        ret = {
+            'code': code,
+            'result': {
+                'res': "",
+                'msg': ""
+            }
+        }
         return ret, code
 
 class ItemPostInfo(Resource):
-    @classmethod
-    def post(cls):
+    def post(self):
         # req = request
         ret = {}
         code = 200
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('property_list', type=list, required=True, location='json')
-            parser.add_argument('name', type=str)
-            #parser.add_argument('layer_id', type=str)
-            #parser.add_argument('group_id', type=str)
-            #parser.add_argument('item_id', type=str)
+            #parser.add_argument('property_list', type=list, required=True, location='json')
+            parser.add_argument('user_id', type=str)
+            parser.add_argument('user_name', type=str)
+            parser.add_argument('item_name', type=str)
+            parser.add_argument('item_code', type=str)
+            parser.add_argument('item_department', type=str)
+            parser.add_argument('item_description', type=str)
             args = parser.parse_args()
 
             data = {}
-            data["name"] = args.name
+            data["name"] = args.item_name
             data["layer_id"] = "business"
             data["group_id"] = "BusinessLine"
             data["item_id"] = "project_item"
 
-            args.property_list.append({"type" : "datetime","name" : "创建日期","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
-            data["property_list"] = args.property_list
+            property_list = []
+            property_list.append({"type": "string", "name": "项目编号", "value": args.item_code})
+            property_list.append({"type": "string", "name": "项目名称", "value": args.item_name})
+            property_list.append({"type": "string", "name": "归属部门", "value": args.item_department})
+            property_list.append({"type": "string", "name": "项目描述", "value": args.item_description})
+            property_list.append({"type": "string", "name": "创建人", "value": args.user_name})
+            property_list.append({"type" : "datetime","name" : "创建日期","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            data["property_list"] = property_list
             data_str = json.dumps(data)
 
             res = requests.post(url + "repo/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
+            if res.status_code == 200:
+                ItemInformation(
+                    user = args.user_name,
+                    user_id = args.user_id,
+                    item_id = ret.get("result").get("id"),
+                    item_name = args.item_name,
+                    item_depart= args.item_department,
+                    item_description = args.item_description,
+                    item_code = args.item_code).save()
         except Exception as e:
             code = 500
 
         return ret, code
 
+class ItemInfoLoacl(Resource):
+    def get(self,user_id):
+        code = 200
+        res_list = []
+        try:
+            items = ItemInformation.objects.filter(user_id = user_id)
+            for i in items:
+                res = {}
+                res["user"] = i.user
+                res["user_id"] = i.user_id
+                res["item_id"] = i.item_id
+                res["item_name"] = i.item_name
+                res["item_code"] = i.item_code
+                res["item_depart"] = i.item_depart
+                res["item_description"] = i.item_description
+                res_list.append(res)
+        except Exception as e:
+            code = 500
+
+        ret = {
+            'code': code,
+            'result': {
+                'res': res_list,
+                'msg': ""
+            }
+        }
+        return ret, code
+
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
+iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
