@@ -18,7 +18,7 @@ class DevelopmentConfig(BaseConfig):
         'username': 'xcloud',
         'password': 'xcloud'
     }
-
+    CRP_URL = "http://172.28.20.124:8000/"
 
 class TestingConfig(BaseConfig):
     TESTING = True
@@ -29,6 +29,7 @@ class TestingConfig(BaseConfig):
             'username': 'uop',
             'password': 'uop',
             }
+    CRP_URL = "http://172.28.20.124:8000/"
 
 
 configs = {
