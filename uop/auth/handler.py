@@ -125,8 +125,8 @@ class UserList(Resource):
         id = args.id
         password = args.password
 
-        conn = LdapConn(ldap_server, username, password, base_dn, scope)
-        verify_code, verify_res = conn.verify_user(id, passwd_admin)
+        conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
+        verify_code, verify_res = conn.verify_user(id, password)
         if verify_code:
             res = '登录成功'
             code = 200
