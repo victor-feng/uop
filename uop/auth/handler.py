@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
+import sys
+import ldap
+import os
 from flask import request
 from flask import redirect
 from flask import jsonify
@@ -9,10 +12,67 @@ from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
 from wtforms import ValidationError
-import ldap3
-
+reload(sys)
+sys.setdefaultencoding('utf-8')
+base_dn = 'dc=syswin,dc=com'
+scope = ldap.SCOPE_SUBTREE
+ldap_server = 'ldap://172.28.4.103:389'
+username = 'crm_test1'
+password = 'syswin#'
 
 auth_api = Api(auth_blueprint, errors=user_errors)
+
+
+class LdapConn(object):
+    def __init__(self, server, admin_name, admin_pass, base_dn, scope, flag, cn=None, result=[]):
+        self.server = server,
+        self.name = admin_name,
+        self.passwd = admin_pass,
+        self.base_dn = base_dn,
+        self.scope = scope,
+        self.flag = flag
+
+    def conn_ldap(self):
+        conn = ldap.initialize(self.server)
+        conn.simple_bind_s(self.name, self.passwd)
+        return conn
+
+    def verify_user(self, id, password):
+        con = self.conn_ldap()
+        filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
+        attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
+        for i in con.search_s(base_dn, scope, filter, None):
+            if i[0]:
+                d = {}
+                for k in i[1]:
+                    d[k] = i[1][k][0]
+                if 'telephoneNumber' not in d:
+                    d['telephoneNumber'] = '(无电话)'
+                if 'department' not in d:
+                    d['department'] = '(无部门)'
+                if 'sn' not in d and 'givenName' not in d:
+                    d['givenName'] = d.get('displayName', '')
+                if 'sn' not in d:
+                    d['sn'] = ''
+                if 'givenName' not in d:
+                    d['givenName'] = ''
+                self.result.append(d)
+                self.cn = d.get('distinguishedName', '')
+                print self.cn
+        print '共找到结果 %s 条' % (len(self.result))
+        for d in self.result:
+            print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
+        try:
+            if con.simple_bind_s(self.cn, password):
+                print 'verify successfully'
+                self.flag = 1
+            else:
+                print 'verify fail'
+                self.flag = 0
+        except ldap.INVALID_CREDENTIALS, e:
+            print e
+            self.flag = 0
+        return self.flag, self.result
 
 
 class UserRegister(Resource):
@@ -48,45 +108,6 @@ class UserRegister(Resource):
         return "test info", 200
 
 
-class UserLogin(Resource):
-    def post(self):
-        host = '172.28.4.103'
-        port = 389
-        parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str)
-        parser.add_argument('password')
-        args = parser.parse_args()
-
-        username = args.username
-        password = args.password
-        server = ldap3.Server(host, port, get_info=ldap3.ALL)
-        conn = None
-        auto_bind = False
-        try:
-            if username:
-                username = '%s' % username
-                if password:
-                    auto_bind = True
-            conn = ldap3.Connection(
-                    server,
-                    user=username,
-                    password=password,
-                    auto_bind=auto_bind,
-                    authentication=ldap3.NTLM
-                    )
-            if not auto_bind:
-                succ = conn.bind()
-            else:
-                succ = True
-            msg = conn.result
-            conn.unbind()
-            return succ, msg
-        except Exception as e:
-            if conn:
-                conn.unbind()
-            return False, e
-
-
 class UserList(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -96,6 +117,16 @@ class UserList(Resource):
 
         id = args.id
         password = args.password
+
+        conn = LdapConn()
+        verify_code, verify_res = LdapConn.verify_user(id, password)
+        if verify_code:
+            res = '登录成功'
+            code = 200
+        else:
+            res = '登录失败'
+            code = 304
+
         try:
             user = UserInfo.objects.get(id=id)
             if user:
@@ -187,6 +218,10 @@ auth_api.add_resource(AdminUserList, '/adminlist')
 auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
 # common user
 auth_api.add_resource(UserRegister, '/users')
-auth_api.add_resource(UserLogin, '/userdetail')
 auth_api.add_resource(UserList, '/userlist')
 auth_api.add_resource(AllUserList, '/all_user')
+
+
+if __name__ == "__main__":
+    conn = LdapConn()
+    conn.verify_user(147749, 'syswin1~')
