@@ -56,7 +56,7 @@ class ItemInfo(Resource):
                 res["item_code"] = item.item_code
                 res["item_depart"] = item.item_depart
                 res["item_description"] = item.item_description
-                #res["create_date"] = item.create_date
+                res["create_date"] = str(item.create_date)
                 res_list.append(res)
 
             #res = requests.get(url + "repo_detail/" + item_id + "/")
