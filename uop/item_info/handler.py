@@ -19,17 +19,58 @@ url = "http://cmdb-test.syswin.com/cmdb/api/"
 class ItemInfo(Resource):
     @classmethod
     def get(cls,item_id):
+        res_list = []
         ret = {}
         code = 200
         item_id = "project_item"
         try:
             parser = reqparse.RequestParser()
+            parser.add_argument('user_name', type=str, location='args')
+            parser.add_argument('item_name', type=str, location='args')
+            parser.add_argument('item_code', type=str, location='args')
+            parser.add_argument('start_time', type=str, location='args')
+            parser.add_argument('end_time', type=str, location='args')
+            parser.add_argument('depart', type=str, location='args')
             args = parser.parse_args()
-            res = requests.get(url + "repo_detail/" + item_id + "/")
-            ret = eval(res.content.decode('unicode_escape'))
+
+            args_dict = {}
+            if args.user_name:
+                args_dict["user"] = args.user_name
+            if args.item_name:
+                args_dict["item_name"] = args.item_name
+            if args.item_code:
+                args_dict["item_code"] = args.item_code
+            if args.depart:
+                args_dict["item_depart"] = args.depart
+            if args.start_time and args.end_time:
+                args_dict['create_date__gte'] = args.start_time
+                args_dict['create_date__lt'] = args.end_time
+            items = ItemInformation.objects.filter(**args_dict)
+
+            for item in items:
+                res = {}
+                res["user"] = item.user
+                res["user_id"] = item.user_id
+                res["item_id"] = item.item_id
+                res["item_name"] = item.item_name
+                res["item_code"] = item.item_code
+                res["item_depart"] = item.item_depart
+                res["item_description"] = item.item_description
+                #res["create_date"] = item.create_date
+                res_list.append(res)
+
+            #res = requests.get(url + "repo_detail/" + item_id + "/")
+            #ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
 
+        ret = {
+            'code': code,
+            'result': {
+                'res': res_list,
+                'msg': ""
+            }
+        }
         return ret, code
 
     @classmethod
