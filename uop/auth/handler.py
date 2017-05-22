@@ -33,6 +33,7 @@ class LdapConn(object):
         self.flag = flag,
 
     def conn_ldap(self):
+        ldap.set_option(ldap.OPT_REFERRALS, 0)
         conn = ldap.initialize(self.server[0])
         conn.simple_bind_s(self.name[0], self.passwd[0])
         return conn
@@ -40,9 +41,9 @@ class LdapConn(object):
     def verify_user(self, id, password):
         result = []
         con = self.conn_ldap()
-        filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
+        filter_field = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
-        for i in con.search_s(self.base_dn[0], self.scope[0], filter, None):
+        for i in con.search_s(base_dn, scope, filter_field, None):
             if i[0]:
                 d = {}
                 for k in i[1]:
@@ -124,7 +125,6 @@ class UserList(Resource):
 
         id = args.id
         password = args.password
-
         conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
         verify_code, verify_res = conn.verify_user(id, password)
         if verify_code:
