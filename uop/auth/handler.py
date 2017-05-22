@@ -42,7 +42,7 @@ class LdapConn(object):
         con = self.conn_ldap()
         filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
-        for i in con.search_s(self.base_dn[0], scope, filter, None):
+        for i in con.search_s(self.base_dn[0], self.scope[0], filter, None):
             if i[0]:
                 d = {}
                 for k in i[1]:
