@@ -34,7 +34,7 @@ class LdapConn(object):
 
     def conn_ldap(self):
         conn = ldap.initialize(self.server[0])
-        conn.simple_bind_s(self.name, self.passwd)
+        conn.simple_bind_s(self.name[0], self.passwd[0])
         return conn
 
     def verify_user(self, id, password):
@@ -42,7 +42,7 @@ class LdapConn(object):
         con = self.conn_ldap()
         filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': id}
         attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
-        for i in con.search_s(base_dn, scope, filter, None):
+        for i in con.search_s(self.base_dn[0], scope, filter, None):
             if i[0]:
                 d = {}
                 for k in i[1]:
