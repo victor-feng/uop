@@ -139,7 +139,7 @@ class UserList(Resource):
         verify_res_department = verify_res.get('department')  # 获取到部门
         user = verify_res_name.decode('utf-8')
         department = verify_res_department.decode('utf-8')
-        user_id = verify_res.get('id')
+        user_id = verify_res.get('id')  # 获取到工号
 
         if verify_code:
             res = '登录成功'

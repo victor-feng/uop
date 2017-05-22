@@ -22,7 +22,6 @@ attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNu
 
 cn = None
 result = []
-import ipdb;ipdb.set_trace()
 for i in con.search_s(base_dn, scope, filter, None):
     if i[0]:
         d = {}
