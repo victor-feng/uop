@@ -126,24 +126,24 @@ class UserList(Resource):
         else:
             res = '登录失败'
             code = 304
-
-        try:
-            user = UserInfo.objects.get(id=id)
-            if user:
-                if user.password == password:
-                    res = '登录成功'
-                    code = 200
-                else:
-                    res = '密码错误'
-                    code = 304
-                msg = {
-                        'username': user.username,
-                        'user_id': id
-                        }
-        except UserInfo.DoesNotExist:
-            code = 305
-            res = '用户不存在'
-            msg = ''
+        msg = ''
+        # try:
+        #     user = UserInfo.objects.get(id=id)
+        #     if user:
+        #         if user.password == password:
+        #             res = '登录成功'
+        #             code = 200
+        #         else:
+        #             res = '密码错误'
+        #             code = 304
+        #         msg = {
+        #                 'username': user.username,
+        #                 'user_id': id
+        #                 }
+        # except UserInfo.DoesNotExist:
+        #     code = 305
+        #     res = '用户不存在'
+        #     msg = ''
         res = {
                 "code": code,
                 "result": {
