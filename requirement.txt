@@ -12,3 +12,6 @@ ldap3
 
 #Runtime
 gunicorn==19.7.1
+
+# ldap
+python-ldap==2.4.32

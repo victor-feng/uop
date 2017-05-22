@@ -1,68 +1,68 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
+
+
 import sys
 import ldap
-import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-LDAP_HOST = '172.28.4.103'
-LDAP_PORT = 389
-USER = 'crm_test1'
-PASSWORD = 'syswin#'
-BASE_DN = 'OU=思源集团,dc=syswin,dc=com'
-ldap.set_option(ldap.OPT_REFERRALS, 0)
-l = ldap.initialize('ldap://172.28.4.103:389')
-l.set_option(ldap.OPT_REFERRALS, 0)
+passwd = 'syswin1~'
+
+ldap.set_option(ldap.OPT_REFERRALS, 0)    # 不加这个访问不到MS的服务
+con = ldap.initialize('ldap://172.28.4.103:389')
+con.simple_bind_s('crm_test1', 'syswin#')
+
+base_dn = 'dc=syswin,dc=com'
+scope = ldap.SCOPE_SUBTREE
+
+input = sys.argv[1]
+
+# filter = "(&(|(cn=*%(input)s*)(mail=*%(input)s*))(mail=*))" % {'input': input}
+filter = "(&(|(cn=*%(input)s*)(sAMAccountName=*%(input)s*))(sAMAccountName=*))" % {'input': input}
+
+# attrs = ['mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
+attrs = ['sAMAccountName', 'mail', 'givenName', 'sn', 'department', 'telephoneNumber', 'displayName']
+
+cn = None
+result = []
+for i in con.search_s(base_dn, scope, filter, None):
+    if i[0]:
+        d = {}
+        for k in i[1]:
+            d[k] = i[1][k][0]
+
+        if 'telephoneNumber' not in d:
+            d['telephoneNumber'] = '(无电话)'
+
+        if 'department' not in d:
+            d['department'] = '(无部门)'
+
+        if 'sn' not in d and 'givenName' not in d:
+            d['givenName'] = d.get('displayName', '')
+
+        if 'sn' not in d:
+            d['sn'] = ''
+
+        if 'givenName' not in d:
+            d['givenName'] = ''
+
+        result.append(d)
+        cn = d.get('distinguishedName', '')
+        print cn
+
+print '共找到结果 %s 条' % (len(result))
+for d in result:
+    # print '%(mail)s\t%(sn)s%(givenName)s\t%(telephoneNumber)s %(department)s' %d
+    print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' %d
 
 
-class LDAPTool:
-
-    def __init__(self, ldap_host=None, base_dn=None, user=None, password=None):
-        if not ldap_host:
-            ldap_host = LDAP_HOST
-        if not base_dn:
-            self.base_dn = BASE_DN
-        if not user:
-            user = USER
-        if not password:
-            password = PASSWORD
-        try:
-            self.ldapconn = l
-            self.ldapconn.protocol_version = ldap.VERSION3
-            self.ldapconn.simple_bind(user, password)
-            self.ldapconn.set_option(ldap.OPT_REFERRALS, 0)
-        except ldap.LDAPError, e:
-            print e
-
-    # 根据表单提交的用户名，检索该用户的dn,一条dn就相当于数据库里的一条记录。
-    # 在ldap里类似cn=username,ou=users,dc=gccmx,dc=cn,验证用户密码，必须先检索出该DN
-    def ldap_search_dn(self, uid=None):
-        obj = self.ldapconn
-        obj.protocal_version = ldap.VERSION3
-        searchScope = ldap.SCOPE_SUBTREE
-        retrieveAttributes = None
-        searchFilter = "cn=" + uid
-
-        try:
-            ldap_result_id = obj.search(self.base_dn, searchScope, searchFilter, retrieveAttributes)
-            result_type, result_data = obj.result(ldap_result_id, 0)
-            # 返回数据格式
-            # ('cn=django,ou=users,dc=gccmx,dc=cn',
-            #    {  'objectClass': ['inetOrgPerson', 'top'],
-            #        'userPassword': ['{MD5}lueSGJZetyySpUndWjMBEg=='],
-            #        'cn': ['django'], 'sn': ['django']  }  )
-            #
-            if result_type == ldap.RES_SEARCH_ENTRY:
-                # dn = result[0][0]
-                return result_data[0][0]
-            else:
-                return None
-        except ldap.LDAPError, e:
-            print e
+def verify_user(passwd):
+    try:
+        if con.simple_bind_s(cn, passwd):
+            print '验证成功'
+        else:
+            print '验证失败'
+    except ldap.INVALID_CREDENTIALS, e:
+        print e
 
 
-if __name__ == '__main__':
-    user = '147749'
-    password = 'syswin1~'
-    l = LDAPTool(user=user, password=password)
-    # l.set_option(ldap.OPT_REFERRALS, 0)
-    l.ldap_search_dn(uid=user)
+verify_user(passwd)
