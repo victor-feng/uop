@@ -135,15 +135,17 @@ class UserList(Resource):
         conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
         verify_code, verify_res = conn.verify_user(id, password)
 
-        verify_res_name = verify_res.get('name')
-        verify_res_department = verify_res.get('department')
+        verify_res_name = verify_res.get('name')  # 获取到用户名
+        verify_res_department = verify_res.get('department')  # 获取到部门
         user = verify_res_name.decode('utf-8')
         department = verify_res_department.decode('utf-8')
+        user_id = verify_res.get('id')
 
         if verify_code:
             res = '登录成功'
             code = 200
             msg = {
+                    'user_id': user_id,
                     'username': user,
                     'department': department
                     }
@@ -151,23 +153,16 @@ class UserList(Resource):
             res = '登录失败'
             code = 304
             msg = ''
-        # try:
-        #     user = UserInfo.objects.get(id=id)
-        #     if user:
-        #         if user.password == password:
-        #             res = '登录成功'
-        #             code = 200
-        #         else:
-        #             res = '密码错误'
-        #             code = 304
-        #         msg = {
-        #                 'username': user.username,
-        #                 'user_id': id
-        #                 }
-        # except UserInfo.DoesNotExist:
-        #     code = 305
-        #     res = '用户不存在'
-        #     msg = ''
+        try:
+            user = UserInfo.objects.get(id=user_id)
+        except UserInfo.DoesNotExist:
+            user_obj = UserInfo()
+            user_obj.id = user_id
+            user_obj.username = user
+            user_obj.password = password
+            user_obj.department = department
+            user_obj.save()
+
         res = {
                 "code": code,
                 "result": {
