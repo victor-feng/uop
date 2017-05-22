@@ -103,7 +103,8 @@ class ResourceModel(db.DynamicDocument):
     domain = db.StringField(required=False)
     env = db.StringField(required=False)
     application_status = db.StringField(required=False)
-    # approval_status = db.StringField(required=False)
+    approval_status = db.StringField(required=False)
+    reservation_status = db.StringField(required=False)
     resource_list = db.ListField(db.EmbeddedDocumentField('DBIns'))
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
 
