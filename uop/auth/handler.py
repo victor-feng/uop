@@ -184,7 +184,7 @@ class UserList(Resource):
                     "msg": msg
                     }
                 }
-        return res
+        return json.dumps(res)
 
 
 class AdminUserList(Resource):
@@ -215,8 +215,8 @@ class AdminUserList(Resource):
 
 
 class AdminUserDetail(Resource):
-    def put(self, name):
-        user = UserInfo.objects.get(username=name)
+    def put(self, tag):
+        user = UserInfo.objects.get(username=tag)
         is_admin = json.loads(request.body())
         if user:
             user.is_admin = is_admin
@@ -245,7 +245,6 @@ class AllUserList(Resource):
             data = {
                     'id': i.id,
                     'username': i.username,
-                    'password': i.password,
                     'department': i.department,
                     'is_admin': i.is_admin,
                     'created_time': str(i.created_time)
@@ -256,7 +255,7 @@ class AllUserList(Resource):
 
 # admin user
 auth_api.add_resource(AdminUserList, '/adminlist')
-auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
+auth_api.add_resource(AdminUserDetail, '/admindetail/<tag>')
 # common user
 auth_api.add_resource(UserRegister, '/users')
 auth_api.add_resource(UserList, '/userlist')
