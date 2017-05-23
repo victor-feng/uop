@@ -4,6 +4,7 @@ import sys
 import ldap
 import datetime
 import os
+import hashlib
 from flask import request
 from flask import redirect
 from flask import jsonify
@@ -133,6 +134,9 @@ class UserList(Resource):
 
         id = args.id
         password = args.password
+        md5 = hashlib.md5()
+        md5.update(password)
+        salt_password = md5.hexdigest()
         conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
         verify_code, verify_res = conn.verify_user(id, password)
 
@@ -153,7 +157,7 @@ class UserList(Resource):
                 user_obj = UserInfo()
                 user_obj.id = user_id
                 user_obj.username = user
-                user_obj.password = password
+                user_obj.password = salt_password
                 user_obj.department = department
                 # user_obj.created_time = datetime.datetime.now()
                 user_obj.save()
