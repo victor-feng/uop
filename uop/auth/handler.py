@@ -2,6 +2,7 @@
 import json
 import sys
 import ldap
+import datetime
 import os
 from flask import request
 from flask import redirect
@@ -154,6 +155,7 @@ class UserList(Resource):
                 user_obj.username = user
                 user_obj.password = password
                 user_obj.department = department
+                user_obj.created_time = datetime.datetime.now()
                 user_obj.save()
             msg = {
                     'user_id': user_id,
@@ -240,7 +242,15 @@ class AllUserList(Resource):
         all_user = []
         users = UserInfo.objects.all()
         for i in users:
-            all_user.append(i.username)
+            data = {
+                    'id': i.id,
+                    'username': i.username,
+                    'password': i.password,
+                    'department': i.department,
+                    'is_admin': i.is_admin,
+                    'created_time': i.created_time
+                    }
+            all_user.append(data)
         return all_user
 
 

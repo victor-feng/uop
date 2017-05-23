@@ -17,6 +17,7 @@ class UserInfo(db.Document):
     password = db.StringField(required=True, max_length=50)
     department = db.StringField(required=False)
     is_admin = db.BooleanField(required=False, default=False)
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
 
     meta = {
             "collection": "uop_userinfo",
