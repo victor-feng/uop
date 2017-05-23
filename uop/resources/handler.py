@@ -26,7 +26,7 @@ class ResourceApplication(Resource):
         parser.add_argument('domain', type=str)
         parser.add_argument('env', type=str)
         parser.add_argument('application_status', type=str)
-        # parser.add_argument('approval_status', type=str)
+        parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
@@ -42,7 +42,7 @@ class ResourceApplication(Resource):
         domain = args.domain
         env = args.env
         application_status = args.application_status
-        # approval_status = args.approval_status
+        approval_status = args.approval_status
         resource_list = args.resource_list
         compute_list = args.compute_list
 
@@ -63,7 +63,7 @@ class ResourceApplication(Resource):
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                              department_id=department_id, res_id=res_id,
                                              user_name=user_name, user_id=user_id, domain=domain, env=env,
-                                             application_status=application_status)
+                                             application_status=application_status, approval_status=approval_status)
         for resource in resource_list:
             ins_name = resource.get('res_name')
             # ins_id = resource.get('res_id')
@@ -285,7 +285,7 @@ class ResourceDetail(Resource):
         parser.add_argument('domain', type=str)
         parser.add_argument('env', type=str)
         parser.add_argument('application_status', type=str)
-        # parser.add_argument('approval_status', type=str)
+        parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
@@ -298,6 +298,7 @@ class ResourceDetail(Resource):
         resource_application.domain = args.domain
         resource_application.env = args.env
         resource_application.application_status = args.application_status
+        resource_application.approval_status = args.approval_status
         resource_list = args.resource_list
         compute_list = args.compute_list
 
