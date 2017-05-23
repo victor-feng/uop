@@ -241,12 +241,13 @@ class AdminUserDetail(Resource):
         return res
 
     def put(self, name):
+        data = json.loads(request.data)
+        admin_user = data.get('admin_user')
         user = UserInfo.objects.get(id=name)
-        # is_admin = json.loads(request.body)
-        parser = reqparse.RequestParser()
-        parser.add_argument('admin_user', type=bool)
-        args = parser.parse_args()
-        admin_user = args.admin_user
+        # parser = reqparse.RequestParser()
+        # parser.add_argument('admin_user', type=bool)
+        # args = parser.parse_args()
+        # admin_user = args.admin_user
         if user:
             user.is_admin = admin_user
             user.save()
