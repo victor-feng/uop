@@ -248,7 +248,7 @@ class AllUserList(Resource):
                     'password': i.password,
                     'department': i.department,
                     'is_admin': i.is_admin,
-                    'created_time': i.created_time
+                    'created_time': str(i.created_time)
                     }
             all_user.append(data)
         return all_user
