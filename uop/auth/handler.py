@@ -155,7 +155,7 @@ class UserList(Resource):
                 user_obj.username = user
                 user_obj.password = password
                 user_obj.department = department
-                user_obj.created_time = datetime.datetime.now()
+                # user_obj.created_time = datetime.datetime.now()
                 user_obj.save()
             msg = {
                     'user_id': user_id,
@@ -184,7 +184,7 @@ class UserList(Resource):
                     "msg": msg
                     }
                 }
-        return json.dumps(res)
+        return res
 
 
 class AdminUserList(Resource):
