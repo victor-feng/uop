@@ -159,7 +159,7 @@ class UserList(Resource):
                 user_obj.save()
             msg = {
                     'user_id': user_id,
-                    'username': user,
+                    'username': user.username,
                     'department': department,
                     'is_admin': is_admin
                     }
