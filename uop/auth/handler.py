@@ -249,7 +249,7 @@ class AdminUserDetail(Resource):
         # args = parser.parse_args()
         # admin_user = args.admin_user
         if user:
-            user.is_admin = admin_user
+            user.is_admin = eval(admin_user)
             user.save()
         data = {
                 'id': user.id,
