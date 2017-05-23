@@ -215,12 +215,41 @@ class AdminUserList(Resource):
 
 
 class AdminUserDetail(Resource):
-    def put(self, tag):
-        user = UserInfo.objects.get(username=tag)
+
+    def get(self, name):
+        res = []
+        users = UserInfo.objects.filter(username=name)
+        if not users:
+            users = UserInfo.objects.filter(id=name)
+
+        if users:
+            for user in users:
+                data = {
+                        'id': user.id,
+                        'username': user.username,
+                        'department': user.department,
+                        'is_admin': user.is_admin,
+                        'created_time': str(user.created_time),
+                        }
+        else:
+            data = '用户不存在'
+        res.append(data)
+        return res
+
+    def put(self, name):
+        user = UserInfo.objects.get(username=name)
         is_admin = json.loads(request.body())
         if user:
             user.is_admin = is_admin
             user.save()
+        data = {
+                'id': user.id,
+                'username': user.username,
+                'department': user.department,
+                'is_admin': user.is_admin,
+                'created_time': str(user.created_time),
+                }
+        return data
 
     def delete(self, name):
         user = UserInfo.objects.get(username=name)
@@ -255,7 +284,7 @@ class AllUserList(Resource):
 
 # admin user
 auth_api.add_resource(AdminUserList, '/adminlist')
-auth_api.add_resource(AdminUserDetail, '/admindetail/<tag>')
+auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
 # common user
 auth_api.add_resource(UserRegister, '/users')
 auth_api.add_resource(UserList, '/userlist')
