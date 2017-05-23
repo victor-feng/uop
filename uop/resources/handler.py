@@ -302,13 +302,13 @@ class ResourceDetail(Resource):
         resource_list = args.resource_list
         compute_list = args.compute_list
 
-        try:
-            resource_application.update(pull_all__resource_list=resource_application.resource_list)
+        # try:
+        #     resource_application.update(pull_all__resource_list=resource_application.resource_list)
         #     ResourceModel.objects(res_id=res_id).update_one(pull__resource_list=resource_application.resource_list)
         #     # resource_application.update(pull_all__compute_list=resource_application.compute_list)
-        except Exception as e:
-            print e
-            return
+        # except Exception as e:
+        #     print e
+        #     return
         resource_application.resource_list = []
         resource_application.compute_list = []
 
