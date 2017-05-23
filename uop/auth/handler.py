@@ -140,28 +140,40 @@ class UserList(Resource):
         user = verify_res_name.decode('utf-8')
         department = verify_res_department.decode('utf-8')
         user_id = verify_res.get('id')  # 获取到工号
+        is_admin = False
 
         if verify_code:
             res = '登录成功'
             code = 200
+            try:
+                user = UserInfo.objects.get(id=user_id)
+                is_admin = user.is_admin
+            except UserInfo.DoesNotExist:
+                user_obj = UserInfo()
+                user_obj.id = user_id
+                user_obj.username = user
+                user_obj.password = password
+                user_obj.department = department
+                user_obj.save()
             msg = {
                     'user_id': user_id,
                     'username': user,
-                    'department': department
+                    'department': department,
+                    'is_admin': is_admin
                     }
         else:
             res = '登录失败'
             code = 304
             msg = ''
-        try:
-            user = UserInfo.objects.get(id=user_id)
-        except UserInfo.DoesNotExist:
-            user_obj = UserInfo()
-            user_obj.id = user_id
-            user_obj.username = user
-            user_obj.password = password
-            user_obj.department = department
-            user_obj.save()
+        # try:
+        #     user = UserInfo.objects.get(id=user_id)
+        # except UserInfo.DoesNotExist:
+        #     user_obj = UserInfo()
+        #     user_obj.id = user_id
+        #     user_obj.username = user
+        #     user_obj.password = password
+        #     user_obj.department = department
+        #     user_obj.save()
 
         res = {
                 "code": code,
