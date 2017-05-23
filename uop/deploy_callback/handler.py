@@ -39,7 +39,32 @@ class DeployCallback(Resource):
             }
             return ret
         parser = reqparse.RequestParser()
-        parser.add_argument('resource_name', type=str)
+        parser.add_argument('result', type=str)
+        args = parser.parse_args()
+
+        dep.deploy_result = args.result
+        try:
+            dep.save()
+        except Exception as e:
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'failed',
+                    'msg': "Deployment update failed."
+                }
+            }
+            return ret
+
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': "Deployment update success."
+            }
+        }
+        return ret
 
 
 

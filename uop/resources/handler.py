@@ -197,6 +197,7 @@ class ResourceDetail(Resource):
                 result['domain'] = resource.domain
                 result['env'] = resource.env
                 result['application_status'] = resource.application_status
+                result['approval_status'] = resource.approval_status
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list
                 if resource_list:
@@ -419,6 +420,7 @@ class ResourceRecord(Resource):
                 result['date'] = res.created_date
                 result['resource'] = res.resource_name
                 result['formStatus'] = res.application_status
+                result['approvalStatus'] = res.approval_status
                 result['project'] = res.project
                 result['id'] = res.res_id
                 result_list.append(result)

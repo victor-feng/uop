@@ -38,6 +38,7 @@ class Deployment(db.Document):
     exec_tag = db.StringField(max_length=50)
     exec_context = db.StringField(max_length=5000)
     app_image = db.StringField(max_length=100)
+    deploy_result = db.StringField(max_length=50)
     meta = {
         'collection': 'deployment',
         'index': [
