@@ -42,7 +42,8 @@ class ResourceApplication(Resource):
         domain = args.domain
         env = args.env
         application_status = args.application_status
-        approval_status = args.approval_status
+        # approval_status = args.approval_status
+        approval_status = "unsubmit"
         resource_list = args.resource_list
         compute_list = args.compute_list
 
@@ -300,7 +301,7 @@ class ResourceDetail(Resource):
         resource_application.domain = args.domain
         resource_application.env = args.env
         resource_application.application_status = args.application_status
-        resource_application.approval_status = args.approval_status
+        # resource_application.approval_status = args.approval_status
         resource_list = args.resource_list
         compute_list = args.compute_list
 
