@@ -172,7 +172,7 @@ class UserList(Resource):
                     }
         else:
             res = '登录失败'
-            code = 304
+            code = 400
             msg = 'ldap验证错误'
         # try:
         #     user = UserInfo.objects.get(id=user_id)
