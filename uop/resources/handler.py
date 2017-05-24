@@ -205,9 +205,9 @@ class ResourceDetail(Resource):
                     for db_res in resource_list:
                         res.append(
                             {
-                                "ins_name": db_res.ins_name,
-                                "ins_id": db_res.ins_id,
-                                "ins_type": db_res.ins_type,
+                                "res_name": db_res.ins_name,
+                                "res_id": db_res.ins_id,
+                                "res_type": db_res.ins_type,
                                 "cpu": db_res.cpu,
                                 "mem": db_res.mem,
                                 "disk": db_res.disk,
