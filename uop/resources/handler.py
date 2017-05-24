@@ -154,6 +154,7 @@ class ResourceApplication(Resource):
                 result['date'] = str(res.created_date)
                 result['resource'] = res.resource_name
                 result['formStatus'] = res.application_status
+                result['approval_status'] = res.approval_status
                 result['project'] = res.project
                 result['id'] = res.res_id
                 result_list.append(result)
