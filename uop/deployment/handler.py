@@ -42,7 +42,8 @@ class DeploymentListAPI(Resource):
                     'exec_tag': deployment.exec_tag,
                     'exec_context': deployment.exec_context,
                     'app_image': deployment.app_image,
-                    'created_time': str(deployment.created_time)
+                    'created_time': str(deployment.created_time),
+                    'deploy_result': deployment.deploy_result
                 })
         except Exception as e:
             res = {

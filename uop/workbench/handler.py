@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
+import requests
 from flask import request
 from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
-from uop.user import user_blueprint
-from uop.models import User
-from uop.user.errors import user_errors
+from uop.workbench import bench_blueprint
+from uop.models import User, ItemInformation
+from uop.workbench.errors import user_errors
 
-user_api = Api(user_blueprint, errors=user_errors)
+bench_api = Api(bench_blueprint, errors=user_errors)
+url = 'http://cmdb-test.syswin.com/cmdb/api/repo_detail/project_item'
 
 
 class UserRegister(Resource):
@@ -40,4 +42,36 @@ class UserRegister(Resource):
         return "test info", 409
 
 
-user_api.add_resource(UserRegister, '/users')
+class SourceUnitList(Resource):
+    def get(self):
+        r = requests.get(url)
+        return r.text
+
+
+class SourceUnitDetail(Resource):
+    def get(self):
+        res = []
+        parser = reqparse.RequestParser()
+        parser.add_argument('unit_name', type=str, location='args')
+        args = parser.parse_args()
+
+        args_dict = {}
+        if args.unit_name:
+            args_dict['unit_name'] = args.unit_name
+        items = ItemInformation.objects.filter(**args_dict)
+        for item in items:
+            res.append({
+                "user": item.user,
+                "user_id": item.user_id,
+                "item_id": item.item_id,
+                "item_name": item.item_name,
+                "item_code": item.item_code,
+                "item_depart": item.item_depart,
+                "item_description": item.item_description,
+                "create_date": str(item.create_date)
+            })
+        return res
+
+
+bench_api.add_resource(SourceUnitList, '/source_unit')
+bench_api.add_resource(SourceUnitDetail, '/source_unit_detail')
