@@ -2,6 +2,7 @@
 Flask==0.12.1
 flask-restful-swagger==0.19
 Flask-RESTful==0.3.5
+Flask-HTTPAuth==3.2.2
 requests==2.10.0
 
 #Database

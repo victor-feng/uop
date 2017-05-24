@@ -16,6 +16,9 @@ from uop.auth.errors import user_errors
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
+from flask.ext.httpauth import HTTPBasicAuth
+auth = HTTPBasicAuth()
+
 base_dn = 'dc=syswin,dc=com'
 scope = ldap.SCOPE_SUBTREE
 ldap_server = 'ldap://172.28.4.103:389'
@@ -220,6 +223,7 @@ class AdminUserList(Resource):
 
 class AdminUserDetail(Resource):
 
+    @auth.login_required
     def get(self, name):
         res = []
         users = UserInfo.objects.filter(username=name)
@@ -240,6 +244,7 @@ class AdminUserDetail(Resource):
         res.append(data)
         return res
 
+    @auth.login_required
     def put(self, name):
         data = json.loads(request.data)
         admin_user = data.get('admin_user')
@@ -260,6 +265,7 @@ class AdminUserDetail(Resource):
                 }
         return data
 
+    @auth.login_required
     def delete(self, name):
         user = UserInfo.objects.get(username=name)
         user.delete()
@@ -276,6 +282,7 @@ class AdminUserDetail(Resource):
 
 
 class AllUserList(Resource):
+    @auth.login_required
     def get(self):
         all_user = []
         users = UserInfo.objects.all()
