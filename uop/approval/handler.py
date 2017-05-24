@@ -187,6 +187,43 @@ class Reservation(Resource):
         return ret, code
 
 
+
+class ReservationMock(Resource):
+    def post(self):
+        code = 0
+        res = ""
+        msg = {}
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str)
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        try:
+            resource = models.ResourceModel.objects.get(res_id=resource_id)
+        except Exception as e:
+            code = 410
+            res = "Failed to find the rsource"
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+            return ret, code
+        #MOCE
+        code = 200
+        ret = {
+            "code": code,
+            "result": {
+            "res": res,
+            "msg": msg
+            }
+        }
+        return ret, code
+
+
+
 approval_api.add_resource(ApprovalList, '/approvals')
 approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
-approval_api.add_resource(Reservation, '/reservation')
+#approval_api.add_resource(Reservation, '/reservation')
+approval_api.add_resource(ReservationMock, '/reservation')
