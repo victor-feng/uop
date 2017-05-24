@@ -11,6 +11,7 @@ from uop.deployment import deployment_blueprint
 from uop.resources import resources_blueprint
 from uop.approval import approval_blueprint
 from uop.deploy_callback import deploy_cb_blueprint
+from uop.workbench import bench_blueprint
 
 
 def create_app(config_name):
@@ -32,5 +33,6 @@ def create_app(config_name):
     app.register_blueprint(resources_blueprint, url_prefix='/api/resource')
     app.register_blueprint(approval_blueprint, url_prefix='/api/approval')
     app.register_blueprint(deploy_cb_blueprint, url_prefix='/api/dep_result')
+    app.register_blueprint(bench_blueprint, url_prefix='/api/bench')
 
     return app
