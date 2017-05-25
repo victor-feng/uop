@@ -150,7 +150,7 @@ class UserList(Resource):
         user_id = verify_res.get('id')  # 获取到工号
         is_admin = False
         is_root = False
-        root_list = ['147749', '147405']
+        root_list = ['147749', '147405', '147523', '147768']
 
         if verify_code:
             res = '登录成功'
