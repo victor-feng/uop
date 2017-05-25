@@ -9,6 +9,11 @@ from uop.deploy_callback import deploy_cb_blueprint
 from uop.deploy_callback.errors import deploy_cb_errors
 from uop.models import Deployment
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 deploy_cb_api = Api(deploy_cb_blueprint, errors=deploy_cb_errors)
 
 
@@ -38,9 +43,13 @@ class DeployCallback(Resource):
                 }
             }
             return ret
-        parser = reqparse.RequestParser()
-        parser.add_argument('result', type=str)
-        args = parser.parse_args()
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('result', type=str)
+            args = parser.parse_args()
+        except Exception as e:
+            print e
+            return
 
         dep.deploy_result = args.result
         try:
