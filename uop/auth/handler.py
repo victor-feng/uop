@@ -245,6 +245,7 @@ class AdminUserDetail(Resource):
                         'username': user.username,
                         'department': user.department,
                         'is_admin': user.is_admin,
+                        'is_root': user.is_root,
                         'created_time': str(user.created_time),
                         }
         else:
