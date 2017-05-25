@@ -149,6 +149,7 @@ class UserList(Resource):
         department = verify_res_department.decode('utf-8')
         user_id = verify_res.get('id')  # 获取到工号
         is_admin = False
+        is_root = False
 
         if verify_code:
             res = '登录成功'
@@ -156,19 +157,22 @@ class UserList(Resource):
             try:
                 user = UserInfo.objects.get(id=user_id)
                 is_admin = user.is_admin
+                is_root = user.root
             except UserInfo.DoesNotExist:
                 user_obj = UserInfo()
                 user_obj.id = user_id
                 user_obj.username = user
                 user_obj.password = salt_password
                 user_obj.department = department
+                user_obj.is_root = is_root
                 # user_obj.created_time = datetime.datetime.now()
                 user_obj.save()
             msg = {
                     'user_id': user_id,
                     'username': user.username,
                     'department': department,
-                    'is_admin': is_admin
+                    'is_admin': is_admin,
+                    'is_root': is_root,
                     }
         else:
             res = '登录失败'
@@ -248,21 +252,26 @@ class AdminUserDetail(Resource):
     def put(self, name):
         data = json.loads(request.data)
         admin_user = data.get('admin_user')
-        user = UserInfo.objects.get(id=name)
+        user_id = data.get('user_id')
+        user = UserInfo.objects.get(id=user_id)
+        root = UserInfo.objects.get(id=name)
         # parser = reqparse.RequestParser()
         # parser.add_argument('admin_user', type=bool)
         # args = parser.parse_args()
         # admin_user = args.admin_user
-        if user:
+        if root.is_root:
             user.is_admin = eval(admin_user)
             user.save()
-        data = {
-                'id': user.id,
-                'username': user.username,
-                'department': user.department,
-                'is_admin': user.is_admin,
-                'created_time': str(user.created_time),
-                }
+            data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'department': user.department,
+                    'is_admin': user.is_admin,
+                    'is_root': user.is_root,
+                    'created_time': str(user.created_time),
+                    }
+        else:
+            data = '您没有root权限'
         return data
 
     # @auth.login_required
