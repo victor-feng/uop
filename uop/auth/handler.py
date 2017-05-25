@@ -161,6 +161,8 @@ class UserList(Resource):
             except UserInfo.DoesNotExist:
                 if user_id == '147405' or '147749':  # 设置某用户为root用户
                     is_root = True
+                else:
+                    is_root = False
 
                 user_obj = UserInfo()
                 user_obj.id = user_id
