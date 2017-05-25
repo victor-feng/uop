@@ -159,6 +159,9 @@ class UserList(Resource):
                 is_admin = user.is_admin
                 is_root = user.is_root
             except UserInfo.DoesNotExist:
+                if user_id == '147405' or '147749':  # 设置某用户为root用户
+                    is_root = True
+
                 user_obj = UserInfo()
                 user_obj.id = user_id
                 user_obj.username = user
@@ -260,10 +263,10 @@ class AdminUserDetail(Resource):
         # args = parser.parse_args()
         # admin_user = args.admin_user
 
-        if name == '147405' or '147749':  # 设置谋用户为root用户
-            if not root.is_root:
-                root.is_root = True
-                root.save()
+        # if name == '147405' or '147749':  # 设置某用户为root用户
+        #     if not root.is_root:
+        #         root.is_root = True
+        #         root.save()
 
         if root.is_root:
             user.is_admin = eval(admin_user)
