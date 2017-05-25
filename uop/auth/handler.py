@@ -271,7 +271,10 @@ class AdminUserDetail(Resource):
                     'created_time': str(user.created_time),
                     }
         else:
-            data = '您没有root权限'
+            data = {
+                    'code': 300,
+                    'msg': '您没有root权限'
+                    }
         return data
 
     # @auth.login_required
