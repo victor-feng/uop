@@ -157,7 +157,7 @@ class UserList(Resource):
             try:
                 user = UserInfo.objects.get(id=user_id)
                 is_admin = user.is_admin
-                is_root = user.root
+                is_root = user.is_root
             except UserInfo.DoesNotExist:
                 user_obj = UserInfo()
                 user_obj.id = user_id
