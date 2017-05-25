@@ -150,6 +150,7 @@ class UserList(Resource):
         user_id = verify_res.get('id')  # 获取到工号
         is_admin = False
         is_root = False
+        root_list = ['147749', '147405']
 
         if verify_code:
             res = '登录成功'
@@ -159,10 +160,8 @@ class UserList(Resource):
                 is_admin = user.is_admin
                 is_root = user.is_root
             except UserInfo.DoesNotExist:
-                if user_id == '147405' or '147749':  # 设置某用户为root用户
+                if user_id in root_list:  # 设置某用户为root用户
                     is_root = True
-                else:
-                    is_root = False
 
                 user_obj = UserInfo()
                 user_obj.id = user_id
