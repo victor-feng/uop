@@ -263,6 +263,7 @@ class AdminUserDetail(Resource):
             user.is_admin = eval(admin_user)
             user.save()
             data = {
+                    'code': 200,
                     'id': user.id,
                     'username': user.username,
                     'department': user.department,
