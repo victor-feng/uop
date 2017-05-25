@@ -157,10 +157,14 @@ class UserList(Resource):
             code = 200
             try:
                 user = UserInfo.objects.get(id=user_id)
+                if user.id in root_list:  # 已经存在本地的用户 设置为root用户
+                    is_root = True
+                    user.is_root = is_root
+                    user.save()
                 is_admin = user.is_admin
                 is_root = user.is_root
             except UserInfo.DoesNotExist:
-                if user_id in root_list:  # 设置某用户为root用户
+                if user_id in root_list:  # 没有登录过的用户 设置为root用户
                     is_root = True
 
                 user_obj = UserInfo()
