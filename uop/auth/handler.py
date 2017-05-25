@@ -260,7 +260,7 @@ class AdminUserDetail(Resource):
         # args = parser.parse_args()
         # admin_user = args.admin_user
 
-        if name == '147405':  # 设置谋用户为root用户
+        if name == '147405' or '147749':  # 设置谋用户为root用户
             if not root.is_root:
                 root.is_root = True
 
