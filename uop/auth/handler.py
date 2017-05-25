@@ -263,6 +263,7 @@ class AdminUserDetail(Resource):
         if name == '147405' or '147749':  # 设置谋用户为root用户
             if not root.is_root:
                 root.is_root = True
+                root.save()
 
         if root.is_root:
             user.is_admin = eval(admin_user)
