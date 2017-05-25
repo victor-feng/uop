@@ -316,6 +316,7 @@ class AllUserList(Resource):
                     'username': i.username,
                     'department': i.department,
                     'is_admin': i.is_admin,
+                    'is_root': i.is_root,
                     'created_time': str(i.created_time)
                     }
             all_user.append(data)
