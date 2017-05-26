@@ -87,7 +87,7 @@ class ResCallback(Resource):
         data['env'] = env
         data['db_info'] = db_info
         res = requests.post(res_callback_url + 'repo_store/', data=json.dumps(data))
-        res = json.loads(res)
+        res = json.loads(res.text)
 
         return res
 
