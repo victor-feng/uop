@@ -164,28 +164,76 @@ class Reservation(Resource):
             }
             return ret, code
 
-        data = {}
-        data['env'] = resource.env
+        data = dict()
         data['resource_list'] = resource.resource_list
-        data['compute_list'] = resource.compute_list
+        data['project'] = resource.project
+        data['project_id'] = resource.project_id
+        data['department'] = resource.department
+        data['res_id'] = resource.res_id
+        data['user_name'] = resource.user_name
+        data['user_id'] = resource.user_id
+        data['domain'] = resource.domain
+        data['env'] = resource.env
+        data['application_status'] = resource.application_status
+        resource_list = resource.resource_list
+        compute_list = resource.compute_list
+        if resource_list:
+            res = []
+            for db_res in resource_list:
+                res.append(
+                    {
+                        "res_name": db_res.ins_name,
+                        "res_id": db_res.ins_id,
+                        "res_type": db_res.ins_type,
+                        "cpu": db_res.cpu,
+                        "mem": db_res.mem,
+                        "disk": db_res.disk,
+                        "quantity": db_res.quantity,
+                        "version": db_res.version
+                    }
+                )
+            data['resource_list'] = res
+        if compute_list:
+            com = []
+            for db_com in compute_list:
+                com.append(
+                    {
+                        "ins_name": db_com.ins_name,
+                        "ins_id": db_com.ins_id,
+                        "cpu": db_com.cpu,
+                        "mem": db_com.mem,
+                        "url": db_com.url
+                    }
+                )
+            data['compute_list'] = com
+
         data_str = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
         try:
-            msg = requests.post(CPR_URL + "revervation/", data=data_str)
-            code = 200
+            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service."
             code = 500
-        finally:
             ret = {
                 "code": code,
                 "result": {
-                    "res": res,
-                    "msg": msg
+                    "res": res
                 }
             }
-
+            return ret, code
+        if msg.status_code != 202:
+            code = msg.status_code
+            res = "Failed to reserve resource."
+        else:
+            code = 200
+            res = "Success in reserving resource."
+        ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
         return ret, code
-
 
 
 class ReservationMock(Resource):
@@ -225,5 +273,5 @@ class ReservationMock(Resource):
 
 approval_api.add_resource(ApprovalList, '/approvals')
 approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
-#approval_api.add_resource(Reservation, '/reservation')
-approval_api.add_resource(ReservationMock, '/reservation')
+approval_api.add_resource(Reservation, '/reservation')
+# approval_api.add_resource(ReservationMock, '/reservation')
