@@ -8,9 +8,9 @@ from uop.res_callback import res_callback_blueprint
 from uop.models import User
 from uop.res_callback.errors import res_callback_errors
 import requests
-
+# from uop_backend.config import res_callback_url
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
-cmdb_url = 'http://cmdb-test.syswin.com/cmdb/api/'
+res_callback_url = 'http://cmdb-test.syswin.com/cmdb/api/'
 
 
 class UserRegister(Resource):
@@ -49,14 +49,30 @@ class ResCallback(Resource):
     def post(self):
         data = {}
         parser = reqparse.RequestParser()
-        parser.add_argument('project_name', type=list, required=True, location='json')
-        parser.add_argument('project_id', type=int)
+        parser.add_argument('resource_id', type=str, required=True)
+        parser.add_argument('resource_name', type=str, required=True)
+        parser.add_argument('under_id', type=str, required=True)
+        parser.add_argument('domain', type=str)
+        parser.add_argument('env', type=str)
+        parser.add_argument('container', type=dict)
+        parser.add_argument('db_info', type=dict)
+
         args = parser.parse_args()
-        project_name = args.project_name
-        project_id = args.project_id
-        data['project_id'] = project_id
-        data['project_name'] = project_name
-        res = requests.post(cmdb_url + 'items', data=json.dumps(data))
+        project_name = args.resource_name
+        project_id = args.resource_id
+        under_id = args.under_id
+        domain = args.domain
+        env = args.env
+        container = args.container
+        db_info = args.db_info
+        data['resource_id'] = project_id
+        data['resource_name'] = project_name
+        data['under_id'] = under_id
+        data['domain'] = domain
+        data['container'] = container
+        data['env'] = env
+        data['db_info'] = db_info
+        res = requests.post(res_callback_url + 'repo_store/', data=json.dumps(data))
 
         return res
 
