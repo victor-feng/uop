@@ -161,6 +161,7 @@ class ResourceApplication(Resource):
                 result['project'] = res.project
                 result['project_id'] = res.project_id
                 result['id'] = res.res_id
+                result['reservation_status'] = res.reservation_status
                 result_list.append(result)
         code = 200
         ret = {
