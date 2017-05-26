@@ -140,62 +140,65 @@ class UserList(Resource):
         md5 = hashlib.md5()
         md5.update(password)
         salt_password = md5.hexdigest()
-        conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
-        verify_code, verify_res = conn.verify_user(id, password)
-
-        verify_res_name = verify_res.get('name')  # 获取到用户名
-        verify_res_department = verify_res.get('department')  # 获取到部门
-        user = verify_res_name.decode('utf-8')
-        department = verify_res_department.decode('utf-8')
-        user_id = verify_res.get('id')  # 获取到工号
-        is_admin = False
-        is_root = False
-        root_list = ['147749', '147405', '147523']
-
-        if verify_code:
-            res = '登录成功'
+        try:
+            user = UserInfo.objects.get(id=id)
             code = 200
-            try:
-                user = UserInfo.objects.get(id=user_id)
-                if user.id in root_list:  # 已经存在本地的用户 设置为root用户
-                    is_root = True
-                user.is_root = is_root
-                user.save()
-                is_admin = user.is_admin
-                is_root = user.is_root
-            except UserInfo.DoesNotExist:
-                if user_id in root_list:  # 没有登录过的用户 设置为root用户
-                    is_root = True
-
-                user_obj = UserInfo()
-                user_obj.id = user_id
-                user_obj.username = user
-                user_obj.password = salt_password
-                user_obj.is_admin = is_admin
-                user_obj.department = department
-                user_obj.is_root = is_root
-                # user_obj.created_time = datetime.datetime.now()
-                user_obj.save()
+            res = '登录成功'
             msg = {
-                    'user_id': user_id,
+                    'user_id': user.id,
                     'username': user.username,
-                    'department': department,
+                    'department': 'admin',
                     'is_admin': user.is_admin,
-                    'is_root': is_root,
+                    'is_root': user.is_root,
                     }
-        else:
-            res = '登录失败'
-            code = 400
-            msg = 'ldap验证错误'
-        # try:
-        #     user = UserInfo.objects.get(id=user_id)
-        # except UserInfo.DoesNotExist:
-        #     user_obj = UserInfo()
-        #     user_obj.id = user_id
-        #     user_obj.username = user
-        #     user_obj.password = password
-        #     user_obj.department = department
-        #     user_obj.save()
+        except UserInfo.DoesNotExist:
+            conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
+            verify_code, verify_res = conn.verify_user(id, password)
+
+            verify_res_name = verify_res.get('name')  # 获取到用户名
+            verify_res_department = verify_res.get('department')  # 获取到部门
+            user = verify_res_name.decode('utf-8')
+            department = verify_res_department.decode('utf-8')
+            user_id = verify_res.get('id')  # 获取到工号
+            is_admin = False
+            is_root = False
+            root_list = ['147749', '147405', '147523']
+
+            if verify_code:
+                res = '登录成功'
+                code = 200
+                try:
+                    user = UserInfo.objects.get(id=user_id)
+                    if user.id in root_list:  # 已经存在本地的用户 设置为root用户
+                        is_root = True
+                    user.is_root = is_root
+                    user.save()
+                    is_admin = user.is_admin
+                    is_root = user.is_root
+                except UserInfo.DoesNotExist:
+                    if user_id in root_list:  # 没有登录过的用户 设置为root用户
+                        is_root = True
+
+                    user_obj = UserInfo()
+                    user_obj.id = user_id
+                    user_obj.username = user
+                    user_obj.password = salt_password
+                    user_obj.is_admin = is_admin
+                    user_obj.department = department
+                    user_obj.is_root = is_root
+                    # user_obj.created_time = datetime.datetime.now()
+                    user_obj.save()
+                msg = {
+                        'user_id': user_id,
+                        'username': user.username,
+                        'department': department,
+                        'is_admin': user.is_admin,
+                        'is_root': is_root,
+                        }
+            else:
+                res = '登录失败'
+                code = 400
+                msg = 'ldap验证错误'
 
         res = {
                 "code": code,
