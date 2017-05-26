@@ -147,7 +147,7 @@ class UserList(Resource):
             msg = {
                     'user_id': user.id,
                     'username': user.username,
-                    'department': 'admin',
+                    'department': user.department,
                     'is_admin': user.is_admin,
                     'is_root': user.is_root,
                     }
