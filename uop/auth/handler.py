@@ -150,7 +150,7 @@ class UserList(Resource):
         user_id = verify_res.get('id')  # 获取到工号
         is_admin = False
         is_root = False
-        root_list = ['147749', '147405', '147523', '147768']
+        root_list = ['147749', '147405', '147523']
 
         if verify_code:
             res = '登录成功'
@@ -171,6 +171,7 @@ class UserList(Resource):
                 user_obj.id = user_id
                 user_obj.username = user
                 user_obj.password = salt_password
+                user_obj.is_admin = is_admin
                 user_obj.department = department
                 user_obj.is_root = is_root
                 # user_obj.created_time = datetime.datetime.now()
@@ -179,7 +180,7 @@ class UserList(Resource):
                     'user_id': user_id,
                     'username': user.username,
                     'department': department,
-                    'is_admin': is_admin,
+                    'is_admin': user.is_admin,
                     'is_root': is_root,
                     }
         else:
