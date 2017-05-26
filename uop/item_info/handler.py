@@ -25,6 +25,7 @@ class ItemInfo(Resource):
         item_id = "project_item"
         try:
             parser = reqparse.RequestParser()
+            parser.add_argument('user_id', type=str, location='args')
             parser.add_argument('user_name', type=str, location='args')
             parser.add_argument('item_name', type=str, location='args')
             parser.add_argument('item_code', type=str, location='args')
@@ -34,6 +35,8 @@ class ItemInfo(Resource):
             args = parser.parse_args()
 
             args_dict = {}
+            if args.user_id:
+                args_dict["user_id"] = args.user_id
             if args.user_name:
                 args_dict["user"] = args.user_name
             if args.item_name:
