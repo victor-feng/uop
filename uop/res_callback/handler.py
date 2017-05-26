@@ -48,28 +48,42 @@ class UserRegister(Resource):
 class ResCallback(Resource):
     def post(self):
         data = {}
-        parser = reqparse.RequestParser()
-        parser.add_argument('resource_id', type=str, required=True)
-        parser.add_argument('resource_name', type=str, required=True)
-        parser.add_argument('under_id', type=str, required=True)
-        parser.add_argument('domain', type=str)
-        parser.add_argument('env', type=str)
-        parser.add_argument('container', type=dict)
-        parser.add_argument('db_info', type=dict)
+        res_data = json.loads(request.data)
+        
+        resource_id = res_data.get('resource_id')
+        resource_name = res_data.get('resource_name')
+        under_id = res_data.get('under_id')
+        domain = res_data.get('domain')
+        env = res_data.get('env')
+        container = res_data.get('container')
+        status = res_data.get('status')
+        db_info = res_data.get('db_info')
 
-        args = parser.parse_args()
-        project_name = args.resource_name
-        project_id = args.resource_id
-        under_id = args.under_id
-        domain = args.domain
-        env = args.env
-        container = args.container
-        db_info = args.db_info
-        data['resource_id'] = project_id
-        data['resource_name'] = project_name
+        # parser = reqparse.RequestParser()
+        # parser.add_argument('resource_id', type=str, required=True)
+        # parser.add_argument('resource_name', type=str, required=True)
+        # parser.add_argument('under_id', type=str, required=True)
+        # parser.add_argument('domain', type=str)
+        # parser.add_argument('env', type=str)
+        # parser.add_argument('container')
+        # parser.add_argument('status')
+        # parser.add_argument('db_info')
+
+        # args = parser.parse_args()
+        # project_name = args.resource_name
+        # project_id = args.resource_id
+        # under_id = args.under_id
+        # domain = args.domain
+        # env = args.env
+        # status = args.status
+        # container = args.container
+        # db_info = args.db_info
+        data['resource_id'] = resource_id
+        data['resource_name'] = resource_name
         data['under_id'] = under_id
         data['domain'] = domain
         data['container'] = container
+        data['status'] = status
         data['env'] = env
         data['db_info'] = db_info
         res = requests.post(res_callback_url + 'repo_store/', data=json.dumps(data))
