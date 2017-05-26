@@ -18,6 +18,7 @@ class ResourceApplication(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('resource_name', type=str)
         parser.add_argument('project', type=str)
+        parser.add_argument('project_id', type=str)
         parser.add_argument('department', type=str)
         # parser.add_argument('department_id', type=str)
         # parser.add_argument('res_id', type=str)
@@ -33,6 +34,7 @@ class ResourceApplication(Resource):
 
         resource_name = args.resource_name
         project = args.project
+        project_id = args.project_id
         department = args.department
         department_id = '1'
         # res_id = args.res_id
@@ -62,7 +64,7 @@ class ResourceApplication(Resource):
             print e
             return
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
-                                             department_id=department_id, res_id=res_id,
+                                             department_id=department_id, res_id=res_id, project_id=project_id,
                                              user_name=user_name, user_id=user_id, domain=domain, env=env,
                                              application_status=application_status, approval_status=approval_status)
         for resource in resource_list:
@@ -157,6 +159,7 @@ class ResourceApplication(Resource):
                 result['formStatus'] = res.application_status
                 result['approval_status'] = res.approval_status
                 result['project'] = res.project
+                result['project_id'] = res.project_id
                 result['id'] = res.res_id
                 result_list.append(result)
         code = 200
@@ -191,6 +194,7 @@ class ResourceDetail(Resource):
             for resource in resources:
                 result['resource_name'] = resource.resource_name
                 result['project'] = resource.project
+                result['project_id'] = resource.project_id
                 result['department'] = resource.department
                 result['department_id'] = resource.department_id
                 result['res_id'] = res_id
@@ -424,6 +428,7 @@ class ResourceRecord(Resource):
                 result['formStatus'] = res.application_status
                 result['approvalStatus'] = res.approval_status
                 result['project'] = res.project
+                result['project_id'] = res.project_id
                 result['id'] = res.res_id
                 result_list.append(result)
         code = 200

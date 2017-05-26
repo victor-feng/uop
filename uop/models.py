@@ -98,6 +98,7 @@ class DBIns(db.EmbeddedDocument):
 class ResourceModel(db.DynamicDocument):
     resource_name = db.StringField(required=True, unique=True)
     project = db.StringField(required=True)
+    project_id = db.StringField(required=False)
     department = db.StringField(required=True)
     department_id = db.StringField(required=True)
     res_id = db.StringField(required=True, unique=True)
