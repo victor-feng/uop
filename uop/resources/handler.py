@@ -81,15 +81,16 @@ class ResourceApplication(Resource):
                            quantity=quantity, version=version)
             resource_application.resource_list.append(db_ins)
 
-        for compute in compute_list:
-            ins_name = compute.get('ins_name')
-            # ins_id = compute.get('ins_id')
-            ins_id = str(uuid.uuid1())
-            cpu = compute.get('cpu')
-            mem = compute.get('mem')
-            url = compute.get('url')
-            compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url)
-            resource_application.compute_list.append(compute_ins)
+        if compute_list:
+            for compute in compute_list:
+                ins_name = compute.get('ins_name')
+                # ins_id = compute.get('ins_id')
+                ins_id = str(uuid.uuid1())
+                cpu = compute.get('cpu')
+                mem = compute.get('mem')
+                url = compute.get('url')
+                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url)
+                resource_application.compute_list.append(compute_ins)
 
         try:
             resource_application.save()

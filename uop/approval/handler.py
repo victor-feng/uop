@@ -165,16 +165,11 @@ class Reservation(Resource):
             return ret, code
 
         data = dict()
-        data['resource_list'] = resource.resource_list
-        data['project'] = resource.project
-        data['project_id'] = resource.project_id
-        data['department'] = resource.department
-        data['res_id'] = resource.res_id
-        data['user_name'] = resource.user_name
-        data['user_id'] = resource.user_id
+        data['under_id'] = resource.project_id
+        data['resource_id'] = resource.res_id
+        data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
         data['env'] = resource.env
-        data['application_status'] = resource.application_status
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
@@ -182,9 +177,9 @@ class Reservation(Resource):
             for db_res in resource_list:
                 res.append(
                     {
-                        "res_name": db_res.ins_name,
-                        "res_id": db_res.ins_id,
-                        "res_type": db_res.ins_type,
+                        "instance_name": db_res.ins_name,
+                        "instance_id": db_res.ins_id,
+                        "instance_type": db_res.ins_type,
                         "cpu": db_res.cpu,
                         "mem": db_res.mem,
                         "disk": db_res.disk,
@@ -198,11 +193,11 @@ class Reservation(Resource):
             for db_com in compute_list:
                 com.append(
                     {
-                        "ins_name": db_com.ins_name,
-                        "ins_id": db_com.ins_id,
+                        "instance_name": db_com.ins_name,
+                        "instance_id": db_com.ins_id,
                         "cpu": db_com.cpu,
                         "mem": db_com.mem,
-                        "url": db_com.url
+                        "image_url": db_com.url
                     }
                 )
             data['compute_list'] = com
