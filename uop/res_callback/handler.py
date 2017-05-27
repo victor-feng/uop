@@ -49,7 +49,7 @@ class ResCallback(Resource):
     def post(self):
         data = {}
         res_data = json.loads(request.data)
-        
+
         resource_id = res_data.get('resource_id')
         resource_name = res_data.get('resource_name')
         under_id = res_data.get('under_id')
@@ -102,6 +102,11 @@ class ResCallback(Resource):
         res = requests.post(res_callback_url + 'repo_store/', data=json.dumps(data))
         res = json.loads(res.text)
 
+        return res
+
+    def get(self):
+        data = requests.get(res_callback_url + 'repo_list/')
+        res = json.loads(data.text)
         return res
 
 
