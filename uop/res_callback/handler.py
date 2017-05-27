@@ -5,7 +5,7 @@ from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.res_callback import res_callback_blueprint
-from uop.models import User
+from uop.models import User, ResourceModel
 from uop.res_callback.errors import res_callback_errors
 import requests
 # from uop_backend.config import res_callback_url
@@ -58,6 +58,19 @@ class ResCallback(Resource):
         container = res_data.get('container')
         status = res_data.get('status')
         db_info = res_data.get('db_info')
+        try:
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.reservation_status = status
+            resource.save()
+        except Exception as e:
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
 
         # parser = reqparse.RequestParser()
         # parser.add_argument('resource_id', type=str, required=True)

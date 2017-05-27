@@ -66,7 +66,8 @@ class ResourceApplication(Resource):
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                              department_id=department_id, res_id=res_id, project_id=project_id,
                                              user_name=user_name, user_id=user_id, domain=domain, env=env,
-                                             application_status=application_status, approval_status=approval_status)
+                                             application_status=application_status, approval_status=approval_status,
+                                             reservation_status="unreserved")
         for resource in resource_list:
             ins_name = resource.get('res_name')
             # ins_id = resource.get('res_id')
