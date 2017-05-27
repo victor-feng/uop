@@ -20,6 +20,7 @@ class DevelopmentConfig(BaseConfig):
         'password': 'xcloud'
     }
     CRP_URL = "http://172.28.32.32:8001/"
+    CMDB_URL = "http://cmdb-test.syswin.com/"
 
 class TestingConfig(BaseConfig):
     TESTING = True
@@ -31,6 +32,7 @@ class TestingConfig(BaseConfig):
             'password': 'uop',
             }
     CRP_URL = "http://172.28.32.32:8001/"
+    CMDB_URL = "http://cmdb-test.syswin.com/"
 
 
 configs = {

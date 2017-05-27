@@ -11,48 +11,71 @@ from uop.deployment.errors import deploy_errors
 from config import APP_ENV, configs
 
 CPR_URL = configs[APP_ENV].CRP_URL
+CMDB_URL = configs[APP_ENV].CMDB_URL
+
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
 
 def get_resource_by_id(resource_id):
-    url = 'http://cmdb-test.syswin.com/cmdb/api/items?resource_id=' + resource_id
-    headers = {'Content-Type': 'application/json'}
-    result = requests.post(url, headers=headers)
-    print result.json()
+    err_msg = None
+    resource_info = {}
+    try:
+        url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
+        headers = {'Content-Type': 'application/json'}
+        print url+' '+json.dumps(headers)
+        result = requests.get(url, headers=headers)
+        result = result.json()
+        print 'data: '+json.dumps(result)
+    except requests.exceptions.ConnectionError as rq:
+        err_msg = rq.message.message
+    except BaseException as e:
+        err_msg = e.message
+    else:
+        if result:
+            _container = result.get('container', {})
+            _mysql = result.get('db_info', {}).get('mysql', {})
+            resource_info['mysql_ip'] = _mysql.get('ip', None)
+            resource_info['mysql_port'] = _mysql.get('port', None)
+            resource_info['mysql_user'] = _mysql.get('username', None)
+            resource_info['mysql_password'] = _mysql.get('password', None)
+            resource_info['docker_ip'] = _container.get('ip', None)
+        else:
+            err_msg = 'resource('+resource_id+') not found.'
+
+    return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item):
-
-    # todo:from CMDB get data
-
+def deploy_to_crp(deploy_item, resource_info):
     data = {
         "deploy_id": deploy_item.deploy_id,
         "mysql": {
-            "ip": "172.28.29.46",
-            "port": "3306",
+            "ip": resource_info['mysql_ip'],
+            "port": resource_info['mysql_port'],
             "host_user": "root",
             "host_password": "123456",
-            "mysql_user": "root",
-            "mysql_password": "Syswin#123",
+            "mysql_user": resource_info['mysql_user'],
+            "mysql_password": resource_info['mysql_password'],
             "database": "mysql",
             "sql_script": deploy_item.exec_context
         },
         "docker": {
             "image_url": deploy_item.app_image,
-            "ip": "172.28.29.46"
+            "ip": resource_info['docker_ip']
         }
     }
-    data_str = json.dumps(data)
     try:
+        data_str = json.dumps(data)
+        url = CPR_URL + "api/deploy/deploys"
         headers = {'Content-Type': 'application/json'}
-        result = requests.post(
-            CPR_URL + "api/deploy/deploys",
-            headers=headers, data=data_str)
+        print url + ' ' + json.dumps(headers) + ' ' + data_str
+        result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
-    except Exception as e:
+    except requests.exceptions.ConnectionError as rq:
+        result = rq.message.message
+    except BaseException as e:
         result = e.message
 
-    print 'deployment(' + deploy_item.deploy_id + ') apply to crp, request body:' + data_str + ' result:' + result
+    print 'response: '+result
 
 
 class DeploymentListAPI(Resource):
@@ -160,7 +183,11 @@ class DeploymentListAPI(Resource):
             deploy_item.save()
 
             if action == 'deploy_to_crp':
-                deploy_to_crp(deploy_item)
+                err_msg, resource_info = get_resource_by_id(deploy_item.resource_id)
+                if not err_msg:
+                    deploy_to_crp(deploy_item, resource_info)
+                else:
+                    raise Exception(err_msg)
 
         except Exception as e:
             res = {
@@ -196,9 +223,6 @@ class DeploymentAPI(Resource):
             res_code = 404
         return "", res_code
 
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
-
-
-if __name__ == '__main__':
-    get_resource_by_id('')
