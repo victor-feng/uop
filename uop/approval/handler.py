@@ -165,7 +165,13 @@ class Reservation(Resource):
             return ret, code
 
         data = dict()
-        data['under_id'] = resource.project_id
+        data['unit_id'] = resource.project_id
+        data['unit_name'] = resource.project
+        data['unit_des'] = ''
+        data['user_id'] = resource.user_id
+        data['username'] = resource.user_name
+        data['department'] = resource.department
+        data['created_time'] = resource.created_date
         data['resource_id'] = resource.res_id
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
@@ -220,6 +226,8 @@ class Reservation(Resource):
             code = msg.status_code
             res = "Failed to reserve resource."
         else:
+            resource.reservation_status = "reserving"
+            resource.save()
             code = 200
             res = "Success in reserving resource."
         ret = {
