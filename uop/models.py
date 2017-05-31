@@ -31,7 +31,7 @@ class UserInfo(db.Document):
 
 class Deployment(db.Document):
     deploy_id = db.StringField(max_length=100, unique=True)
-    deploy_name = db.StringField(max_length=50, unique=True)
+    deploy_name = db.StringField(max_length=50)
     initiator = db.StringField(max_length=50)
     project_id = db.StringField(max_length=50)
     project_name = db.StringField(max_length=50)
