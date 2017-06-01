@@ -395,11 +395,6 @@ class ResCallback(Resource):
                         'name': '所属部署单元ID',
                         'value': unit_id,
                         },
-                    {
-                        'type': 'string',
-                        'name': 'IP地址',
-                        'value': mysql_ip,
-                        },
                     ],
                 }
         try:
