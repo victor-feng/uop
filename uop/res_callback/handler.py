@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import random
+import uuid
 from flask import request
 from flask import redirect
 from flask import jsonify
@@ -220,7 +221,7 @@ class ResCallback(Resource):
                 }
         """
         data_container = {
-                'name': container_name+str(random.randint(1,1000)),
+                'name': str(uuid.uuid()),
                 'layer_id': 'iaas',
                 'group_id': 'server',
                 'item_id': 'docker',
@@ -284,7 +285,7 @@ class ResCallback(Resource):
                 }
         """
         data_mysql = {
-                'name': mysql_username,
+                'name': str(uuid.uuid()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'mysql_item',
@@ -322,7 +323,7 @@ class ResCallback(Resource):
                     ]
                 }
         data_redis = {
-                'name': redis_username+str(random.randint(1, 1000)),
+                'name': str(uuid.uuid()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'redis_item',
@@ -360,7 +361,7 @@ class ResCallback(Resource):
                     ],
                 }
         data_mongo = {
-                'name': mongo_username+str(random.randint(1, 1000)),
+                'name': str(uuid.uuid()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'mongo_item',
