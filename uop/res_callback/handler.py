@@ -82,6 +82,8 @@ class ResCallback(Resource):
         redis_info = db_info.get('redis')
         mongo_info = db_info.get('mongodb')
 
+        if not mysql_info:
+            mysql_info = {}
         mysql_ins_id = mysql_info.get('ins_id', '')
         mysql_username = mysql_info.get('username', '')
         mysql_password = mysql_info.get('password', '')
