@@ -221,7 +221,7 @@ class ResCallback(Resource):
                 }
         """
         data_container = {
-                'name': str(uuid.uuid()),
+                'name': str(uuid.uuid4()),
                 'layer_id': 'iaas',
                 'group_id': 'server',
                 'item_id': 'docker',
@@ -285,7 +285,7 @@ class ResCallback(Resource):
                 }
         """
         data_mysql = {
-                'name': str(uuid.uuid()),
+                'name': str(uuid.uuid4()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'mysql_item',
@@ -323,7 +323,7 @@ class ResCallback(Resource):
                     ]
                 }
         data_redis = {
-                'name': str(uuid.uuid()),
+                'name': str(uuid.uuid4()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'redis_item',
@@ -361,7 +361,7 @@ class ResCallback(Resource):
                     ],
                 }
         data_mongo = {
-                'name': str(uuid.uuid()),
+                'name': str(uuid.uuid4()),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'mongo_item',
