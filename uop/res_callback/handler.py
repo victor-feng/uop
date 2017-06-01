@@ -82,23 +82,23 @@ class ResCallback(Resource):
         redis_info = db_info.get('redis')
         mongo_info = db_info.get('mongodb')
 
-        mysql_ins_id = mysql_info.get('ins_id')
-        mysql_username = mysql_info.get('username')
-        mysql_password = mysql_info.get('password')
-        mysql_port = mysql_info.get('port')
-        mysql_ip = mysql_info.get('ip')
+        mysql_ins_id = mysql_info.get('ins_id', '')
+        mysql_username = mysql_info.get('username', '')
+        mysql_password = mysql_info.get('password', '')
+        mysql_port = mysql_info.get('port', '')
+        mysql_ip = mysql_info.get('ip', '')
 
-        redis_ind_id = redis_info.get('ind_id')
-        redis_username = redis_info.get('username')
-        redis_password = redis_info.get('password')
-        redis_port = redis_info.get('port')
-        redis_ip = redis_info.get('ip')
+        redis_ind_id = redis_info.get('ind_id', '')
+        redis_username = redis_info.get('username', '')
+        redis_password = redis_info.get('password', '')
+        redis_port = redis_info.get('port', '')
+        redis_ip = redis_info.get('ip', '')
 
-        mongo_ind_id = mongo_info.get('ind_id')
-        mongo_username = mongo_info.get('username')
-        mongo_password = mongo_info.get('password')
-        mongo_port = mongo_info.get('port')
-        mongo_ip = mongo_info.get('ip')
+        mongo_ind_id = mongo_info.get('ind_id', '')
+        mongo_username = mongo_info.get('username', '')
+        mongo_password = mongo_info.get('password', '')
+        mongo_port = mongo_info.get('port', '')
+        mongo_ip = mongo_info.get('ip', '')
         mongo_ref = unit_id  # 所属部署单元
 
         try:
