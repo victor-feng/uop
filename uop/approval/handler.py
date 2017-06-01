@@ -171,7 +171,7 @@ class Reservation(Resource):
         data['user_id'] = resource.user_id
         data['username'] = resource.user_name
         data['department'] = resource.department
-        data['created_time'] = resource.created_date
+        data['created_time'] = str(resource.created_date)
         data['resource_id'] = resource.res_id
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
