@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import random
 from flask import request
 from flask import redirect
 from flask import jsonify
@@ -321,7 +322,7 @@ class ResCallback(Resource):
                     ]
                 }
         data_redis = {
-                'name': redis_username,
+                'name': redis_username+str(random.randint(1, 1000)),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'redis_item',
@@ -348,13 +349,18 @@ class ResCallback(Resource):
                         },
                     {
                         'type': 'string',
+                        'name': 'IP地址',
+                        'value': redis_ip,
+                        },
+                    {
+                        'type': 'string',
                         'name': '所属部署单元ID',
                         'value': unit_id,
                         },
                     ],
                 }
         data_mongo = {
-                'name': mongo_username,
+                'name': mongo_username+str(random.randint(1, 1000)),
                 'layer_id': 'paas',
                 'group_id': 'database',
                 'item_id': 'mongo_item',
@@ -381,8 +387,18 @@ class ResCallback(Resource):
                         },
                     {
                         'type': 'string',
+                        'name': 'IP地址',
+                        'value': mongo_ip,
+                        },
+                    {
+                        'type': 'string',
                         'name': '所属部署单元ID',
                         'value': unit_id,
+                        },
+                    {
+                        'type': 'string',
+                        'name': 'IP地址',
+                        'value': mysql_ip,
                         },
                     ],
                 }
