@@ -63,6 +63,8 @@ class ResCallback(Resource):
         env = res_data.get('env')
         domain = res_data.get('domain')
         status = res_data.get('status')
+
+        # get the container and db
         container = res_data.get('container')
         db_info = res_data.get('db_info')
 
@@ -94,18 +96,17 @@ class ResCallback(Resource):
         mysql_port = mysql_info.get('port', '')
         mysql_ip = mysql_info.get('ip', '')
 
-        redis_ind_id = redis_info.get('ind_id', '')
+        redis_ind_id = redis_info.get('ins_id', '')
         redis_username = redis_info.get('username', '')
         redis_password = redis_info.get('password', '')
         redis_port = redis_info.get('port', '')
         redis_ip = redis_info.get('ip', '')
 
-        mongo_ind_id = mongo_info.get('ind_id', '')
+        mongo_ind_id = mongo_info.get('ins_id', '')
         mongo_username = mongo_info.get('username', '')
         mongo_password = mongo_info.get('password', '')
         mongo_port = mongo_info.get('port', '')
         mongo_ip = mongo_info.get('ip', '')
-        mongo_ref = unit_id  # 所属部署单元
 
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
@@ -319,16 +320,102 @@ class ResCallback(Resource):
                         },
                     ]
                 }
-        unit_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_unit))
-        res = json.loads(unit_res.text)
-        print res
-        container_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_container))
-        res = json.loads(container_res.text)
-        print res
-        mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mysql))
-        res = json.loads(mysql_res.text)
-
-        return res
+        data_redis = {
+                'name': redis_username,
+                'layer_id': 'paas',
+                'group_id': 'database',
+                'item_id': 'redis_item',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '实例id',
+                        'value': redis_ind_id,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '用户名',
+                        'value': redis_username,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '密码',
+                        'value': redis_password,
+                        },
+                    {
+                        'type': 'int',
+                        'name': '端口',
+                        'value': redis_port,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '所属部署单元ID',
+                        'value': unit_id,
+                        },
+                    ],
+                }
+        data_mongo = {
+                'name': mongo_username,
+                'layer_id': 'paas',
+                'group_id': 'database',
+                'item_id': 'mongo_item',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '实例id',
+                        'value': mongo_ind_id,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '用户名',
+                        'value': mongo_username,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '密码',
+                        'value': mongo_password,
+                        },
+                    {
+                        'type': 'int',
+                        'name': '端口',
+                        'value': mongo_port,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '所属部署单元ID',
+                        'value': unit_id,
+                        },
+                    ],
+                }
+        try:
+            unit_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_unit))
+            res_1 = json.loads(unit_res.text)
+            code = res_1.get('code')
+            res = '存储成功'
+            print res_1
+            if container:
+                container_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_container))
+                res_2 = json.loads(container_res.text)
+                print res_2
+            if mysql_info:
+                mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mysql))
+                res_3 = json.loads(mysql_res.text)
+                print res_3
+            if redis_info:
+                redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_redis))
+                res_4 = json.loads(redis_res.text)
+                print res_4
+            if mongo_info:
+                mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
+                res_5 = json.loads(mongo_res.text)
+                print res_5
+        except Exception, e:
+            code = 2003
+            res = '存储错误'
+        data_response = {
+                'code': code,
+                'res': res,
+                }
+        return data_response
 
     def get(self):
         data = requests.get(res_callback_url + 'repo_list/')
