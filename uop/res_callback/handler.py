@@ -398,27 +398,27 @@ class ResCallback(Resource):
                     ],
                 }
         try:
-            # unit_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_unit))
-            # res_1 = json.loads(unit_res.text)
-            # code = res_1.get('code')
-            # res = '存储成功'
-            # print res_1
+            unit_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_unit))
+            res_1 = json.loads(unit_res.text)
+            code = res_1.get('code')
+            res = '存储成功'
+            print res_1
             if container:
                 container_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_container))
                 res_2 = json.loads(container_res.text)
                 print res_2
-            # if mysql_info:
-            #     mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mysql))
-            #     res_3 = json.loads(mysql_res.text)
-            #     print res_3
-            # if redis_info:
-            #     redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_redis))
-            #     res_4 = json.loads(redis_res.text)
-            #     print res_4
-            # if mongo_info:
-            #     mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
-            #     res_5 = json.loads(mongo_res.text)
-            #     print res_5
+            if mysql_info:
+                mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mysql))
+                res_3 = json.loads(mysql_res.text)
+                print res_3
+            if redis_info:
+                redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_redis))
+                res_4 = json.loads(redis_res.text)
+                print res_4
+            if mongo_info:
+                mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
+                res_5 = json.loads(mongo_res.text)
+                print res_5
         except Exception, e:
             code = 2003
             res = '存储错误'
