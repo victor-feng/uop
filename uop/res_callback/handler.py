@@ -220,7 +220,7 @@ class ResCallback(Resource):
                 }
         """
         data_container = {
-                'name': container_name,
+                'name': container_name+str(random.randint(1,1000)),
                 'layer_id': 'iaas',
                 'group_id': 'server',
                 'item_id': 'docker',
