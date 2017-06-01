@@ -56,13 +56,21 @@ def deploy_to_crp(deploy_item, resource_info):
             "mysql_user": resource_info['mysql_user'],
             "mysql_password": resource_info['mysql_password'],
             "database": "mysql",
-            "sql_script": deploy_item.exec_context
+            "sql_script": deploy_item.mysql_context
+        },
+        "redis": {
+            "sql_script": deploy_item.redis_context
+        },
+        "mongodb": {
+            "sql_script": deploy_item.mongodb_context
         },
         "docker": {
             "image_url": deploy_item.app_image,
             "ip": resource_info['docker_ip']
         }
     }
+    err_msg = None
+    result = None
     try:
         data_str = json.dumps(data)
         url = CPR_URL + "api/deploy/deploys"
@@ -71,11 +79,11 @@ def deploy_to_crp(deploy_item, resource_info):
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
-        result = rq.message.message
+        err_msg = rq.message.message
     except BaseException as e:
-        result = e.message
+        err_msg = e.message
 
-    print 'response: '+result
+    return err_msg, result
 
 
 class DeploymentListAPI(Resource):
@@ -112,8 +120,13 @@ class DeploymentListAPI(Resource):
                     'resource_id': deployment.resource_id,
                     'resource_name': deployment.resource_name,
                     'environment': deployment.environment,
-                    'exec_tag': deployment.exec_tag,
-                    'exec_context': deployment.exec_context,
+                    'release_notes': deployment.release_notes,
+                    'mysql_tag': deployment.mysql_tag,
+                    'mysql_context': deployment.mysql_context,
+                    'redis_tag': deployment.redis_tag,
+                    'redis_context': deployment.redis_context,
+                    'mongodb_tag': deployment.mongodb_tag,
+                    'mongodb_context': deployment.mongodb_context,
                     'app_image': deployment.app_image,
                     'created_time': str(deployment.created_time),
                     'deploy_result': deployment.deploy_result
@@ -144,8 +157,13 @@ class DeploymentListAPI(Resource):
                             help='No resource id provided', location='json')
         parser.add_argument('resource_name', type=str, location='json')
         parser.add_argument('environment', type=str, location='json')
-        parser.add_argument('exec_tag', type=str, location='json')
-        parser.add_argument('exec_context', type=str, location='json')
+        parser.add_argument('release_notes', type=str, location='json')
+        parser.add_argument('mysql_tag', type=str, location='json')
+        parser.add_argument('mysql_context', type=str, location='json')
+        parser.add_argument('redis_tag', type=str, location='json')
+        parser.add_argument('redis_context', type=str, location='json')
+        parser.add_argument('mongodb_tag', type=str, location='json')
+        parser.add_argument('mongodb_context', type=str, location='json')
         parser.add_argument('app_image', type=str, location='json')
         args = parser.parse_args()
 
@@ -157,14 +175,21 @@ class DeploymentListAPI(Resource):
         resource_id = args.resource_id
         resource_name = args.resource_name
         environment = args.environment
-        exec_tag = args.exec_tag
-        exec_context = args.exec_context
+        release_notes = args.release_notes
+        mysql_tag = args.mysql_tag
+        mysql_context = args.mysql_context
+        redis_tag = args.redis_tag
+        redis_context = args.redis_context
+        mongodb_tag = args.mongodb_tag
+        mongodb_context = args.mongodb_context
         app_image = args.app_image
 
         if action == 'deploy_to_crp':
             deploy_result = 'deploying'
-        else:
+        elif action == 'save_to_db':
             deploy_result = 'not_deployed'
+        else:
+            deploy_result = 'unknown'
 
         try:
             deploy_item = Deployment(
@@ -176,18 +201,31 @@ class DeploymentListAPI(Resource):
                 resource_id=resource_id,
                 resource_name=resource_name,
                 environment=environment,
-                exec_tag=exec_tag,
-                exec_context=exec_context,
+                release_notes=release_notes,
+                mysql_tag=mysql_tag,
+                mysql_context=mysql_context,
+                redis_tag=redis_tag,
+                redis_context=redis_context,
+                mongodb_tag=mongodb_tag,
+                mongodb_context=mongodb_context,
                 app_image=app_image,
                 deploy_result=deploy_result)
-            deploy_item.save()
 
             if action == 'deploy_to_crp':
-                err_msg, resource_info = get_resource_by_id(deploy_item.resource_id)
+                err_msg, resource_info = get_resource_by_id(
+                    deploy_item.resource_id)
                 if not err_msg:
-                    deploy_to_crp(deploy_item, resource_info)
-                else:
+                    err_msg, result = deploy_to_crp(deploy_item, resource_info)
+                    if err_msg:
+                        deploy_item.deploy_result = 'deploy_failed'
+                        print 'deploy_to_crp err: '+err_msg
+                    else:
+                        print 'deploy_to_crp response: '+result
+                    deploy_item.save()
+                if err_msg:
                     raise Exception(err_msg)
+            elif action == 'save_to_db':
+                deploy_item.save()
 
         except Exception as e:
             res = {
