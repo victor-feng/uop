@@ -126,9 +126,11 @@ class ResourceApplication(Resource):
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
         parser.add_argument('agg_by', type=str, location='args')
+        # parser.add_argument('agg_match', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
+        # agg_match = args.agg_match
         condition = {}
         if args.user_id:
             condition['user_id'] = args.user_id
@@ -165,6 +167,17 @@ class ResourceApplication(Resource):
             group2_group_dict['ret'] = group2_ret_dict
             group2['$group'] = group2_group_dict
 
+            user_id = args.user_id
+            match = dict()
+            match_cond = dict()
+            match_dict = dict()
+            match_list = []
+            match_cond['user_id'] = user_id
+            match_list.append(match_cond)
+            match_dict['$and'] = match_list
+            match['$match'] = match_dict
+
+            pipeline.append(match)
             pipeline.append(group1)
             pipeline.append(group2)
 
