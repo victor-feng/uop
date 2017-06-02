@@ -167,17 +167,18 @@ class ResourceApplication(Resource):
             group2_group_dict['ret'] = group2_ret_dict
             group2['$group'] = group2_group_dict
 
-            user_id = args.user_id
-            match = dict()
-            match_cond = dict()
-            match_dict = dict()
-            match_list = []
-            match_cond['user_id'] = user_id
-            match_list.append(match_cond)
-            match_dict['$and'] = match_list
-            match['$match'] = match_dict
+            if args.user_id:
+                user_id = args.user_id
+                match = dict()
+                match_cond = dict()
+                match_dict = dict()
+                match_list = []
+                match_cond['user_id'] = user_id
+                match_list.append(match_cond)
+                match_dict['$and'] = match_list
+                match['$match'] = match_dict
+                pipeline.append(match)
 
-            pipeline.append(match)
             pipeline.append(group1)
             pipeline.append(group2)
 
