@@ -10,7 +10,7 @@ from uop.models import User, ItemInformation
 from uop.workbench.errors import user_errors
 
 bench_api = Api(bench_blueprint, errors=user_errors)
-url = 'http://cmdb-test.syswin.com/cmdb/api/repo_detail/project_item'
+url = 'http://cmdb-test.syswin.com/cmdb/api/repo_list/'
 
 
 class SourceUnitList(Resource):
@@ -22,45 +22,152 @@ class SourceUnitList(Resource):
             # res.append(i)
             for j in i.get('column'):
                 res.append(j)
-        # for z in res:
-        #     res_list.append({
-        #         'item_code': z.get('value'),
-        #         'item_name': z.get('value'),
-        #         'department': z.get('value'),
-        #         'item_description': z.get('value'),
-        #         'user': z.get('value'),
-        #         'creatd_time': z.get('value'),
-        #         })
         return res_list
 
 
 class SourceUnitDetail(Resource):
     def get(self, id):
         res = []
-        parser = reqparse.RequestParser()
-        parser.add_argument('unit_name', type=str, location='args')
-        args = parser.parse_args()
+        unit_data = requests.get(url+id+'/')
+        if unit_data:
+            # import ipdb;ipdb.set_trace()
+            res = json.loads(unit_data.text)
+            unit_name = res.get('msg').get('unit').get(u'名称')
+            container_name = res.get('msg').get('virtual').get(u'名称')
+            unit_domain = res.get('msg').get('unit').get(u'域名')
+            # unit_domain = res.get('msg').get('unit').get(u'域名')
+            mysql_ip = res.get('msg').get('res_mysql').get(u'IP地址')
+            data = [
+                # 部署实例层
+                        {
+                            'layerName': "deployInstance",
+                            'children': [
+                                {
+                                    'name': unit_name,
+                                    'imageUrl': 'deployInstance',
+                                    #  提示信息
+                                    'tooltip': unit_domain,
+                                    #  关系
+                                    'target': ['应用']
+                                }
+                            ]
+                        },
+                        #  集群层数据
+                        {
+                            'layerName': "clusterLayer",
+                            'children': [
+                                {
+                                    'name': 'Mysql',
+                                    'imageUrl': 'mysqlCluster',
+                                    'tooltip': mysql_ip,
+                                    'target': ['VM1', '应用']
+                                },
+                                {
+                                    'name': '应用',
+                                    'imageUrl': 'applicationCluster',
+                                    'tooltip': '应用集群',
+                                    'target': ['VM2']
+                                },
+                                {
+                                    'name': 'Redis',
+                                    'imageUrl': 'redisCluster',
+                                    'tooltip': 'Redis集群',
+                                    'target': ['VM3', '应用']
+                                },
+                                {
+                                    'name': 'Mongo',
+                                    'imageUrl': 'redisCluster',
+                                    'tooltip': 'mongo集群',
+                                    'target': ['VM3', '应用']
+                                },
+                            ]
+                        },
+                        #  虚拟机层数据
+                        {
+                            'layerName': "virtualLayer",
+                            'children': [
+                                {
+                                    'name': container_name,
+                                    'imageUrl': 'virtual',
+                                    'tooltip': 'VM1 192.168.33.77',
+                                    'target': ['物理机1']
+                                },
 
-        args_dict = {}
-        # if args.unit_name:
-        #     args_dict['unit_name'] = args.unit_name
-        items = ItemInformation.objects.filter(item_name=id)
-        if items:
-            for item in items:
-                res.append({
-                    "user": item.user,
-                    "user_id": item.user_id,
-                    "item_id": item.item_id,
-                    "item_name": item.item_name,
-                    "item_code": item.item_code,
-                    "item_depart": item.item_depart,
-                    "item_description": item.item_description,
-                    "create_date": str(item.create_date)
-                })
+                                {
+                                    'name': 'VM2',
+                                    'imageUrl': 'virtual',
+                                    'tooltip': 'VM2 192.168.33.78',
+                                    'target': ['物理机1']
+                                },
+                                {
+                                    'name': 'VM3',
+                                    'imageUrl': 'virtual',
+                                    'tooltip': 'VM3 192.168.33.38',
+                                    'target': ['物理机2']
+                                }
+                            ]
+                        },
+
+                        #   物理机层数据
+                        {
+                            'layerName': "physicalLayer",
+                            'children': [
+                                {
+                                    'name': '物理机1',
+                                    'imageUrl': 'physical',
+                                    'tooltip': '物理机1',
+                                    'target': ['机架']
+                                },
+
+                                {
+                                    'name': '物理机2',
+                                    'imageUrl': 'physical',
+                                    'tooltip': '物理机2',
+                                    'target': ['机架']
+                                }
+                            ]
+                        },
+                        #  机架层
+                        {
+                            'layerName': "frameLayer",
+                            'children': [
+                                {
+                                    'name': "机架",
+                                    'imageUrl': '',
+                                    'tooltip': '机架',
+                                    'target': ['资源池']
+                                }
+                            ]
+                        },
+                        #  资源池层
+                        {
+                            'layerName': "resDomainLayer",
+                            'children': [
+                                {
+                                    'name': "资源池",
+                                    'imageUrl': 'resDomain',
+                                    'tooltip': '资源池',
+                                    'target': ['DC']
+                                }
+                            ]
+                        },
+                        #  数据中心层
+                        {
+                            'layerName': "dcLayer",
+                            'children': [
+                                {
+                                    'name': "DC",
+                                    'imageUrl': 'DC',
+                                    'tooltip': '数据中心',
+                                    'target': []
+                                }
+                            ]
+                        }
+                ]
         else:
-            res = '查询结果不存在'
+            data = '查询结果不存在'
 
-        return res
+        return data
 
 
 bench_api.add_resource(SourceUnitList, '/source_unit')
