@@ -93,6 +93,9 @@ class DeploymentListAPI(Resource):
         parser.add_argument('initiator', type=str, location='args')
         parser.add_argument('deploy_name', type=str, location='args')
         parser.add_argument('project_name', type=str, location='args')
+        parser.add_argument('resource_name', type=str, location='args')
+        parser.add_argument('deploy_result', type=str, location='args')
+        parser.add_argument('environment', type=str, location='args')
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
 
@@ -104,6 +107,12 @@ class DeploymentListAPI(Resource):
             condition['deploy_name'] = args.deploy_name
         if args.project_name:
             condition['project_name'] = args.project_name
+        if args.resource_name:
+            condition['resource_name'] = args.resource_name
+        if args.deploy_result:
+            condition['deploy_result'] = args.deploy_result
+        if args.environment:
+            condition['environment'] = args.environment
         if args.start_time and args.end_time:
             condition['created_time__gte'] = args.start_time
             condition['created_time__lt'] = args.end_time
