@@ -125,8 +125,10 @@ class ResourceApplication(Resource):
         parser.add_argument('project', type=str, location='args')
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
+        parser.add_argument('agg_by', type=str, location='args')
 
         args = parser.parse_args()
+        agg_by = args.agg_by
         condition = {}
         if args.user_id:
             condition['user_id'] = args.user_id
@@ -137,6 +139,45 @@ class ResourceApplication(Resource):
         if args.start_time and args.end_time:
             condition['created_date__gte'] = args.start_time
             condition['created_date__lt'] = args.end_time
+
+        if agg_by:
+            pipeline = []
+            group1 = dict()
+            group2 = dict()
+            group1_id_dict = dict()
+            agg_dict = dict()
+            group2_id_dict = dict()
+            group2_ret_dict = dict()
+            group2_group_dict = dict()
+            agg_dict[agg_by] = '$' + agg_by
+            agg_exprs = request.args.getlist('agg_expr')
+            for agg_expr in agg_exprs:
+                agg_dict[agg_expr] = '$' + agg_expr
+            group1_id_dict['_id'] = agg_dict
+            group1['$group'] = group1_id_dict
+
+            group2_id_dict[agg_by] = '$_id.' + agg_by
+            agg_dict = {}
+            for agg_expr in agg_exprs:
+                agg_dict[agg_expr] = '$_id.' + agg_expr
+            group2_ret_dict['$addToSet'] = agg_dict
+            group2_group_dict['_id'] = group2_id_dict
+            group2_group_dict['ret'] = group2_ret_dict
+            group2['$group'] = group2_group_dict
+
+            pipeline.append(group1)
+            pipeline.append(group2)
+
+            result = ResourceModel._get_collection().aggregate(pipeline)
+            code = 200
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'success',
+                    'msg': list(result)
+                }
+            }
+            return ret, code
 
         result_list = []
         try:
