@@ -270,7 +270,12 @@ class ResCallback(Resource):
                         'type': 'string',
                         'name': '所属部署单元',
                         'value': unit_id,
-                        }
+                        },
+                    {
+                        'type': 'string',
+                        'name': '资源ID',
+                        'value': resource_id,
+                        },
                     ]
                 }
 
@@ -320,6 +325,11 @@ class ResCallback(Resource):
                         'name': '所属部署单元ID',
                         'value': unit_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '资源ID',
+                        'value': resource_id,
+                        },
                     ]
                 }
         data_redis = {
@@ -358,6 +368,11 @@ class ResCallback(Resource):
                         'name': '所属部署单元ID',
                         'value': unit_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '资源ID',
+                        'value': resource_id,
+                        },
                     ],
                 }
         data_mongo = {
@@ -395,6 +410,11 @@ class ResCallback(Resource):
                         'type': 'string',
                         'name': '所属部署单元ID',
                         'value': unit_id,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '资源ID',
+                        'value': resource_id,
                         },
                     ],
                 }
