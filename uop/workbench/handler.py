@@ -15,14 +15,21 @@ url = 'http://cmdb-test.syswin.com/cmdb/api/repo_list/'
 
 class SourceUnitList(Resource):
     def get(self):
-        r = requests.get(url)
-        res = []
-        res_list = []
-        for i in json.loads(r.text).get('result').get('res'):
-            # res.append(i)
-            for j in i.get('column'):
-                res.append(j)
-        return res_list
+        unit_data = requests.get(url+id+'/')
+        if unit_data:
+            # import ipdb;ipdb.set_trace()
+            res = json.loads(unit_data.text)
+            mysql_ip = res.get('msg').get('res_mysql').get(u'IP地址')
+            redis_ip = res.get('msg').get('res_redis').get(u'IP地址')
+            mongo_ip = res.get('msg').get('res_mongo').get(u'IP地址')
+            data = {
+                    'mysql_ip': mysql_ip,
+                    'redis_ip': redis_ip,
+                    'mongo_ip': mongo_ip,
+                    }
+        else:
+            data = '查询结果不存在'
+        return data
 
 
 class SourceUnitDetail(Resource):
@@ -37,6 +44,8 @@ class SourceUnitDetail(Resource):
             unit_domain = res.get('msg').get('unit').get(u'域名')
             # unit_domain = res.get('msg').get('unit').get(u'域名')
             mysql_ip = res.get('msg').get('res_mysql').get(u'IP地址')
+            redis_ip = res.get('msg').get('res_redis').get(u'IP地址')
+            mongo_ip = res.get('msg').get('res_mongo').get(u'IP地址')
             data = [
                 # 部署实例层
                         {
@@ -71,13 +80,13 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': 'Redis',
                                     'imageUrl': 'redisCluster',
-                                    'tooltip': 'Redis集群',
+                                    'tooltip': redis_ip,
                                     'target': ['VM3', '应用']
                                 },
                                 {
                                     'name': 'Mongo',
                                     'imageUrl': 'redisCluster',
-                                    'tooltip': 'mongo集群',
+                                    'tooltip': mongo_ip,
                                     'target': ['VM3', '应用']
                                 },
                             ]
@@ -170,5 +179,5 @@ class SourceUnitDetail(Resource):
         return data
 
 
-bench_api.add_resource(SourceUnitList, '/source_unit')
+bench_api.add_resource(SourceUnitList, '/source_unit/<id>')
 bench_api.add_resource(SourceUnitDetail, '/source_unit_detail/<id>')
