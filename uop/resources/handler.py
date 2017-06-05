@@ -12,6 +12,29 @@ from uop.resources.errors import resources_errors
 resources_api = Api(resources_blueprint, errors=resources_errors)
 
 
+def _match_condition_generator(args):
+    if args.user_id or args.resource_name or args.project or args.application_status or args.approval_status\
+            or (args.start_time and args.end_time):
+        match = dict()
+        match_cond = dict()
+        match_dict = dict()
+        match_list = []
+        if args.user_id:
+            match_cond['user_id'] = args.user_id
+        if args.resource_name:
+            match_cond['resource_name'] = args.resource_name
+        if args.project:
+            match_cond['project'] = args.project
+        if args.application_status:
+            match_cond['application_status'] = args.application_status
+        if args.approval_status:
+            match_cond['approval_status'] = args.approval_status
+        match_list.append(match_cond)
+        match_dict['$and'] = match_list
+        match['$match'] = match_dict
+    return match
+
+
 class ResourceApplication(Resource):
     @classmethod
     def post(cls):
@@ -20,8 +43,6 @@ class ResourceApplication(Resource):
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('department', type=str)
-        # parser.add_argument('department_id', type=str)
-        # parser.add_argument('res_id', type=str)
         parser.add_argument('user_name', type=str)
         parser.add_argument('user_id', type=str)
         parser.add_argument('domain', type=str)
@@ -37,14 +58,12 @@ class ResourceApplication(Resource):
         project_id = args.project_id
         department = args.department
         department_id = '1'
-        # res_id = args.res_id
         res_id = str(uuid.uuid1())
         user_name = args.user_name
         user_id = args.user_id
         domain = args.domain
         env = args.env
         application_status = args.application_status
-        # approval_status = args.approval_status
         approval_status = "unsubmit"
         resource_list = args.resource_list
         compute_list = args.compute_list
@@ -172,16 +191,8 @@ class ResourceApplication(Resource):
             group2_group_dict['ret'] = group2_ret_dict
             group2['$group'] = group2_group_dict
 
-            if args.user_id:
-                user_id = args.user_id
-                match = dict()
-                match_cond = dict()
-                match_dict = dict()
-                match_list = []
-                match_cond['user_id'] = user_id
-                match_list.append(match_cond)
-                match_dict['$and'] = match_list
-                match['$match'] = match_dict
+            match = _match_condition_generator(args)
+            if match:
                 pipeline.append(match)
 
             pipeline.append(group1)
