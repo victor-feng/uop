@@ -13,9 +13,9 @@ resources_api = Api(resources_blueprint, errors=resources_errors)
 
 
 def _match_condition_generator(args):
+    match = dict()
     if args.user_id or args.resource_name or args.project or args.application_status or args.approval_status\
             or (args.start_time and args.end_time):
-        match = dict()
         match_cond = dict()
         match_dict = dict()
         match_list = []
