@@ -4,6 +4,7 @@ from flask import request
 from flask import redirect
 from flask import jsonify
 import uuid
+import datetime
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
@@ -29,6 +30,11 @@ def _match_condition_generator(args):
             match_cond['application_status'] = args.application_status
         if args.approval_status:
             match_cond['approval_status'] = args.approval_status
+        if args.start_time and args.end_time:
+            created_date_dict = dict()
+            created_date_dict['$gte'] = datetime.datetime.strptime(args.start_time, "%Y-%m-%d %H:%M:%S")
+            created_date_dict['$lte'] = datetime.datetime.strptime(args.end_time, "%Y-%m-%d %H:%M:%S")
+            match_cond['created_date'] = created_date_dict
         match_list.append(match_cond)
         match_dict['$and'] = match_list
         match['$match'] = match_dict
