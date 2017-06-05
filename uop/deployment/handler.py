@@ -119,7 +119,7 @@ class DeploymentListAPI(Resource):
 
         deployments = []
         try:
-            for deployment in Deployment.objects.filter(**condition):
+            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
