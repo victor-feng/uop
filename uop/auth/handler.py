@@ -302,7 +302,8 @@ class AdminUserDetail(Resource):
         else:
             data = {
                     'code': 300,
-                    'msg': '您没有root权限'
+                    # 'msg': '您没有root权限'
+                    'msg': '您没有管理员权限'
                     }
         return data
 
