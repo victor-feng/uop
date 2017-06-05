@@ -239,6 +239,102 @@ class Reservation(Resource):
         return ret, code
 
 
+class ReservationAPI(Resource):
+    def put(self, res_id):
+        code = 0
+        res = ""
+        msg = {}
+        try:
+            resource = models.ResourceModel.objects.get(res_id=res_id)
+        except Exception as e:
+            code = 410
+            res = "Failed to find the rsource"
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+            return ret, code
+
+        data = dict()
+        data['unit_id'] = resource.project_id
+        data['unit_name'] = resource.project
+        data['unit_des'] = ''
+        data['user_id'] = resource.user_id
+        data['username'] = resource.user_name
+        data['department'] = resource.department
+        data['created_time'] = str(resource.created_date)
+        data['resource_id'] = resource.res_id
+        data['resource_name'] = resource.resource_name
+        data['domain'] = resource.domain
+        data['env'] = resource.env
+        resource_list = resource.resource_list
+        compute_list = resource.compute_list
+        if resource_list:
+            res = []
+            for db_res in resource_list:
+                res.append(
+                    {
+                        "instance_name": db_res.ins_name,
+                        "instance_id": db_res.ins_id,
+                        "instance_type": db_res.ins_type,
+                        "cpu": db_res.cpu,
+                        "mem": db_res.mem,
+                        "disk": db_res.disk,
+                        "quantity": db_res.quantity,
+                        "version": db_res.version
+                    }
+                )
+            data['resource_list'] = res
+        if compute_list:
+            com = []
+            for db_com in compute_list:
+                com.append(
+                    {
+                        "instance_name": db_com.ins_name,
+                        "instance_id": db_com.ins_id,
+                        "cpu": db_com.cpu,
+                        "mem": db_com.mem,
+                        "image_url": db_com.url
+                    }
+                )
+            data['compute_list'] = com
+
+        data_str = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
+        try:
+            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+        except Exception as e:
+            res = "failed to connect CRP service."
+            code = 500
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
+            return ret, code
+        if msg.status_code != 202:
+            resource.reservation_status = "unreserved"
+            resource.save()
+            code = msg.status_code
+            res = "Failed to reserve resource."
+        else:
+            resource.reservation_status = "reserving"
+            resource.save()
+            code = 200
+            res = "Success in reserving resource."
+        ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
+        return ret, code
+
+
 class ReservationMock(Resource):
     def post(self):
         code = 0
@@ -277,4 +373,5 @@ class ReservationMock(Resource):
 approval_api.add_resource(ApprovalList, '/approvals')
 approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
 approval_api.add_resource(Reservation, '/reservation')
+approval_api.add_resource(ReservationAPI, '/reservation/<string:res_id>')
 # approval_api.add_resource(ReservationMock, '/reservation')

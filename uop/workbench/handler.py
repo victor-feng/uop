@@ -39,8 +39,9 @@ class SourceUnitDetail(Resource):
         if unit_data:
             # import ipdb;ipdb.set_trace()
             res = json.loads(unit_data.text)
-            unit_name = res.get('msg').get('unit').get(u'名称')
+            unit_name = res.get('msg').get('unit').get(u'资源名称')
             container_name = res.get('msg').get('virtual').get(u'名称')
+            container_ip = res.get('msg').get('virtual').get(u'IP地址')
             unit_domain = res.get('msg').get('unit').get(u'域名')
             # unit_domain = res.get('msg').get('unit').get(u'域名')
             mysql_ip = res.get('msg').get('res_mysql').get(u'IP地址')
@@ -57,7 +58,7 @@ class SourceUnitDetail(Resource):
                                     #  提示信息
                                     'tooltip': unit_domain,
                                     #  关系
-                                    'target': ['应用']
+                                    'target': ['Mysql', 'Redis', 'Mongo']
                                 }
                             ]
                         },
@@ -69,25 +70,25 @@ class SourceUnitDetail(Resource):
                                     'name': 'Mysql',
                                     'imageUrl': 'mysqlCluster',
                                     'tooltip': mysql_ip,
-                                    'target': ['VM1', '应用']
+                                    'target': [container_name]
                                 },
                                 {
-                                    'name': '应用',
-                                    'imageUrl': 'applicationCluster',
-                                    'tooltip': '应用集群',
-                                    'target': ['VM2']
+                                    'name': '',
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 },
                                 {
                                     'name': 'Redis',
                                     'imageUrl': 'redisCluster',
                                     'tooltip': redis_ip,
-                                    'target': ['VM3', '应用']
+                                    'target': [container_name]
                                 },
                                 {
                                     'name': 'Mongo',
                                     'imageUrl': 'redisCluster',
                                     'tooltip': mongo_ip,
-                                    'target': ['VM3', '应用']
+                                    'target': [container_name]
                                 },
                             ]
                         },
@@ -98,76 +99,76 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': container_name,
                                     'imageUrl': 'virtual',
-                                    'tooltip': 'VM1 192.168.33.77',
-                                    'target': ['物理机1']
+                                    'tooltip': container_ip,
+                                    'target': []
                                 },
 
                                 {
-                                    'name': 'VM2',
-                                    'imageUrl': 'virtual',
-                                    'tooltip': 'VM2 192.168.33.78',
-                                    'target': ['物理机1']
+                                    'name': '',
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 },
                                 {
-                                    'name': 'VM3',
-                                    'imageUrl': 'virtual',
-                                    'tooltip': 'VM3 192.168.33.38',
-                                    'target': ['物理机2']
+                                    'name': '',
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 }
                             ]
                         },
 
                         #   物理机层数据
                         {
-                            'layerName': "physicalLayer",
+                            'layerName': "",
                             'children': [
                                 {
-                                    'name': '物理机1',
-                                    'imageUrl': 'physical',
-                                    'tooltip': '物理机1',
-                                    'target': ['机架']
+                                    'name': '',
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 },
 
                                 {
-                                    'name': '物理机2',
-                                    'imageUrl': 'physical',
-                                    'tooltip': '物理机2',
-                                    'target': ['机架']
+                                    'name': '',
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 }
                             ]
                         },
                         #  机架层
                         {
-                            'layerName': "frameLayer",
+                            'layerName': "",
                             'children': [
                                 {
-                                    'name': "机架",
+                                    'name': "",
                                     'imageUrl': '',
-                                    'tooltip': '机架',
-                                    'target': ['资源池']
+                                    'tooltip': '',
+                                    'target': []
                                 }
                             ]
                         },
                         #  资源池层
                         {
-                            'layerName': "resDomainLayer",
+                            'layerName': "",
                             'children': [
                                 {
-                                    'name': "资源池",
-                                    'imageUrl': 'resDomain',
-                                    'tooltip': '资源池',
-                                    'target': ['DC']
+                                    'name': "",
+                                    'imageUrl': '',
+                                    'tooltip': '',
+                                    'target': []
                                 }
                             ]
                         },
                         #  数据中心层
                         {
-                            'layerName': "dcLayer",
+                            'layerName': "",
                             'children': [
                                 {
-                                    'name': "DC",
-                                    'imageUrl': 'DC',
-                                    'tooltip': '数据中心',
+                                    'name': "",
+                                    'imageUrl': '',
+                                    'tooltip': '',
                                     'target': []
                                 }
                             ]

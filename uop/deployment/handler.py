@@ -115,7 +115,7 @@ class DeploymentListAPI(Resource):
             condition['environment'] = args.environment
         if args.start_time and args.end_time:
             condition['created_time__gte'] = args.start_time
-            condition['created_time__lt'] = args.end_time
+            condition['created_time__lte'] = args.end_time
 
         deployments = []
         try:
