@@ -48,7 +48,7 @@ class ItemInfo(Resource):
             if args.start_time and args.end_time:
                 args_dict['create_date__gte'] = args.start_time
                 args_dict['create_date__lt'] = args.end_time
-            items = ItemInformation.objects.filter(**args_dict)
+            items = ItemInformation.objects.filter(**args_dict).order_by('-create_date')
 
             for item in items:
                 res = {}
