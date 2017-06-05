@@ -126,7 +126,8 @@ class ResourceApplication(Resource):
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
         parser.add_argument('agg_by', type=str, location='args')
-        # parser.add_argument('agg_match', type=str, location='args')
+        parser.add_argument('application_status', type=str, location='args')
+        parser.add_argument('approval_status', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -141,6 +142,10 @@ class ResourceApplication(Resource):
         if args.start_time and args.end_time:
             condition['created_date__gte'] = args.start_time
             condition['created_date__lt'] = args.end_time
+        if args.application_status:
+            condition['application_status'] = args.application_status
+        if args.approval_status:
+            condition['approval_status'] = args.approval_status
 
         if agg_by:
             pipeline = []
@@ -195,7 +200,7 @@ class ResourceApplication(Resource):
 
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(**condition)
+            resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
         except Exception as e:
             print e
             code = 500
