@@ -39,7 +39,7 @@ class SourceUnitDetail(Resource):
         if unit_data:
             # import ipdb;ipdb.set_trace()
             res = json.loads(unit_data.text)
-            unit_name = res.get('msg').get('unit').get(u'名称')
+            unit_name = res.get('msg').get('unit').get(u'资源名称')
             container_name = res.get('msg').get('virtual').get(u'名称')
             unit_domain = res.get('msg').get('unit').get(u'域名')
             # unit_domain = res.get('msg').get('unit').get(u'域名')
