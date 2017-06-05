@@ -221,8 +221,11 @@ class AdminUserList(Resource):
         id = data.get('id')
         password = data.get('password')
         user = UserInfo.objects.get(id=id)
+        md5 = hashlib.md5()
+        md5.update(password)
+        salt_password = md5.hexdigest()
         if user:
-            if user.password == password:
+            if user.password == salt_password:
                 if user.is_admin:
                     res = '管理员登录成功'
                     code = 200
