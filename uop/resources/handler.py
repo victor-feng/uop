@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
+import requests
+
 from flask import request
 from flask import redirect
 from flask import jsonify
 import uuid
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+
+from uop.deployment.handler import get_resource_by_id
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
@@ -506,8 +510,30 @@ class ResourceRecord(Resource):
         return ret, code
 
 
-
-
+class GetDBInfo(Resource):
+    def get(cls, res_id):
+        err_msg, resource_info = get_resource_by_id(res_id)
+        if err_msg:
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': err_msg
+                }
+            }
+        else:
+            resource_info['redis_ip'] = ''
+            resource_info['mongo_ip'] = ''
+            code = 200
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'success',
+                    'msg': resource_info
+                }
+            }
+        return ret, code
 
 
 
@@ -521,3 +547,4 @@ class ResourceRecord(Resource):
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
+resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
