@@ -142,15 +142,20 @@ class UserList(Resource):
         salt_password = md5.hexdigest()
         try:
             user = UserInfo.objects.get(id=id)
-            code = 200
-            res = '登录成功'
-            msg = {
-                    'user_id': user.id,
-                    'username': user.username,
-                    'department': user.department,
-                    'is_admin': user.is_admin,
-                    'is_root': user.is_root,
-                    }
+            if user.password == salt_password:
+                code = 200
+                res = '登录成功'
+                msg = {
+                        'user_id': user.id,
+                        'username': user.username,
+                        'department': user.department,
+                        'is_admin': user.is_admin,
+                        # 'is_root': user.is_root,
+                        }
+            else:
+                res = '登录失败'
+                code = 400
+                msg = '验证错误'
         except UserInfo.DoesNotExist:
             conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
             verify_code, verify_res = conn.verify_user(id, password)
@@ -161,7 +166,7 @@ class UserList(Resource):
             department = verify_res_department.decode('utf-8')
             user_id = verify_res.get('id')  # 获取到工号
             is_admin = False
-            is_root = False
+            # is_root = False
             root_list = ['147749', '147405', '147523']
 
             if verify_code:
@@ -169,15 +174,15 @@ class UserList(Resource):
                 code = 200
                 try:
                     user = UserInfo.objects.get(id=user_id)
-                    if user.id in root_list:  # 已经存在本地的用户 设置为root用户
-                        is_root = True
-                    user.is_root = is_root
+                    # if user.id in root_list:  # 已经存在本地的用户 设置为root用户
+                    #     is_root = True
+                    # user.is_root = is_root
                     user.save()
                     is_admin = user.is_admin
-                    is_root = user.is_root
+                    # is_root = user.is_root
                 except UserInfo.DoesNotExist:
-                    if user_id in root_list:  # 没有登录过的用户 设置为root用户
-                        is_root = True
+                    # if user_id in root_list:  # 没有登录过的用户 设置为root用户
+                    #     is_root = True
 
                     user_obj = UserInfo()
                     user_obj.id = user_id
@@ -185,7 +190,7 @@ class UserList(Resource):
                     user_obj.password = salt_password
                     user_obj.is_admin = is_admin
                     user_obj.department = department
-                    user_obj.is_root = is_root
+                    # user_obj.is_root = is_root
                     # user_obj.created_time = datetime.datetime.now()
                     user_obj.save()
                 msg = {
@@ -193,7 +198,7 @@ class UserList(Resource):
                         'username': user.username,
                         'department': department,
                         'is_admin': user.is_admin,
-                        'is_root': is_root,
+                        # 'is_root': is_root,
                         }
             else:
                 res = '登录失败'
@@ -253,7 +258,7 @@ class AdminUserDetail(Resource):
                         'username': user.username,
                         'department': user.department,
                         'is_admin': user.is_admin,
-                        'is_root': user.is_root,
+                        # 'is_root': user.is_root,
                         'created_time': str(user.created_time),
                         }
         else:
@@ -278,7 +283,8 @@ class AdminUserDetail(Resource):
         #         root.is_root = True
         #         root.save()
 
-        if root.is_root:
+        # if root.is_root:
+        if root.is_admin:
             user.is_admin = eval(admin_user)
             user.save()
             data = {
@@ -287,7 +293,7 @@ class AdminUserDetail(Resource):
                     'username': user.username,
                     'department': user.department,
                     'is_admin': user.is_admin,
-                    'is_root': user.is_root,
+                    # 'is_root': user.is_root,
                     'created_time': str(user.created_time),
                     }
         else:
@@ -324,7 +330,7 @@ class AllUserList(Resource):
                     'username': i.username,
                     'department': i.department,
                     'is_admin': i.is_admin,
-                    'is_root': i.is_root,
+                    # 'is_root': i.is_root,
                     'created_time': str(i.created_time)
                     }
             all_user.append(data)
