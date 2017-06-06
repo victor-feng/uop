@@ -80,7 +80,7 @@ class SourceUnitDetail(Resource):
                                 },
                                 {
                                     'name': 'Mongo',
-                                    'imageUrl': 'redisCluster',
+                                    'imageUrl': 'mongoCluster',
                                     'tooltip': mongo_ip,
                                     'target': [container_name]
                                 },
