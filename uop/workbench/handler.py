@@ -40,16 +40,16 @@ class SourceUnitDetail(Resource):
             # import ipdb;ipdb.set_trace()
             res = json.loads(unit_data.text)
             unit_name = res.get('msg').get('unit').get(u'资源名称')
+            unit_domain = res.get('msg').get('unit').get(u'域名')
             container_name = res.get('msg').get('virtual').get(u'名称')
             container_ip = res.get('msg').get('virtual').get(u'IP地址')
-            unit_domain = res.get('msg').get('unit').get(u'域名')
             # unit_domain = res.get('msg').get('unit').get(u'域名')
             mysql_ip = res.get('msg').get('res_mysql').get(u'IP地址')
             redis_ip = res.get('msg').get('res_redis').get(u'IP地址')
             mongo_ip = res.get('msg').get('res_mongo').get(u'IP地址')
-            data = [
-                # 部署实例层
-                        {
+
+            # 部署实例层
+            deploy_data = {
                             'layerName': "deployInstance",
                             'children': [
                                 {
@@ -62,8 +62,8 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         },
-                        #  集群层数据
-                        {
+            # 集群层
+            aggregation_data = {
                             'layerName': "clusterLayer",
                             'children': [
                                 {
@@ -71,12 +71,6 @@ class SourceUnitDetail(Resource):
                                     'imageUrl': 'mysqlCluster',
                                     'tooltip': mysql_ip,
                                     'target': [container_name]
-                                },
-                                {
-                                    'name': '',
-                                    'imageUrl': '',
-                                    'tooltip': '',
-                                    'target': []
                                 },
                                 {
                                     'name': 'Redis',
@@ -92,8 +86,8 @@ class SourceUnitDetail(Resource):
                                 },
                             ]
                         },
-                        #  虚拟机层数据
-                        {
+            # 虚机层
+            virtual_data = {
                             'layerName': "virtualLayer",
                             'children': [
                                 {
@@ -103,23 +97,22 @@ class SourceUnitDetail(Resource):
                                     'target': []
                                 },
 
-                                {
-                                    'name': '',
-                                    'imageUrl': '',
-                                    'tooltip': '',
-                                    'target': []
-                                },
-                                {
-                                    'name': '',
-                                    'imageUrl': '',
-                                    'tooltip': '',
-                                    'target': []
-                                }
+                                # {
+                                #     'name': '',
+                                #     'imageUrl': '',
+                                #     'tooltip': '',
+                                #     'target': []
+                                # },
+                                # {
+                                #     'name': '',
+                                #     'imageUrl': '',
+                                #     'tooltip': '',
+                                #     'target': []
+                                # }
                             ]
                         },
-
-                        #   物理机层数据
-                        {
+            # 物理机层
+            physical_data = {
                             'layerName': "",
                             'children': [
                                 {
@@ -137,8 +130,8 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         },
-                        #  机架层
-                        {
+            # 机架层
+            rack_data = {
                             'layerName': "",
                             'children': [
                                 {
@@ -149,8 +142,8 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         },
-                        #  资源池层
-                        {
+            # 资源池层
+            resource_pool = {
                             'layerName': "",
                             'children': [
                                 {
@@ -161,8 +154,8 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         },
-                        #  数据中心层
-                        {
+            # 数据中心层
+            data_center = {
                             'layerName': "",
                             'children': [
                                 {
@@ -173,7 +166,22 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         }
-                ]
+            data = [
+                # 部署实例层
+                deploy_data,
+                #  集群层数据
+                aggregation_data,
+                #  虚拟机层数据
+                virtual_data,
+                # #   物理机层数据
+                # physical_data,
+                # #  机架层
+                # rack_data,
+                # #  资源池层
+                # resource_pool,
+                # #  数据中心层
+                # data_center,
+            ]
         else:
             data = '查询结果不存在'
 
