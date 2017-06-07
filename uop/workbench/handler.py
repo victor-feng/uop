@@ -54,6 +54,8 @@ class SourceUnitDetail(Resource):
                 redis_ip = ''
             if not mongo_ip:
                 mongo_ip = ''
+            if not unit_domain:
+                unit_domain = []
             # 部署实例层
             deploy_data = {
                             'layerName': "deployInstance",
