@@ -152,6 +152,7 @@ class Reservation(Resource):
         resource_id = args.resource_id
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
             code = 410
             res = "Failed to find the rsource"
@@ -163,6 +164,7 @@ class Reservation(Resource):
                 }
             }
             return ret, code
+
 
         data = dict()
         data['unit_id'] = resource.project_id
@@ -176,6 +178,7 @@ class Reservation(Resource):
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
         data['env'] = resource.env
+        data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
