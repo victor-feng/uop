@@ -442,6 +442,7 @@ class ResCallback(Resource):
                 mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
                 res_5 = json.loads(mongo_res.text)
                 print res_5
+            res = '存储成功'
         except Exception, e:
             code = 2003
             res = '存储错误'
