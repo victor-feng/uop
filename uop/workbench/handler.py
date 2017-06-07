@@ -57,12 +57,16 @@ class SourceUnitDetail(Resource):
                 mongo_ip = []
             if not unit_domain:
                 unit_domain = []
+            if unit_name:
+                unit_name = unit_name[0]
+            else:
+                unit_name = ''
             # 部署实例层
             deploy_data = {
                             'layerName': "deployInstance",
                             'children': [
                                 {
-                                    'name': unit_name[0],
+                                    'name': unit_name,
                                     'imageUrl': 'deployInstance',
                                     #  提示信息
                                     'tooltip': unit_domain,
