@@ -255,12 +255,12 @@ class ResCallback(Resource):
                     {
                         'type': 'int',
                         'name': 'CPU数量',
-                        'value': str(container_cpu),
+                        'value': container_cpu,
                         },
                     {
                         'type': 'int',
                         'name': '内存容量',
-                        'value': str(container_memory),
+                        'value': container_memory,
                         },
                     {
                         'type': 'string',
