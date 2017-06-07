@@ -65,6 +65,7 @@ class ResCallback(Resource):
         env = res_data.get('env')
         domain = res_data.get('domain')
         status = res_data.get('status')
+        cmdb_repo_id = res_data.get('cmdb_repo_id')
 
         # get the container and db
         container = res_data.get('container')
@@ -419,7 +420,7 @@ class ResCallback(Resource):
                     ],
                 }
         try:
-            unit_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_unit))
+            unit_res = requests.put(res_callback_url + 'repo/' + str(cmdb_repo_id) + '/', data=json.dumps(data_unit))
             res_1 = json.loads(unit_res.text)
             code = res_1.get('code')
             res = '存储成功'
