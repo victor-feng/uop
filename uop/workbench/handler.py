@@ -48,6 +48,12 @@ class SourceUnitDetail(Resource):
             redis_ip = res.get('msg').get('res_redis').get(u'IP地址')
             mongo_ip = res.get('msg').get('res_mongo').get(u'IP地址')
 
+            if not mysql_ip:
+                mysql_ip = ''
+            if not redis_ip:
+                redis_ip = ''
+            if not mongo_ip:
+                mongo_ip = ''
             # 部署实例层
             deploy_data = {
                             'layerName': "deployInstance",
