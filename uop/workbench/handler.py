@@ -35,6 +35,7 @@ class SourceUnitList(Resource):
 class SourceUnitDetail(Resource):
     def get(self, id):
         res = []
+        data = []
         unit_data = requests.get(url+id+'/')
         if unit_data:
             # import ipdb;ipdb.set_trace()
@@ -69,7 +70,7 @@ class SourceUnitDetail(Resource):
                                     'target': ['Mysql', 'Redis', 'Mongo']
                                 }
                             ]
-                        },
+                        }
             # 集群层
             aggregation_data = {
                             'layerName': "clusterLayer",
@@ -93,7 +94,7 @@ class SourceUnitDetail(Resource):
                                     'target': container_name
                                 },
                             ]
-                        },
+                        }
             # 虚机层
             virtual_data = {
                             'layerName': "virtualLayer",
@@ -118,7 +119,7 @@ class SourceUnitDetail(Resource):
                                 #     'target': []
                                 # }
                             ]
-                        },
+                        }
             # 物理机层
             physical_data = {
                             'layerName': "",
@@ -137,7 +138,7 @@ class SourceUnitDetail(Resource):
                                     'target': []
                                 }
                             ]
-                        },
+                        }
             # 机架层
             rack_data = {
                             'layerName': "",
@@ -149,7 +150,7 @@ class SourceUnitDetail(Resource):
                                     'target': []
                                 }
                             ]
-                        },
+                        }
             # 资源池层
             resource_pool = {
                             'layerName': "",
@@ -161,7 +162,7 @@ class SourceUnitDetail(Resource):
                                     'target': []
                                 }
                             ]
-                        },
+                        }
             # 数据中心层
             data_center = {
                             'layerName': "",
@@ -174,25 +175,12 @@ class SourceUnitDetail(Resource):
                                 }
                             ]
                         }
-            data = [
-                # 部署实例层
-                deploy_data,
-                #  集群层数据
-                aggregation_data,
-                #  虚拟机层数据
-                virtual_data,
-                # #   物理机层数据
-                # physical_data,
-                # #  机架层
-                # rack_data,
-                # #  资源池层
-                # resource_pool,
-                # #  数据中心层
-                # data_center,
-            ]
+            data.append(deploy_data)
+            data.append(aggregation_data)
+            data.append(virtual_data)
         else:
             data = '查询结果不存在'
-
+        print deploy_data, type(deploy_data)
         return data
 
 
