@@ -70,19 +70,19 @@ class SourceUnitDetail(Resource):
                                     'name': 'Mysql',
                                     'imageUrl': 'mysqlCluster',
                                     'tooltip': mysql_ip,
-                                    'target': [container_name]
+                                    'target': container_name
                                 },
                                 {
                                     'name': 'Redis',
                                     'imageUrl': 'redisCluster',
                                     'tooltip': redis_ip,
-                                    'target': [container_name]
+                                    'target': container_name
                                 },
                                 {
                                     'name': 'Mongo',
                                     'imageUrl': 'mongoCluster',
                                     'tooltip': mongo_ip,
-                                    'target': [container_name]
+                                    'target': container_name
                                 },
                             ]
                         },
