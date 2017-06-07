@@ -118,14 +118,14 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': '',
                                     'imageUrl': '',
-                                    'tooltip': '',
+                                    'tooltip': [],
                                     'target': []
                                 },
 
                                 {
                                     'name': '',
                                     'imageUrl': '',
-                                    'tooltip': '',
+                                    'tooltip': [],
                                     'target': []
                                 }
                             ]
@@ -137,7 +137,7 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': "",
                                     'imageUrl': '',
-                                    'tooltip': '',
+                                    'tooltip': [],
                                     'target': []
                                 }
                             ]
@@ -149,7 +149,7 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': "",
                                     'imageUrl': '',
-                                    'tooltip': '',
+                                    'tooltip': [],
                                     'target': []
                                 }
                             ]
@@ -161,7 +161,7 @@ class SourceUnitDetail(Resource):
                                 {
                                     'name': "",
                                     'imageUrl': '',
-                                    'tooltip': '',
+                                    'tooltip': [],
                                     'target': []
                                 }
                             ]
