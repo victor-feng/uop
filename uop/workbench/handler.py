@@ -53,7 +53,7 @@ class SourceUnitDetail(Resource):
                             'layerName': "deployInstance",
                             'children': [
                                 {
-                                    'name': unit_name,
+                                    'name': unit_name[0],
                                     'imageUrl': 'deployInstance',
                                     #  提示信息
                                     'tooltip': unit_domain,
@@ -91,7 +91,7 @@ class SourceUnitDetail(Resource):
                             'layerName': "virtualLayer",
                             'children': [
                                 {
-                                    'name': container_name,
+                                    'name': container_name[0],
                                     'imageUrl': 'virtual',
                                     'tooltip': container_ip,
                                     'target': []
