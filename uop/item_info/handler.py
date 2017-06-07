@@ -94,13 +94,13 @@ class ItemInfo(Resource):
             property_list = []
 
             if args.item_code:
-                property_list.append({"type": "string", "name": "项目编号", "value": args.item_code})
+                property_list.append({"type": "string", "name": "部署单元编号", "value": args.item_code})
             if args.item_name:
-                property_list.append({"type": "string", "name": "项目名称", "value": args.item_name})
+                property_list.append({"type": "string", "name": "名称", "value": args.item_name})
             if args.item_department:
                 property_list.append({"type": "string", "name": "归属部门", "value": args.item_department})
             if args.item_description:
-                property_list.append({"type": "string", "name": "项目描述", "value": args.item_description})
+                property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
@@ -169,12 +169,12 @@ class ItemPostInfo(Resource):
             data["item_id"] = "project_item"
 
             property_list = []
-            property_list.append({"type": "string", "name": "项目编号", "value": args.item_code})
-            property_list.append({"type": "string", "name": "项目名称", "value": args.item_name})
+            property_list.append({"type": "string", "name": "部署单元编号", "value": args.item_code})
+            property_list.append({"type": "string", "name": "名称", "value": args.item_name})
             property_list.append({"type": "string", "name": "归属部门", "value": args.item_department})
-            property_list.append({"type": "string", "name": "项目描述", "value": args.item_description})
+            property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             property_list.append({"type": "string", "name": "创建人", "value": args.user_name})
-            property_list.append({"type" : "datetime","name" : "创建日期","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            property_list.append({"type" : "datetime","name" : "创建时间","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
