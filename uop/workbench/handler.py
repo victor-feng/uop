@@ -49,11 +49,11 @@ class SourceUnitDetail(Resource):
             mongo_ip = res.get('msg').get('res_mongo').get(u'IP地址')
 
             if not mysql_ip:
-                mysql_ip = ''
+                mysql_ip = []
             if not redis_ip:
-                redis_ip = ''
+                redis_ip = []
             if not mongo_ip:
-                mongo_ip = ''
+                mongo_ip = []
             if not unit_domain:
                 unit_domain = []
             # 部署实例层
