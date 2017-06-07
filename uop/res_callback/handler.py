@@ -423,8 +423,9 @@ class ResCallback(Resource):
             unit_res = requests.put(res_callback_url + 'repo/' + str(cmdb_repo_id) + '/', data=json.dumps(data_unit))
             res_1 = json.loads(unit_res.text)
             code = res_1.get('code')
-            res = '存储成功'
-            print res_1
+            if code == '2002':
+                res = '存储成功'
+                print res_1
             if container:
                 container_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_container))
                 res_2 = json.loads(container_res.text)
