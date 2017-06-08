@@ -77,10 +77,10 @@ class ResCallback(Resource):
         container_ip = container.get('ip')
         container_name = container.get('container_name')
         image_addr = container.get('image_addr')
-        # standard_ins = container.get('standard_ins')
         container_cpu = container.get('cpu')
         container_memory = container.get('memory')
         container_ins_id = container.get('ins_id')
+        physical_server = container.get('physical_server')
 
         # get the db field
         mysql_info = db_info.get('mysql')
@@ -98,18 +98,21 @@ class ResCallback(Resource):
         mysql_password = mysql_info.get('password', '')
         mysql_port = mysql_info.get('port', '')
         mysql_ip = mysql_info.get('ip', '')
+        mysql_physical = mysql_info.get('physical_server')
 
         redis_ind_id = redis_info.get('ins_id', '')
         redis_username = redis_info.get('username', '')
         redis_password = redis_info.get('password', '')
         redis_port = redis_info.get('port', '')
         redis_ip = redis_info.get('ip', '')
+        redis_physical = redis_info.get('physical_server')
 
         mongo_ind_id = mongo_info.get('ins_id', '')
         mongo_username = mongo_info.get('username', '')
         mongo_password = mongo_info.get('password', '')
         mongo_port = mongo_info.get('port', '')
         mongo_ip = mongo_info.get('ip', '')
+        mongo_physical = mongo_info.get('physical_server')
 
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
@@ -277,6 +280,11 @@ class ResCallback(Resource):
                         'name': '资源ID',
                         'value': resource_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '所属服务器',
+                        'value': physical_server,
+                        },
                     ]
                 }
 
@@ -331,6 +339,11 @@ class ResCallback(Resource):
                         'name': '资源ID',
                         'value': resource_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '所属服务器',
+                        'value': mysql_physical,
+                        },
                     ]
                 }
         data_redis = {
@@ -374,6 +387,11 @@ class ResCallback(Resource):
                         'name': '资源ID',
                         'value': resource_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '所属服务器',
+                        'value': redis_physical,
+                        },
                     ],
                 }
         data_mongo = {
@@ -398,7 +416,7 @@ class ResCallback(Resource):
                         'value': mongo_password,
                         },
                     {
-                        'type': 'int',
+                        'type': 'string',
                         'name': '端口',
                         'value': str(mongo_port),
                         },
@@ -417,6 +435,11 @@ class ResCallback(Resource):
                         'name': '资源ID',
                         'value': resource_id,
                         },
+                    {
+                        'type': 'string',
+                        'name': '所属服务器',
+                        'value': mongo_physical,
+                        }
                     ],
                 }
         try:
