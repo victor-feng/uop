@@ -321,7 +321,7 @@ class ResCallback(Resource):
                         },
                     {
                         'type': 'int',
-                        'name': '监听端口',
+                        'name': '端口',
                         'value': mysql_port,
                         },
                     {
