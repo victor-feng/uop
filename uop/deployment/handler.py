@@ -275,15 +275,16 @@ class DeploymentListByByInitiatorAPI(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('initiator', type=str, required=True, default="",
-                            help='No initiator provided', location='args')
+        parser.add_argument('initiator', type=str, location='args')
         args = parser.parse_args()
+
+        condition = {}
+        if args.initiator:
+            condition['initiator'] = args.initiator
 
         pipeline = [
             {
-                '$match': {
-                    'initiator': args.initiator
-                }
+                '$match': condition
             },
             {
                 '$group': {
