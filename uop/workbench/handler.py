@@ -71,7 +71,7 @@ class SourceUnitDetail(Resource):
                                     #  提示信息
                                     'tooltip': unit_domain,
                                     #  关系
-                                    'target': ['Mysql', 'Redis', 'Mongo']
+                                    'target': ['Mysql', 'Redis', 'Mongo', container_namei[0]]
                                 }
                             ]
                         }
@@ -83,19 +83,25 @@ class SourceUnitDetail(Resource):
                                     'name': 'Mysql',
                                     'imageUrl': 'mysqlCluster',
                                     'tooltip': mysql_ip,
-                                    'target': container_name
+                                    'target': [unit_name, mysql_ip]
                                 },
                                 {
                                     'name': 'Redis',
                                     'imageUrl': 'redisCluster',
                                     'tooltip': redis_ip,
-                                    'target': container_name
+                                    'target': [unit_name, redis_ip]
                                 },
                                 {
                                     'name': 'Mongo',
                                     'imageUrl': 'mongoCluster',
                                     'tooltip': mongo_ip,
-                                    'target': container_name
+                                    'target': [unit_name, redis_ip]
+                                },
+                                {
+                                    'name': container_name[0],
+                                    'imageUrl': 'app',
+                                    'tooltip': [],
+                                    'target': [unit_name, container_ip]
                                 },
                             ]
                         }
@@ -104,24 +110,30 @@ class SourceUnitDetail(Resource):
                             'layerName': "virtualLayer",
                             'children': [
                                 {
-                                    'name': container_name[0],
+                                    'name': container_ip,
                                     'imageUrl': 'virtual',
                                     'tooltip': container_ip,
                                     'target': []
                                 },
 
-                                # {
-                                #     'name': '',
-                                #     'imageUrl': '',
-                                #     'tooltip': '',
-                                #     'target': []
-                                # },
-                                # {
-                                #     'name': '',
-                                #     'imageUrl': '',
-                                #     'tooltip': '',
-                                #     'target': []
-                                # }
+                                {
+                                    'name': mysql_ip,
+                                    'imageUrl': 'virtual',
+                                    'tooltip': '',
+                                    'target': []
+                                },
+                                {
+                                    'name': redis_ip,
+                                    'imageUrl': 'virtual',
+                                    'tooltip': '',
+                                    'target': []
+                                },
+                                {
+                                    'name': mongo_ip,
+                                    'imageUrl': 'virtual',
+                                    'tooltip': '',
+                                    'target': []
+                                }
                             ]
                         }
             # 物理机层
