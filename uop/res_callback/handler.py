@@ -306,7 +306,7 @@ class ResCallback(Resource):
                 'property_list': [
                     {
                         'type': 'string',
-                        'name': '实例id',
+                        'name': '实例ID',
                         'value': mysql_ins_id,
                         },
                     {
@@ -354,7 +354,7 @@ class ResCallback(Resource):
                 'property_list': [
                     {
                         'type': 'string',
-                        'name': '实例id',
+                        'name': '实例ID',
                         'value': redis_ind_id,
                         },
                     {
