@@ -258,12 +258,12 @@ class ResCallback(Resource):
                     {
                         'type': 'string',
                         'name': 'CPU数量',
-                        'value': container_cpu,
+                        'value': str(container_cpu),
                         },
                     {
                         'type': 'string',
                         'name': '内存容量',
-                        'value': container_memory,
+                        'value': str(container_memory),
                         },
                     {
                         'type': 'string',
