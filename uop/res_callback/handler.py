@@ -256,12 +256,12 @@ class ResCallback(Resource):
                         'value': container_ip,
                         },
                     {
-                        'type': 'int',
+                        'type': 'string',
                         'name': 'CPU数量',
                         'value': container_cpu,
                         },
                     {
-                        'type': 'int',
+                        'type': 'string',
                         'name': '内存容量',
                         'value': container_memory,
                         },
