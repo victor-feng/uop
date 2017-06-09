@@ -34,11 +34,11 @@ def get_resource_by_id(resource_id):
         if result:
             _container = result.get('container', {})
             _mysql = result.get('db_info', {}).get('mysql', {})
-            resource_info['mysql_ip'] = _mysql.get('ip', None)
-            resource_info['mysql_port'] = _mysql.get('port', None)
-            resource_info['mysql_user'] = _mysql.get('username', None)
-            resource_info['mysql_password'] = _mysql.get('password', None)
-            resource_info['docker_ip'] = _container.get('ip', None)
+            resource_info['mysql_ip'] = _mysql.get('ip', '')
+            resource_info['mysql_port'] = _mysql.get('port', '3306')
+            resource_info['mysql_user'] = _mysql.get('username', 'root')
+            resource_info['mysql_password'] = _mysql.get('password', '123456')
+            resource_info['docker_ip'] = _container.get('ip', '')
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
