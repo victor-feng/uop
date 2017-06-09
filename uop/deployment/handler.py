@@ -376,7 +376,6 @@ class DeploymentListByByInitiatorAPI(Resource):
             return rst, 200
 
 
-
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
