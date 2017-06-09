@@ -71,7 +71,7 @@ class SourceUnitDetail(Resource):
                                     #  提示信息
                                     'tooltip': unit_domain,
                                     #  关系
-                                    'target': ['Mysql', 'Redis', 'Mongo', container_namei[0]]
+                                    'target': ['Mysql', 'Redis', 'Mongo', container_name[0]]
                                 }
                             ]
                         }
