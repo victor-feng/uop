@@ -3,6 +3,7 @@
 import uuid
 import requests
 import json
+import datetime
 
 from flask_restful import reqparse, Api, Resource
 from uop.deployment import deployment_blueprint
@@ -209,6 +210,7 @@ class DeploymentListAPI(Resource):
                 project_name=project_name,
                 resource_id=resource_id,
                 resource_name=resource_name,
+                created_time=datetime.datetime.now(),
                 environment=environment,
                 release_notes=release_notes,
                 mysql_tag=mysql_tag,
