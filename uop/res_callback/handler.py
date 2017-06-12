@@ -206,10 +206,82 @@ class ResCallback(Resource):
                         'type': 'string',
                         'name': '状态',
                         'value': status,
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'deploy_instance',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含部署实例',
                         }
                     ]
-                }
+                } 
 
+        deploy_instance = {
+                'name': resource_name,
+                'item_id': 'deploy_instance',
+                'group_id': 'BusinessLine',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': resource_name,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '部署实例ID',
+                        'value': resource_id,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '创建人',
+                        'value': username,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '归属部门',
+                        'value': department,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '创建时间',
+                        'value': created_time,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '预留状态',
+                        'value': status,
+                        },
+                    {
+                        'type': 'string',
+                        'name': '部署状态',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'app_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含应用集群',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'mysql_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含mysql集群',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'mongo_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含mongo集群'
+                        },
+                    {
+                        'type': 'referencee',
+                        'reference_ci': 'redis_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含redis集群',
+                        },
+                    ]
+                }
         """
         data_container = {
                 '名称': container_name,
@@ -225,7 +297,7 @@ class ResCallback(Resource):
                 }
         """
         data_container = {
-                'name': str(uuid.uuid4()),
+                'name': container_name,
                 'layer_id': 'iaas',
                 'group_id': 'server',
                 'item_id': 'docker',
@@ -285,24 +357,166 @@ class ResCallback(Resource):
                         'name': '所属服务器',
                         'value': physical_server,
                         },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'physical_server',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '所在物理机',
+                        },
                     ]
                 }
 
-        """
-        data_mysql = {
-                '实例id': ins_id,
-                '用户名': username,
-                '密码': password,
-                '端口': port,
-                'IP地址': ip,
-                '所属部署单元': unit_id
+        mysql_cluster = {
+                'name': 'mysql集群',
+                'item_id': 'mysql_cluster',
+                'group_id': 'database',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': 'mysql',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '集群id',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': 'IP地址',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '端口',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '版本',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '角色',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '最大连接数',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '最大错误连接数',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '超时等待时间',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'mysql_instance',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含mysql实例',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'app_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '依赖应用集群',
+                        },
+                    ]
                 }
-        """
+        redis_cluster = {
+                'name': 'redis集群',
+                'item_id': 'redis_cluster',
+                'group_id': 'BusinessLine',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': 'redis',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '集群id',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'redis_instance',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含redis实例',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'app_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '依赖应用集群',
+                        }
+                    ]
+                }
+        mongo_cluster = {
+                'name': 'mongo集群',
+                'item_id': 'mongo_cluster',
+                'group_id': 'BusinessLine',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': 'mongo',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '部署单元编号',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'mongo_instance',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含mongo实例',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'app_cluster',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '依赖应用集群',
+                        }
+                    ]
+                }
+        app_cluster = {
+                'name': 'redis集群',
+                'item_id': 'redis_cluster',
+                'group_id': 'BusinessLine',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': 'app',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '部署单元编号',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'app_instance',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '包含应用实例',
+                        }
+                    ]
+                }
+
         data_mysql = {
-                'name': str(uuid.uuid4()),
+                'name': 'mysql',
                 'layer_id': 'paas',
                 'group_id': 'database',
-                'item_id': 'mysql_item',
+                'item_id': 'mysql_instance',
                 'property_list': [
                     {
                         'type': 'string',
@@ -344,13 +558,19 @@ class ResCallback(Resource):
                         'name': '所属服务器',
                         'value': mysql_physical,
                         },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'virtual_server',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '关联虚拟机',
+                        },
                     ]
                 }
         data_redis = {
-                'name': str(uuid.uuid4()),
+                'name': 'redis',
                 'layer_id': 'paas',
                 'group_id': 'database',
-                'item_id': 'redis_item',
+                'item_id': 'redis_instance',
                 'property_list': [
                     {
                         'type': 'string',
@@ -392,13 +612,19 @@ class ResCallback(Resource):
                         'name': '所属服务器',
                         'value': redis_physical,
                         },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'virtual_server',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '关联虚拟机',
+                        },
                     ],
                 }
         data_mongo = {
-                'name': str(uuid.uuid4()),
+                'name': 'mongo',
                 'layer_id': 'paas',
                 'group_id': 'database',
-                'item_id': 'mongo_item',
+                'item_id': 'mongo_instance',
                 'property_list': [
                     {
                         'type': 'string',
@@ -439,8 +665,43 @@ class ResCallback(Resource):
                         'type': 'string',
                         'name': '所属服务器',
                         'value': mongo_physical,
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'virtual_server',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '关联虚拟机',
                         }
                     ],
+                }
+        data_app = {
+                'name': '应用实例',
+                'p_code': 'app_instance',
+                'group': 'database',
+                'item_id': 'app_instance',
+                'property_list': [
+                    {
+                        'type': 'string',
+                        'name': '名称',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': 'IP地址',
+                        'value': '',
+                        },
+                    {
+                        'type': 'string',
+                        'name': '端口',
+                        'value': '',
+                        },
+                    {
+                        'type': 'reference',
+                        'reference_ci': 'docker',
+                        'reference_id': str(uuid.uuid4()),
+                        'name': '关联Docker',
+                        }
+                    ]
                 }
         try:
             unit_res = requests.put(res_callback_url + 'repo/' + str(cmdb_repo_id) + '/', data=json.dumps(data_unit))
@@ -465,6 +726,30 @@ class ResCallback(Resource):
                 mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
                 res_5 = json.loads(mongo_res.text)
                 print res_5
+
+            data_app_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_app))
+            res_6 = json.loads(data_app_res.text)
+            print res_6
+
+            app_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(app_cluster))
+            res_7 = json.loads(app_cluster_res.text)
+            print res_7
+
+            mysql_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mysql_cluster))
+            res_8 = json.loads(mysql_cluster_res.text)
+            print res_8
+
+            redis_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(redis_cluster))
+            res_9 = json.loads(redis_cluster_res.text)
+            print res_9
+
+            mongo_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mongo_cluster))
+            res_10 = json.loads(mongo_cluster_res.text)
+            print res_10
+
+            deploy_instance_res = requests.post(res_callback_url + 'repo/', data=json.dumps(deploy_instance))
+            res_11 = json.loads(deploy_instance_res.text)
+            print res_11
             res = '存储成功'
         except Exception, e:
             code = 2003
