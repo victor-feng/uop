@@ -303,7 +303,7 @@ class ResCallback(Resource):
             deploy_instance_res = requests.post(res_callback_url + 'repo/', data=json.dumps(deploy_instance))
             res_11 = json.loads(deploy_instance_res.text)
             ret_id = res_11.get('result').get('id')
-            print ret_id
+            print '部署实例',ret_id
 
             app_cluster = {
                     'name': '应用集群',
@@ -331,7 +331,7 @@ class ResCallback(Resource):
             app_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(app_cluster))
             res_7 = json.loads(app_cluster_res.text)
             ret_id_7 = res_7.get('result').get('id')
-            print ret_id_7
+            print '应用集群',ret_id_7
 
             mysql_cluster = {
                     'name': 'mysql集群',
@@ -400,7 +400,7 @@ class ResCallback(Resource):
             mysql_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mysql_cluster))
             res_8 = json.loads(mysql_cluster_res.text)
             ret_id_8 = res_8.get('result').get('id')
-            print ret_id_8
+            print 'mysql集群',ret_id_8
 
             redis_cluster = {
                     'name': 'redis集群',
@@ -435,7 +435,7 @@ class ResCallback(Resource):
             redis_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(redis_cluster))
             res_9 = json.loads(redis_cluster_res.text)
             ret_id_9 = res_9.get('result').get('id')
-            print ret_id_9
+            print 'redis集群',ret_id_9
             mongo_cluster = {
                     'name': 'mongo集群',
                     'item_id': 'mongo_cluster',
@@ -470,7 +470,7 @@ class ResCallback(Resource):
             mongo_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mongo_cluster))
             res_10 = json.loads(mongo_cluster_res.text)
             ret_id_10 = res_10.get('result').get('id')
-            print ret_id_10
+            print 'mongo集群',ret_id_10
 
             # 实例
             data_app = {
@@ -506,7 +506,7 @@ class ResCallback(Resource):
             data_app_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_app))
             res_6 = json.loads(data_app_res.text)
             ret_id_6 = res_6.get('result').get('id')
-            print ret_id_6
+            print '应用实例',ret_id_6
 
 
             data_mysql = {
@@ -567,7 +567,7 @@ class ResCallback(Resource):
                 mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mysql))
                 res_3 = json.loads(mysql_res.text)
                 ret_id_3 = res_3.get('result').get('id')
-                print ret_id_3
+                print 'mysql', ret_id_3
 
             data_redis = {
                     'name': 'redis',
@@ -627,7 +627,7 @@ class ResCallback(Resource):
                 redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_redis))
                 res_4 = json.loads(redis_res.text)
                 ret_id_4 = res_4.get('result').get('id')
-                print ret_id_4
+                print 'redis', ret_id_4
             data_mongo = {
                     'name': 'mongo',
                     'layer_id': 'paas',
@@ -686,7 +686,7 @@ class ResCallback(Resource):
                 mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_mongo))
                 res_5 = json.loads(mongo_res.text)
                 ret_id_5 = res_5.get('result').get('id')
-                print ret_id_5
+                print 'mongo',ret_id_5
 
             data_container = {
                     'name': container_name,
@@ -761,7 +761,7 @@ class ResCallback(Resource):
                 container_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_container))
                 res_2 = json.loads(container_res.text)
                 ret_id_2 = res_2.get('result').get('id')
-                print ret_id_2
+                print 'container',ret_id_2
 
             vm_mysql = {
                     'name': '虚拟机',
@@ -789,7 +789,7 @@ class ResCallback(Resource):
             vm_mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mysql))
             res_13 = json.loads(vm_mysql_res)
             ret_id_13 = res_13.get('result').get('id')
-            print ret_id_13
+            print 'mysql虚拟机', ret_id_13
             vm_redis = {
                     'name': '虚拟机',
                     'item_id': 'virtual_server',
@@ -816,7 +816,7 @@ class ResCallback(Resource):
             vm_redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_redis))
             res_14 = json.loads(vm_redis_res)
             ret_id_14 = res_14.get('result').get('id')
-            print ret_id_14
+            print 'redis虚拟机',ret_id_14
             vm_mongo = {
                     'name': '虚拟机',
                     'item_id': 'virtual_server',
@@ -843,7 +843,7 @@ class ResCallback(Resource):
             vm_mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mongo))
             res_15 = json.loads(vm_mongo_res)
             ret_id_15 = res_15.get('result').get('id')
-            print ret_id_15
+            print 'mongo虚拟机',ret_id_15
             data_physical_server = {
                     'name': '物理机',
                     'item_id': 'physical_server',
@@ -888,7 +888,7 @@ class ResCallback(Resource):
             physical_server_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_physical_server))
             res_12 = json.loads(physical_server_res)
             ret_id_12 = res_12.get('result').get('id')
-            print ret_id_12
+            print '物理机',ret_id_12
             res = 'successful'
           except Exception, e:
             code = 2003
