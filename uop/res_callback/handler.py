@@ -13,7 +13,7 @@ import requests
 # from uop_backend.config import res_callback_url
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
 # res_callback_url = 'http://cmdb-test.syswin.com/cmdb/api/'
-res_callback_url = 'http://172.28.11.111:8001/cmdb/api/'
+res_callback_url = 'http://172.28.11.111:8002/cmdb/api/'
 
 
 class UserRegister(Resource):
@@ -259,7 +259,7 @@ class ResCallback(Resource):
                         },
                     {
                         'type': 'reference',
-                        'reference_ci': 'app_cluster',
+                        'reference_ci': 'project_item',
                         'reference_id': cmdb_repo_id,
                         'name': '归属部署单元',
                         },
@@ -702,14 +702,14 @@ class ResCallback(Resource):
                             'value': container_ip,
                             },
                         {
-                            'type': 'string',
+                            'type': 'int',
                             'name': 'CPU数量',
-                            'value': str(container_cpu),
+                            'value': int(container_cpu),
                             },
                         {
-                            'type': 'string',
+                            'type': 'int',
                             'name': '内存容量',
-                            'value': str(container_memory),
+                            'value': int(container_memory),
                             },
                         {
                             'type': 'string',
