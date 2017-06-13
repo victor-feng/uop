@@ -298,8 +298,8 @@ class ResCallback(Resource):
                 }
         """
 
-
-        try:
+        if str(status) == '成功':
+          try:
             deploy_instance_res = requests.post(res_callback_url + 'repo/', data=json.dumps(deploy_instance))
             res_11 = json.loads(deploy_instance_res.text)
             ret_id = res_11.get('result').get('id')
@@ -890,7 +890,7 @@ class ResCallback(Resource):
             ret_id_12 = res_12.get('result').get('id')
             print ret_id_12
             res = 'successful'
-        except Exception, e:
+          except Exception, e:
             code = 2003
             res = '存储错误'
         data_response = {
