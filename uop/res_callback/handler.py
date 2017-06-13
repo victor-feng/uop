@@ -261,25 +261,7 @@ class ResCallback(Resource):
                         'type': 'reference',
                         'reference_ci': 'app_cluster',
                         'reference_id': cmdb_repo_id,
-                        'name': '包含应用集群',
-                        },
-                    {
-                        'type': 'reference',
-                        'reference_ci': 'mysql_cluster',
-                        'reference_id': cmdb_repo_id,
-                        'name': '包含mysql集群',
-                        },
-                    {
-                        'type': 'reference',
-                        'reference_ci': 'mongo_cluster',
-                        'reference_id': cmdb_repo_id,
-                        'name': '包含mongo集群'
-                        },
-                    {
-                        'type': 'reference',
-                        'reference_ci': 'redis_cluster',
-                        'reference_id': cmdb_repo_id,
-                        'name': '包含redis集群',
+                        'name': '归属部署单元',
                         },
                     ]
                 }
@@ -322,9 +304,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'app_instance',
+                            'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
-                            'name': '包含应用实例',
+                            'name': '归属部署实例',
                             }
                         ]
                     }
@@ -385,14 +367,14 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'mysql_instance',
+                            'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
-                            'name': '包含mysql实例',
+                            'name': '归属部署实例',
                             },
                         {
                             'type': 'reference',
                             'reference_ci': 'app_cluster',
-                            'reference_id': ret_id,
+                            'reference_id': ret_id_7,
                             'name': '依赖应用集群',
                             },
                         ]
@@ -419,14 +401,14 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'redis_instance',
+                            'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
-                            'name': '包含redis实例',
+                            'name': '归属部署实例',
                             },
                         {
                             'type': 'reference',
                             'reference_ci': 'app_cluster',
-                            'reference_id': ret_id,
+                            'reference_id': ret_id_7,
                             'name': '依赖应用集群',
                             }
                         ]
@@ -453,14 +435,14 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'mongo_instance',
+                            'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
-                            'name': '包含mongo实例',
+                            'name': '归属部署实例',
                             },
                         {
                             'type': 'reference',
                             'reference_ci': 'app_cluster',
-                            'reference_id': ret_id,
+                            'reference_id': ret_id_7,
                             'name': '依赖应用集群',
                             }
                         ]
@@ -496,9 +478,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'docker',
+                            'reference_ci': 'app_cluster',
                             'reference_id': ret_id_7,
-                            'name': '关联Docker',
+                            'name': '所在应用集群',
                             }
                         ]
                     }
@@ -557,9 +539,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'virtual_server',
+                            'reference_ci': 'mysql_cluster',
                             'reference_id': ret_id_8,
-                            'name': '关联虚拟机',
+                            'name': '所在MySQL集群',
                             },
                         ]
                     }
@@ -617,9 +599,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'virtual_server',
+                            'reference_ci': 'redis_cluster',
                             'reference_id': ret_id_9,
-                            'name': '关联虚拟机',
+                            'name': '所在Redis集群',
                             },
                         ],
                     }
@@ -676,9 +658,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'virtual_server',
+                            'reference_ci': 'mongo_cluster',
                             'reference_id': ret_id_10,
-                            'name': '关联虚拟机',
+                            'name': '所在Mongo集群',
                             }
                         ],
                     }
@@ -751,9 +733,9 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'physical_server',
+                            'reference_ci': 'app_instance',
                             'reference_id': ret_id_6,
-                            'name': '所在物理机',
+                            'name': '关联应用实例',
                             },
                         ]
                     }
@@ -764,7 +746,7 @@ class ResCallback(Resource):
                 print 'container',ret_id_2
 
             vm_mysql = {
-                    'name': '虚拟机',
+                    'name': 'mysql虚拟机',
                     'item_id': 'virtual_server',
                     'group_id': 'server',
                     'property_list': [
@@ -787,11 +769,11 @@ class ResCallback(Resource):
                         ]
                     }
             vm_mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mysql))
-            res_13 = json.loads(vm_mysql_res)
+            res_13 = json.loads(vm_mysql_res.text)
             ret_id_13 = res_13.get('result').get('id')
             print 'mysql虚拟机', ret_id_13
             vm_redis = {
-                    'name': '虚拟机',
+                    'name': 'redis虚拟机',
                     'item_id': 'virtual_server',
                     'group_id': 'server',
                     'property_list': [
@@ -814,11 +796,11 @@ class ResCallback(Resource):
                         ]
                     }
             vm_redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_redis))
-            res_14 = json.loads(vm_redis_res)
+            res_14 = json.loads(vm_redis_res.text)
             ret_id_14 = res_14.get('result').get('id')
             print 'redis虚拟机',ret_id_14
             vm_mongo = {
-                    'name': '虚拟机',
+                    'name': 'mongo虚拟机',
                     'item_id': 'virtual_server',
                     'group_id': 'server',
                     'property_list': [
@@ -841,7 +823,7 @@ class ResCallback(Resource):
                         ]
                     }
             vm_mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mongo))
-            res_15 = json.loads(vm_mongo_res)
+            res_15 = json.loads(vm_mongo_res.text)
             ret_id_15 = res_15.get('result').get('id')
             print 'mongo虚拟机',ret_id_15
             data_physical_server = {
