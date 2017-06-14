@@ -114,6 +114,7 @@ class ResCallback(Resource):
         mongo_port = mongo_info.get('port', '')
         mongo_ip = mongo_info.get('ip', '')
         mongo_physical = mongo_info.get('physical_server')
+        code = 2002
 
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
@@ -702,14 +703,14 @@ class ResCallback(Resource):
                             'value': container_ip,
                             },
                         {
-                            'type': 'int',
+                            'type': 'string',
                             'name': 'CPU数量',
-                            'value': int(container_cpu),
+                            'value': str(container_cpu),
                             },
                         {
-                            'type': 'int',
+                            'type': 'string',
                             'name': '内存容量',
-                            'value': int(container_memory),
+                            'value': str(container_memory),
                             },
                         {
                             'type': 'string',
@@ -720,11 +721,6 @@ class ResCallback(Resource):
                             'type': 'string',
                             'name': '所属部署单元',
                             'value': unit_id,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '资源ID',
-                            'value': resource_id,
                             },
                         {
                             'type': 'string',
