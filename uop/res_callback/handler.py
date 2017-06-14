@@ -115,7 +115,7 @@ class ResCallback(Resource):
         mongo_ip = mongo_info.get('ip', '')
         mongo_physical = mongo_info.get('physical_server')
         code = 2002
-
+        res = 'successful'
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
