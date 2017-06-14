@@ -116,19 +116,6 @@ class ResCallback(Resource):
         mongo_physical = mongo_info.get('physical_server')
         code = 2002
         res = 'successful'
-        try:
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            resource.reservation_status = status
-            resource.save()
-        except Exception as e:
-            code = 500
-            ret = {
-                'code': code,
-                'result': {
-                    'res': 'fail',
-                    'msg': "Resource find error."
-                }
-            }
 
         # item_id: project_item,layer:business,group:BusinessLine 部署单元
         """
@@ -871,6 +858,21 @@ class ResCallback(Resource):
           except Exception, e:
             code = 2003
             res = '存储错误'
+        try:
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.reservation_status = status
+            resource.cmdb_p_code = ret_id
+            resource.save()
+        except Exception as e:
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret
         data_response = {
                 'code': code,
                 'res': res,

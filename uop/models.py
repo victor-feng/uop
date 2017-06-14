@@ -120,6 +120,7 @@ class ResourceModel(db.DynamicDocument):
     reservation_status = db.StringField(required=False)
     resource_list = db.ListField(db.EmbeddedDocumentField('DBIns'))
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
+    cmdb_p_code = db.StringField(requeired=False)
 
     meta = {
         'collection': 'resources',
