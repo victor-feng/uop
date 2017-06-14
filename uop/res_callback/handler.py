@@ -116,7 +116,26 @@ class ResCallback(Resource):
         mongo_physical = mongo_info.get('physical_server')
         code = 2002
         res = 'successful'
-
+        ret_id_13 = ''
+        ret_id_14 = ''
+        ret_id_15 = ''
+        ret_id_4 = ''
+        ret_id_5 = ''
+        ret_id_3 = ''
+        try:
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.reservation_status = status
+            resource.save()
+        except Exception as e:
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret
         # item_id: project_item,layer:business,group:BusinessLine 部署单元
         """
         data_unit = {  # for unit
@@ -751,10 +770,11 @@ class ResCallback(Resource):
                             }
                         ]
                     }
-            vm_mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mysql))
-            res_13 = json.loads(vm_mysql_res.text)
-            ret_id_13 = res_13.get('result').get('id')
-            print 'mysql虚拟机', ret_id_13
+            if mysql_ip:
+                vm_mysql_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mysql))
+                res_13 = json.loads(vm_mysql_res.text)
+                ret_id_13 = res_13.get('result').get('id')
+                print 'mysql虚拟机', ret_id_13
             vm_redis = {
                     'name': 'redis虚拟机',
                     'item_id': 'virtual_server',
@@ -778,10 +798,11 @@ class ResCallback(Resource):
                             }
                         ]
                     }
-            vm_redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_redis))
-            res_14 = json.loads(vm_redis_res.text)
-            ret_id_14 = res_14.get('result').get('id')
-            print 'redis虚拟机',ret_id_14
+            if redis_ip:
+                vm_redis_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_redis))
+                res_14 = json.loads(vm_redis_res.text)
+                ret_id_14 = res_14.get('result').get('id')
+                print 'redis虚拟机',ret_id_14
             vm_mongo = {
                     'name': 'mongo虚拟机',
                     'item_id': 'virtual_server',
@@ -805,10 +826,12 @@ class ResCallback(Resource):
                             },
                         ]
                     }
-            vm_mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mongo))
-            res_15 = json.loads(vm_mongo_res.text)
-            ret_id_15 = res_15.get('result').get('id')
-            print 'mongo虚拟机',ret_id_15
+            if mongo_ip:
+                vm_mongo_res = requests.post(res_callback_url + 'repo/', data=json.dumps(vm_mongo))
+                res_15 = json.loads(vm_mongo_res.text)
+                ret_id_15 = res_15.get('result').get('id')
+                print 'mongo虚拟机',ret_id_15
+
             data_physical_server = {
                     'name': '物理机',
                     'item_id': 'physical_server',
@@ -851,7 +874,7 @@ class ResCallback(Resource):
                         ]
                     }
             physical_server_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_physical_server))
-            res_12 = json.loads(physical_server_res)
+            res_12 = json.loads(physical_server_res.text)
             ret_id_12 = res_12.get('result').get('id')
             print '物理机',ret_id_12
             res = 'successful'
