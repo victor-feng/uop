@@ -340,7 +340,7 @@ class ResCallback(Resource):
                         {
                             'type': 'string',
                             'name': 'IP地址',
-                            'value': '',
+                            'value': mysql_ip,
                             },
                         {
                             'type': 'string',
@@ -407,6 +407,11 @@ class ResCallback(Resource):
                             'value': '',
                             },
                         {
+                            'type': 'string',
+                            'name': 'IP地址',
+                            'value': redis_ip,
+                            },
+                        {
                             'type': 'reference',
                             'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
@@ -439,6 +444,11 @@ class ResCallback(Resource):
                             'type': 'string',
                             'name': '部署单元编号',
                             'value': '',
+                            },
+                        {
+                            'type': 'string',
+                            'name': 'IP地址',
+                            'value': mongo_ip,
                             },
                         {
                             'type': 'reference',
