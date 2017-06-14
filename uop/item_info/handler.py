@@ -174,7 +174,7 @@ class ItemPostInfo(Resource):
             property_list.append({"type": "string", "name": "归属部门", "value": args.item_department})
             property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             property_list.append({"type": "string", "name": "创建人", "value": args.user_name})
-            property_list.append({"type" : "datetime","name" : "创建时间","value" : datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            property_list.append({"type": "string", "name": "创建时间", "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
