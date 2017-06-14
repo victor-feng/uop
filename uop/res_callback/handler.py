@@ -283,7 +283,6 @@ class ResCallback(Resource):
 
         if str(status) == 'ok':
           try:
-            import ipdb;ipdb.set_trace()
             deploy_instance_res = requests.post(res_callback_url + 'repo/', data=json.dumps(deploy_instance))
             res_11 = json.loads(deploy_instance_res.text)
             ret_id = res_11.get('result').get('id')
