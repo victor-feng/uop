@@ -7,6 +7,7 @@ from flask import redirect
 from flask import jsonify
 import uuid
 import datetime
+import hashlib
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 
 from uop.deployment.handler import get_resource_by_id
@@ -98,7 +99,10 @@ class ResourceApplication(Resource):
                                              application_status=application_status, approval_status=approval_status,
                                              reservation_status="unreserved")
         for resource in resource_list:
+            m = hashlib.md5()
             ins_name = resource.get('res_name')
+            m.update(ins_name)
+            ins_name = m.hexdigest()
             # ins_id = resource.get('res_id')
             ins_id = str(uuid.uuid1())
             ins_type = resource.get('res_type')
