@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-user_errors = {
+resource_view_errors = {
     'UserAlreadyExistsError': {
         'message': "A user with that username already exists.",
         'status': 409,
