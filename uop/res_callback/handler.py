@@ -345,7 +345,7 @@ class ResCallback(Resource):
                         {
                             'type': 'string',
                             'name': '端口',
-                            'value': '',
+                            'value': mysql_port,
                             },
                         {
                             'type': 'string',
@@ -412,6 +412,11 @@ class ResCallback(Resource):
                             'value': redis_ip,
                             },
                         {
+                            'type': 'string',
+                            'name': '端口',
+                            'value': redis_port,
+                            },
+                        {
                             'type': 'reference',
                             'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
@@ -449,6 +454,11 @@ class ResCallback(Resource):
                             'type': 'string',
                             'name': 'IP地址',
                             'value': mongo_ip,
+                            },
+                        {
+                            'type': 'string',
+                            'name': '端口',
+                            'value': str(mongo_port),
                             },
                         {
                             'type': 'reference',
