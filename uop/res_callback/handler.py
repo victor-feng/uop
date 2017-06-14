@@ -12,8 +12,8 @@ from uop.res_callback.errors import res_callback_errors
 import requests
 # from uop_backend.config import res_callback_url
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
-# res_callback_url = 'http://cmdb-test.syswin.com/cmdb/api/'
-res_callback_url = 'http://172.28.11.111:8002/cmdb/api/'
+res_callback_url = 'http://cmdb-test.syswin.com/cmdb/api/'
+# res_callback_url = 'http://172.28.11.111:8002/cmdb/api/'
 
 
 class UserRegister(Resource):
