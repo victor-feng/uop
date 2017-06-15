@@ -6,6 +6,7 @@ from uop.resource_view import resource_view_blueprint
 from uop.resource_view.errors import resource_view_errors
 from uop.log import Log
 from config import APP_ENV, configs
+from uop.models import ResourceModel
 
 
 resource_view_api = Api(resource_view_blueprint, errors=resource_view_errors)
@@ -15,7 +16,18 @@ CMDB_RELATION = CMDB_URL+'cmdb/api/repo_relation/'
 
 class ResourceView(Resource):
     @classmethod
-    def get(self, id):
+    def _response_data_not_fount(cls):
+        res = {
+                'code': 2015,
+                'result': {
+                    'res': None,
+                    'msg': u'数据不存在'
+                    }
+                }
+        return res
+
+    @classmethod
+    def get(cls, res_id):
         parser = reqparse.RequestParser()
         parser.add_argument('reference_type', type=str, action='append', location='args')
         parser.add_argument('item_filter', type=str, action='append', location='args')
@@ -53,10 +65,17 @@ class ResourceView(Resource):
             else:
                 param_str += "&total_count="+args.total_count
 
+        try:
+            resource_instance = ResourceModel.objects.filter(res_id=res_id).first()
+            cmdb_p_code = resource_instance.cmdb_p_code
+        except Exception as e:
+            Log.logger.error(e.message)
+            return cls._response_data_not_fount(), 500
+
         if param_str == "?":
-            req_str = CMDB_RELATION + id + '/'
+            req_str = CMDB_RELATION + cmdb_p_code + '/'
         else:
-            req_str = CMDB_RELATION + id + param_str
+            req_str = CMDB_RELATION + cmdb_p_code + param_str
 
         Log.logger.debug("The Request Body is: " + req_str)
 
@@ -69,4 +88,4 @@ class ResourceView(Resource):
         return result, 200
 
 
-resource_view_api.add_resource(ResourceView, '/res_view/<id>')
+resource_view_api.add_resource(ResourceView, '/res_view/<res_id>')
