@@ -403,11 +403,6 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'string',
-                            'name': '集群id',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
                             'name': 'IP地址',
                             'value': redis_ip,
                             },
@@ -458,7 +453,7 @@ class ResCallback(Resource):
                         {
                             'type': 'string',
                             'name': '端口',
-                            'value': str(mongo_port),
+                            'value': mongo_port,
                             },
                         {
                             'type': 'reference',
