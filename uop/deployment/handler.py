@@ -46,7 +46,8 @@ def get_resource_by_id(resource_id):
             for item in data.get('items'):
                 colunm = {}
                 for i in item.get('column'):
-                    colunm[i.name] = i.value
+                    if i.get('name') is not None:
+                        colunm[i.get('name')] = i.get('value')
 
                 resource_info[item.get('item_id')] = {
                     'ip': colunm.get('IP地址', '127.0.0.1'),
