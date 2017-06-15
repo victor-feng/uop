@@ -4,15 +4,18 @@ import uuid
 import requests
 import json
 import datetime
+import os
 
+from flask import request
 from flask_restful import reqparse, Api, Resource
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment
+from uop.models import Deployment, ResourceModel
 from uop.deployment.errors import deploy_errors
 from config import APP_ENV, configs
 
 CPR_URL = configs[APP_ENV].CRP_URL
 CMDB_URL = configs[APP_ENV].CMDB_URL
+UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
@@ -20,64 +23,96 @@ deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 def get_resource_by_id(resource_id):
     err_msg = None
     resource_info = {}
+    resource = ResourceModel.objects.get(res_id=resource_id)
     try:
-        url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
+        # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
+        url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
+              '?reference_type=all&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster&layer_count=10&total_count=100' \
+              '&columns_filter={"mysql_cluster":["IP地址","用户名","密码","端口"], "mongo_cluster":["IP地址","用户名","密码","端口"],"redis_cluster":["IP地址","用户名","密码","端口"]}'
+
         headers = {'Content-Type': 'application/json'}
         print url+' '+json.dumps(headers)
         result = requests.get(url, headers=headers)
         result = result.json()
+        data = result.get('result', {}).get('res', {})
+        code = result.get('code', -1)
         print 'data: '+json.dumps(result)
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
     except BaseException as e:
         err_msg = e.message
     else:
-        if result:
-            _container = result.get('container', {})
-            _mysql = result.get('db_info', {}).get('mysql', {})
-            resource_info['mysql_ip'] = _mysql.get('ip', '')
-            resource_info['mysql_port'] = _mysql.get('port', '3306')
-            resource_info['mysql_user'] = _mysql.get('username', 'root')
-            resource_info['mysql_password'] = _mysql.get('password', '123456')
-            resource_info['docker_ip'] = _container.get('ip', '')
+        if code == 2002:
+            for item in data.get('items'):
+                colunm = {}
+                for i in item.get('column'):
+                    colunm[i.name] = i.value
+
+                resource_info[item.get('item_id')] = {
+                    'ip': colunm.get('IP地址', '127.0.0.1'),
+                    'user': colunm.get('用户名', 'root'),
+                    'password': colunm.get('密码', '123456'),
+                    'port': colunm.get('端口', '3306'),
+                }
+
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info):
-    data = {
-        "deploy_id": deploy_item.deploy_id,
-        "mysql": {
-            "ip": resource_info['mysql_ip'],
-            "port": resource_info['mysql_port'],
-            "host_user": "root",
-            "host_password": "123456",
-            "mysql_user": resource_info['mysql_user'],
-            "mysql_password": resource_info['mysql_password'],
-            "database": "mysql",
-            "sql_script": deploy_item.mysql_context
-        },
-        "redis": {
-            "sql_script": deploy_item.redis_context
-        },
-        "mongodb": {
-            "sql_script": deploy_item.mongodb_context
-        },
-        "docker": {
-            "image_url": deploy_item.app_image,
-            "ip": resource_info['docker_ip']
-        }
-    }
+def deploy_to_crp(deploy_item, resource_info, filename):
+    # data = {
+    #     "deploy_id": deploy_item.deploy_id,
+    #     "mysql": {
+    #         "ip": resource_info['mysql_cluster']['ip'],
+    #         "port": resource_info['mysql_cluster']['port'],
+    #         "host_user": "root",
+    #         "host_password": "123456",
+    #         "mysql_user": resource_info['mysql_cluster']['user'],
+    #         "mysql_password": resource_info['mysql_cluster']['password'],
+    #         "database": "mysql",
+    #         "sql_script": deploy_item.mysql_context
+    #     },
+    #     "redis": {
+    #         "sql_script": deploy_item.redis_context
+    #     },
+    #     "mongodb": {
+    #         "sql_script": deploy_item.mongodb_context
+    #     },
+    #     "docker": {
+    #         "image_url": deploy_item.app_image,
+    #         "ip": resource_info['docker']['ip']
+    #     }
+    # }
     err_msg = None
     result = None
     try:
-        data_str = json.dumps(data)
+        # data_str = json.dumps(data)
         url = CPR_URL + "api/deploy/deploys"
-        headers = {'Content-Type': 'application/json'}
-        print url + ' ' + json.dumps(headers) + ' ' + data_str
-        result = requests.post(url=url, headers=headers, data=data_str)
+        headers = {
+            'Content-Type': 'application/json',
+            'deployid': deploy_item.deploy_id,
+            'mysql.host.password': '123456',
+            'mysql.host.user': 'root',
+            'mysql.password': resource_info['mysql_cluster']['password'],
+            'mysql.user': resource_info['mysql_cluster']['user'],
+            'mysql.ip': resource_info['mysql_cluster']['ip'],
+            'mysql.port': resource_info['mysql_cluster']['port'],
+            'mysql.database': 'mysql',
+            'mysql.script': deploy_item.mysql_context,
+            'docker.ip': resource_info['docker']['ip'],
+            'docker.image.url': deploy_item.app_image
+        }
+        if filename:
+            files = {
+                'file': open(os.path.join(UPLOAD_FOLDER, 'mysql',filename), 'rb')
+            }
+            print url + ' ' + json.dumps(headers)
+            result = requests.post(url=url, headers=headers, files=files)
+        else:
+            print url + ' ' + json.dumps(headers)
+            result = requests.post(url=url, headers=headers)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
@@ -175,6 +210,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('mongodb_tag', type=str, location='json')
         parser.add_argument('mongodb_context', type=str, location='json')
         parser.add_argument('app_image', type=str, location='json')
+        parser.add_argument('file_name', type=str, location='json')
         args = parser.parse_args()
 
         action = args.action
@@ -193,6 +229,7 @@ class DeploymentListAPI(Resource):
         mongodb_tag = args.mongodb_tag
         mongodb_context = args.mongodb_context
         app_image = args.app_image
+        file_name = args.file_name
 
         if action == 'deploy_to_crp':
             deploy_result = 'deploying'
@@ -226,7 +263,7 @@ class DeploymentListAPI(Resource):
                 err_msg, resource_info = get_resource_by_id(
                     deploy_item.resource_id)
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_item, resource_info)
+                    err_msg, result = deploy_to_crp(deploy_item, resource_info, file_name)
                     if err_msg:
                         deploy_item.deploy_result = 'fail'
                         print 'deploy_to_crp err: '+err_msg
@@ -379,6 +416,32 @@ class DeploymentListByByInitiatorAPI(Resource):
         #     return rst, 200
 
 
+class Upload(Resource):
+    def post(self):
+        try:
+            file = request.files['file']
+            type = request.form['0']
+            # mysql 1 redis 2  mongo 3
+            if type == '1':
+                type = 'mysql'
+            elif type == '2':
+                type = 'redis'
+            elif type == '3':
+                type = 'mongo'
+            file.save(os.path.join(UPLOAD_FOLDER, type, file.filename))
+        except Exception as e:
+            return {
+                'code': 500,
+                'msg': e.message
+            }
+        return {
+            'code': 200,
+            'msg': '上传成功！',
+        }
+
+
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
+deployment_api.add_resource(Upload, '/upload')

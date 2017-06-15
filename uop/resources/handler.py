@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
-import requests
 
-from flask import request
+from flask import request, make_response
 from flask import redirect
 from flask import jsonify
 import uuid
@@ -534,6 +533,11 @@ class ResourceRecord(Resource):
 class GetDBInfo(Resource):
     def get(cls, res_id):
         err_msg, resource_info = get_resource_by_id(res_id)
+        data = {
+            'mysql_ip': resource_info['mysql_cluster']['ip'],
+            'redis_ip': resource_info['redis_cluster']['ip'],
+            'mongo_ip': resource_info['mongo_cluster']['ip'],
+        }
         if err_msg:
             code = 500
             ret = {
@@ -544,24 +548,80 @@ class GetDBInfo(Resource):
                 }
             }
         else:
-            resource_info['redis_ip'] = ''
-            resource_info['mongo_ip'] = ''
             code = 200
             ret = {
                 'code': code,
                 'result': {
                     'res': 'success',
-                    'msg': resource_info
+                    'msg': data
                 }
             }
         return ret, code
 
 
+class GetMyResourcesInfo(Resource):
+    def get(self):
+        user_id = request.args.get('user_id')
+        result_list = []
+        try:
+            resources = ResourceModel.objects.filter(user_id=user_id, approval_status='success')
+        except Exception as e:
+            print e
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret
+        if len(resources):
+            for res in resources:
+                # TODO: 应该写一个可供批量查询的接口 不能遍历发送请求
+                err_msg, resource_info = get_resource_by_id(res.res_id)
+                if err_msg:
+                    resource_info['docker'] = {'ip':'127.0.0.1'}
+                    resource_info['mysql_cluster'] = {'ip':'127.0.0.1'}
+                    resource_info['redis_cluster'] = {'ip':'127.0.0.1'}
+                    resource_info['mongo_cluster'] = {'ip':'127.0.0.1'}
+
+                result = {}
+                result['create_date'] = res.created_date
+                result['resource'] = res.resource_name
+                result['item_name'] = res.project
+                result['item_code'] = res.project_id
+                result['id'] = res.res_id
+                for docker in res.compute_list:
+                    result['resource_type'] = 'docker'
+                    result['resource_config'] = [
+                        {'name': 'CPU','value': docker.cpu + '核'},
+                        {'name': '内存','value': docker.mem + 'GB'},
+                    ]
+                    result['resource_status'] = '运行中'
+                    result['resource_ip'] = resource_info['docker']['ip']
+                    result_list.append(result)
+                for db_info in res.resource_list:
+                    db_type = db_info.get('ins_type', 'mysql_default')
+                    result['resource_type'] = db_type
+                    result['resource_ip'] = resource_info[db_type+'_cluster']['ip']
+                    result['resource_config'] = [
+                        {'name': 'CPU', 'value': db_info.cpu + '核'},
+                        {'name': '内存', 'value': db_info.mem + 'GB'},
+                    ]
+                    result_list.append(result)
 
 
-
-
-
+                result_list.append(result)
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': result_list
+            }
+        }
+        return ret, code
 
 
 
@@ -569,3 +629,4 @@ resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
 resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
+resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
