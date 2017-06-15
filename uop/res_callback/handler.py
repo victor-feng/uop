@@ -354,6 +354,16 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'string',
+                            'name': '用户名',
+                            'value': mysql_username
+                            },
+                        {
+                            'type': 'string',
+                            'name': '密码',
+                            'value': mysql_password
+                            },
+                        {
+                            'type': 'string',
                             'name': '角色',
                             'value': '',
                             },
@@ -412,6 +422,16 @@ class ResCallback(Resource):
                             'value': redis_port,
                             },
                         {
+                            'type': 'string',
+                            'name': '用户名',
+                            'value': redis_username
+                            },
+                        {
+                            'type': 'string',
+                            'name': '密码',
+                            'value': redis_password
+                            },
+                        {
                             'type': 'reference',
                             'reference_ci': 'deploy_instance',
                             'reference_id': ret_id,
@@ -449,6 +469,16 @@ class ResCallback(Resource):
                             'type': 'string',
                             'name': 'IP地址',
                             'value': mongo_ip,
+                            },
+                        {
+                            'type': 'string',
+                            'name': '用户名',
+                            'value': mongo_username
+                            },
+                        {
+                            'type': 'string',
+                            'name': '密码',
+                            'value': mongo_password
                             },
                         {
                             'type': 'string',
