@@ -19,6 +19,7 @@ class ResourceView(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('reference_type', type=str, action='append', location='args')
         parser.add_argument('item_filter', type=str, action='append', location='args')
+        parser.add_argument('columns_filter', type=str, location='args')
         parser.add_argument('layer_count', type=str, location='args')
         parser.add_argument('total_count', type=str, location='args')
 
@@ -36,6 +37,11 @@ class ResourceView(Resource):
                     param_str += "item_filter="+item_filter
                 else:
                     param_str += "&item_filter="+item_filter
+        if args.columns_filter:
+            if param_str == "?":
+                param_str += "columns_filter="+args.columns_filter
+            else:
+                param_str += "&columns_filter="+args.columns_filter
         if args.layer_count:
             if param_str == "?":
                 param_str += "layer_count="+args.layer_count
