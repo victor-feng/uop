@@ -918,19 +918,19 @@ class ResCallback(Resource):
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'mysql_virtual_server',
+                            'reference_ci': 'virtual_server',
                             'reference_id': ret_id_13,
                             'name': '包含mysql虚拟机',
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'redis_virtual_server',
+                            'reference_ci': 'virtual_server',
                             'reference_id': ret_id_14,
                             'name': '包含redis虚拟机',
                             },
                         {
                             'type': 'reference',
-                            'reference_ci': 'mongo_virtual_server',
+                            'reference_ci': 'virtual_server',
                             'reference_id': ret_id_15,
                             'name': '包含mongo虚拟机',
                             },
