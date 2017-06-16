@@ -784,6 +784,12 @@ class ResCallback(Resource):
                             'reference_id': ret_id_6,
                             'name': '关联应用实例',
                             },
+                        {
+                            'type': 'reference',
+                            'reference_ci': 'physical_server',
+                            'reference_id': '0034fac2-525a-11e7-bdb3-fa163e9474c9',
+                            'name': '所在物理机',
+                        },
                         ]
                     }
             if container:
@@ -816,7 +822,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': ret_id_3,
+                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
                             'name': '所在物理机',
                             }
                         ]
@@ -850,7 +856,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': ret_id_4,
+                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
                             'name': '所在物理机',
                             }
                         ]
@@ -884,7 +890,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': ret_id_5,
+                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
                             'name': '所在物理机'
                             }
                         ]
