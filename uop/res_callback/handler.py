@@ -787,7 +787,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': '0034fac2-525a-11e7-bdb3-fa163e9474c9',
+                            'reference_id': '42c1fdf2-525c-11e7-aa8f-fa163e9474c9',
                             'name': '所在物理机',
                         },
                         ]
@@ -822,7 +822,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
+                            'reference_id': '42bd403c-525c-11e7-881a-fa163e9474c9',
                             'name': '所在物理机',
                             }
                         ]
@@ -856,7 +856,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
+                            'reference_id': '42bd403c-525c-11e7-881a-fa163e9474c9',
                             'name': '所在物理机',
                             }
                         ]
@@ -890,7 +890,7 @@ class ResCallback(Resource):
                         {
                             'type': 'reference',
                             'reference_ci': 'physical_server',
-                            'reference_id': '003016c4-525a-11e7-bdfa-fa163e9474c9',
+                            'reference_id': '42bd403c-525c-11e7-881a-fa163e9474c9',
                             'name': '所在物理机'
                             }
                         ]
