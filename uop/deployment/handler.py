@@ -50,10 +50,10 @@ def get_resource_by_id(resource_id):
                         colunm[i.get('name')] = i.get('value')
 
                 resource_info[item.get('item_id')] = {
-                    'ip': colunm.get('IP地址', '127.0.0.1'),
-                    'user': colunm.get('用户名', 'root'),
-                    'password': colunm.get('密码', '123456'),
-                    'port': colunm.get('端口', '3306'),
+                    'ip': colunm.get('IP地址'.decode('utf-8'), '127.0.0.1'),
+                    'user': colunm.get('用户名'.decode('utf-8'), 'root'),
+                    'password': colunm.get('密码'.decode('utf-8'), '123456'),
+                    'port': colunm.get('端口'.decode('utf-8'), '3306'),
                 }
 
         else:
