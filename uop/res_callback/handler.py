@@ -812,6 +812,12 @@ class ResCallback(Resource):
                             'reference_ci': 'mysql_instance',
                             'reference_id': ret_id_3,
                             'name': '关联mysql实例',
+                            },
+                        {
+                            'type': 'reference',
+                            'reference_ci': 'physical_server',
+                            'reference_id': ret_id_3,
+                            'name': '所在物理机',
                             }
                         ]
                     }
@@ -840,6 +846,12 @@ class ResCallback(Resource):
                             'reference_ci': 'redis_instance',
                             'reference_id': ret_id_4,
                             'name': '关联redis实例',
+                            },
+                        {
+                            'type': 'reference',
+                            'reference_ci': 'physical_server',
+                            'reference_id': ret_id_4,
+                            'name': '所在物理机',
                             }
                         ]
                     }
@@ -869,6 +881,12 @@ class ResCallback(Resource):
                             'reference_id': ret_id_5,
                             'name': '关联mongo实例',
                             },
+                        {
+                            'type': 'reference',
+                            'reference_ci': 'physical_server',
+                            'reference_id': ret_id_5,
+                            'name': '所在物理机'
+                            }
                         ]
                     }
             if mongo_ip:
