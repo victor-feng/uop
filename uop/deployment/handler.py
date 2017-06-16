@@ -63,29 +63,30 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, resource_info, filename):
-    # data = {
-    #     "deploy_id": deploy_item.deploy_id,
-    #     "mysql": {
-    #         "ip": resource_info['mysql_cluster']['ip'],
-    #         "port": resource_info['mysql_cluster']['port'],
-    #         "host_user": "root",
-    #         "host_password": "123456",
-    #         "mysql_user": resource_info['mysql_cluster']['user'],
-    #         "mysql_password": resource_info['mysql_cluster']['password'],
-    #         "database": "mysql",
-    #         "sql_script": deploy_item.mysql_context
-    #     },
-    #     "redis": {
-    #         "sql_script": deploy_item.redis_context
-    #     },
-    #     "mongodb": {
-    #         "sql_script": deploy_item.mongodb_context
-    #     },
-    #     "docker": {
-    #         "image_url": deploy_item.app_image,
-    #         "ip": resource_info['docker']['ip']
-    #     }
-    # }
+    data = {
+        "deploy_id": deploy_item.deploy_id,
+        "mysql": {
+            "ip": resource_info['mysql_cluster']['ip'],
+            "port": resource_info['mysql_cluster']['port'],
+            "host_user": "root",
+            "host_password": "123456",
+            "mysql_user": resource_info['mysql_cluster']['user'],
+            "mysql_password": resource_info['mysql_cluster']['password'],
+            "database": "mysql",
+            "sql_script": deploy_item.mysql_context
+        },
+        "redis": {
+            "sql_script": deploy_item.redis_context
+        },
+        "mongodb": {
+            "sql_script": deploy_item.mongodb_context
+        },
+        "docker": {
+            "image_url": deploy_item.app_image,
+            "ip": resource_info['docker']['ip']
+        }
+    }
+
     err_msg = None
     result = None
     try:
@@ -93,18 +94,19 @@ def deploy_to_crp(deploy_item, resource_info, filename):
         url = CPR_URL + "api/deploy/deploys"
         headers = {
             'Content-Type': 'application/json',
-            'deployid': deploy_item.deploy_id,
-            'mysql.host.password': '123456',
-            'mysql.host.user': 'root',
-            'mysql.password': resource_info['mysql_cluster']['password'],
-            'mysql.user': resource_info['mysql_cluster']['user'],
-            'mysql.ip': resource_info['mysql_cluster']['ip'],
-            'mysql.port': resource_info['mysql_cluster']['port'],
-            'mysql.database': 'mysql',
-            'mysql.script': deploy_item.mysql_context,
-            'docker.ip': resource_info['docker']['ip'],
-            'docker.image.url': deploy_item.app_image
+            # 'deployid': deploy_item.deploy_id,
+            # 'mysql.host.password': '123456',
+            # 'mysql.host.user': 'root',
+            # 'mysql.password': resource_info['mysql_cluster']['password'],
+            # 'mysql.user': resource_info['mysql_cluster']['user'],
+            # 'mysql.ip': resource_info['mysql_cluster']['ip'],
+            # 'mysql.port': resource_info['mysql_cluster']['port'],
+            # 'mysql.database': 'mysql',
+            # 'mysql.script': deploy_item.mysql_context,
+            # 'docker.ip': resource_info['docker']['ip'],
+            # 'docker.image.url': deploy_item.app_image
         }
+        data_str = json.dumps(data)
         if filename:
             files = {
                 'file': open(os.path.join(UPLOAD_FOLDER, 'mysql',filename), 'rb')
@@ -113,7 +115,7 @@ def deploy_to_crp(deploy_item, resource_info, filename):
             result = requests.post(url=url, headers=headers, files=files)
         else:
             print url + ' ' + json.dumps(headers)
-            result = requests.post(url=url, headers=headers)
+            result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
