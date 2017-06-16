@@ -901,51 +901,51 @@ class ResCallback(Resource):
                 ret_id_15 = res_15.get('result').get('id')
                 print 'mongo虚拟机',ret_id_15
 
-            data_physical_server = {
-                    'name': '物理机',
-                    'item_id': 'physical_server',
-                    'group_id': 'server',
-                    'property_list': [
-                        {
-                            'type': 'string',
-                            'name': '名称',
-                            'value': '物理机',
-                            },
-                        {
-                            'type': 'string',
-                            'name': 'IP地址',
-                            'value': physical_server
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'docker',
-                            'reference_id': ret_id_2,
-                            'name': '包含Docker',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'virtual_server',
-                            'reference_id': ret_id_13,
-                            'name': '包含mysql虚拟机',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'virtual_server',
-                            'reference_id': ret_id_14,
-                            'name': '包含redis虚拟机',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'virtual_server',
-                            'reference_id': ret_id_15,
-                            'name': '包含mongo虚拟机',
-                            },
-                        ]
-                    }
-            physical_server_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_physical_server))
-            res_12 = json.loads(physical_server_res.text)
-            ret_id_12 = res_12.get('result').get('id')
-            print '物理机',ret_id_12
+            # data_physical_server = {
+            #         'name': '物理机',
+            #         'item_id': 'physical_server',
+            #         'group_id': 'server',
+            #         'property_list': [
+            #             {
+            #                 'type': 'string',
+            #                 'name': '名称',
+            #                 'value': '物理机',
+            #                 },
+            #             {
+            #                 'type': 'string',
+            #                 'name': 'IP地址',
+            #                 'value': physical_server
+            #                 },
+            #             {
+            #                 'type': 'reference',
+            #                 'reference_ci': 'docker',
+            #                 'reference_id': ret_id_2,
+            #                 'name': '包含Docker',
+            #                 },
+            #             {
+            #                 'type': 'reference',
+            #                 'reference_ci': 'virtual_server',
+            #                 'reference_id': ret_id_13,
+            #                 'name': '包含mysql虚拟机',
+            #                 },
+            #             {
+            #                 'type': 'reference',
+            #                 'reference_ci': 'virtual_server',
+            #                 'reference_id': ret_id_14,
+            #                 'name': '包含redis虚拟机',
+            #                 },
+            #             {
+            #                 'type': 'reference',
+            #                 'reference_ci': 'virtual_server',
+            #                 'reference_id': ret_id_15,
+            #                 'name': '包含mongo虚拟机',
+            #                 },
+            #             ]
+            #         }
+            # physical_server_res = requests.post(res_callback_url + 'repo/', data=json.dumps(data_physical_server))
+            # res_12 = json.loads(physical_server_res.text)
+            # ret_id_12 = res_12.get('result').get('id')
+            # print '物理机',ret_id_12
             res = 'successful'
           except Exception, e:
             code = 2003
