@@ -73,6 +73,7 @@ class ResourceApplication(Resource):
         user_id = args.user_id
         domain = args.domain
         env = args.env
+        created_date = datetime.datetime.now()
         application_status = args.application_status
         approval_status = "unsubmit"
         resource_list = args.resource_list
@@ -96,7 +97,7 @@ class ResourceApplication(Resource):
                                              department_id=department_id, res_id=res_id, project_id=project_id,
                                              user_name=user_name, user_id=user_id, domain=domain, env=env,
                                              application_status=application_status, approval_status=approval_status,
-                                             reservation_status="unreserved")
+                                             reservation_status="unreserved", created_date=created_date)
         for resource in resource_list:
             m = hashlib.md5()
             ins_name = resource.get('res_name')
