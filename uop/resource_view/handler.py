@@ -72,7 +72,8 @@ class ResourceView(Resource):
             if param_str == "?":
                 # req_str = CMDB_RELATION + cmdb_p_code + '/'
                 layer_and_total_count = '?layer_count=10&total_count=50'
-                reference_types = '&reference_type=child&reference_type=dependent&reference_type=bond'
+                reference_types = '&reference_type=dependent'
+                reference_sequence = '&reference_sequence=[\"child\",\"bond\",\"parent\"]'
                 item_filter = ''
                 columns_filter = '&columns_filter={' +\
                                  '\"project_item\":[\"名称\"],' +\
@@ -90,7 +91,7 @@ class ResourceView(Resource):
                                  '\"rack\":[\"机柜编号\"],' +\
                                  '\"idc_item\":[\"名称\",\"机房地址\"]' +\
                                  '}'
-                req_str = CMDB_RELATION + cmdb_p_code + layer_and_total_count + reference_types +\
+                req_str = CMDB_RELATION + cmdb_p_code + layer_and_total_count + reference_types + reference_sequence +\
                           item_filter + columns_filter
             else:
                 req_str = CMDB_RELATION + cmdb_p_code + param_str
