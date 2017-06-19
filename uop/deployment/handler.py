@@ -28,12 +28,12 @@ def get_resource_by_id(resource_id):
         # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
               '?layer_count=3&total_count=50' +\
-              '&reference_sequence=["child","bond"]' +\
+              '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
               '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
-              '&columns_filter={"mysql_cluster":["IP地址","用户名","密码","端口"],' +\
-              ' "mongo_cluster":["IP地址","用户名","密码","端口"],' +\
-              ' "redis_cluster":["IP地址","用户名","密码","端口"],' +\
-              ' "docker":["IP地址","用户名","密码","端口"]}'
+              '&columns_filter={\"mysql_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+              ' \"mongo_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+              ' \"redis_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+              ' \"docker\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"]}'
 
         headers = {'Content-Type': 'application/json'}
         print url+' '+json.dumps(headers)

@@ -73,7 +73,7 @@ class ResourceView(Resource):
                 # req_str = CMDB_RELATION + cmdb_p_code + '/'
                 layer_and_total_count = '?layer_count=10&total_count=50'
                 reference_types = '&reference_type=dependent'
-                reference_sequence = '&reference_sequence=[\"child\",\"bond\",\"parent\"]'
+                reference_sequence = '&reference_sequence=[{\"child\": 3},{\"bond\": 2},{\"parent\": 5}]'
                 item_filter = ''
                 columns_filter = '&columns_filter={' +\
                                  '\"project_item\":[\"名称\"],' +\
