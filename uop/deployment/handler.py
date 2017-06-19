@@ -27,8 +27,13 @@ def get_resource_by_id(resource_id):
     try:
         # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
-              '?reference_type=all&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster&layer_count=10&total_count=100' \
-              '&columns_filter={"mysql_cluster":["IP地址","用户名","密码","端口"], "mongo_cluster":["IP地址","用户名","密码","端口"],"redis_cluster":["IP地址","用户名","密码","端口"]}'
+              '?layer_count=3&total_count=50' +\
+              '&reference_sequence=["child","bond"]' +\
+              '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
+              '&columns_filter={"mysql_cluster":["IP地址","用户名","密码","端口"],' +\
+              ' "mongo_cluster":["IP地址","用户名","密码","端口"],' +\
+              ' "redis_cluster":["IP地址","用户名","密码","端口"],' +\
+              ' "docker":["IP地址","用户名","密码","端口"]}'
 
         headers = {'Content-Type': 'application/json'}
         print url+' '+json.dumps(headers)
