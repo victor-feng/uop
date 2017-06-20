@@ -30,6 +30,7 @@ class ResourceView(Resource):
     def get(cls, res_id):
         try:
             parser = reqparse.RequestParser()
+            parser.add_argument('reference_sequence', type=str, location='args')
             parser.add_argument('reference_type', type=str, action='append', location='args')
             parser.add_argument('item_filter', type=str, action='append', location='args')
             parser.add_argument('columns_filter', type=str, location='args')
@@ -38,6 +39,11 @@ class ResourceView(Resource):
 
             args = parser.parse_args()
             param_str = "?"
+            if args.reference_sequence:
+                if param_str == "?":
+                    param_str += "reference_sequence="+args.reference_sequence
+                else:
+                    param_str += "&reference_sequence="+args.reference_sequence
             if args.reference_type:
                 for reference_type in args.reference_type:
                     if param_str == "?":
