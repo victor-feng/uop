@@ -7,7 +7,8 @@ import uuid
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.deploy_callback.errors import deploy_cb_errors
-from uop.models import Deployment
+from uop.models import Deployment, ResourceModel
+import requests
 
 import sys
 reload(sys)
@@ -15,6 +16,7 @@ sys.setdefaultencoding('utf-8')
 
 
 deploy_cb_api = Api(deploy_cb_blueprint, errors=deploy_cb_errors)
+
 
 
 class DeployCallback(Resource):
@@ -52,8 +54,24 @@ class DeployCallback(Resource):
             return
 
         dep.deploy_result = args.result
+        resource_id = dep.resource_id
         try:
             dep.save()
+            p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
+            # 修改cmdb部署状态信息
+            deployment_url = "http://cmdb-test.syswin.com/cmdb/api/repo/%s/" % p_code
+            print 'status', dep.deploy_result, p_code
+            data = {
+                'property_list': [
+                    {
+                        "type": "string",
+                        "name": "部署状态",
+                        "value": dep.deploy_result
+                    }
+                ]
+            }
+            req = requests.put(deployment_url, data=json.dumps(data))
+            print '-----', req.text
         except Exception as e:
             code = 500
             ret = {
