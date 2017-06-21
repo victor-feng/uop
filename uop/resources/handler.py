@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+import copy
 from flask import request, make_response
 from flask import redirect
 from flask import jsonify
@@ -563,9 +564,28 @@ class GetDBInfo(Resource):
 class GetMyResourcesInfo(Resource):
     def get(self):
         user_id = request.args.get('user_id')
+        resource_type = request.args.get('resource_type')
+        resource_name = request.args.get('resource_name')
+        item_name = request.args.get('item_name')
+        item_code = request.args.get('item_code')
+        create_date = request.args.get('create_date')
+        resource_status = request.args.get('resource_status')
         result_list = []
+        query = {
+            'approval_status': 'success',
+        }
         try:
-            resources = ResourceModel.objects.filter(user_id=user_id, approval_status='success')
+            if user_id:
+                query['user_id'] = user_id
+            if resource_name:
+                query['resource_name'] = resource_name
+            if item_name:
+                query['project'] = item_name
+            if item_code:
+                query['project_id'] = item_code
+            if create_date:
+                query['create_date'] = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S')
+            resources = ResourceModel.objects.filter(**query).order_by('-create_date')
         except Exception as e:
             print e
             code = 500
@@ -588,32 +608,40 @@ class GetMyResourcesInfo(Resource):
                     resource_info['mongo_cluster'] = {'ip':'127.0.0.1'}
 
                 result = {}
-                result['create_date'] = res.created_date
-                result['resource'] = res.resource_name
+                result['create_date'] =datetime.datetime.strftime(res.created_date, '%Y-%m-%d %H:%M:%S')
+                result['resource_name'] = res.resource_name
                 result['item_name'] = res.project
                 result['item_code'] = res.project_id
                 result['id'] = res.res_id
-                for docker in res.compute_list:
-                    result['resource_type'] = 'docker'
-                    result['resource_config'] = [
-                        {'name': 'CPU','value': docker.cpu + '核'},
-                        {'name': '内存','value': docker.mem + 'GB'},
-                    ]
-                    result['resource_status'] = '运行中'
-                    result['resource_ip'] = resource_info['docker']['ip']
-                    result_list.append(result)
-                for db_info in res.resource_list:
-                    db_type = db_info.get('ins_type', 'mysql_default')
-                    result['resource_type'] = db_type
-                    result['resource_ip'] = resource_info[db_type+'_cluster']['ip']
-                    result['resource_config'] = [
-                        {'name': 'CPU', 'value': db_info.cpu + '核'},
-                        {'name': '内存', 'value': db_info.mem + 'GB'},
-                    ]
-                    result_list.append(result)
+                if not resource_type:
+                    result_list.extend(self.get_source_item(res.compute_list, result, resource_info, 'docker'))
+                    result_list.extend(self.get_source_item(res.resource_list, result, resource_info, 'db'))
+                else :
+                    if resource_type == 'docker':
+                        source_list = res.compute_list
+                    else:
+                        source_list = res.resource_list
+                    result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
 
+                # for docker in res.compute_list:
+                #     result['resource_type'] = 'docker'
+                #     result['resource_config'] = [
+                #         {'name': 'CPU','value': str(docker.cpu) + '核'},
+                #         {'name': '内存','value': str(docker.mem) + 'GB'},
+                #     ]
+                #     result['resource_status'] = '运行中'
+                #     result['resource_ip'] = resource_info['docker']['ip']
+                #     result_list.append(result)
+                # for db_info in res.resource_list:
+                #     db_type = db_info.ins_type
+                #     result['resource_type'] = db_type
+                #     result['resource_ip'] = resource_info[db_type+'_cluster']['ip']
+                #     result['resource_config'] = [
+                #         {'name': 'CPU', 'value': str(db_info.cpu) + '核'},
+                #         {'name': '内存', 'value': str(db_info.mem) + 'GB'},
+                #     ]
+                #     result_list.append(result)
 
-                result_list.append(result)
         code = 200
         ret = {
             'code': code,
@@ -623,6 +651,38 @@ class GetMyResourcesInfo(Resource):
             }
         }
         return ret, code
+
+
+    def get_source_item(self, source_list, result, resource_info, source_type):
+        result_list = []
+        for source in source_list:
+            result = copy.copy(result)
+            if source_type == 'docker':
+                type = source_type
+                ip = source_type
+            else:
+                if source_type == 'db':
+                    type = source.ins_type
+                elif source_type == 'mysqlandmongo':
+                    if source.ins_type == 'redis':
+                        continue
+                    else:
+                        type = source.ins_type
+                else:
+                    if source.ins_type == source_type:
+                        type = source.ins_type
+                    else:
+                        continue
+                ip = type + '_cluster'
+            result['resource_type'] = type
+            result['resource_config'] = [
+                {'name': 'CPU', 'value': str(source.cpu) + '核'},
+                {'name': '内存', 'value': str(source.mem) + 'GB'},
+            ]
+            result['resource_status'] = '运行中'
+            result['resource_ip'] = resource_info[ip]['ip']
+            result_list.append(result)
+        return result_list
 
 
 
