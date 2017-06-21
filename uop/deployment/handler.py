@@ -67,7 +67,7 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, filename):
+def deploy_to_crp(deploy_item, resource_info, file_data):
     data = {
         "deploy_id": deploy_item.deploy_id,
         "mysql": {
@@ -83,7 +83,7 @@ def deploy_to_crp(deploy_item, resource_info, filename):
         "redis": {
             "sql_script": deploy_item.redis_context
         },
-        "mongodb": {
+        "mongo": {
             "sql_script": deploy_item.mongodb_context
         },
         "docker": {
@@ -95,32 +95,19 @@ def deploy_to_crp(deploy_item, resource_info, filename):
     err_msg = None
     result = None
     try:
-        # data_str = json.dumps(data)
         url = CPR_URL + "api/deploy/deploys"
         headers = {
             'Content-Type': 'application/json',
-            # 'deployid': deploy_item.deploy_id,
-            # 'mysql.host.password': '123456',
-            # 'mysql.host.user': 'root',
-            # 'mysql.password': resource_info['mysql_cluster']['password'],
-            # 'mysql.user': resource_info['mysql_cluster']['user'],
-            # 'mysql.ip': resource_info['mysql_cluster']['ip'],
-            # 'mysql.port': resource_info['mysql_cluster']['port'],
-            # 'mysql.database': 'mysql',
-            # 'mysql.script': deploy_item.mysql_context,
-            # 'docker.ip': resource_info['docker']['ip'],
-            # 'docker.image.url': deploy_item.app_image
         }
         data_str = json.dumps(data)
-        if filename:
-            files = {
-                'file': open(os.path.join(UPLOAD_FOLDER, 'mysql',filename), 'rb')
-            }
-            print url + ' ' + json.dumps(headers)
-            result = requests.post(url=url, headers=headers, files=files)
-        else:
-            print url + ' ' + json.dumps(headers)
-            result = requests.post(url=url, headers=headers, data=data_str)
+        res = upload_files_to_crp(file_data)
+        if res.code == 200:
+            for type, filename_list in res.file_info.items():
+                data[type]['filenames'] = filename_list
+        elif res.code == 500:
+            return 'upload sql file failed', result
+        print url + ' ' + json.dumps(headers)
+        result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
@@ -128,6 +115,21 @@ def deploy_to_crp(deploy_item, resource_info, filename):
         err_msg = e.message
 
     return err_msg, result
+
+def upload_files_to_crp(file_data):
+    url = CPR_URL + "api/deploy/upload"
+    files = []
+    for db_type, filenames in file_data.items():
+        for idx, filename in enumerate(filenames):
+            files.append((db_type + '_' + str(idx), open(os.path.join(UPLOAD_FOLDER, db_type, filename), 'rb')))
+
+    if files:
+        data = {'action': 'upload'}
+        result = requests.post(url=url, files=files, data=data)
+        return result
+    else:
+        return {'code': -1}
+
 
 
 class DeploymentListAPI(Resource):
@@ -428,14 +430,7 @@ class Upload(Resource):
     def post(self):
         try:
             file = request.files['file']
-            type = request.form['0']
-            # mysql 1 redis 2  mongo 3
-            if type == '1':
-                type = 'mysql'
-            elif type == '2':
-                type = 'redis'
-            elif type == '3':
-                type = 'mongo'
+            type = request.form['file_type']
             file.save(os.path.join(UPLOAD_FOLDER, type, file.filename))
         except Exception as e:
             return {
@@ -445,6 +440,7 @@ class Upload(Resource):
         return {
             'code': 200,
             'msg': '上传成功！',
+            'type': type,
         }
 
 
