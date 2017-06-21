@@ -137,23 +137,7 @@ class ResCallback(Resource):
             }
             return ret
         # item_id: project_item,layer:business,group:BusinessLine 部署单元
-        """
-        data_unit = {  # for unit
-                '名称': unit_name,
-                '部署单元编号': unit_id,
-                '部署单元描述': unit_des,
-                '创建人': username,
-                '归属部门': department,
-                '创建时间': created_time,
-                }
-        data_resource = {
-                '资源名称': resource_name,
-                '资源ID': resource_id,
-                '部署环境': env,
-                '域名': domain,
-                '状态': status,
-                }
-        """
+
         data_unit = {
                 'name': unit_name,
                 'layer_id': 'business',
@@ -272,21 +256,7 @@ class ResCallback(Resource):
                         },
                     ]
                 }
-        """
-        data_container = {
-                '名称': container_name,
-                '镜像地址': image_addr,
-                # '实例规格': standard_ins,
-                '用户名': username,
-                '密码': password,
-                'IP地址': ip,
-                'CPU数量': cpu,
-                '内存容量': memory,
-                '实例id': ins_id,
-                '所属部署单元': unit_id,
-                }
-        """
-
+        
         if str(status) == 'ok':
           try:
             deploy_instance_res = requests.post(res_callback_url + 'repo/', data=json.dumps(deploy_instance))
@@ -322,189 +292,190 @@ class ResCallback(Resource):
             ret_id_7 = res_7.get('result').get('id')
             print '应用集群',ret_id_7
 
-            mysql_cluster = {
-                    'name': 'mysql集群',
-                    'item_id': 'mysql_cluster',
-                    'group_id': 'database',
-                    'property_list': [
-                        {
-                            'type': 'string',
-                            'name': '名称',
-                            'value': 'mysql',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '集群id',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': 'IP地址',
-                            'value': mysql_ip,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '端口',
-                            'value': mysql_port,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '版本',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '用户名',
-                            'value': mysql_username
-                            },
-                        {
-                            'type': 'string',
-                            'name': '密码',
-                            'value': mysql_password
-                            },
-                        {
-                            'type': 'string',
-                            'name': '角色',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '最大连接数',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '最大错误连接数',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '超时等待时间',
-                            'value': '',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'deploy_instance',
-                            'reference_id': ret_id,
-                            'name': '归属部署实例',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'app_cluster',
-                            'reference_id': ret_id_7,
-                            'name': '依赖应用集群',
-                            },
-                        ]
-                    }
-            mysql_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mysql_cluster))
-            res_8 = json.loads(mysql_cluster_res.text)
-            ret_id_8 = res_8.get('result').get('id')
-            print 'mysql集群',ret_id_8
+            if mysql_ip:
+                mysql_cluster = {
+                        'name': 'mysql集群',
+                        'item_id': 'mysql_cluster',
+                        'group_id': 'database',
+                        'property_list': [
+                            {
+                                'type': 'string',
+                                'name': '名称',
+                                'value': 'mysql',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '集群id',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': 'IP地址',
+                                'value': mysql_ip,
+                                },
+                            {
+                                'type': 'string',
+                                'name': '端口',
+                                'value': mysql_port,
+                                },
+                            {
+                                'type': 'string',
+                                'name': '版本',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '用户名',
+                                'value': mysql_username
+                                },
+                            {
+                                'type': 'string',
+                                'name': '密码',
+                                'value': mysql_password
+                                },
+                            {
+                                'type': 'string',
+                                'name': '角色',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '最大连接数',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '最大错误连接数',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '超时等待时间',
+                                'value': '',
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'deploy_instance',
+                                'reference_id': ret_id,
+                                'name': '归属部署实例',
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'app_cluster',
+                                'reference_id': ret_id_7,
+                                'name': '依赖应用集群',
+                                },
+                            ]
+                        }
+                mysql_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mysql_cluster))
+                res_8 = json.loads(mysql_cluster_res.text)
+                ret_id_8 = res_8.get('result').get('id')
+                print 'mysql集群',ret_id_8
 
-            redis_cluster = {
-                    'name': 'redis集群',
-                    'item_id': 'redis_cluster',
-                    'group_id': 'BusinessLine',
-                    'property_list': [
-                        {
-                            'type': 'string',
-                            'name': '名称',
-                            'value': 'redis',
-                            },
-                        {
-                            'type': 'string',
-                            'name': 'IP地址',
-                            'value': redis_ip,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '端口',
-                            'value': redis_port,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '用户名',
-                            'value': redis_username
-                            },
-                        {
-                            'type': 'string',
-                            'name': '密码',
-                            'value': redis_password
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'deploy_instance',
-                            'reference_id': ret_id,
-                            'name': '归属部署实例',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'app_cluster',
-                            'reference_id': ret_id_7,
-                            'name': '依赖应用集群',
-                            }
-                        ]
-                    }
+            if redis_ip:
+                redis_cluster = {
+                        'name': 'redis集群',
+                        'item_id': 'redis_cluster',
+                        'group_id': 'BusinessLine',
+                        'property_list': [
+                            {
+                                'type': 'string',
+                                'name': '名称',
+                                'value': 'redis',
+                                },
+                            {
+                                'type': 'string',
+                                'name': 'IP地址',
+                                'value': redis_ip,
+                                },
+                            {
+                                'type': 'string',
+                                'name': '端口',
+                                'value': redis_port,
+                                },
+                            {
+                                'type': 'string',
+                                'name': '用户名',
+                                'value': redis_username
+                                },
+                            {
+                                'type': 'string',
+                                'name': '密码',
+                                'value': redis_password
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'deploy_instance',
+                                'reference_id': ret_id,
+                                'name': '归属部署实例',
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'app_cluster',
+                                'reference_id': ret_id_7,
+                                'name': '依赖应用集群',
+                                }
+                            ]
+                        }
+                redis_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(redis_cluster))
+                res_9 = json.loads(redis_cluster_res.text)
+                ret_id_9 = res_9.get('result').get('id')
+                print 'redis集群',ret_id_9
 
-            redis_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(redis_cluster))
-            res_9 = json.loads(redis_cluster_res.text)
-            ret_id_9 = res_9.get('result').get('id')
-            print 'redis集群',ret_id_9
-            mongo_cluster = {
-                    'name': 'mongo集群',
-                    'item_id': 'mongo_cluster',
-                    'group_id': 'BusinessLine',
-                    'property_list': [
-                        {
-                            'type': 'string',
-                            'name': '名称',
-                            'value': 'mongo',
-                            },
-                        {
-                            'type': 'string',
-                            'name': '部署单元编号',
-                            'value': '',
-                            },
-                        {
-                            'type': 'string',
-                            'name': 'IP地址',
-                            'value': mongo_ip,
-                            },
-                        {
-                            'type': 'string',
-                            'name': '用户名',
-                            'value': mongo_username
-                            },
-                        {
-                            'type': 'string',
-                            'name': '密码',
-                            'value': mongo_password
-                            },
-                        {
-                            'type': 'string',
-                            'name': '端口',
-                            'value': mongo_port,
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'deploy_instance',
-                            'reference_id': ret_id,
-                            'name': '归属部署实例',
-                            },
-                        {
-                            'type': 'reference',
-                            'reference_ci': 'app_cluster',
-                            'reference_id': ret_id_7,
-                            'name': '依赖应用集群',
-                            }
-                        ]
-                    }
-
-
-            mongo_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mongo_cluster))
-            res_10 = json.loads(mongo_cluster_res.text)
-            ret_id_10 = res_10.get('result').get('id')
-            print 'mongo集群',ret_id_10
+            if mongo_ip:
+                mongo_cluster = {
+                        'name': 'mongo集群',
+                        'item_id': 'mongo_cluster',
+                        'group_id': 'BusinessLine',
+                        'property_list': [
+                            {
+                                'type': 'string',
+                                'name': '名称',
+                                'value': 'mongo',
+                                },
+                            {
+                                'type': 'string',
+                                'name': '部署单元编号',
+                                'value': '',
+                                },
+                            {
+                                'type': 'string',
+                                'name': 'IP地址',
+                                'value': mongo_ip,
+                                },
+                            {
+                                'type': 'string',
+                                'name': '用户名',
+                                'value': mongo_username
+                                },
+                            {
+                                'type': 'string',
+                                'name': '密码',
+                                'value': mongo_password
+                                },
+                            {
+                                'type': 'string',
+                                'name': '端口',
+                                'value': mongo_port,
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'deploy_instance',
+                                'reference_id': ret_id,
+                                'name': '归属部署实例',
+                                },
+                            {
+                                'type': 'reference',
+                                'reference_ci': 'app_cluster',
+                                'reference_id': ret_id_7,
+                                'name': '依赖应用集群',
+                                }
+                            ]
+                        }
+                mongo_cluster_res = requests.post(res_callback_url + 'repo/', data=json.dumps(mongo_cluster))
+                res_10 = json.loads(mongo_cluster_res.text)
+                ret_id_10 = res_10.get('result').get('id')
+                print 'mongo集群',ret_id_10
 
             # 实例
             data_app = {
