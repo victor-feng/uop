@@ -232,6 +232,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('app_image', type=str, location='json')
         parser.add_argument('file_name', type=str, location='json')
 
+        parser.add_argument('approve_suggestion', type=str, location='json')
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
@@ -257,6 +258,7 @@ class DeploymentListAPI(Resource):
         app_image = args.app_image
         file_name = args.file_name
 
+        approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
         approve_status = args.approve_status
         if args.dep_id:
@@ -294,6 +296,7 @@ class DeploymentListAPI(Resource):
                 deploy_result=deploy_result,
                 apply_status=apply_status,
                 approve_status=approve_status,
+                approve_suggestion=approve_suggestion,
             )
 
             if action == 'deploy_to_crp':
