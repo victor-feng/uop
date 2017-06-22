@@ -601,7 +601,7 @@ class GetMyResourcesInfo(Resource):
             for res in resources:
                 # TODO: 应该写一个可供批量查询的接口 不能遍历发送请求
                 err_msg, resource_info = get_resource_by_id(res.res_id)
-                if err_msg:
+                if err_msg or not resource_info:
                     resource_info['docker'] = {'ip':'127.0.0.1'}
                     resource_info['mysql_cluster'] = {'ip':'127.0.0.1'}
                     resource_info['redis_cluster'] = {'ip':'127.0.0.1'}
