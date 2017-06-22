@@ -256,7 +256,8 @@ class DeploymentListAPI(Resource):
 
         apply_status = args.apply_status
         approve_status = args.approve_status
-        dep_id = args.dep_id
+        if args.dep_id:
+            dep_id = args.dep_id
 
         if action == 'deploy_to_crp':
             deploy_result = 'deploying'
