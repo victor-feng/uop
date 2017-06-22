@@ -137,6 +137,7 @@ class DeploymentListAPI(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, location='args')
+        parser.add_argument('deploy_id', type=str, location='args')
         parser.add_argument('initiator', type=str, location='args')
         parser.add_argument('deploy_name', type=str, location='args')
         parser.add_argument('project_name', type=str, location='args')
@@ -148,6 +149,8 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         condition = {}
+        if args.deploy_id:
+            condition['deploy_id'] = args.deploy_id
         if args.user_id:
             condition['user_id'] = args.user_id
         if args.initiator:
