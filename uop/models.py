@@ -48,6 +48,9 @@ class Deployment(db.Document):
     mongodb_context = db.StringField()
     app_image = db.StringField()
     deploy_result = db.StringField()
+    user_id = db.StringField()
+    apply_status = db.StringField()  # 部署申请状态
+    approve_status = db.StringField()  # 部署审批状态
     meta = {
         'collection': 'deployment',
         'index': [

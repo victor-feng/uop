@@ -136,6 +136,7 @@ class DeploymentListAPI(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('user_id', type=str, location='args')
         parser.add_argument('initiator', type=str, location='args')
         parser.add_argument('deploy_name', type=str, location='args')
         parser.add_argument('project_name', type=str, location='args')
@@ -147,6 +148,8 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         condition = {}
+        if args.user_id:
+            condition['user_id'] = args.user_id
         if args.initiator:
             condition['initiator'] = args.initiator
         if args.deploy_name:
@@ -170,6 +173,7 @@ class DeploymentListAPI(Resource):
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
                     'initiator': deployment.initiator,
+                    'user_id': deployment.user_id,
                     'project_id': deployment.project_id,
                     'project_name': deployment.project_name,
                     'resource_id': deployment.resource_id,
@@ -184,7 +188,9 @@ class DeploymentListAPI(Resource):
                     'mongodb_context': deployment.mongodb_context,
                     'app_image': deployment.app_image,
                     'created_time': str(deployment.created_time),
-                    'deploy_result': deployment.deploy_result
+                    'deploy_result': deployment.deploy_result,
+                    'apply_status': deployment.apply_status,
+                    'approve_status': deployment.approve_status,
                 })
         except Exception as e:
             res = {
@@ -200,11 +206,12 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('action', type=str, choices=('save_to_db', 'deploy_to_crp'), required=True,
+        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve', 'deploy_to_crp'), required=True,
                             help='No action(save_to_db/deploy_to_crp) provided', location='json')
         parser.add_argument('deploy_name', type=str, required=True,
                             help='No deploy name provided', location='json')
         parser.add_argument('initiator', type=str, location='json')
+        parser.add_argument('user_id', type=str, location='json')
         parser.add_argument('project_id', type=str, required=True,
                             help='No project id provided', location='json')
         parser.add_argument('project_name', type=str, location='json')
@@ -221,11 +228,17 @@ class DeploymentListAPI(Resource):
         parser.add_argument('mongodb_context', type=str, location='json')
         parser.add_argument('app_image', type=str, location='json')
         parser.add_argument('file_name', type=str, location='json')
+
+        parser.add_argument('apply_status', type=str, location='json')
+        parser.add_argument('approve_status', type=str, location='json')
+        parser.add_argument('dep_id', type=str, location='json')
+
         args = parser.parse_args()
 
         action = args.action
         deploy_name = args.deploy_name
         initiator = args.initiator
+        user_id = args.user_id
         project_id = args.project_id
         project_name = args.project_name
         resource_id = args.resource_id
@@ -241,9 +254,15 @@ class DeploymentListAPI(Resource):
         app_image = args.app_image
         file_name = args.file_name
 
+        apply_status = args.apply_status
+        approve_status = args.approve_status
+        dep_id = args.id
+
         if action == 'deploy_to_crp':
             deploy_result = 'deploying'
         elif action == 'save_to_db':
+            deploy_result = 'not_deployed'
+        elif action == 'admin_approve':
             deploy_result = 'not_deployed'
         else:
             deploy_result = 'unknown'
@@ -253,6 +272,7 @@ class DeploymentListAPI(Resource):
                 deploy_id=str(uuid.uuid1()),
                 deploy_name=deploy_name,
                 initiator=initiator,
+                user_id=user_id,
                 project_id=project_id,
                 project_name=project_name,
                 resource_id=resource_id,
@@ -267,22 +287,35 @@ class DeploymentListAPI(Resource):
                 mongodb_tag=mongodb_tag,
                 mongodb_context=mongodb_context,
                 app_image=app_image,
-                deploy_result=deploy_result)
+                deploy_result=deploy_result,
+                apply_status=apply_status,
+                approve_status=approve_status,
+            )
 
             if action == 'deploy_to_crp':
+                # 需要传过来部署id
+
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+
                 err_msg, resource_info = get_resource_by_id(
-                    deploy_item.resource_id)
+                    deploy_obj.resource_id)
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_item, resource_info, file_name)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, file_name)
                     if err_msg:
-                        deploy_item.deploy_result = 'fail'
+                        deploy_obj.deploy_result = 'fail'
+                        deploy_obj.approve_status = 'fail'
                         print 'deploy_to_crp err: '+err_msg
                     else:
                         print 'deploy_to_crp response: '+result
-                    deploy_item.save()
+                        deploy_obj.approve_status = 'success'
+                    deploy_obj.save()
                 if err_msg:
                     raise Exception(err_msg)
-            elif action == 'save_to_db':
+            elif action == 'admin_approve':  # 管理员审批
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+                deploy_obj.approve_status = 'success'
+                deploy_obj.save()
+            elif action == 'save_to_db':  # 部署申请
                 deploy_item.save()
 
         except Exception as e:
@@ -299,7 +332,7 @@ class DeploymentListAPI(Resource):
                 "code": 200,
                 "result": {
                     "res": "success",
-                    "msg": "create deployment success"
+                    "msg": deploy_item.deploy_id,
                 }
             }
             return res, 200
