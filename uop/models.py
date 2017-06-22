@@ -51,6 +51,7 @@ class Deployment(db.Document):
     user_id = db.StringField()
     apply_status = db.StringField()  # 部署申请状态
     approve_status = db.StringField()  # 部署审批状态
+    approve_suggestion = db.StringField()  # 审批意见
     meta = {
         'collection': 'deployment',
         'index': [
