@@ -336,7 +336,7 @@ class DeploymentListAPI(Resource):
                 "code": 200,
                 "result": {
                     "res": "success",
-                    "msg": deploy_item.deploy_id,
+                    "msg": {"deploy_id": deploy_item.deploy_id},
                 }
             }
             return res, 200
