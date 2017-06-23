@@ -680,7 +680,7 @@ class GetMyResourcesInfo(Resource):
                 {'name': '内存', 'value': str(source.mem) + 'GB'},
             ]
             result['resource_status'] = '运行中'
-            result['resource_ip'] = resource_info[ip]['ip']
+            result['resource_ip'] = resource_info.get(ip, {'ip':'127.0.0.1'}).get('ip')
             result_list.append(result)
         return result_list
 
