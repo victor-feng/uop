@@ -536,9 +536,9 @@ class GetDBInfo(Resource):
     def get(cls, res_id):
         err_msg, resource_info = get_resource_by_id(res_id)
         data = {
-            'mysql_ip': resource_info['mysql_cluster']['ip'],
-            'redis_ip': resource_info['redis_cluster']['ip'],
-            'mongo_ip': resource_info['mongo_cluster']['ip'],
+            'mysql_ip': resource_info.get('mysql_cluster', {'ip': '127.0.0.1'}).get('ip'),
+            'redis_ip': resource_info.get('redis_cluster', {'ip': '127.0.0.1'}).get('ip'),
+            'mongo_ip': resource_info.get('mongo_cluster', {'ip': '127.0.0.1'}).get('ip'),
         }
         if err_msg:
             code = 500
