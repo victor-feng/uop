@@ -100,12 +100,13 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
             'Content-Type': 'application/json',
         }
         data_str = json.dumps(data)
-        res = upload_files_to_crp(file_data)
-        if res.code == 200:
-            for type, filename_list in res.file_info.items():
-                data[type]['filenames'] = filename_list
-        elif res.code == 500:
-            return 'upload sql file failed', result
+        if file_data:
+            res = upload_files_to_crp(file_data)
+            if res.code == 200:
+                for type, filename_list in res.file_info.items():
+                    data[type]['filenames'] = filename_list
+            elif res.code == 500:
+                return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
