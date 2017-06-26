@@ -5,6 +5,7 @@ import ldap
 import datetime
 import os
 import hashlib
+import requests
 from flask import request
 from flask import redirect
 from flask import jsonify
@@ -13,11 +14,16 @@ from mongoengine import NotUniqueError
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
+from config import APP_ENV, configs
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask.ext.httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
+
+CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB_API = CMDB_URL+'cmdb/api/'
+
 
 base_dn = 'dc=syswin,dc=com'
 scope = ldap.SCOPE_SUBTREE
@@ -128,6 +134,44 @@ class UserRegister(Resource):
         return "test info", 200
 
 
+def add_person(name, user_id, department):
+    success = False
+    already_exist = False
+
+    req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
+                             "\"repoitem_string.default_value\":\""+user_id+"\" }"
+    res = requests.get(req)
+    ret_query_decode = res.content.decode('unicode_escape')
+    ret = json.loads(ret_query_decode)
+    if res.status_code == 200:
+        repoitem_person = ret.get("result").get("res")
+        if len(repoitem_person) is not 0:
+            already_exist = True
+            success = True
+
+    if already_exist is False:
+        data = {}
+        data["name"] = "人"
+        data["layer_id"] = "Organization"
+        data["group_id"] = "OrganizationLine"
+        data["item_id"] = "person_item"
+
+        property_list = []
+        property_list.append({"type": "string", "p_code": "name", "name": "姓名", "value": name})
+        property_list.append({"type": "string", "p_code": "user_id", "name": "员工工号", "value": user_id})
+        property_list.append({"type": "string", "p_code": "department", "name": "归属部门", "value": department})
+        property_list.append({"type": "string", "p_code": "create_time", "name": "创建时间",
+                              "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+        data["property_list"] = property_list
+        data_str = json.dumps(data)
+
+        res = requests.post(CMDB_API + "repo/", data=data_str)
+        ret = eval(res.content.decode('unicode_escape'))
+        if res.status_code == 200:
+            success = True
+    return success
+
+
 class UserList(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -142,6 +186,7 @@ class UserList(Resource):
         salt_password = md5.hexdigest()
         try:
             user = UserInfo.objects.get(id=id)
+            add_person(user.username, user.id, user.department)
             if user.password == salt_password:
                 code = 200
                 res = '登录成功'
@@ -193,6 +238,7 @@ class UserList(Resource):
                     # user_obj.is_root = is_root
                     # user_obj.created_time = datetime.datetime.now()
                     user_obj.save()
+                    add_person(user, user_id, department)
                 msg = {
                         'user_id': user_id,
                         'username': user.username,

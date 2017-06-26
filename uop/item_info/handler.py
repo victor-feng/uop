@@ -6,6 +6,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 from uop.models import ItemInformation
+from config import APP_ENV, configs
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -13,9 +14,10 @@ sys.setdefaultencoding('utf-8')
 iteminfo_api = Api(iteminfo_blueprint, errors=user_errors)
 
 null = "null"
-#url = "http://172.28.11.111:8001/cmdb/api/"
-url = "http://cmdb-test.syswin.com/cmdb/api/"
-#url = "http://172.28.20.124/cmdb/api/"
+CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB_API = CMDB_URL+'cmdb/api/'
+
+
 class ItemInfo(Resource):
     @classmethod
     def get(cls,item_id):
@@ -62,7 +64,7 @@ class ItemInfo(Resource):
                 res["create_date"] = str(item.create_date)
                 res_list.append(res)
 
-            #res = requests.get(url + "repo_detail/" + item_id + "/")
+            #res = requests.get(CMDB_API + "repo_detail/" + item_id + "/")
             #ret = eval(res.content.decode('unicode_escape'))
         except Exception as e:
             code = 500
@@ -104,7 +106,7 @@ class ItemInfo(Resource):
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
-            res = requests.put(url + "repo/" + item_id + "/",data = data_str)
+            res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
                 item = ItemInformation.objects.get(item_id=item_id)
@@ -128,7 +130,7 @@ class ItemInfo(Resource):
         ret = {}
         code = 200
         try:
-            res = requests.delete(url + "repo_delete/" + item_id + "/")
+            res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
             #ret = eval(res.content.decode('unicode_escape'))
 
             items = ItemInformation.objects.filter(item_id=item_id)
@@ -162,6 +164,14 @@ class ItemPostInfo(Resource):
             parser.add_argument('item_description', type=str)
             args = parser.parse_args()
 
+            req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
+                             "\"repoitem_string.default_value\":\""+args.user_id+"\" }"
+            res = requests.get(req)
+            ret = eval(res.content.decode('unicode_escape'))
+            user_p_code = None
+            if res.status_code == 200:
+                user_p_code = ret.get("result").get("res")[0].get("p_code")
+
             data = {}
             data["name"] = args.item_name
             data["layer_id"] = "business"
@@ -175,10 +185,16 @@ class ItemPostInfo(Resource):
             property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             property_list.append({"type": "string", "name": "创建人", "value": args.user_name})
             property_list.append({"type": "string", "name": "创建时间", "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            property_list.append({
+                            'type': 'reference',
+                            'reference_ci': 'person_item',
+                            'reference_id': user_p_code,
+                            'name': '归属人',
+                            })
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
-            res = requests.post(url + "repo/", data=data_str)
+            res = requests.post(CMDB_API + "repo/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
                 ItemInformation(
