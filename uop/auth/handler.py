@@ -162,7 +162,7 @@ def add_person(name, user_id, department, contact_info, privilege):
         property_list.append({"type": "string", "p_code": "department", "name": "部门", "value": department})
         property_list.append({"type": "string", "p_code": "contact_info", "name": "联系方式", "value": contact_info})
         property_list.append({"type": "string", "p_code": "privilege", "name": "权限", "value": privilege})
-        property_list.append({"type": "datetime", "p_code": "create_time", "name": "创建时间",
+        property_list.append({"type": "string", "p_code": "create_time", "name": "创建时间",
                               "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
         data["property_list"] = property_list
         data_str = json.dumps(data)
@@ -189,7 +189,10 @@ class UserList(Resource):
         try:
             user = UserInfo.objects.get(id=id)
             if user.password == salt_password:
-                add_person(user.username, user.id, user.department, "", user.is_admin)
+                privilege = "普通用户"
+                if user.is_admin:
+                    privilege = "管理员"
+                add_person(user.username, user.id, user.department, "", privilege)
                 code = 200
                 res = '登录成功'
                 msg = {
@@ -240,7 +243,10 @@ class UserList(Resource):
                     # user_obj.is_root = is_root
                     # user_obj.created_time = datetime.datetime.now()
                     user_obj.save()
-                    add_person(user, user_id, department, "", is_admin)
+                    privilege = "普通用户"
+                    if is_admin:
+                        privilege = "管理员"
+                    add_person(user, user_id, department, "", privilege)
                 msg = {
                         'user_id': user_id,
                         'username': user.username,
