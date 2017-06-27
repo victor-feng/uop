@@ -79,6 +79,20 @@ def disconf_filetext(appId, envId, version, fileContent, fileName):
         return False, ret_json
 
 
+def disconf_filetext_update(config_id, filecontent):
+    url = FILETEXT + '/' + config_id
+    filetext = {
+        'fileContent': filecontent
+    }
+    rep = session.put(url, data=filetext)
+    ret_json = json.loads(rep.text)
+    result = ret_json.get('success')
+    if result == 'true':
+        return True, ret_json
+    else:
+        return False, ret_json
+
+
 def disconf_app_list():
     rep = session.get(APP_LIST)
     ret_json = json.loads(rep.text)
@@ -274,7 +288,9 @@ class DisconfAPI(Resource):
             if config is not None:
                 config_value['filename'] = config.get('key')
                 config_value['filecontent'] = config.get('value')
+                config_value['config_id'] = config.get('configId')
                 configurations.append(config_value)
+                config_value = {}
         ret = {
             'message': "Get configurations of " + app_name,
             'success': 'true',
@@ -284,25 +300,21 @@ class DisconfAPI(Resource):
         return ret, 200
 
 
-
-
 class DisconfItem(Resource):
     @classmethod
-    def put(cls, res_id):
+    def put(cls, config_id):
         parser = reqparse.RequestParser()
-        pass
+        parser.add_argument('filecontent', type=str, location='json')
+        args = parser.parse_args()
+        filecontent = args.get('filecontent')
 
+        ret, msg = disconf_session()
+        if not ret:
+            return msg, 200
 
-
-
-
-
-
-
-
-
-
+        ret, msg = disconf_filetext_update(config_id, filecontent)
+        return msg, 200
 
 
 disconf_api.add_resource(DisconfAPI, '/')
-disconf_api.add_resource(DisconfItem, '/<string:res_id>/')
+disconf_api.add_resource(DisconfItem, '/<string:config_id>/')
