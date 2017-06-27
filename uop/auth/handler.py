@@ -134,7 +134,7 @@ class UserRegister(Resource):
         return "test info", 200
 
 
-def add_person(name, user_id, department):
+def add_person(name, user_id, department, contact_info, privilege):
     success = False
     already_exist = False
 
@@ -159,8 +159,10 @@ def add_person(name, user_id, department):
         property_list = []
         property_list.append({"type": "string", "p_code": "name", "name": "姓名", "value": name})
         property_list.append({"type": "string", "p_code": "user_id", "name": "员工工号", "value": user_id})
-        property_list.append({"type": "string", "p_code": "department", "name": "归属部门", "value": department})
-        property_list.append({"type": "string", "p_code": "create_time", "name": "创建时间",
+        property_list.append({"type": "string", "p_code": "department", "name": "部门", "value": department})
+        property_list.append({"type": "string", "p_code": "contact_info", "name": "联系方式", "value": contact_info})
+        property_list.append({"type": "string", "p_code": "privilege", "name": "权限", "value": privilege})
+        property_list.append({"type": "datetime", "p_code": "create_time", "name": "创建时间",
                               "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
         data["property_list"] = property_list
         data_str = json.dumps(data)
@@ -186,7 +188,7 @@ class UserList(Resource):
         salt_password = md5.hexdigest()
         try:
             user = UserInfo.objects.get(id=id)
-            add_person(user.username, user.id, user.department)
+            add_person(user.username, user.id, user.department, "", user.is_admin)
             if user.password == salt_password:
                 code = 200
                 res = '登录成功'
@@ -238,7 +240,7 @@ class UserList(Resource):
                     # user_obj.is_root = is_root
                     # user_obj.created_time = datetime.datetime.now()
                     user_obj.save()
-                    add_person(user, user_id, department)
+                    add_person(user, user_id, department, "", is_admin)
                 msg = {
                         'user_id': user_id,
                         'username': user.username,
