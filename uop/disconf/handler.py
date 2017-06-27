@@ -276,7 +276,7 @@ class DisconfAPI(Resource):
                 config_value['filecontent'] = config.get('value')
                 configurations.append(config_value)
         ret = {
-            'msg': "Get configurations of " + app_name,
+            'message': "Get configurations of " + app_name,
             'success': 'true',
             'config': configurations
         }
