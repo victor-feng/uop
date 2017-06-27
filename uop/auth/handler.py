@@ -188,8 +188,8 @@ class UserList(Resource):
         salt_password = md5.hexdigest()
         try:
             user = UserInfo.objects.get(id=id)
-            add_person(user.username, user.id, user.department, "", user.is_admin)
             if user.password == salt_password:
+                add_person(user.username, user.id, user.department, "", user.is_admin)
                 code = 200
                 res = '登录成功'
                 msg = {
