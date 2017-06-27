@@ -35,6 +35,7 @@ class TestingConfig(BaseConfig):
     CRP_URL = "http://172.28.32.32:8001/"
     CMDB_URL = "http://cmdb-test.syswin.com/"
     UPLOAD_FOLDER = "/tmp/"
+    DISCONF_URL = 'http://172.28.11.111:8081'
 
 
 configs = {
