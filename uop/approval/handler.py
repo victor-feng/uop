@@ -298,7 +298,7 @@ class ReservationAPI(Resource):
                 for i in range(0, db_com.quantity):
                     com.append(
                         {
-                            "instance_name": db_com.ins_name,
+                            "instance_name": db_com.ins_name + str(i),
                             "instance_id": db_com.ins_id,
                             "cpu": db_com.cpu,
                             "mem": db_com.mem,
