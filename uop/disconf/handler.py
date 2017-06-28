@@ -26,6 +26,7 @@ ENV_LIST = DISCONF_URL + '/api/env/list'
 VERSION_LIST = DISCONF_URL + '/api/web/config/versionlist'
 CONFIG_LIST = DISCONF_URL + '/api/web/config/list'
 CONFIG_SHOW = DISCONF_URL + '/api/web/config'
+CONFIG_DEL = DISCONF_URL + '/api/web/config'
 session = requests.Session()
 
 
@@ -91,6 +92,18 @@ def disconf_filetext_update(config_id, filecontent):
         return True, ret_json
     else:
         return False, ret_json
+
+
+def disconf_filetext_delete(config_id):
+    url = CONFIG_DEL + '/' + config_id
+    rep = session.delete(url)
+    ret_json = json.loads(rep.text)
+    result = ret_json.get('success')
+    if result == 'true':
+        return True, ret_json
+    else:
+        return False, ret_json
+
 
 
 def disconf_app_list():
@@ -301,20 +314,69 @@ class DisconfAPI(Resource):
 
 
 class DisconfItem(Resource):
+    # @classmethod
+    # def put(cls, config_id):
+    #     parser = reqparse.RequestParser()
+    #     parser.add_argument('filecontent', type=str, location='json')
+    #     args = parser.parse_args()
+    #     filecontent = args.get('filecontent')
+    #
+    #     ret, msg = disconf_session()
+    #     if not ret:
+    #         return msg, 200
+    #
+    #     ret, msg = disconf_filetext_update(config_id, filecontent)
+    #     return msg, 200
     @classmethod
-    def put(cls, config_id):
+    def put(cls, res_id):
         parser = reqparse.RequestParser()
         parser.add_argument('filecontent', type=str, location='json')
+        parser.add_argument('filename', type=str, location='json')
         args = parser.parse_args()
         filecontent = args.get('filecontent')
+        filename = args.get('filename')
+        try:
+            resource = models.ResourceModel.objects.get(res_id=res_id)
+        except Exception as e:
+            code = 500
+            res = "Failed to find the rsource. "
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res + e.message,
+                    "msg": ""
+                }
+            }
+            return ret, code
+
+        app_name = resource.resource_name
 
         ret, msg = disconf_session()
         if not ret:
             return msg, 200
+        app_id, msg = disconf_app_id(app_name)
+        if app_id is None:
+            return msg, 200
+        app_id = str(app_id)
+        version_id, msg = disconf_version_list(app_id)
+        if version_id is None:
+            return msg, 200
 
-        ret, msg = disconf_filetext_update(config_id, filecontent)
+        config_list, msg = disconf_config_list(app_id, '1', version_id)
+        if config_list is None:
+            return msg, 200
+
+        for conf in config_list:
+            config, msg = disconf_config_show(str(conf.get('configId')))
+            if config is not None:
+                if filename == config.get('key'):
+                    ret, msg = disconf_filetext_update(str(config.get('configId')), filecontent)
+                else:
+                    ret, msg = disconf_filetext_delete(str(config.get('configId')))
+
         return msg, 200
 
 
 disconf_api.add_resource(DisconfAPI, '/')
-disconf_api.add_resource(DisconfItem, '/<string:config_id>/')
+# disconf_api.add_resource(DisconfItem, '/<string:config_id>/')
+disconf_api.add_resource(DisconfItem, '/<string:res_id>/')

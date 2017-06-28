@@ -71,7 +71,8 @@ class ComputeIns(db.EmbeddedDocument):
     cpu = db.IntField(required=False)
     mem = db.IntField(required=False)
     # disk = db.StringField(required=False)
-    # quantity = db.StringField(required=False, default_value='1')
+    domain = db.StringField(required=False)
+    quantity = db.StringField(required=False)
     # version = db.StringField(required=False)
     url = db.StringField(required=False)
     meta = {

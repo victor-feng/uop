@@ -124,7 +124,10 @@ class ResourceApplication(Resource):
                 cpu = compute.get('cpu')
                 mem = compute.get('mem')
                 url = compute.get('url')
-                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url)
+                domain = compute.get('domain')
+                quantity = compute.get('quantity')
+                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
+                                         url=url, domain=domain, quantity=quantity)
                 resource_application.compute_list.append(compute_ins)
 
         try:
