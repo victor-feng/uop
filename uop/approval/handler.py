@@ -295,15 +295,16 @@ class ReservationAPI(Resource):
         if compute_list:
             com = []
             for db_com in compute_list:
-                com.append(
-                    {
-                        "instance_name": db_com.ins_name,
-                        "instance_id": db_com.ins_id,
-                        "cpu": db_com.cpu,
-                        "mem": db_com.mem,
-                        "image_url": db_com.url
-                    }
-                )
+                for i in range(0, db_com.quantity):
+                    com.append(
+                        {
+                            "instance_name": db_com.ins_name,
+                            "instance_id": db_com.ins_id,
+                            "cpu": db_com.cpu,
+                            "mem": db_com.mem,
+                            "image_url": db_com.url
+                        }
+                    )
             data['compute_list'] = com
 
         data_str = json.dumps(data)
