@@ -323,7 +323,9 @@ class ResourceDetail(Resource):
                                 "ins_id": db_com.ins_id,
                                 "cpu": db_com.cpu,
                                 "mem": db_com.mem,
-                                "url": db_com.url
+                                "url": db_com.url,
+                                "domain": db_com.domain,
+                                "quantity": db_com.quantity
                             }
                         )
                 result['resource_list'] = res
