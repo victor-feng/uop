@@ -174,7 +174,11 @@ def disconf_version_list(app_id):
     ret_json = json.loads(rep.text)
     result = ret_json.get('success')
     if result == 'true':
-        version_id = ret_json.get('page').get('result')[0]
+        result_list = ret_json.get('page').get('result')
+        if result_list:
+            version_id = ret_json.get('page').get('result')[0]
+        else:
+            version_id = None
     else:
         version_id = None
     return version_id, ret_json
@@ -366,13 +370,17 @@ class DisconfItem(Resource):
         if config_list is None:
             return msg, 200
 
+        find = False
         for conf in config_list:
             config, msg = disconf_config_show(str(conf.get('configId')))
             if config is not None:
                 if filename == config.get('key'):
                     ret, msg = disconf_filetext_update(str(config.get('configId')), filecontent)
+                    find = True
                 else:
                     ret, msg = disconf_filetext_delete(str(config.get('configId')))
+        if not find:
+            ret, msg = disconf_filetext(app_id, '1', version_id, filecontent, filename)
 
         return msg, 200
 
