@@ -288,6 +288,11 @@ class DisconfAPI(Resource):
             return msg, 200
         app_id, msg = disconf_app_id(app_name)
         if app_id is None:
+            msg = {
+                        "config": [],
+                        "message": "Get configurations of " + app_name,
+                        "success": "true"
+                    }
             return msg, 200
         app_id = str(app_id)
 
