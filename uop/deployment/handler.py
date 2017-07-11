@@ -210,7 +210,7 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve', 'deploy_to_crp'), required=True,
+        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid','deploy_to_crp'), required=True,
                             help='No action(save_to_db/deploy_to_crp) provided', location='json')
         parser.add_argument('deploy_name', type=str, required=True,
                             help='No deploy name provided', location='json')
@@ -319,9 +319,13 @@ class DeploymentListAPI(Resource):
                     deploy_obj.save()
                 if err_msg:
                     raise Exception(err_msg)
-            elif action == 'admin_approve':  # 管理员审批
+            elif action == 'admin_approve_allow':  # 管理员审批通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
+                deploy_obj.save()
+            elif action == 'admin_approve_forbid':  # 管理员审批不通过
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+                deploy_obj.approve_status = 'fail'
                 deploy_obj.save()
             elif action == 'save_to_db':  # 部署申请
                 deploy_item.save()
