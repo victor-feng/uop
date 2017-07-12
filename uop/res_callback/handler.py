@@ -24,6 +24,7 @@ CMDB_ITEM_URL = CMDB_RESTAPI_URL+'cmdb/item/'
 CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_RESTAPI_URL+'repo_detail/'
 
 
+# Define CallBack JSON Format
 items_sequence_list_config = [
     {
         'deploy_instance':
@@ -85,6 +86,7 @@ items_sequence_list_config = [
     }]
 
 
+# Define CMDB Item porperty p_code to CallBack json poerperty mapper
 porperty_json_mapper_config = {
     'deploy_instance': {
         'name': 'resource_name',
@@ -100,14 +102,22 @@ porperty_json_mapper_config = {
         'project_domain': 'domain'
     },
     'app_instance': {
-        'domain': 'domain',
-        'container_name': 'container_name',
-        'physical_server': 'physical_server',
-        'ip': 'ip'
-    }
+        'name': 'container_name',
+        'ip': 'ip',
+    },
+    'docker': {
+        'name': 'container_name',
+        'ip_address': 'ip',
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
+        'username': 'username',
+        'password': 'password',
+        'image_addr': 'image_addr'
+    },
 }
 
 
+# Transition state Log debug decorator
 def transition_state_logger(func):
     def wrapper(self, *args, **kwargs):
         Log.logger.debug("Transition state is turned in " + self.state)
@@ -353,6 +363,7 @@ class ResourceProviderTransitions(object):
         self._do_one_item_post('virtual_server')
 
 
+# Transit request_data from the JSON nest structure to the chain structure with items_sequence and porerty_json_mapper
 def transit_request_data(items_sequence, porerty_json_mapper, request_data):
     if not (isinstance(items_sequence, list) or isinstance(items_sequence, dict)) \
             and not (isinstance(request_data, list) or isinstance(request_data, dict)) \
@@ -401,6 +412,7 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
     return request_items
 
 
+# Transit request_items from JSON porperty to CMDB item porperty p_code with porperty_json_mapper
 def transit_repo_items(porperty_json_mapper, request_items):
     if not isinstance(porperty_json_mapper, dict) and not isinstance(request_items, list):
         raise Exception("Need input dict for porperty_json_mapper and list for request_items in transit_repo_items.")
@@ -488,11 +500,8 @@ class ResourceProviderCallBack(Resource):
         rpt.start()
         if rpt.state == "stop":
             Log.logger.debug("完成停止")
-            return {"state": "ok"}, 200
         else:
             Log.logger.debug(rpt.state)
-            import time
-            time.sleep(20)
 
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
@@ -510,7 +519,7 @@ class ResourceProviderCallBack(Resource):
             return ret
 
         res = {
-            "code": 200,
+            "code": code,
             "result": {
                 "res": "success",
                 "msg": "test info"
