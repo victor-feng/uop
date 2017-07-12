@@ -86,8 +86,8 @@ items_sequence_list_config = [
     }]
 
 
-# Define CMDB Item porperty p_code to CallBack json poerperty mapper
-porperty_json_mapper_config = {
+# Define CMDB Item property p_code to CallBack json property mapper
+property_json_mapper_config = {
     'deploy_instance': {
         'name': 'resource_name',
         'deploy_instance_id': 'resource_id',
@@ -412,20 +412,20 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
     return request_items
 
 
-# Transit request_items from JSON porperty to CMDB item porperty p_code with porperty_json_mapper
-def transit_repo_items(porperty_json_mapper, request_items):
-    if not isinstance(porperty_json_mapper, dict) and not isinstance(request_items, list):
-        raise Exception("Need input dict for porperty_json_mapper and list for request_items in transit_repo_items.")
+# Transit request_items from JSON property to CMDB item property p_code with property_json_mapper
+def transit_repo_items(property_json_mapper, request_items):
+    if not isinstance(property_json_mapper, dict) and not isinstance(request_items, list):
+        raise Exception("Need input dict for property_json_mapper and list for request_items in transit_repo_items.")
     property_mappers_list = []
     for request_item in request_items:
         item_id = request_item.keys()[0]
         repo_property = {}
-        item_porperty_mapper = porperty_json_mapper.get(item_id)
-        item_porperty_keys = item_porperty_mapper.keys()
-        for item_porperty_key in item_porperty_keys:
-            repo_json_porperty = request_item.get(item_id).get(item_porperty_mapper.get(item_porperty_key))
-            if repo_json_porperty is not None:
-                repo_property[item_porperty_key] = repo_json_porperty
+        item_property_mapper = property_json_mapper.get(item_id)
+        item_property_keys = item_property_mapper.keys()
+        for item_property_key in item_property_keys:
+            repo_json_property = request_item.get(item_id).get(item_property_mapper.get(item_property_key))
+            if repo_json_property is not None:
+                repo_property[item_property_key] = repo_json_property
         if len(repo_property) >= 1:
             repo_item = {}
             repo_item[item_id] = repo_property
@@ -433,9 +433,9 @@ def transit_repo_items(porperty_json_mapper, request_items):
     return property_mappers_list
 
 
-def do_transit_repo_items(porperty_json_mapper, request_data):
-    request_items = transit_request_data(items_sequence_list_config, porperty_json_mapper, request_data)
-    property_mappers_list = transit_repo_items(porperty_json_mapper, request_items)
+def do_transit_repo_items(property_json_mapper, request_data):
+    request_items = transit_request_data(items_sequence_list_config, property_json_mapper, request_data)
+    property_mappers_list = transit_repo_items(property_json_mapper, request_items)
     return property_mappers_list
 
 
@@ -494,7 +494,7 @@ class ResourceProviderCallBack(Resource):
         request_data = json.loads(request.data)
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
-        property_mappers_list = do_transit_repo_items(porperty_json_mapper_config, request_data)
+        property_mappers_list = do_transit_repo_items(property_json_mapper_config, request_data)
 
         rpt = ResourceProviderTransitions(property_mappers_list)
         rpt.start()
