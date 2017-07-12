@@ -248,6 +248,9 @@ class ResourceProviderTransitions(object):
         resp_repo_item = requests.post(CMDB_REPO_URL, data=data)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
+        Log.logger.debug("The CMDB RESTFUL API Post Response is:")
+        Log.logger.debug(item_property)
+        Log.logger.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
             self.pcode_mapper[item_id] = p_code
