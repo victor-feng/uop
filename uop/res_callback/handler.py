@@ -194,7 +194,11 @@ class ResourceProviderTransitions(object):
 
     def preload_property_mapper(self):
         if len(self.property_mappers_list) != 0:
-            self.pre_property_mapper = self.property_mapper
+            if len(self.pre_property_mapper) == 0:
+                self.pre_property_mapper = self.property_mapper
+            if len(self.pre_property_mapper) != 0 and len(self.property_mapper) != 0 \
+                    and (self.pre_property_mapper.keys()[0] != self.property_mapper.keys()[0]):
+                self.pre_property_mapper = self.property_mapper
             self.property_mapper = self.property_mappers_list.pop()
         else:
             self.pre_property_mapper = {}
