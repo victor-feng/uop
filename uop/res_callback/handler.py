@@ -104,6 +104,7 @@ property_json_mapper_config = {
     'app_instance': {
         'name': 'container_name',
         'ip': 'ip',
+        'physical_server': 'physical_server'
     },
     'docker': {
         'name': 'container_name',
@@ -112,7 +113,8 @@ property_json_mapper_config = {
         'memory_count': 'memory',
         'username': 'username',
         'password': 'password',
-        'image_addr': 'image_addr'
+        'image_addr': 'image_addr',
+        'physical_server': 'physical_server'
     },
 }
 
