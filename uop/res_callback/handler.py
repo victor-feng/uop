@@ -88,11 +88,16 @@ items_sequence_list_config = [
 porperty_json_mapper_config = {
     'deploy_instance': {
         'name': 'resource_name',
-        'resource_id': 'resource_id'
+        'deploy_instance_id': 'resource_id',
+        'project_pople': 'username',
+        'project_dep': 'department',
+        'create_time': 'created_time',
+        'reservation_status': 'status',
+        # 'deploy_status': '',
     },
     'app_cluster': {
-        'name': 'container_name',
-        'domain': 'domain'
+        'name': 'cluster_name',
+        'project_domain': 'domain'
     },
     'app_instance': {
         'domain': 'domain',
@@ -238,6 +243,8 @@ class ResourceProviderTransitions(object):
     def _do_one_item_post(self, item_id):
         repo_item = self.transit_item_property_list(item_id)
         data = json.dumps(repo_item)
+        Log.logger.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
+        Log.logger.debug(data)
         resp_repo_item = requests.post(CMDB_REPO_URL, data=data)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
