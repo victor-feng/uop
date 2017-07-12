@@ -179,6 +179,7 @@ class ResourceProviderTransitions(object):
         # Initialize the variable
         self.property_mappers_list = copy.deepcopy(property_mappers_list)
         self.property_mappers_list.reverse()
+        self.pre_property_mapper = {}
         self.property_mapper = {}
 
         # self.pcode_mapper 仅记录最近一次更新的 pcode 数据，因此集群需要按如下顺序构造property_mappers_list
@@ -193,8 +194,10 @@ class ResourceProviderTransitions(object):
 
     def preload_property_mapper(self):
         if len(self.property_mappers_list) != 0:
+            self.pre_property_mapper = self.property_mapper
             self.property_mapper = self.property_mappers_list.pop()
         else:
+            self.pre_property_mapper = {}
             self.property_mapper = {}
 
     def tick_announce(self):
@@ -222,6 +225,8 @@ class ResourceProviderTransitions(object):
                 # string 类型
                 if 'string' == property_type:
                     value = self.property_mapper.values()[0].get(p_code)
+                    if value is None:
+                        value = self.pre_property_mapper.values()[0].get(p_code)
                     if value is not None:
                         transited_property = {
                             'type': property_type,
