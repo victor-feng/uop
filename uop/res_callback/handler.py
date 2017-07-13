@@ -117,9 +117,10 @@ property_json_mapper_config = {
     },
     'mysql_instance': {
         'name': 'name',
-        "username": "username",
-        "password": "password",
-        "dbtype": "dbtype",
+        "mysql_username": "username",
+        "mysql_password": "password",
+        "mysql_dbtype": "dbtype",
+        'ip_address': 'ip',
         'physical_server': 'physical_server'
     },
     'mongodb_cluster': {
@@ -135,6 +136,7 @@ property_json_mapper_config = {
         "username": "username",
         "password": "password",
         "dbtype": "dbtype",
+        'ip_address': 'ip',
         'physical_server': 'physical_server'
     },
     'redis_cluster': {
@@ -150,6 +152,7 @@ property_json_mapper_config = {
         "username": "username",
         "password": "password",
         "dbtype": "dbtype",
+        'ip_address': 'ip',
         'physical_server': 'physical_server'
     },
     'virtual_server': {
