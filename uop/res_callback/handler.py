@@ -45,42 +45,33 @@ items_sequence_list_config = [
                     ],
                 'db_info':
                     {
-                        'mysql':
-                            {
-                                'mysql_cluster':
-                                    [
+                        'mysql_cluster':
+                            [
+                                {
+                                    'mysql_instance':
                                         {
-                                            'mysql_instance':
-                                                {
-                                                    'mysql_instance'
-                                                }
+                                            'mysql_instance'
                                         }
-                                    ]
-                            },
-                        'mongodb':
-                            {
-                                'mongodb_cluster':
-                                    [
+                                }
+                            ],
+                        'mongodb_cluster':
+                            [
+                                {
+                                    'mongodb_instance':
                                         {
-                                            'mongodb_instance':
-                                                {
-                                                    'mongodb_instance'
-                                                }
+                                            'mongodb_instance'
                                         }
-                                    ]
-                            },
-                        'redis':
-                            {
-                                'redis_cluster':
-                                    [
+                                }
+                            ],
+                        'redis_cluster':
+                            [
+                                {
+                                    'redis_instance':
                                         {
-                                            'redis_instance':
-                                                {
-                                                    'redis_instance'
-                                                }
+                                            'redis_instance'
                                         }
-                                    ]
-                             }
+                                }
+                            ]
                     }
             }
     }]
@@ -95,7 +86,7 @@ property_json_mapper_config = {
         'project_dep': 'department',
         'create_time': 'created_time',
         'reservation_status': 'status',
-        # 'deploy_status': '',
+        'deploy_status': 'deploy_status',
     },
     'app_cluster': {
         'name': 'cluster_name',
@@ -114,6 +105,60 @@ property_json_mapper_config = {
         'username': 'username',
         'password': 'password',
         'image_addr': 'image_addr',
+        'physical_server': 'physical_server'
+    },
+    'mysql_cluster': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "port": "port",
+        "vip": "vip",
+        "ins_id": "ins_id"
+    },
+    'mysql_instance': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "dbtype": "dbtype",
+        'physical_server': 'physical_server'
+    },
+    'mongodb_cluster': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "port": "port",
+        "vip": "vip",
+        "ins_id": "ins_id"
+    },
+    'mongodb_instance': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "dbtype": "dbtype",
+        'physical_server': 'physical_server'
+    },
+    'redis_cluster': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "port": "port",
+        "vip": "vip",
+        "ins_id": "ins_id"
+    },
+    'redis_instance': {
+        'name': 'name',
+        "username": "username",
+        "password": "password",
+        "dbtype": "dbtype",
+        'physical_server': 'physical_server'
+    },
+    'virtual_server': {
+        'name': 'name',
+        'ip_address': 'ip',
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
+        'username': 'username',
+        'password': 'password',
         'physical_server': 'physical_server'
     },
 }
@@ -179,7 +224,9 @@ class ResourceProviderTransitions(object):
         # Initialize the variable
         self.property_mappers_list = copy.deepcopy(property_mappers_list)
         self.property_mappers_list.reverse()
+        # 刚刚处理过的节点，可能为存在引用关系的父节点
         self.pre_property_mapper = {}
+        # 待处理的节点
         self.property_mapper = {}
 
         # self.pcode_mapper 仅记录最近一次更新的 pcode 数据，因此集群需要按如下顺序构造property_mappers_list
@@ -403,11 +450,13 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                             request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
                 else:
                     item = {}
-                    sub_item = copy.deepcopy(request_data)
-                    item[item_mapper_key] = sub_item
+                    current_item = copy.deepcopy(request_data)
+                    item[item_mapper_key] = current_item
                     request_items.append(item)
                     if context is not None:
-                        request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                        sub_item = current_item.get(item_mapper_key)
+                        if sub_item is not None:
+                            request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
             else:
                 sub_item = request_data.get(item_mapper_key)
                 if context is not None:
