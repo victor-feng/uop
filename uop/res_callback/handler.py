@@ -48,7 +48,7 @@ items_sequence_list_config = [
                         'mysql_cluster':
                             [
                                 {
-                                    'mysql_instance':
+                                    'instance':
                                         {
                                             'mysql_instance'
                                         }
@@ -57,7 +57,7 @@ items_sequence_list_config = [
                         'mongodb_cluster':
                             [
                                 {
-                                    'mongodb_instance':
+                                    'instance':
                                         {
                                             'mongodb_instance'
                                         }
@@ -66,7 +66,7 @@ items_sequence_list_config = [
                         'redis_cluster':
                             [
                                 {
-                                    'redis_instance':
+                                    'instance':
                                         {
                                             'redis_instance'
                                         }
@@ -454,9 +454,10 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                     item[item_mapper_key] = current_item
                     request_items.append(item)
                     if context is not None:
-                        sub_item = current_item.get(item_mapper_key)
-                        if sub_item is not None:
-                            request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                        if hasattr(current_item, item_mapper_key):
+                            sub_item = current_item.get(item_mapper_key)
+                            if sub_item is not None:
+                                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
             else:
                 sub_item = request_data.get(item_mapper_key)
                 if context is not None:
