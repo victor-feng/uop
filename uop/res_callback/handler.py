@@ -280,7 +280,7 @@ class ResourceProviderTransitions(object):
                 if 'string' == property_type:
                     value = self.property_mapper.values()[0].get(p_code)
                     if value is None:
-                        value = self.pre_property_mapper.values()[0].get(p_code)
+                        value = self.pre_property_mapper.keys()[0].get(p_code)
                     if value is not None:
                         transited_property = {
                             'type': property_type,
