@@ -209,7 +209,8 @@ class Reservation(Resource):
                         "mem": db_com.mem,
                         "image_url": db_com.url,
                         "quantity": db_com.quantity,
-                        "domain": db_com.url
+                        "domain": db_com.url,
+                        "port": db_com.port
                     }
                 )
             data['compute_list'] = com
@@ -305,7 +306,8 @@ class ReservationAPI(Resource):
                         "cpu": db_com.cpu,
                         "mem": db_com.mem,
                         "image_url": db_com.url,
-                        "quantity": db_com.quantity
+                        "quantity": db_com.quantity,
+                        "port": db_com.port
                     }
                 )
             data['compute_list'] = com

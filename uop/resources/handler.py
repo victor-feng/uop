@@ -126,8 +126,9 @@ class ResourceApplication(Resource):
                 url = compute.get('url')
                 domain = compute.get('domain')
                 quantity = compute.get('quantity')
+                port = compute.get('port')
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                         url=url, domain=domain, quantity=quantity)
+                                         url=url, domain=domain, quantity=quantity, port=port)
                 resource_application.compute_list.append(compute_ins)
 
         try:
@@ -435,7 +436,10 @@ class ResourceDetail(Resource):
             cpu = compute.get('cpu')
             mem = compute.get('mem')
             url = compute.get('url')
-            compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url)
+            quantity = compute.get('quantity')
+            port = compute.get('port')
+            compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
+                                     quantity=quantity, port=port)
             resource_application.compute_list.append(compute_ins)
 
         try:
