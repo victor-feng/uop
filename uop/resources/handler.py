@@ -14,6 +14,7 @@ from uop.deployment.handler import get_resource_by_id
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
+from uop.dns.api import *
 
 resources_api = Api(resources_blueprint, errors=resources_errors)
 
@@ -133,6 +134,21 @@ class ResourceApplication(Resource):
 
         try:
             resource_application.save()
+            #####
+            connect_to_ansible = AnsibleConnect(env)
+            fetch_response = connect_to_ansible.fetch_file()
+            if fetch_response['success']:
+                Dns.dns_add(env, domain)
+                fetch_result = 'fetch is ok'
+            else:
+                raise ServerError('ansible fetch is error')
+
+            copy_response = connect_to_ansible.copy_file()
+            if copy_response['success']:
+                copy_result = 'copy is ok'
+            else:
+                raise ServerError('ansible copy is error')
+            ####
         except Exception as e:
             code = 500
             res = {"code": code,
