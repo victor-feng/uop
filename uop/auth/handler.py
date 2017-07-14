@@ -326,8 +326,14 @@ class AdminUserDetail(Resource):
         admin = UserInfo.objects.get(id=name)
 
         if admin.is_admin:
-            user.is_admin = eval(admin_user)
-            user.is_external = eval(external_user)
+            if isinstance(admin_user, bool):
+                user.is_admin = admin_user
+            else:
+                user.is_admin = eval(admin_user)
+            if isinstance(external_user, bool):
+                user.is_external = external_user
+            else:
+                user.is_external = eval(external_user)
             user.save()
             data = {
                     'code': 200,

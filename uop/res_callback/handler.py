@@ -95,6 +95,12 @@ property_json_mapper_config = {
     'app_instance': {
         'name': 'container_name',
         'ip': 'ip',
+        'ip_address': 'ip',
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
+        'username': 'username',
+        'password': 'password',
+        'image_addr': 'image_addr',
         'physical_server': 'physical_server'
     },
     'docker': {
@@ -121,6 +127,9 @@ property_json_mapper_config = {
         "mysql_password": "password",
         "mysql_dbtype": "dbtype",
         'ip_address': 'ip',
+        "port": "port",
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
         'physical_server': 'physical_server'
     },
     'mongodb_cluster': {
@@ -137,6 +146,9 @@ property_json_mapper_config = {
         "password": "password",
         "dbtype": "dbtype",
         'ip_address': 'ip',
+        "port": "port",
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
         'physical_server': 'physical_server'
     },
     'redis_cluster': {
@@ -153,6 +165,9 @@ property_json_mapper_config = {
         "password": "password",
         "dbtype": "dbtype",
         'ip_address': 'ip',
+        "port": "port",
+        'cpu_count': 'cpu',
+        'memory_count': 'memory',
         'physical_server': 'physical_server'
     },
     'virtual_server': {
