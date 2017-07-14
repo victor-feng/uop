@@ -576,6 +576,7 @@ class ResourceProviderCallBack(Resource):
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
+            resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
             resource.save()
         except Exception as e:
             code = 500
