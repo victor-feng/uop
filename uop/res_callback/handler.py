@@ -280,7 +280,9 @@ class ResourceProviderTransitions(object):
                 if 'string' == property_type:
                     value = self.property_mapper.values()[0].get(p_code)
                     if value is None:
-                        value = self.pre_property_mapper.keys()[0].get(p_code)
+                        keys = self.pre_property_mapper.keys()
+                        if len(keys) >= 1:
+                            value = self.pre_property_mapper.values()[0].get(p_code)
                     if value is not None:
                         transited_property = {
                             'type': property_type,
@@ -461,10 +463,14 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                             sub_item = current_item.get(item_mapper_key)
                             if sub_item is not None:
                                 request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                        else:
+                            sub_item = current_item
+                            request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
             else:
-                sub_item = request_data.get(item_mapper_key)
-                if context is not None:
-                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                if request_data is not None:
+                    sub_item = request_data.get(item_mapper_key)
+                    if context is not None:
+                        request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
     elif isinstance(items_sequence, dict):
         items_sequence_keys = items_sequence.keys()
         for items_sequence_key in items_sequence_keys:
