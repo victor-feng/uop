@@ -326,7 +326,8 @@ class ResourceDetail(Resource):
                                 "mem": db_com.mem,
                                 "url": db_com.url,
                                 "domain": db_com.domain,
-                                "quantity": db_com.quantity
+                                "quantity": db_com.quantity,
+                                "port": db_com.port
                             }
                         )
                 result['resource_list'] = res
