@@ -75,6 +75,7 @@ class ComputeIns(db.EmbeddedDocument):
     quantity = db.IntField(required=False)
     # version = db.StringField(required=False)
     url = db.StringField(required=False)
+    port = db.StringField(required=False)
     meta = {
         'collection': 'compute_ins',
         'index': [
