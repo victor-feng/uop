@@ -200,7 +200,7 @@ class UserList(Resource):
                         'username': user.username,
                         'department': user.department,
                         'is_admin': user.is_admin,
-                        # 'is_root': user.is_root,
+                        'is_external': user.is_external,
                         }
             else:
                 res = '登录失败'
@@ -216,32 +216,25 @@ class UserList(Resource):
             department = verify_res_department.decode('utf-8')
             user_id = verify_res.get('id')  # 获取到工号
             is_admin = False
-            # is_root = False
-            root_list = ['147749', '147405', '147523']
+            is_external = False
 
             if verify_code:
                 res = '登录成功'
                 code = 200
                 try:
                     user = UserInfo.objects.get(id=user_id)
-                    # if user.id in root_list:  # 已经存在本地的用户 设置为root用户
-                    #     is_root = True
-                    # user.is_root = is_root
                     user.save()
                     is_admin = user.is_admin
-                    # is_root = user.is_root
+                    is_external = user.is_external
                 except UserInfo.DoesNotExist:
-                    # if user_id in root_list:  # 没有登录过的用户 设置为root用户
-                    #     is_root = True
-
                     user_obj = UserInfo()
                     user_obj.id = user_id
                     user_obj.username = user
                     user_obj.password = salt_password
                     user_obj.is_admin = is_admin
                     user_obj.department = department
-                    # user_obj.is_root = is_root
-                    # user_obj.created_time = datetime.datetime.now()
+                    user_obj.is_external = is_external
+                    user_obj.created_time = datetime.datetime.now()
                     user_obj.save()
                     privilege = "普通用户"
                     if is_admin:
@@ -252,7 +245,7 @@ class UserList(Resource):
                         'username': user.username,
                         'department': department,
                         'is_admin': user.is_admin,
-                        # 'is_root': is_root,
+                        'is_external': is_external,
                         }
             else:
                 res = '登录失败'
@@ -315,7 +308,7 @@ class AdminUserDetail(Resource):
                         'username': user.username,
                         'department': user.department,
                         'is_admin': user.is_admin,
-                        # 'is_root': user.is_root,
+                        'is_external': user.is_external,
                         'created_time': str(user.created_time),
                         }
         else:
@@ -327,22 +320,14 @@ class AdminUserDetail(Resource):
     def put(self, name):
         data = json.loads(request.data)
         admin_user = data.get('admin_user')
+        external_user = data.get('external_user')
         user_id = data.get('user_id')
         user = UserInfo.objects.get(id=user_id)
-        root = UserInfo.objects.get(id=name)
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('admin_user', type=bool)
-        # args = parser.parse_args()
-        # admin_user = args.admin_user
+        admin = UserInfo.objects.get(id=name)
 
-        # if name == '147405' or '147749':  # 设置某用户为root用户
-        #     if not root.is_root:
-        #         root.is_root = True
-        #         root.save()
-
-        # if root.is_root:
-        if root.is_admin:
+        if admin.is_admin:
             user.is_admin = eval(admin_user)
+            user.is_external = eval(external_user)
             user.save()
             data = {
                     'code': 200,
@@ -350,13 +335,12 @@ class AdminUserDetail(Resource):
                     'username': user.username,
                     'department': user.department,
                     'is_admin': user.is_admin,
-                    # 'is_root': user.is_root,
+                    'is_external': user.is_external,
                     'created_time': str(user.created_time),
                     }
         else:
             data = {
                     'code': 300,
-                    # 'msg': '您没有root权限'
                     'msg': '您没有管理员权限'
                     }
         return data
@@ -388,7 +372,7 @@ class AllUserList(Resource):
                     'username': i.username,
                     'department': i.department,
                     'is_admin': i.is_admin,
-                    # 'is_root': i.is_root,
+                    'is_external': i.is_external,
                     'created_time': str(i.created_time)
                     }
             all_user.append(data)
