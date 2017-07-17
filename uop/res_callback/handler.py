@@ -386,9 +386,9 @@ class ResourceProviderTransitions(object):
     @transition_state_logger
     def do_app_instance(self):
         # 应用实例状态
-        self._do_one_item_post('app_instance')
         if 'docker' in self.pcode_mapper:
             self.pcode_mapper.pop('docker', None)
+        self._do_one_item_post('app_instance')
         physical_server = self.property_mapper.get('app_instance').get('physical_server')
         self._do_get_physical_server_for_instance(physical_server)
         self.docker()
