@@ -168,7 +168,7 @@ class ItemInformation(db.DynamicDocument):
     user = db.StringField(required=True)
     user_id = db.StringField(required=True)
     item_id = db.StringField(required=True)
-    item_name = db.StringField(required=True)
+    item_name = db.StringField(required=True, unique=True)
     item_code = db.StringField(required=True)
     item_depart = db.StringField(required=True)
     item_description = db.StringField(required=False)
