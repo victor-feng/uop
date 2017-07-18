@@ -400,12 +400,14 @@ class ResourceProviderTransitions(object):
 
     @transition_state_logger
     def do_mysql_cluster(self):
-        # 数据库集群状态
+        # MySQL数据库集群状态
         self._do_one_item_post('mysql_cluster')
 
     @transition_state_logger
     def do_mysql_instance(self):
-        # 数据库实例状态
+        # MySQL数据库实例状态
+        if 'virtual_server' in self.pcode_mapper:
+            self.pcode_mapper.pop('virtual_server', None)
         self._do_one_item_post('mysql_instance')
         physical_server = self.property_mapper.get('mysql_instance').get('physical_server')
         self._do_get_physical_server_for_instance(physical_server)
@@ -413,12 +415,14 @@ class ResourceProviderTransitions(object):
 
     @transition_state_logger
     def do_mongodb_cluster(self):
-        # 数据库集群状态
+        # MongoDB数据库集群状态
         self._do_one_item_post('mongodb_cluster')
 
     @transition_state_logger
     def do_mongodb_instance(self):
-        # 数据库实例状态
+        # MongoDB数据库实例状态
+        if 'virtual_server' in self.pcode_mapper:
+            self.pcode_mapper.pop('virtual_server', None)
         self._do_one_item_post('mongodb_instance')
         physical_server = self.property_mapper.get('mongodb_instance').get('physical_server')
         self._do_get_physical_server_for_instance(physical_server)
@@ -426,12 +430,14 @@ class ResourceProviderTransitions(object):
 
     @transition_state_logger
     def do_redis_cluster(self):
-        # 数据库集群状态
+        # Redis数据库集群状态
         self._do_one_item_post('redis_cluster')
 
     @transition_state_logger
     def do_redis_instance(self):
-        # 数据库实例状态
+        # Redis数据库实例状态
+        if 'virtual_server' in self.pcode_mapper:
+            self.pcode_mapper.pop('virtual_server', None)
         self._do_one_item_post('redis_instance')
         physical_server = self.property_mapper.get('redis_instance').get('physical_server')
         self._do_get_physical_server_for_instance(physical_server)
