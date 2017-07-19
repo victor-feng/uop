@@ -16,6 +16,7 @@ from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
 from uop.dns.api import *
 
+dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
 
 
@@ -126,29 +127,15 @@ class ResourceApplication(Resource):
                 mem = compute.get('mem')
                 url = compute.get('url')
                 domain = compute.get('domain')
+                ip = dns_env(env)
                 quantity = compute.get('quantity')
                 port = compute.get('port')
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                         url=url, domain=domain, quantity=quantity, port=port)
+                                         url=url, domain=domain, ip=ip, quantity=quantity, port=port)
                 resource_application.compute_list.append(compute_ins)
 
         try:
             resource_application.save()
-            #####
-            connect_to_ansible = AnsibleConnect(env)
-            fetch_response = connect_to_ansible.fetch_file()
-            if fetch_response['success']:
-                Dns.dns_add(env, domain)
-                fetch_result = 'fetch is ok'
-            else:
-                raise ServerError('ansible fetch is error')
-
-            copy_response = connect_to_ansible.copy_file()
-            if copy_response['success']:
-                copy_result = 'copy is ok'
-            else:
-                raise ServerError('ansible copy is error')
-            ####
         except Exception as e:
             code = 500
             res = {"code": code,

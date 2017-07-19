@@ -72,6 +72,7 @@ class ComputeIns(db.EmbeddedDocument):
     mem = db.IntField(required=False)
     # disk = db.StringField(required=False)
     domain = db.StringField(required=False)
+    ip = db.StringField(required=False)
     quantity = db.IntField(required=False)
     # version = db.StringField(required=False)
     url = db.StringField(required=False)
