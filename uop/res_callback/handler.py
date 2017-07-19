@@ -77,7 +77,7 @@ items_sequence_list_config = [
     }]
 
 
-# Define CMDB Item property p_code to CallBack json property mapper
+# Define CMDB Item Property p_code to CallBack JSON Property Mapper
 property_json_mapper_config = {
     'deploy_instance': {
         'name': 'resource_name',
