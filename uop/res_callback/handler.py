@@ -529,8 +529,8 @@ def transit_repo_items(property_json_mapper, request_items):
     return property_mappers_list
 
 
-def do_transit_repo_items(property_json_mapper, request_data):
-    request_items = transit_request_data(items_sequence_list_config, property_json_mapper, request_data)
+def do_transit_repo_items(items_sequence_list, property_json_mapper, request_data):
+    request_items = transit_request_data(items_sequence_list, property_json_mapper, request_data)
     property_mappers_list = transit_repo_items(property_json_mapper, request_items)
     return property_mappers_list
 
@@ -590,7 +590,8 @@ class ResourceProviderCallBack(Resource):
         request_data = json.loads(request.data)
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
-        property_mappers_list = do_transit_repo_items(property_json_mapper_config, request_data)
+        property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                      request_data)
 
         rpt = ResourceProviderTransitions(property_mappers_list)
         rpt.start()
