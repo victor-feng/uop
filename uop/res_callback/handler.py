@@ -459,41 +459,44 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
     if isinstance(items_sequence, list) or isinstance(items_sequence, set):
         for one_item_sequence in items_sequence:
             if isinstance(one_item_sequence, dict):
-                item_mapper_key = one_item_sequence.keys()[0]
-                context = one_item_sequence.get(item_mapper_key)
+                item_mapper_keys = one_item_sequence.keys()
             elif isinstance(one_item_sequence, basestring):
-                item_mapper_key = one_item_sequence
-                context = None
+                item_mapper_keys = [one_item_sequence]
             else:
                 raise Exception("Error items_sequence_list_config")
-            item_key = porerty_json_mapper.get(item_mapper_key)
-            if item_key is not None:
-                if isinstance(request_data, list):
-                    for one_req in request_data:
+            for item_mapper_key in item_mapper_keys:
+                if isinstance(one_item_sequence, basestring):
+                    context = None
+                else:
+                    context = one_item_sequence.get(item_mapper_key)
+                item_key = porerty_json_mapper.get(item_mapper_key)
+                if item_key is not None:
+                    if isinstance(request_data, list):
+                        for one_req in request_data:
+                            item = {}
+                            sub_item = copy.deepcopy(one_req)
+                            item[item_mapper_key] = sub_item
+                            request_items.append(item)
+                            if context is not None:
+                                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                    else:
                         item = {}
-                        sub_item = copy.deepcopy(one_req)
-                        item[item_mapper_key] = sub_item
+                        current_item = copy.deepcopy(request_data)
+                        item[item_mapper_key] = current_item
                         request_items.append(item)
                         if context is not None:
-                            request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
-                else:
-                    item = {}
-                    current_item = copy.deepcopy(request_data)
-                    item[item_mapper_key] = current_item
-                    request_items.append(item)
-                    if context is not None:
-                        if hasattr(current_item, item_mapper_key):
-                            sub_item = current_item.get(item_mapper_key)
-                            if sub_item is not None:
+                            if hasattr(current_item, item_mapper_key):
+                                sub_item = current_item.get(item_mapper_key)
+                                if sub_item is not None:
+                                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                            else:
+                                sub_item = current_item
                                 request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
-                        else:
-                            sub_item = current_item
+                else:
+                    if request_data is not None:
+                        sub_item = request_data.get(item_mapper_key)
+                        if context is not None:
                             request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
-            else:
-                if request_data is not None:
-                    sub_item = request_data.get(item_mapper_key)
-                    if context is not None:
-                        request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
     elif isinstance(items_sequence, dict):
         items_sequence_keys = items_sequence.keys()
         for items_sequence_key in items_sequence_keys:
