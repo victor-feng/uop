@@ -451,9 +451,9 @@ class ResourceProviderTransitions(object):
 
 # Transit request_data from the JSON nest structure to the chain structure with items_sequence and porerty_json_mapper
 def transit_request_data(items_sequence, porerty_json_mapper, request_data):
-    if not (isinstance(items_sequence, list) or isinstance(items_sequence, dict)) \
-            and not (isinstance(request_data, list) or isinstance(request_data, dict)) \
-            and not isinstance(porerty_json_mapper, dict):
+    if not (isinstance(items_sequence, list) or isinstance(items_sequence, dict) or isinstance(items_sequence, set)) \
+            or not (isinstance(request_data, list) or isinstance(request_data, dict)) \
+            or not isinstance(porerty_json_mapper, dict):
         raise Exception("Need input dict for porerty_json_mapper and request_data in transit_request_data.")
     request_items = []
     if isinstance(items_sequence, list) or isinstance(items_sequence, set):
@@ -469,15 +469,15 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                     context = None
                 else:
                     context = one_item_sequence.get(item_mapper_key)
-                item_key = porerty_json_mapper.get(item_mapper_key)
-                if item_key is not None:
-                    if isinstance(request_data, list):
+                item_mapper_body = porerty_json_mapper.get(item_mapper_key)
+                if item_mapper_body is not None:
+                    if isinstance(request_data, list) or isinstance(request_data, set):
                         for one_req in request_data:
                             item = {}
                             sub_item = copy.deepcopy(one_req)
                             item[item_mapper_key] = sub_item
                             request_items.append(item)
-                            if context is not None:
+                            if context is not None and sub_item is not None:
                                 request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
                     else:
                         item = {}
@@ -491,19 +491,28 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                                     request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
                             else:
                                 sub_item = current_item
-                                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                                if sub_item is not None:
+                                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
                 else:
                     if request_data is not None:
                         sub_item = request_data.get(item_mapper_key)
-                        if context is not None:
+                        if context is not None and sub_item is not None:
                             request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
     elif isinstance(items_sequence, dict):
         items_sequence_keys = items_sequence.keys()
         for items_sequence_key in items_sequence_keys:
             context = items_sequence.get(items_sequence_key)
-            if request_data is not None:
+            item_mapper_body = porerty_json_mapper.get(items_sequence_key)
+            if item_mapper_body is not None:
+                item = {}
+                current_item = copy.deepcopy(request_data)
+                if current_item.keys()[0] == items_sequence_key:
+                    item = current_item
+                    request_items.append(item)
+            if context is not None and request_data is not None:
                 sub_item = request_data.get(items_sequence_key)
-                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                if sub_item is not None:
+                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
 
     return request_items
 
