@@ -502,16 +502,18 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                             request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
     elif isinstance(items_sequence, dict):
         items_sequence_keys = items_sequence.keys()
+        current_items = copy.deepcopy(request_data)
+        current_items_keys = current_items.keys()
         for items_sequence_key in items_sequence_keys:
             context = items_sequence.get(items_sequence_key)
             item_mapper_body = porerty_json_mapper.get(items_sequence_key)
             if item_mapper_body is not None:
-                current_item = copy.deepcopy(request_data)
-                current_item_keys = current_item.keys()
-                if len(current_item_keys) == 1:
-                    if current_item_keys[0] == items_sequence_key:
-                        item = current_item
-                        request_items.append(item)
+                for current_item_key in current_items_keys:
+                    if current_item_key == items_sequence_key:
+                        current_item_body = current_items.get(current_item_key)
+                        if current_item_body is not None and len(current_item_body) > 0:
+                            item = current_items
+                            request_items.append(item)
             if context is not None and request_data is not None:
                 sub_item = request_data.get(items_sequence_key)
                 if sub_item is not None:
