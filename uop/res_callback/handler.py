@@ -627,7 +627,7 @@ class ResourceProviderCallBack(Resource):
                     'msg': "Resource find error."
                 }
             }
-            return ret
+            return ret, code
 
         res = {
             "code": code,
