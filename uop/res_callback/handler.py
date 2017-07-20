@@ -451,6 +451,8 @@ class ResourceProviderTransitions(object):
 
 # Transit request_data from the JSON nest structure to the chain structure with items_sequence and porerty_json_mapper
 def transit_request_data(items_sequence, porerty_json_mapper, request_data):
+    if request_data is None:
+        return
     if not (isinstance(items_sequence, list) or isinstance(items_sequence, dict) or isinstance(items_sequence, set)) \
             or not (isinstance(request_data, list) or isinstance(request_data, dict)) \
             or not isinstance(porerty_json_mapper, dict):
