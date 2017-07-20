@@ -519,9 +519,11 @@ def transit_repo_items(property_json_mapper, request_items):
         item_property_mapper = property_json_mapper.get(item_id)
         item_property_keys = item_property_mapper.keys()
         for item_property_key in item_property_keys:
-            repo_json_property = request_item.get(item_id).get(item_property_mapper.get(item_property_key))
-            if repo_json_property is not None:
-                repo_property[item_property_key] = repo_json_property
+            value = request_item.get(item_id)
+            if value is not None:
+                repo_json_property = value.get(item_property_mapper.get(item_property_key))
+                if repo_json_property is not None:
+                    repo_property[item_property_key] = repo_json_property
         if len(repo_property) >= 1:
             repo_item = {}
             repo_item[item_id] = repo_property
