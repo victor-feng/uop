@@ -14,7 +14,7 @@ from uop.deployment.handler import get_resource_by_id
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
-from uop.dns.api import *
+
 
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
