@@ -40,6 +40,5 @@ def create_app(config_name):
     app.register_blueprint(deploy_cb_blueprint, url_prefix='/api/dep_result')
     app.register_blueprint(resource_view_blueprint, url_prefix='/api/resource_view')
     app.register_blueprint(disconf_blueprint, url_prefix='/api/disconf')
-    app.register_blueprint(dns_blueprint, url_prefix='/api/dns')
 
     return app

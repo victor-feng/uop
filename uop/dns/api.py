@@ -5,8 +5,8 @@ import os
 import re
 from ansible.inventory.group import Group
 from ansible.inventory.host import Host
-from ansible.inventory import Inventory
-from ansible.runner import Runner
+#from ansible.inventory import Inventory
+#from ansible.runner import Runner
 from ansible.playbook import PlayBook
 from ansible import callbacks
 from ansible import utils
