@@ -127,7 +127,7 @@ class ResourceApplication(Resource):
                 mem = compute.get('mem')
                 url = compute.get('url')
                 domain = compute.get('domain')
-                ip = dns_env(env)
+                # ip = dns_env(env)
                 quantity = compute.get('quantity')
                 port = compute.get('port')
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
