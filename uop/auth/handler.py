@@ -140,7 +140,7 @@ def add_person(name, user_id, department, contact_info, privilege):
 
     req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
                              "\"repoitem_string.default_value\":\""+user_id+"\" }"
-    res = requests.get(req)
+    res = requests.get(str(req))
     ret_query_decode = res.content.decode('unicode_escape')
     ret = json.loads(ret_query_decode)
     if res.status_code == 200:
