@@ -59,7 +59,7 @@ class DeployCallback(Resource):
             dep.save()
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
-            deployment_url = "http://cmdb-test.syswin.com/cmdb/api/repo/%s/" % p_code
+            deployment_url = "http://cmdb-dev.syswin.com/cmdb/api/repo/%s/" % p_code
             print 'status', dep.deploy_result, p_code
             data = {
                 'property_list': [
