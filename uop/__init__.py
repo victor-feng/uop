@@ -14,7 +14,6 @@ from uop.approval import approval_blueprint
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.resource_view import resource_view_blueprint
 from uop.disconf import disconf_blueprint
-from uop.dns import dns_blueprint
 
 
 def create_app(config_name):
