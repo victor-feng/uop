@@ -13,6 +13,8 @@ from uop.models import Deployment, ResourceModel
 from uop.deployment.errors import deploy_errors
 from config import APP_ENV, configs
 
+import logging
+
 CPR_URL = configs[APP_ENV].CRP_URL
 CMDB_URL = configs[APP_ENV].CMDB_URL
 UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
@@ -371,6 +373,7 @@ class DeploymentListByByInitiatorAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('initiator', type=str, location='args')
         args = parser.parse_args()
+        logging.info("[UOP] come into uop/deployment/handler.py, args: %s", args)
 
         condition = {}
         if args.initiator:

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+
 import json
 import sys
 import ldap
 import datetime
 import os
 import hashlib
+
 import requests
 from flask import request
 from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from mongoengine import NotUniqueError
+
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
@@ -18,7 +21,7 @@ from config import APP_ENV, configs
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
-from flask.ext.httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
@@ -192,6 +195,8 @@ class UserList(Resource):
                 privilege = "普通用户"
                 if user.is_admin:
                     privilege = "管理员"
+                
+                # add user in cmdb
                 add_person(user.username, user.id, user.department, "", privilege)
                 code = 200
                 res = '登录成功'
@@ -206,7 +211,7 @@ class UserList(Resource):
                 res = '登录失败'
                 code = 400
                 msg = '验证错误'
-        except UserInfo.DoesNotExist:
+        except UserInfo.DoesNotExist as e:
             conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
             verify_code, verify_res = conn.verify_user(id, password)
 

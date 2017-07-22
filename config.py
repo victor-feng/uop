@@ -10,6 +10,7 @@ class BaseConfig:
     DEBUG = False
 
 
+#NOTE:TODO? used?
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     MONGODB_SETTINGS = {
@@ -35,7 +36,9 @@ class TestingConfig(BaseConfig):
             }
     CRP_URL = "http://172.28.32.32:8001/"
     CMDB_URL = "http://cmdb-dev.syswin.com/"
+
     UPLOAD_FOLDER = "/tmp/"
+    #TODO:  move it to conf
     DISCONF_URL = 'http://172.28.11.111:8081'
 
 
