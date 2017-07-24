@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+
 import json
 import uuid
+import copy
+import requests
+
 from flask import request
 from flask_restful import reqparse, Api, Resource
+
 from uop.res_callback import res_callback_blueprint
 from uop.models import User, ResourceModel
 from uop.res_callback.errors import res_callback_errors
 from config import APP_ENV, configs
 from transitions import Machine
 from uop.log import Log
-import copy
-import requests
 
 
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
@@ -185,9 +188,9 @@ property_json_mapper_config = {
 # Transition state Log debug decorator
 def transition_state_logger(func):
     def wrapper(self, *args, **kwargs):
-        Log.logger.debug("Transition state is turned in " + self.state)
+        logging.debug("Transition state is turned in " + self.state)
         ret = func(self, *args, **kwargs)
-        Log.logger.debug("Transition state is turned out " + self.state)
+        logging.debug("Transition state is turned out " + self.state)
         return ret
     return wrapper
 
@@ -276,7 +279,7 @@ class ResourceProviderTransitions(object):
             func = getattr(self, item_id, None)
             if not func:
                 raise NotImplementedError("Unexpected item_id=%s" % item_id)
-            Log.logger.debug('Trigger is %s', item_id)
+            logging.debug('Trigger is %s', item_id)
             func()
         else:
             self.stop()
@@ -325,24 +328,24 @@ class ResourceProviderTransitions(object):
                 repo_item['name'] = item.get('result').get('res').get('item_name')
                 repo_item['property_list'] = transited_property_list
         except Exception as e:
-            Log.logger.debug(e.message)
+            logging.debug(e.message)
         return repo_item
 
     def _do_one_item_post(self, item_id):
         repo_item = self.transit_item_property_list(item_id)
         data = json.dumps(repo_item)
-        Log.logger.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
-        Log.logger.debug(data)
+        logging.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
+        logging.debug(data)
         resp_repo_item = requests.post(CMDB_REPO_URL, data=data)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
-        Log.logger.debug("The CMDB RESTFUL API Post Response is:")
-        Log.logger.debug(item_property)
-        Log.logger.debug("The Response code is :"+code.__str__())
+        logging.debug("The CMDB RESTFUL API Post Response is:")
+        logging.debug(item_property)
+        logging.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
             self.pcode_mapper[item_id] = p_code
-            Log.logger.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
+            logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
         condition = '{\"repoitem_string.default_value\":\"'+physical_server+'\"}'
@@ -353,7 +356,7 @@ class ResourceProviderTransitions(object):
         if 2002 == code:
             p_code = item_property.get('result').get('res')[0].get('p_code')
             self.pcode_mapper['physical_server'] = p_code
-            Log.logger.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
+            logging.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
                              % (physical_server, p_code))
 
     def start(self):
@@ -612,9 +615,9 @@ class ResourceProviderCallBack(Resource):
         rpt = ResourceProviderTransitions(property_mappers_list)
         rpt.start()
         if rpt.state == "stop":
-            Log.logger.debug("完成停止")
+            logging.debug("完成停止")
         else:
-            Log.logger.debug(rpt.state)
+            logging.debug(rpt.state)
 
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)

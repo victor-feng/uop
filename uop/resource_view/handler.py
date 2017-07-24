@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+
 import json
 import requests
+
 from flask_restful import reqparse, Api, Resource
+
 from uop.resource_view import resource_view_blueprint
 from uop.resource_view.errors import resource_view_errors
 from uop.log import Log
@@ -76,7 +79,7 @@ class ResourceView(Resource):
             cmdb_p_code = resource_instance.cmdb_p_code
 
             if cmdb_p_code is None:
-                Log.logger.warning("The data of cmdb_p_code is not found for resource id " + res_id)
+                logging.warning("The data of cmdb_p_code is not found for resource id " + res_id)
                 return cls._response_data_not_found(), 200
             else:
                 if param_str == "?":
@@ -106,15 +109,15 @@ class ResourceView(Resource):
                 else:
                     req_str = CMDB_RELATION + cmdb_p_code + param_str
 
-                Log.logger.debug("The Request Body is: " + req_str)
+                logging.debug("The Request Body is: " + req_str)
 
                 ci_relation_query = requests.get(req_str)
-                Log.logger.debug(ci_relation_query)
-                Log.logger.debug(ci_relation_query.content)
+                logging.debug(ci_relation_query)
+                logging.debug(ci_relation_query.content)
                 ci_relation_query_decode = ci_relation_query.content.decode('unicode_escape')
                 result = json.loads(ci_relation_query_decode)
         except Exception as e:
-            Log.logger.error(e.message)
+            logging.error(e.message)
             return cls._response_data_not_found(), 500
 
         return result, 200
