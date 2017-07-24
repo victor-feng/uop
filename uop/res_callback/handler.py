@@ -276,8 +276,8 @@ class ResourceProviderTransitions(object):
             func = getattr(self, item_id, None)
             if not func:
                 raise NotImplementedError("Unexpected item_id=%s" % item_id)
-            func()
             Log.logger.debug('Trigger is %s', item_id)
+            func()
         else:
             self.stop()
 
