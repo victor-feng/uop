@@ -8,18 +8,24 @@ from tornado.ioloop import IOLoop
 from tornado.options import define, options
 
 define('port', type=int, default=5000)
+# deploy or debug
+define('mode', default='debug')
+
 
 from uop import create_app
 from config import APP_ENV
 
 def main():
     options.parse_command_line()
+    if options.mode.lower() == "debug":
+        from tornado import autoreload
+        autoreload.start()
 
     app = create_app(APP_ENV)
     # app.run(host='0.0.0.0', debug=True)
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(options.port)
-    logging.warn("[MPC] MPC is running on: localhost:%d", options.port)
+    logging.warn("[UOP] UOP is running on: localhost:%d", options.port)
     IOLoop.instance().start()
 
 if __name__ == '__main__':
