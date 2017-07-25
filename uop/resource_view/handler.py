@@ -2,6 +2,7 @@
 
 import json
 import requests
+import logging
 
 from flask_restful import reqparse, Api, Resource
 
