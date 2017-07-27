@@ -121,7 +121,8 @@ property_json_mapper_config = {
         "username": "username",
         "password": "password",
         "port": "port",
-        "vip": "vip",
+        "mysql_cluster_wvip": "wvip",
+        "mysql_cluster_rvip": "rvip",
         "ins_id": "ins_id"
     },
     'mysql_instance': {
@@ -140,7 +141,9 @@ property_json_mapper_config = {
         "username": "username",
         "password": "password",
         "port": "port",
-        "vip": "vip",
+        "mongodb_cluster_ip1": "vip1",
+        "mongodb_cluster_ip2": "vip2",
+        "mongodb_cluster_ip3": "vip3",
         "ins_id": "ins_id"
     },
     'mongodb_instance': {
@@ -159,7 +162,7 @@ property_json_mapper_config = {
         "username": "username",
         "password": "password",
         "port": "port",
-        "vip": "vip",
+        "redis_cluster_vip": "vip",
         "ins_id": "ins_id"
     },
     'redis_instance': {
