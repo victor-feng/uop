@@ -1,0 +1,22 @@
+
+# app
+172.28.32.49 app-1
+172.28.32.50 app-2
+
+# lb
+172.28.32.51 lb-1 
+172.28.32.53 lb-2 
+
+# mongo
+#172.28.32.54 mongo-1
+#172.28.32.55 mongo-2
+#172.28.32.56 mongo-3
+#
+172.28.32.58 mongo-1
+172.28.32.59 mongo-2
+172.28.32.60 mongo-3
+
+
+# keepalived
+172.28.32.57 cmdb.com uop.com crp.com mpc.com mpc-cmdb.com mpc-crp.com
+~
