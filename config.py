@@ -46,8 +46,8 @@ class TestingConfig(BaseConfig):
     DEBUG = True
     MONGODB_SETTINGS = {
             'db': 'uop',
-            'host': '172.28.20.124',
-            'port': 27017,
+            'host': 'mongo-1',
+            'port': 28010,
             'username': 'uop',
             'password': 'uop',
             }
