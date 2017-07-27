@@ -32,10 +32,10 @@ def get_resource_by_id(resource_id):
               '?layer_count=3&total_count=50' +\
               '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
               '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
-              '&columns_filter={\"mysql_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"mongo_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"redis_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"docker\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"]}'
+              '&columns_filter={\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"username\",\"password\",\"port\"],' +\
+              ' \"mongo_cluster\":[\"ip_address\",\"username\",\"password\",\"port\"],' +\
+              ' \"redis_cluster\":[\"ip_address\",\"username\",\"password\",\"port\"],' +\
+              ' \"docker\":[\"ip_address\",\"username\",\"password\",\"port\"]}'
 
         headers = {'Content-Type': 'application/json'}
         print url+' '+json.dumps(headers)

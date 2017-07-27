@@ -90,20 +90,20 @@ class ResourceView(Resource):
                     reference_sequence = '&reference_sequence=[{\"child\": 3},{\"bond\": 2},{\"parent\": 5}]'
                     item_filter = ''
                     columns_filter = '&columns_filter={' +\
-                                     '\"project_item\":[\"名称\"],' +\
-                                     '\"deploy_instance\":[\"名称\"],' +\
-                                     '\"app_cluster\":[\"名称\"],' +\
-                                     '\"mysql_cluster\":[\"IP地址\",\"端口\"],' +\
-                                     '\"mongo_cluster\":[\"IP地址\",\"端口\"],' +\
-                                     '\"redis_cluster\":[\"IP地址\",\"端口\"],' +\
-                                     '\"mysql_instance\":[\"IP地址\",\"端口\",\"角色\"],' +\
-                                     '\"mongo_instance\":[\"IP地址\",\"端口\",\"角色\"],' +\
-                                     '\"redis_instance\":[\"IP\"],' +\
-                                     '\"virtual_server\":[\"IP地址\",\"主机名\"],' +\
-                                     '\"docker\":[\"IP地址\",\"主机名\"],' +\
-                                     '\"physical_server\":[\"IP地址\",\"设备型号\"],' +\
-                                     '\"rack\":[\"机柜编号\"],' +\
-                                     '\"idc_item\":[\"名称\",\"机房地址\"]' +\
+                                     '\"project_item\":[\"name\"],' +\
+                                     '\"deploy_instance\":[\"name\"],' +\
+                                     '\"app_cluster\":[\"name\"],' +\
+                                     '\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"port\"],' +\
+                                     '\"mongodb_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"port\"],' +\
+                                     '\"redis_cluster\":[\"redis_cluster_vip\",\"port\"],' +\
+                                     '\"mysql_instance\":[\"ip_address\",\"port\",\"mysql_dbtype\"],' +\
+                                     '\"mongodb_instance\":[\"ip_address\",\"port\",\"dbtype\"],' +\
+                                     '\"redis_instance\":[\"ip_address\",\"port\",\"dbtype\"],' +\
+                                     '\"virtual_server\":[\"ip_address\",\"hostname\"],' +\
+                                     '\"docker\":[\"ip_address\",\"hostname\"],' +\
+                                     '\"physical_server\":[\"ip_address\",\"device_type\"],' +\
+                                     '\"rack\":[\"rack_number\"],' +\
+                                     '\"idc_item\":[\"name\",\"idc_address\"]' +\
                                      '}'
                     req_str = CMDB_RELATION + cmdb_p_code + layer_and_total_count + reference_types + reference_sequence +\
                               item_filter + columns_filter

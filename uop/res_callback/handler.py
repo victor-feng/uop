@@ -129,7 +129,7 @@ property_json_mapper_config = {
         'name': 'name',
         "mysql_username": "username",
         "mysql_password": "password",
-        "mysql_dbtype": "dbtype",
+        "dbtype": "dbtype",
         'ip_address': 'ip',
         "port": "port",
         'cpu_count': 'cpu',
