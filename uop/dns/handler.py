@@ -4,7 +4,6 @@ import uuid
 import requests
 import json
 import datetime
-import os
 import threading
 from flask import request
 from flask_restful import reqparse, Api, Resource
