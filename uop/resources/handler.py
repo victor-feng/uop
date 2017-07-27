@@ -555,15 +555,15 @@ class GetDBInfo(Resource):
         redis_ip = {
             'vip': resource_info.get('redis_cluster', {'vip': '127.0.0.1'}).get('vip')
         }
-        mongo_ip = {
-            'vip1': resource_info.get('mongo_cluster', {'vip1': '127.0.0.1'}).get('vip1'),
-            'vip2': resource_info.get('mongo_cluster', {'vip2': '127.0.0.1'}).get('vip2'),
-            'vip3': resource_info.get('mongo_cluster', {'vip3': '127.0.0.1'}).get('vip3'),
+        mongodb_ip = {
+            'vip1': resource_info.get('mongodb_cluster', {'vip1': '127.0.0.1'}).get('vip1'),
+            'vip2': resource_info.get('mongodb_cluster', {'vip2': '127.0.0.1'}).get('vip2'),
+            'vip3': resource_info.get('mongodb_cluster', {'vip3': '127.0.0.1'}).get('vip3'),
         }
         data = {
             'mysql_ip': mysql_ip,
             'redis_ip': redis_ip,
-            'mongo_ip': mongo_ip,
+            'mongodb_ip': mongodb_ip,
         }
         if err_msg:
             code = 500

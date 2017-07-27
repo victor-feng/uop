@@ -33,8 +33,8 @@ def get_resource_by_id(resource_id):
               '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
               '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
               '&columns_filter={\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"username\",\"password\",\"port\"],' +\
-              ' \"mongo_cluster\":[\"ip_address\",\"username\",\"password\",\"port\"],' +\
-              ' \"redis_cluster\":[\"ip_address\",\"username\",\"password\",\"port\"],' +\
+              ' \"mongo_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
+              ' \"redis_cluster\":[\"redis_cluster_vip\",\"username\",\"password\",\"port\"],' +\
               ' \"docker\":[\"ip_address\",\"username\",\"password\",\"port\"]}'
 
         headers = {'Content-Type': 'application/json'}
@@ -57,12 +57,19 @@ def get_resource_by_id(resource_id):
                         colunm[i.get('name')] = i.get('value')
 
                 resource_info[item.get('item_id')] = {
-                    'ip': colunm.get('IP地址'.decode('utf-8'), '127.0.0.1'),
                     'user': colunm.get('用户名'.decode('utf-8'), 'root'),
                     'password': colunm.get('密码'.decode('utf-8'), '123456'),
                     'port': colunm.get('端口'.decode('utf-8'), '3306'),
                 }
-
+                if item.get('item_id') == 'mysql_cluster':
+                    resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
+                    resource_info[item.get('item_id')]['rvip'] = colunm.get('mysql_cluster_rvip', '127.0.0.1')
+                elif item.get('item_id') == 'mongodb_cluster':
+                    resource_info[item.get('item_id')]['vip1'] = colunm.get('mongodb_cluster_ip1', '127.0.0.1')
+                    resource_info[item.get('item_id')]['vip2'] = colunm.get('mongodb_cluster_ip2', '127.0.0.1')
+                    resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
+                elif item.get('item_id') == 'redis_cluster':
+                    resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
