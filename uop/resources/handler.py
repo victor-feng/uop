@@ -548,10 +548,22 @@ class ResourceRecord(Resource):
 class GetDBInfo(Resource):
     def get(cls, res_id):
         err_msg, resource_info = get_resource_by_id(res_id)
+        mysql_ip = {
+            'wvip': resource_info.get('mysql_cluster', {'wvip': '127.0.0.1'}).get('wvip'),
+            'rvip': resource_info.get('mysql_cluster', {'rvip': '127.0.0.1'}).get('rvip'),
+        }
+        redis_ip = {
+            'vip': resource_info.get('redis_cluster', {'vip': '127.0.0.1'}).get('vip')
+        }
+        mongo_ip = {
+            'vip1': resource_info.get('mongo_cluster', {'vip1': '127.0.0.1'}).get('vip1'),
+            'vip2': resource_info.get('mongo_cluster', {'vip2': '127.0.0.1'}).get('vip2'),
+            'vip3': resource_info.get('mongo_cluster', {'vip3': '127.0.0.1'}).get('vip3'),
+        }
         data = {
-            'mysql_ip': resource_info.get('mysql_cluster', {'ip': '127.0.0.1'}).get('ip'),
-            'redis_ip': resource_info.get('redis_cluster', {'ip': '127.0.0.1'}).get('ip'),
-            'mongo_ip': resource_info.get('mongo_cluster', {'ip': '127.0.0.1'}).get('ip'),
+            'mysql_ip': mysql_ip,
+            'redis_ip': redis_ip,
+            'mongo_ip': mongo_ip,
         }
         if err_msg:
             code = 500
