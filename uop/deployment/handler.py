@@ -53,13 +53,13 @@ def get_resource_by_id(resource_id):
             for item in data.get('items'):
                 colunm = {}
                 for i in item.get('column'):
-                    if i.get('name') is not None:
-                        colunm[i.get('name')] = i.get('value')
+                    if i.get('p_code') is not None:
+                        colunm[i.get('p_code')] = i.get('value')
 
                 resource_info[item.get('item_id')] = {
-                    'user': colunm.get('用户名'.decode('utf-8'), 'root'),
-                    'password': colunm.get('密码'.decode('utf-8'), '123456'),
-                    'port': colunm.get('端口'.decode('utf-8'), '3306'),
+                    'user': colunm.get('username', 'root'),
+                    'password': colunm.get('password', '123456'),
+                    'port': colunm.get('port', '3306'),
                 }
                 if item.get('item_id') == 'mysql_cluster':
                     resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
