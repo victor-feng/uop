@@ -31,9 +31,9 @@ def get_resource_by_id(resource_id):
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
               '?layer_count=3&total_count=50' +\
               '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
-              '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
+              '&item_filter=docker&item_filter=mongodb_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
               '&columns_filter={\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"username\",\"password\",\"port\"],' +\
-              ' \"mongo_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
+              ' \"mongodb_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
               ' \"redis_cluster\":[\"redis_cluster_vip\",\"username\",\"password\",\"port\"],' +\
               ' \"docker\":[\"ip_address\",\"username\",\"password\",\"port\"]}'
 
