@@ -44,13 +44,40 @@ class DevelopmentConfig(BaseConfig):
 class TestingConfig(BaseConfig):
     TESTING = True
     DEBUG = True
-    MONGODB_SETTINGS = {
+    #MONGODB_SETTINGS = {
+    #        'db': 'uop',
+    #        'host': 'mongo-1',
+    #        'port': 28010,
+    #        'username': 'uop',
+    #        'password': 'uop',
+    #        }
+
+    MONGODB_SETTINGS = [
+             {
             'db': 'uop',
-            'host': '172.28.20.124',
-            'port': 27017,
+            'host': 'mongo-1',
+            'port': 28010,
+            'username': 'uop',
+            'password': 'uop',
+            },
+             {
+            'db': 'uop',
+            'host': 'mongo-2',
+            'port': 28010,
+            'username': 'uop',
+            'password': 'uop',
+            },
+            {
+            'db': 'uop',
+            'host': 'mongo-3',
+            'port': 28010,
             'username': 'uop',
             'password': 'uop',
             }
+    ]
+
+
+
     CRP_URL = "http://172.28.32.32:8001/"
     CMDB_URL = "http://cmdb-dev.syswin.com/"
 
