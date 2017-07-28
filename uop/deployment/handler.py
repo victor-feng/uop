@@ -29,21 +29,21 @@ def get_resource_by_id(resource_id):
     try:
         # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
-              '?layer_count=3&total_count=50' +\
-              '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
-              '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
-              '&columns_filter={\"mysql_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"mongo_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"redis_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
-              ' \"docker\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"]}'
+            '?layer_count=3&total_count=50' +\
+            '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
+            '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
+            '&columns_filter={\"mysql_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+            ' \"mongo_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+            ' \"redis_cluster\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"],' +\
+            ' \"docker\":[\"IP地址\",\"用户名\",\"密码\",\"端口\"]}'
 
         headers = {'Content-Type': 'application/json'}
-        print url+' '+json.dumps(headers)
+        print url + ' ' + json.dumps(headers)
         result = requests.get(url, headers=headers)
         result = result.json()
         data = result.get('result', {}).get('res', {})
         code = result.get('code', -1)
-        print 'data: '+json.dumps(result)
+        print 'data: ' + json.dumps(result)
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
     except BaseException as e:
@@ -64,12 +64,13 @@ def get_resource_by_id(resource_id):
                 }
 
         else:
-            err_msg = 'resource('+resource_id+') not found.'
+            err_msg = 'resource(' + resource_id + ') not found.'
 
     return err_msg, resource_info
 
 
 def deploy_to_crp(deploy_item, resource_info, file_data):
+    """
     data = {
         "deploy_id": deploy_item.deploy_id,
         "mysql": {
@@ -93,7 +94,7 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
             "ip": resource_info['docker']['ip']
         }
     }
-
+    """
     err_msg = None
     result = None
     try:
@@ -101,7 +102,9 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
         headers = {
             'Content-Type': 'application/json',
         }
-        data_str = json.dumps(data)
+        #data_str = json.dumps(data)
+        print url
+        """
         if file_data:
             res = upload_files_to_crp(file_data)
             if res.code == 200:
@@ -112,6 +115,7 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
         print url + ' ' + json.dumps(headers)
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
+        """
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
     except BaseException as e:
@@ -119,12 +123,20 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
 
     return err_msg, result
 
+
 def upload_files_to_crp(file_data):
     url = CPR_URL + "api/deploy/upload"
     files = []
     for db_type, filenames in file_data.items():
         for idx, filename in enumerate(filenames):
-            files.append((db_type + '_' + str(idx), open(os.path.join(UPLOAD_FOLDER, db_type, filename), 'rb')))
+            files.append(
+                (db_type + '_' + str(idx),
+                 open(
+                    os.path.join(
+                        UPLOAD_FOLDER,
+                        db_type,
+                        filename),
+                    'rb')))
 
     if files:
         data = {'action': 'upload'}
@@ -132,7 +144,6 @@ def upload_files_to_crp(file_data):
         return result
     else:
         return {'code': -1}
-
 
 
 class DeploymentListAPI(Resource):
@@ -174,7 +185,8 @@ class DeploymentListAPI(Resource):
 
         deployments = []
         try:
-            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+            for deployment in Deployment.objects.filter(
+                    **condition).order_by('-created_time'):
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -212,8 +224,17 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid','deploy_to_crp'), required=True,
-                            help='No action(save_to_db/deploy_to_crp) provided', location='json')
+        parser.add_argument(
+            'action',
+            type=str,
+            choices=(
+                'save_to_db',
+                'admin_approve_allow',
+                'admin_approve_forbid',
+                'deploy_to_crp'),
+            required=True,
+            help='No action(save_to_db/deploy_to_crp) provided',
+            location='json')
         parser.add_argument('deploy_name', type=str, required=True,
                             help='No deploy name provided', location='json')
         parser.add_argument('initiator', type=str, location='json')
@@ -304,23 +325,26 @@ class DeploymentListAPI(Resource):
 
             if action == 'deploy_to_crp':
                 # 需要传过来部署id
-
+                dep_id = '93cc11ec-72af-11e7-979e-fa163e9474c9'
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-
+                print "resource_id: %s" % deploy_obj.resource_id
                 err_msg, resource_info = get_resource_by_id(
                     deploy_obj.resource_id)
+                print "resource_info:%s" % resource_info
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, file_name)
+                    err_msg, result = deploy_to_crp(
+                        deploy_obj, resource_info, file_name)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
                         deploy_obj.approve_status = 'fail'
-                        print 'deploy_to_crp err: '+err_msg
+                        print 'deploy_to_crp err: ' + err_msg
                     else:
-                        print 'deploy_to_crp response: '+result
+                        print 'deploy_to_crp response: ' + result
                         deploy_obj.approve_status = 'success'
                     deploy_obj.save()
                 if err_msg:
                     raise Exception(err_msg)
+
             elif action == 'admin_approve_allow':  # 管理员审批通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
@@ -373,7 +397,9 @@ class DeploymentListByByInitiatorAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('initiator', type=str, location='args')
         args = parser.parse_args()
-        logging.info("[UOP] come into uop/deployment/handler.py, args: %s", args)
+        logging.info(
+            "[UOP] come into uop/deployment/handler.py, args: %s",
+            args)
 
         condition = {}
         if args.initiator:
@@ -492,8 +518,9 @@ class Upload(Resource):
         }
 
 
-
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
-deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
+deployment_api.add_resource(
+    DeploymentListByByInitiatorAPI,
+    '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
