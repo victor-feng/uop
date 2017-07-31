@@ -93,7 +93,19 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
             "sql_script": deploy_item.redis_context
         },
         "mongo": {
-            "sql_script": deploy_item.mongodb_context
+            "deploy_id": deploy_item.deploy_id,
+            "mongodb": {
+                "vip1": resource_info['mongodb_cluster']['vip1'],
+                "vip2": resource_info['mongodb_cluster']['vip2'],
+                "vip3": resource_info['mongodb_cluster']['vip3'],
+                "port": resource_info['mongodb_cluster']['port'],
+                "host_username": "root",
+                "host_password": "123456",
+                "mongodb_username": resource_info['mongodb_cluster']['user'],
+                "mongodb_password": resource_info['mongodb_cluster']['password'],
+                "database": "mongodb",
+                "sql_script": deploy_item.mongodb_context
+            }
         },
         "docker": {
             "image_url": deploy_item.app_image,
