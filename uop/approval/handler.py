@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
+
 import json
 import uuid
 import datetime
+
 import requests
 from flask_restful import reqparse, Api, Resource
+from flask import current_app
+
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-from config import APP_ENV, configs
+#from config import APP_ENV, configs
 
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
-CPR_URL = configs[APP_ENV].CRP_URL
+CPR_URL = current_app.config['CRP_URL']
+#CPR_URL = configs[APP_ENV].CRP_URL
 
 
 class ApprovalList(Resource):

@@ -5,19 +5,24 @@ import requests
 import json
 import datetime
 import os
+import logging
 
 from flask import request
 from flask_restful import reqparse, Api, Resource
+from flask import current_app
 from uop.deployment import deployment_blueprint
 from uop.models import Deployment, ResourceModel
 from uop.deployment.errors import deploy_errors
-from config import APP_ENV, configs
+#from config import APP_ENV, configs
 
-import logging
 
-CPR_URL = configs[APP_ENV].CRP_URL
-CMDB_URL = configs[APP_ENV].CMDB_URL
-UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
+#CPR_URL = configs[APP_ENV].CRP_URL
+#CMDB_URL = configs[APP_ENV].CMDB_URL
+#UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
+
+CPR_URL = current_app.config['CRP_URL']
+CMDB_URL = current_app.config['CMDB_URL']
+UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 

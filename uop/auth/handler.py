@@ -12,24 +12,27 @@ from flask import request
 from flask import redirect
 from flask import jsonify
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from flask import current_app
 from mongoengine import NotUniqueError
 
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
-from config import APP_ENV, configs
+#from config import APP_ENV, configs
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
-CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB_URL = current_app.config['CMDB_URL']
+#CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB_API = CMDB_URL+'cmdb/api/'
 
 
 base_dn = 'dc=syswin,dc=com'
 scope = ldap.SCOPE_SUBTREE
+# TODO:move to global conf 
 ldap_server = 'ldap://172.28.4.103:389'
 username = 'crm_test1'
 passwd_admin = 'syswin#'

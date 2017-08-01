@@ -5,16 +5,18 @@ import requests
 import logging
 
 from flask_restful import reqparse, Api, Resource
+from flask import current_app
 
 from uop.resource_view import resource_view_blueprint
 from uop.resource_view.errors import resource_view_errors
-from uop.log import Log
-from config import APP_ENV, configs
+#from uop.log import Log
+#from config import APP_ENV, configs
 from uop.models import ResourceModel
 
 
 resource_view_api = Api(resource_view_blueprint, errors=resource_view_errors)
-CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB_URL = current_app.config['CMDB_URL']
+#CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB_RELATION = CMDB_URL+'cmdb/api/repo_relation/'
 
 
