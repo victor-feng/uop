@@ -31,9 +31,9 @@ def get_resource_by_id(resource_id):
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
               '?layer_count=3&total_count=50' +\
               '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
-              '&item_filter=docker&item_filter=mongo_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
+              '&item_filter=docker&item_filter=mongodb_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
               '&columns_filter={\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"username\",\"password\",\"port\"],' +\
-              ' \"mongo_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
+              ' \"mongodb_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
               ' \"redis_cluster\":[\"redis_cluster_vip\",\"username\",\"password\",\"port\"],' +\
               ' \"docker\":[\"ip_address\",\"username\",\"password\",\"port\"]}'
 
@@ -53,13 +53,13 @@ def get_resource_by_id(resource_id):
             for item in data.get('items'):
                 colunm = {}
                 for i in item.get('column'):
-                    if i.get('name') is not None:
-                        colunm[i.get('name')] = i.get('value')
+                    if i.get('p_code') is not None:
+                        colunm[i.get('p_code')] = i.get('value')
 
                 resource_info[item.get('item_id')] = {
-                    'user': colunm.get('用户名'.decode('utf-8'), 'root'),
-                    'password': colunm.get('密码'.decode('utf-8'), '123456'),
-                    'port': colunm.get('端口'.decode('utf-8'), '3306'),
+                    'user': colunm.get('username', 'root'),
+                    'password': colunm.get('password', '123456'),
+                    'port': colunm.get('port', '3306'),
                 }
                 if item.get('item_id') == 'mysql_cluster':
                     resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
@@ -93,7 +93,19 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
             "sql_script": deploy_item.redis_context
         },
         "mongo": {
-            "sql_script": deploy_item.mongodb_context
+            "deploy_id": deploy_item.deploy_id,
+            "mongodb": {
+                "vip1": resource_info['mongodb_cluster']['vip1'],
+                "vip2": resource_info['mongodb_cluster']['vip2'],
+                "vip3": resource_info['mongodb_cluster']['vip3'],
+                "port": resource_info['mongodb_cluster']['port'],
+                "host_username": "root",
+                "host_password": "123456",
+                "mongodb_username": resource_info['mongodb_cluster']['user'],
+                "mongodb_password": resource_info['mongodb_cluster']['password'],
+                "database": "mongodb",
+                "sql_script": deploy_item.mongodb_context
+            }
         },
         "docker": {
             "image_url": deploy_item.app_image,

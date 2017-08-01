@@ -85,7 +85,7 @@ class ResourceView(Resource):
             else:
                 if param_str == "?":
                     # req_str = CMDB_RELATION + cmdb_p_code + '/'
-                    layer_and_total_count = '?layer_count=10&total_count=50'
+                    layer_and_total_count = '?layer_count=10&total_count=200'
                     reference_types = '&reference_type=dependent'
                     reference_sequence = '&reference_sequence=[{\"child\": 3},{\"bond\": 2},{\"parent\": 5}]'
                     item_filter = ''

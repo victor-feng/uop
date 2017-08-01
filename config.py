@@ -78,8 +78,8 @@ class TestingConfig(BaseConfig):
 
 
 
-    CRP_URL = "http://172.28.32.32:8001/"
-    CMDB_URL = "http://cmdb-dev.syswin.com/"
+    CRP_URL = "http://crp-test.syswin.com/"
+    CMDB_URL = "http://cmdb-test.syswin.com/"
 
     UPLOAD_FOLDER = "/tmp/"
     #TODO:  move it to conf
