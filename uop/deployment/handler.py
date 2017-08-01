@@ -108,7 +108,6 @@ def deploy_to_crp(deploy_item, resource_info):
                 "mongodb_username": resource_info['mongodb_cluster']['user'],
                 "mongodb_password": resource_info['mongodb_cluster']['password'],
                 "database": "mongodb",
-                "sql_script": deploy_item.mongodb_context
             }
         },
         "docker": {
