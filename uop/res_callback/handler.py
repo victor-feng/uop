@@ -22,12 +22,12 @@ res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
 
 
 #CMDB_URL = current_app.config['CMDB_URL']
-CMDB_URL = configs[APP_ENV].CMDB_URL
-CMDB_RESTAPI_URL = CMDB_URL+'cmdb/api/'
-CMDB_REPO_URL = CMDB_RESTAPI_URL+'repo/'
-CMDB_ITEM_PROPERTY_LIST_URL = CMDB_RESTAPI_URL+'property_list/'
-CMDB_ITEM_URL = CMDB_RESTAPI_URL+'cmdb/item/'
-CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_RESTAPI_URL+'repo_detail/'
+#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_RESTAPI_URL = CMDB_URL+'cmdb/api/'
+#CMDB_REPO_URL = CMDB_RESTAPI_URL+'repo/'
+#CMDB_ITEM_PROPERTY_LIST_URL = CMDB_RESTAPI_URL+'property_list/'
+#CMDB_ITEM_URL = CMDB_RESTAPI_URL+'cmdb/item/'
+#CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_RESTAPI_URL+'repo_detail/'
 
 
 # Define CallBack JSON Format
@@ -303,6 +303,8 @@ class ResourceProviderTransitions(object):
         repo_item = {}
         transited_property_list = []
         try:
+            CMDB_URL = current_app.config['CMDB_URL'] 
+            CMDB_ITEM_PROPERTY_LIST_URL = CMDB_URL+'cmdb/api/property_list/'
             resp_item_property = requests.get(CMDB_ITEM_PROPERTY_LIST_URL+item_id)
             item_property = json.loads(resp_item_property.text)
             property_list = item_property.get('result').get('res')
@@ -338,6 +340,8 @@ class ResourceProviderTransitions(object):
                         transited_property_list.append(transited_property)
             if len(transited_property_list) >= 1:
                 repo_item['item_id'] = item_id
+                CMDB_URL = current_app.config['CMDB_URL']
+                CMDB_ITEM_URL = CMDB_URL+'cmdb/api/cmdb/item/'
                 resp_item = requests.get(CMDB_ITEM_URL+item_id)
                 item = json.loads(resp_item.text)
                 repo_item['name'] = item.get('result').get('res').get('item_name')
@@ -351,6 +355,8 @@ class ResourceProviderTransitions(object):
         data = json.dumps(repo_item)
         logging.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
         logging.debug(data)
+        CMDB_URL = current_app.config['CMDB_URL']
+        CMDB_REPO_URL = CMDB_URL+'cmdb/api/repo/'
         resp_repo_item = requests.post(CMDB_REPO_URL, data=data)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
@@ -364,6 +370,8 @@ class ResourceProviderTransitions(object):
 
     def _do_get_physical_server_for_instance(self, physical_server):
         condition = '{\"repoitem_string.default_value\":\"'+physical_server+'\"}'
+        CMDB_URL = current_app.config['CMDB_URL']
+        CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_URL+'cmdb/api/repo_detail/'
         request_url = CMDB_REPO_ITEM_CONDITION_GET_URL+'?condition='+condition
         resp_repo_item = requests.get(request_url)
         item_property = json.loads(resp_repo_item.text)

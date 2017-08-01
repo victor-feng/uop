@@ -6,6 +6,7 @@ import ldap
 import datetime
 import os
 import hashlib
+import logging
 
 import requests
 from flask import request
@@ -26,8 +27,8 @@ from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
 #CMDB_URL = current_app.config['CMDB_URL']
-CMDB_URL = configs[APP_ENV].CMDB_URL
-CMDB_API = CMDB_URL+'cmdb/api/'
+#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_API = CMDB_URL+'cmdb/api/'
 
 
 base_dn = 'dc=syswin,dc=com'
@@ -144,6 +145,9 @@ def add_person(name, user_id, department, contact_info, privilege):
     success = False
     already_exist = False
 
+
+    CMDB_URL = current_app.config['CMDB_URL']
+    CMDB_API = CMDB_URL+'cmdb/api/'
     req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
                              "\"repoitem_string.default_value\":\""+user_id+"\" }"
     res = requests.get(str(req))
@@ -172,6 +176,10 @@ def add_person(name, user_id, department, contact_info, privilege):
                               "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
         data["property_list"] = property_list
         data_str = json.dumps(data)
+
+
+        CMDB_URL = current_app.config['CMDB_URL']
+        CMDB_API = CMDB_URL+'cmdb/api/'
 
         res = requests.post(CMDB_API + "repo/", data=data_str)
         ret = eval(res.content.decode('unicode_escape'))
