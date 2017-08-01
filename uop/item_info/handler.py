@@ -20,8 +20,8 @@ iteminfo_api = Api(iteminfo_blueprint, errors=user_errors)
 
 null = "null"
 #CMDB_URL = current_app.config['CMDB_URL']
-CMDB_URL = configs[APP_ENV].CMDB_URL
-CMDB_API = CMDB_URL+'cmdb/api/'
+#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_API = CMDB_URL+'cmdb/api/'
 
 
 class ItemInfo(Resource):
@@ -112,6 +112,9 @@ class ItemInfo(Resource):
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
+
+            CMDB_URL = current_app.config['CMDB_URL']
+            CMDB_API = CMDB_URL+'cmdb/api/'
             res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
@@ -136,6 +139,8 @@ class ItemInfo(Resource):
         ret = {}
         code = 200
         try:
+            CMDB_URL = current_app.config['CMDB_URL']
+            CMDB_API = CMDB_URL+'cmdb/api/'
             res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
             #ret = eval(res.content.decode('unicode_escape'))
 
@@ -170,6 +175,8 @@ class ItemPostInfo(Resource):
             parser.add_argument('item_description', type=str)
             args = parser.parse_args()
 
+            CMDB_URL = current_app.config['CMDB_URL']
+            CMDB_API = CMDB_URL+'cmdb/api/'
             req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
                              "\"repoitem_string.default_value\":\""+args.user_id+"\" }"
             res = requests.get(req)
@@ -200,6 +207,8 @@ class ItemPostInfo(Resource):
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
+            CMDB_URL = current_app.config['CMDB_URL']
+            CMDB_API = CMDB_URL+'cmdb/api/'
             res = requests.post(CMDB_API + "repo/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:

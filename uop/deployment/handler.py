@@ -16,9 +16,9 @@ from uop.deployment.errors import deploy_errors
 from config import APP_ENV, configs
 
 
-CPR_URL = configs[APP_ENV].CRP_URL
-CMDB_URL = configs[APP_ENV].CMDB_URL
-UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
+#CPR_URL = configs[APP_ENV].CRP_URL
+#CMDB_URL = configs[APP_ENV].CMDB_URL
+#UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
 
 #CPR_URL = current_app.config['CRP_URL']
 #CMDB_URL = current_app.config['CMDB_URL']
@@ -33,6 +33,8 @@ def get_resource_by_id(resource_id):
     resource = ResourceModel.objects.get(res_id=resource_id)
     try:
         # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
+
+        CMDB_URL = current_app.config['CMDB_URL']
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
               '?layer_count=3&total_count=50' +\
               '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
@@ -118,6 +120,8 @@ def deploy_to_crp(deploy_item, resource_info):
     err_msg = None
     result = None
     try:
+
+        CPR_URL = current_app.config['CRP_URL']
         url = CPR_URL + "api/deploy/deploys"
         headers = {
             'Content-Type': 'application/json',
@@ -150,6 +154,8 @@ def deploy_to_crp(deploy_item, resource_info):
 
 
 def upload_files_to_crp(file_paths):
+
+    CPR_URL = current_app.config['CRP_URL']
     url = CPR_URL + "api/deploy/upload"
     files = []
     for db_type, path in file_paths:
@@ -296,6 +302,8 @@ class DeploymentListAPI(Resource):
 
         deploy_result = 'not_deployed'
 
+
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
         def write_file(uid, context, type):
             path = os.path.join(UPLOAD_FOLDER, type, 'script_' + uid)
@@ -504,6 +512,8 @@ class DeploymentListByByInitiatorAPI(Resource):
 
 class Upload(Resource):
     def post(self):
+
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         try:
             file = request.files['file']
             type = request.form['file_type']
