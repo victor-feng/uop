@@ -13,7 +13,7 @@ from flask import current_app
 from uop.res_callback import res_callback_blueprint
 from uop.models import User, ResourceModel
 from uop.res_callback.errors import res_callback_errors
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 from transitions import Machine
 #from uop.log import Log
 
@@ -21,8 +21,8 @@ from transitions import Machine
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
 
 
-CMDB_URL = current_app.config['CMDB_URL']
-#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_URL = current_app.config['CMDB_URL']
+CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB_RESTAPI_URL = CMDB_URL+'cmdb/api/'
 CMDB_REPO_URL = CMDB_RESTAPI_URL+'repo/'
 CMDB_ITEM_PROPERTY_LIST_URL = CMDB_RESTAPI_URL+'property_list/'

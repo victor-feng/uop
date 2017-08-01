@@ -13,16 +13,16 @@ from flask import current_app
 from uop.deployment import deployment_blueprint
 from uop.models import Deployment, ResourceModel
 from uop.deployment.errors import deploy_errors
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 
 
-#CPR_URL = configs[APP_ENV].CRP_URL
-#CMDB_URL = configs[APP_ENV].CMDB_URL
-#UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
+CPR_URL = configs[APP_ENV].CRP_URL
+CMDB_URL = configs[APP_ENV].CMDB_URL
+UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
 
-CPR_URL = current_app.config['CRP_URL']
-CMDB_URL = current_app.config['CMDB_URL']
-UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+#CPR_URL = current_app.config['CRP_URL']
+#CMDB_URL = current_app.config['CMDB_URL']
+#UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
@@ -81,7 +81,7 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, file_data):
+def deploy_to_crp(deploy_item, resource_info):
     data = {
         "deploy_id": deploy_item.deploy_id,
         "mysql": {
@@ -92,11 +92,8 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
             "mysql_user": resource_info['mysql_cluster']['user'],
             "mysql_password": resource_info['mysql_cluster']['password'],
             "database": "mysql",
-            "sql_script": deploy_item.mysql_context
         },
-        "redis": {
-            "sql_script": deploy_item.redis_context
-        },
+        "redis": {},
         "mongo": {
             "deploy_id": deploy_item.deploy_id,
             "mongodb": {
@@ -125,15 +122,23 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
         headers = {
             'Content-Type': 'application/json',
         }
-        data_str = json.dumps(data)
-        if file_data:
-            res = upload_files_to_crp(file_data)
+        file_paths = []
+        if deploy_item.mysql_context:
+            file_paths.append(('mysql',deploy_item.mysql_context))
+        if deploy_item.redis_context:
+            file_paths.append(('redis', deploy_item.redis_context))
+        if deploy_item.mongodb_context:
+            file_paths.append(('mongodb', deploy_item.mongodb_context))
+
+        if file_paths:
+            res = upload_files_to_crp(file_paths)
             if res.code == 200:
-                for type, filename_list in res.file_info.items():
-                    data[type]['filenames'] = filename_list
+                for type, file_path in res.file_info.items():
+                    data[type]['path'] = file_path
             elif res.code == 500:
                 return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
+        data_str = json.dumps(data)
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
@@ -143,12 +148,12 @@ def deploy_to_crp(deploy_item, resource_info, file_data):
 
     return err_msg, result
 
-def upload_files_to_crp(file_data):
+
+def upload_files_to_crp(file_paths):
     url = CPR_URL + "api/deploy/upload"
     files = []
-    for db_type, filenames in file_data.items():
-        for idx, filename in enumerate(filenames):
-            files.append((db_type + '_' + str(idx), open(os.path.join(UPLOAD_FOLDER, db_type, filename), 'rb')))
+    for db_type, path in file_paths:
+        files.append((db_type, open(path, 'rb')))
 
     if files:
         data = {'action': 'upload'}
@@ -236,8 +241,8 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid','deploy_to_crp'), required=True,
-                            help='No action(save_to_db/deploy_to_crp) provided', location='json')
+        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid'), required=True,
+                            help='No action(save_to_db/admin_approve_allow/admin_approve_forbid) provided', location='json')
         parser.add_argument('deploy_name', type=str, required=True,
                             help='No deploy name provided', location='json')
         parser.add_argument('initiator', type=str, location='json')
@@ -250,14 +255,13 @@ class DeploymentListAPI(Resource):
         parser.add_argument('resource_name', type=str, location='json')
         parser.add_argument('environment', type=str, location='json')
         parser.add_argument('release_notes', type=str, location='json')
-        parser.add_argument('mysql_tag', type=str, location='json')
+        parser.add_argument('mysql_exe_mode', type=str, location='json')
         parser.add_argument('mysql_context', type=str, location='json')
-        parser.add_argument('redis_tag', type=str, location='json')
+        parser.add_argument('redis_exe_mode', type=str, location='json')
         parser.add_argument('redis_context', type=str, location='json')
-        parser.add_argument('mongodb_tag', type=str, location='json')
+        parser.add_argument('mongodb_exe_mode', type=str, location='json')
         parser.add_argument('mongodb_context', type=str, location='json')
         parser.add_argument('app_image', type=str, location='json')
-        parser.add_argument('file_name', type=str, location='json')
 
         parser.add_argument('approve_suggestion', type=str, location='json')
         parser.add_argument('apply_status', type=str, location='json')
@@ -276,14 +280,13 @@ class DeploymentListAPI(Resource):
         resource_name = args.resource_name
         environment = args.environment
         release_notes = args.release_notes
-        mysql_tag = args.mysql_tag
+        mysql_exe_mode = args.mysql_exe_mode
         mysql_context = args.mysql_context
-        redis_tag = args.redis_tag
+        redis_exe_mode = args.redis_exe_mode
         redis_context = args.redis_context
-        mongodb_tag = args.mongodb_tag
+        mongodb_exe_mode = args.mongodb_exe_mode
         mongodb_context = args.mongodb_context
         app_image = args.app_image
-        file_name = args.file_name
 
         approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
@@ -291,69 +294,70 @@ class DeploymentListAPI(Resource):
         if args.dep_id:
             dep_id = args.dep_id
 
-        if action == 'deploy_to_crp':
-            deploy_result = 'deploying'
-        elif action == 'save_to_db':
-            deploy_result = 'not_deployed'
-        elif action == 'admin_approve':
-            deploy_result = 'not_deployed'
-        else:
-            deploy_result = 'unknown'
+        deploy_result = 'not_deployed'
+
+        uid = str(uuid.uuid1())
+        def write_file(uid, context, type):
+            path = os.path.join(UPLOAD_FOLDER, type, 'script_' + uid)
+            with open(path, 'wb') as f:
+                f.write(context)
+            return path
+        if mysql_exe_mode == 'tag' and  (not mysql_context):
+            mysql_context = write_file(uid, mysql_context, 'mysql')
+        if redis_exe_mode == 'tag' and  (not redis_context):
+            redis_context = write_file(uid, redis_context, 'redis')
+        if mongodb_exe_mode == 'tag' and  (not mongodb_context):
+            mongodb_context = write_file(uid, mongodb_context, 'mongodb')
 
         try:
-            deploy_item = Deployment(
-                deploy_id=str(uuid.uuid1()),
-                deploy_name=deploy_name,
-                initiator=initiator,
-                user_id=user_id,
-                project_id=project_id,
-                project_name=project_name,
-                resource_id=resource_id,
-                resource_name=resource_name,
-                created_time=datetime.datetime.now(),
-                environment=environment,
-                release_notes=release_notes,
-                mysql_tag=mysql_tag,
-                mysql_context=mysql_context,
-                redis_tag=redis_tag,
-                redis_context=redis_context,
-                mongodb_tag=mongodb_tag,
-                mongodb_context=mongodb_context,
-                app_image=app_image,
-                deploy_result=deploy_result,
-                apply_status=apply_status,
-                approve_status=approve_status,
-                approve_suggestion=approve_suggestion,
-            )
-
-            if action == 'deploy_to_crp':
-                # 需要传过来部署id
-
+            # 管理员审批通过 直接部署到CRP
+            if action == 'admin_approve_allow':  # 管理员审批通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-
-                err_msg, resource_info = get_resource_by_id(
-                    deploy_obj.resource_id)
+                deploy_obj.approve_status = 'success'
+                err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, file_name)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
-                        deploy_obj.approve_status = 'fail'
                         print 'deploy_to_crp err: '+err_msg
                     else:
                         print 'deploy_to_crp response: '+result
-                        deploy_obj.approve_status = 'success'
-                    deploy_obj.save()
-                if err_msg:
+                else:
                     raise Exception(err_msg)
-            elif action == 'admin_approve_allow':  # 管理员审批通过
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.approve_status = 'success'
+                deploy_obj.deploy_result = 'deploying'
                 deploy_obj.save()
+
+
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
+                deploy_obj.deploy_result = deploy_result
                 deploy_obj.save()
             elif action == 'save_to_db':  # 部署申请
+                deploy_item = Deployment(
+                    deploy_id=uid,
+                    deploy_name=deploy_name,
+                    initiator=initiator,
+                    user_id=user_id,
+                    project_id=project_id,
+                    project_name=project_name,
+                    resource_id=resource_id,
+                    resource_name=resource_name,
+                    created_time=datetime.datetime.now(),
+                    environment=environment,
+                    release_notes=release_notes,
+                    mysql_tag=mysql_exe_mode,
+                    mysql_context=mysql_context,
+                    redis_tag=redis_exe_mode,
+                    redis_context=redis_context,
+                    mongodb_tag=mongodb_exe_mode,
+                    mongodb_context=mongodb_context,
+                    app_image=app_image,
+                    deploy_result=deploy_result,
+                    apply_status=apply_status,
+                    approve_status=approve_status,
+                    approve_suggestion=approve_suggestion,
+                )
                 deploy_item.save()
 
         except Exception as e:
@@ -503,7 +507,8 @@ class Upload(Resource):
         try:
             file = request.files['file']
             type = request.form['file_type']
-            file.save(os.path.join(UPLOAD_FOLDER, type, file.filename))
+            path = os.path.join(UPLOAD_FOLDER, type, file.filename)
+            file.save(path)
         except Exception as e:
             return {
                 'code': 500,
@@ -513,8 +518,8 @@ class Upload(Resource):
             'code': 200,
             'msg': '上传成功！',
             'type': type,
+            'path': path,
         }
-
 
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')

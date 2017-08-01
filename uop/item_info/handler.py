@@ -11,7 +11,7 @@ from flask import current_app
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 from uop.models import ItemInformation
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -19,8 +19,8 @@ sys.setdefaultencoding('utf-8')
 iteminfo_api = Api(iteminfo_blueprint, errors=user_errors)
 
 null = "null"
-CMDB_URL = current_app.config['CMDB_URL']
-#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_URL = current_app.config['CMDB_URL']
+CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB_API = CMDB_URL+'cmdb/api/'
 
 

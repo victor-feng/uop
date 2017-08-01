@@ -14,17 +14,17 @@ from flask import current_app
 from uop.dns import dns_blueprint
 from uop.models import Deployment, ResourceModel
 from uop.dns.errors import dns_errors
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 from api import Dns
 
 
-#CPR_URL = configs[APP_ENV].CRP_URL
-#CMDB_URL = configs[APP_ENV].CMDB_URL
-#UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
+CPR_URL = configs[APP_ENV].CRP_URL
+CMDB_URL = configs[APP_ENV].CMDB_URL
+UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
 
-CPR_URL = current_app.config['CRP_URL']
-CMDB_URL = current_app.config['CMDB_URL']
-UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+#CPR_URL = current_app.config['CRP_URL']
+#CMDB_URL = current_app.config['CMDB_URL']
+#UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
 dns_api = Api(dns_blueprint, errors=dns_errors)
 mu_lock = threading.Lock()
