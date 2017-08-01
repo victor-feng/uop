@@ -133,8 +133,8 @@ def deploy_to_crp(deploy_item, resource_info):
         if file_paths:
             res = upload_files_to_crp(file_paths)
             if res.code == 200:
-                for type, file_path in res.file_info.items():
-                    data[type]['path'] = file_path
+                for type, path_filename in res.file_info.items():
+                    data[type]['path_filename'] = path_filename
             elif res.code == 500:
                 return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
