@@ -2,6 +2,7 @@
 
 import requests
 import json
+#from uop import models
 #from config import APP_ENV, configs
 
 
@@ -77,13 +78,14 @@ def disconf_app(app_name, desc):
 def disconf_file(appId, envId, version, myfilerar):
     try:
         file_content = {
-                    'appId': appId,
-                    'envId': envId,
-                    'version': version,
-                    'myfilerar': myfilerar
+                    'appId': (None,appId),
+                    'envId': (None,envId),
+                    'version': (None,version),
+                    'myfilerar': open(myfilerar,'rb')
                     }
+
         disconf_session()
-        rep = session.post(FILE, data=file_content)
+        rep = session.post(FILE, files=file_content)
         ret_json = json.loads(rep.text)
         result = ret_json.get('success')
 
@@ -303,32 +305,52 @@ def disconf_config_show(config_id):
     return config
 
 
+def disconf_add_app_config_api(app_name, filename, filecontent):
+    try:
+        version = "1_0_0"
+        #resource = models.ResourceModel.objects.get(res_id=res_id)
+        #app_name = resource.resource_name
+        app_id = disconf_app_id(app_name)
+        if app_id is None:
+            app_desc = '{res_name} config generated.'.format(res_name=app_name)
+            disconf_app(app_name, app_desc)
+            app_id = disconf_app_id(app_name)
+        env_id = disconf_env_id('rd')
+        ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
+
+    except Exception as e:
+        raise ServerError(e.message)
+    return ret
+
+def disconf_get_app_config_api(app_name):
+    try:
+        #resource = models.ResourceModel.objects.get(res_id=res_id)
+        #app_name = resource.resource_name
+        app_id = disconf_app_id(app_name=app_name)
+        env_id = disconf_env_id(env_name='rd')
+        version_id = disconf_version_list(app_id=app_id)
+        config_id_list = disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
+
+        configurations = []
+        for config_id in config_id_list:
+            config = disconf_config_show(config_id)
+            config_value = {}
+            if config is not None:
+                config_value['filename'] = config.get('key')
+                config_value['filecontent'] = config.get('value')
+                config_value['config_id'] = config.get('configId')
+                configurations.append(config_value)
+    except Exception as e:
+        raise ServerError(e.message)
+    return configurations
+
 
 if __name__ == '__main__':
-    version = "1_0_0_0"
-    #print disconf_app('final72','generated final72')
-    #print disconf_app_list()
-    #print disconf_env_list()
-    #print disconf_app_id('final71')
-    #print disconf_env_id('rd')
-    #print disconf_version_list(45)
-
-    #print disconf_config_list(app_id=45, env_id=1,version=version)
-    #fileContent = 'auto=bbdxxjdccd'
-    #fileName = 'final72-test'
-    app_id = disconf_app_id('disconf_demo')
-    env_id = disconf_env_id('rd')
-    #config_list = disconf_config_list(app_id, env_id, version)
-    config_id_list = disconf_config_id_list(app_id, env_id, version)
-    configurations = []
-    for config_id in config_id_list:
-        config = disconf_config_show(config_id)
-        config_value = {}
-        if config is not None:
-            config_value['filename'] = config.get('key')
-            config_value['filecontent'] = config.get('value')
-            config_value['config_id'] = config.get('configId')
-            configurations.append(config_value)
-    print configurations
-    print config_id_list,app_id,env_id
-    #print disconf_filetext(app_id, env_id, version, fileContent, fileName)
+    version = "1_0_0"
+    #app_name = 'final71'
+    #filename = 'test3'
+    #filecontent = 'dsfsdfsfs'
+    #print disconf_add_app_config_api(app_name, filename, filecontent)
+    #print disconf_get_app_config_api(app_name)
+    myfilerar = '/vpants/microbolog/test7'
+    print disconf_file(appId='45',envId='1',version=version,myfilerar=myfilerar)

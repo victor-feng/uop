@@ -26,7 +26,8 @@ class DisconfAPI(Resource):
         parser.add_argument('filename', type=str, location='json')
         parser.add_argument('filecontent', type=str, location='json')
         # parser.add_argument('version', type=str, location='json')
-        parser.add_argument('res_id', type=str)
+        parser.add_argument('res_id', type=str, location='json')
+        parser.add_argument('ins_name', type=str, location='json')
         args = parser.parse_args()
 
         res_id = args.get("res_id")
@@ -37,16 +38,17 @@ class DisconfAPI(Resource):
 
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            res_name = resource.resource_name
-            res_desc = '{res_name} config generated.'.format(res_name=res_name)
-            disconf_app(res_name, res_desc)
-            app_id = disconf_app_id(res_name)
+            app_name = ins_info.ins_name
+            app_desc = '{res_name} config generated.'.format(res_name=app_name)
+            disconf_app(app_name, app_desc)
+            app_id = disconf_app_id(app_name)
             env_id = disconf_env_id('rd')
             ret = disconf_filetext(app_id, env_id, version, fileContent, fileName)
 
+
             code = 200
             res = 'Disconf Success.'
-            message = ret
+            message = message
         except ServerError as e:
             code = 500
             res = "Disconf Failed."
@@ -73,25 +75,31 @@ class DisconfAPI(Resource):
         res_id = args.res_id
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            app_name = resource.resource_name
-            app_id = disconf_app_id(app_name=app_name)
-            env_id = disconf_env_id(env_name='rd')
-            version_id = disconf_version_list(app_id=app_id)
-            config_id_list = disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
+            compute_list = resource.compute_list
+            print compute_list
+            message = []
+            for ins_info in resource.compute_list:
+                if ins_info is not None:
+                    result = {}
+                    app_name = getattr(ins_info,'ins_name')
+                    app_id = disconf_app_id(app_name=app_name)
+                    env_id = disconf_env_id(env_name='rd')
+                    version_id = disconf_version_list(app_id=app_id)
+                    config_id_list = disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
 
-            configurations = []
-            for config_id in config_id_list:
-                config = disconf_config_show(config_id)
-                config_value = {}
-                if config is not None:
-                    config_value['filename'] = config.get('key')
-                    config_value['filecontent'] = config.get('value')
-                    config_value['config_id'] = config.get('configId')
-                    configurations.append(config_value)
-
+                    configurations = []
+                    for config_id in config_id_list:
+                        config = disconf_config_show(config_id)
+                        config_value = {}
+                        if config is not None:
+                            config_value['filename'] = config.get('key')
+                            config_value['filecontent'] = config.get('value')
+                            config_value['config_id'] = config.get('configId')
+                            configurations.append(config_value)
+                    result[app_name] = configurations
+                    message.append(result)
             code = 200
             res = "Configurations Success."
-            message = configurations
         except ServerError as e:
             code = 500
             res = "Configurations Failed."
