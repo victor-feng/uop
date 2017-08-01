@@ -18,15 +18,15 @@ from mongoengine import NotUniqueError
 from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask_httpauth import HTTPBasicAuth
 auth = HTTPBasicAuth()
 
-CMDB_URL = current_app.config['CMDB_URL']
-#CMDB_URL = configs[APP_ENV].CMDB_URL
+#CMDB_URL = current_app.config['CMDB_URL']
+CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB_API = CMDB_URL+'cmdb/api/'
 
 
