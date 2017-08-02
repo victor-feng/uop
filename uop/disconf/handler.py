@@ -4,6 +4,7 @@ import uuid
 import requests
 import json
 import datetime
+import logging
 import os
 import werkzeug
 
@@ -96,6 +97,8 @@ class DisconfAPI(Resource):
             code = 500
             res = "Configurations Failed."
             message = e.message
+        except Exception as e:
+            logging.exception("[UOP] Disconf faild, Exception: %s", e.args)
 
         ret = {
             "code": code,
