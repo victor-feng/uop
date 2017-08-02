@@ -7,12 +7,13 @@ import datetime
 import os
 import logging
 
-from flask import request
+from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
 from uop.models import Deployment, ResourceModel
 from uop.deployment.errors import deploy_errors
+from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
 
 
@@ -169,6 +170,29 @@ def upload_files_to_crp(file_paths):
         return {'code': -1}
 
 
+def instance_disconf_list(*args,**kwargs):
+    try:
+        disconf_info = []
+        resource = ResourceModel.objects.get(res_id=resource_id)
+        for instance_info in resource.disconf_list:
+            disconf_info.append(instance_info)
+    except Exception as e:
+        raise ServerError(e.message)
+    return disconf_info
+
+
+def disconf_write_to_file(file_name, file_content, type):
+    try:
+        upload_dir = current_app.config['UPLOAD_FOLDER']
+        if os.path.exits(upload_dir):
+            os.makedirs(upload_dir)
+        upload_file = os.path.join(upload_dir, type, file_name)
+        with open(upload_file, 'wb') as f:
+            f.write(file_content)
+    except Exception as e:
+        raise ServerError(e.message)
+    return upload_file
+
 
 class DeploymentListAPI(Resource):
 
@@ -273,6 +297,11 @@ class DeploymentListAPI(Resource):
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
+        parser.add_argument('diconf_list',type=list, location='json')
+
+        #[{'ins_name':''.'ins_id':'','disconf_tag':'','disconf_name':'','disconf_content':''}]
+        #disconf_tag = tag 为文本形式，为空则为文件形式；
+        #文本形式，disconf_name 是文件名；文件形式，disconf_name 是文件名；
 
         args = parser.parse_args()
 
@@ -293,6 +322,7 @@ class DeploymentListAPI(Resource):
         mongodb_exe_mode = args.mongodb_exe_mode
         mongodb_context = args.mongodb_context
         app_image = args.app_image
+        disconf_list = args.disconf_list
 
         approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
@@ -302,6 +332,21 @@ class DeploymentListAPI(Resource):
 
         deploy_result = 'not_deployed'
 
+        ############
+        #disconf_list = get_instance_disconf_list(resource_id = resource_id)
+        disconf_new_list = []
+        for instance_info in disconf_list:
+            if instance_info.get('disconf_tag'):
+                file_name = instance_info.get('disconf_name')
+                file_content = instance_info.get('disconf_content')
+                upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
+                instance_info['disconf_content'] = upload_file
+            else:
+                upload_dir = current_app.config['UPLOAD_FOLDER']
+                file_name = instance_info.get('disconf_name')
+                upload_file = '{upload_dir}/{file_name}'.format(upload_dir=upload_dir,file_name=file_name)
+            disconf_new_list.append(upload_file)
+        ########
 
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
@@ -532,7 +577,23 @@ class Upload(Resource):
         }
 
 
+class Download(Resource):
+    def get(self,file_name):
+        try:
+            download_dir = current_app.config['UPLOAD_FOLDER']
+            if os.path.isfile(os.path.join(download_dir, file_name)):
+                return send_from_directory(download_dir, file_name, as_attachment=True)
+            else:
+                raise ServerError('file not exist.')
+        except Exception as e:
+            ret = {
+                    'code': 500,
+                    'msg': e.message
+                  }
+            return ret
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
+deployment_api.add_resource(Download, '/download/<file_name>')

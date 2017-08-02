@@ -225,19 +225,6 @@ def disconf_env_id(env_name):
     return env_id
 
 
-# def disconf_version_list(app_id, env_id):
-#     url = ENV_LIST + '?appId=' + app_id + '&envId=' + env_id
-#     rep = session.get(url)
-#     ret_json = json.loads(rep.text)
-#     result = ret_json.get('success')
-#     if result == 'true':
-#         vid = ret_json.get('page').get('result')[0].get('id')
-#         version_id = str(vid)
-#     else:
-#         version_id = None
-#     return version_id, ret_json
-
-
 def disconf_version_list(app_id):
     try:
         url = '{version_list}?appId={app_id}'.format(version_list=VERSION_LIST, app_id=app_id)
@@ -321,6 +308,7 @@ def disconf_add_app_config_api(app_name, filename, filecontent):
     except Exception as e:
         raise ServerError(e.message)
     return ret
+
 
 def disconf_get_app_config_api(app_name):
     try:
