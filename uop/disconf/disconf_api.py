@@ -78,9 +78,9 @@ def disconf_app(app_name, desc):
 def disconf_file(appId, envId, version, myfilerar):
     try:
         file_content = {
-                    'appId': (None,appId),
-                    'envId': (None,envId),
-                    'version': (None,version),
+                    'appId': (None,str(appId)),
+                    'envId': (None,str(envId)),
+                    'version': (None,str(version)),
                     'myfilerar': open(myfilerar,'rb')
                     }
 
@@ -247,7 +247,7 @@ def disconf_version_list(app_id):
     return version_id
 
 
-def disconf_config_list(app_id, env_id, version):
+def disconf_config_list(app_id, env_id, version): ##config可以为空[]
     try:
         url = '{config_list}?appId={app_id}&envId={env_id}&version={version}&'.format(
                 config_list=CONFIG_LIST, app_id=app_id, env_id=env_id, version=version)
@@ -269,22 +269,38 @@ def disconf_config_id_list(app_id, env_id, version):
     try:
         config_list = disconf_config_list(app_id, env_id, version)
         config_id_list = []
-        for config in config_list:
-            config_id_list.append(config.get('configId'))
+        if config_list:
+            for config in config_list:
+                config_id_list.append(config.get('configId'))
     except Exception as e:
         raise ServerError(e.message)
     return config_id_list
+
+
+def disconf_config_id(app_id, env_id, config_name, version):
+    try:
+        config_id = None
+        config_list = disconf_config_list(app_id, env_id, version)
+        if config_list:
+            for config in config_list:
+                if config.get('key') == config_name:
+                        config_id = config.get('configId')
+                        break
+    except Exception as e:
+        raise ServerError(e.message)
+    return config_id
 
 
 def disconf_config_name_list(app_id, env_id, version):
     try:
         config_list = disconf_config_list(app_id, env_id, version)
-        config_id_list = []
-        for config in config_list:
-            config_id_list.append(config.get('configId'))
+        config_name_list = []
+        if config_list:
+            for config in config_list:
+                config_name_list.append(config.get('key'))
     except Exception as e:
         raise ServerError(e.message)
-    return config_id_list
+    return config_name_list
 
 
 def disconf_config_show(config_id):
@@ -303,28 +319,51 @@ def disconf_config_show(config_id):
     return config
 
 
-def disconf_add_app_config_api(app_name, filename, filecontent):
+def disconf_add_app_config_api_content(app_name, filename, filecontent):
     try:
         version = "1_0_0"
-        #resource = models.ResourceModel.objects.get(res_id=res_id)
-        #app_name = resource.resource_name
         app_id = disconf_app_id(app_name)
         if app_id is None:
             app_desc = '{res_name} config generated.'.format(res_name=app_name)
             disconf_app(app_name, app_desc)
             app_id = disconf_app_id(app_name)
+
         env_id = disconf_env_id('rd')
-        ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
+        config_id = disconf_config_id(app_id=app_id, env_id=env_id, config_name=filename,version=version)
+        if config_id is None:
+            ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
+        else:
+            disconf_filetext_delete(config_id)
+            ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
 
     except Exception as e:
         raise ServerError(e.message)
     return ret
 
 
+def disconf_add_app_config_api_file(app_name, filename, myfilerar):
+    try:
+        version = "1_0_0"
+        app_id = disconf_app_id(app_name)
+        if app_id is None:
+            app_desc = '{res_name} config generated.'.format(res_name=app_name)
+            disconf_app(app_name, app_desc)
+            app_id = disconf_app_id(app_name)
+
+        env_id = disconf_env_id('rd')
+        config_id = disconf_config_id(app_id=app_id, env_id=env_id, config_name=filename,version=version)
+        if config_id is None:
+            ret = disconf_file(app_id, env_id, version, myfilerar)
+        else:
+            disconf_filetext_delete(config_id)
+            ret = disconf_file(app_id, env_id, version, myfilerar)
+
+    except Exception as e:
+        raise ServerError(e.message)
+    return ret
+
 def disconf_get_app_config_api(app_name):
     try:
-        #resource = models.ResourceModel.objects.get(res_id=res_id)
-        #app_name = resource.resource_name
         app_id = disconf_app_id(app_name=app_name)
         env_id = disconf_env_id(env_name='rd')
         version_id = disconf_version_list(app_id=app_id)
@@ -346,10 +385,17 @@ def disconf_get_app_config_api(app_name):
 
 if __name__ == '__main__':
     version = "1_0_0"
-    #app_name = 'final71'
-    #filename = 'test3'
-    #filecontent = 'dsfsdfsfs'
-    #print disconf_add_app_config_api(app_name, filename, filecontent)
+    app_name = 'final71'
+    filename = 'test2'
+    filecontent = 'dsfsdfsfs-new-add'
+    myfilerar = '/root/test2'
+    #print disconf_add_app_config_api_content(app_name, filename, filecontent)
+    #print disconf_add_app_config_api_file(app_name, filename, myfilerar)
     #print disconf_get_app_config_api(app_name)
-    myfilerar = '/vpants/microbolog/test7'
-    print disconf_file(appId='45',envId='1',version=version,myfilerar=myfilerar)
+    #myfilerar = '/vpants/microbolog/test7'
+    #print disconf_file(appId='45',envId='1',version=version,myfilerar=myfilerar)
+    #print disconf_config_list(app_id='45', env_id='1', version=version)
+    #app_id = disconf_app_id('final72')
+    #print disconf_config_list(app_id=app_id,env_id='1',version=version)
+    #print disconf_config_id(app_id=app_id,env_id='1',config_name='dsfs',version=version)
+    #print disconf_config_name_list(app_id='45', env_id='1', version=version)
