@@ -341,8 +341,7 @@ class DeploymentListAPI(Resource):
             dep_id = args.dep_id
 
         deploy_result = 'not_deployed'
-        uid = str(uuid.uuid1())
-        '''
+
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
         def write_file(uid, context, type):
@@ -356,7 +355,7 @@ class DeploymentListAPI(Resource):
             redis_context = write_file(uid, redis_context, 'redis')
         if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
-        '''
+
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
@@ -451,7 +450,6 @@ class DeploymentListAPI(Resource):
                 "code": 200,
                 "result": {
                     "res": "success",
-                    "msg": {"deploy_id": deploy_item.deploy_id},
                 }
             }
             return res, 200
@@ -581,13 +579,14 @@ class DeploymentListByByInitiatorAPI(Resource):
 
 class Upload(Resource):
     def post(self):
-
+        uid = str(uuid.uuid1())
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         try:
             file = request.files['file']
             type = request.form['file_type']
+            filename = file.filename + '_' + uid
             index = request.form['index'] if request.form['index'] else ''
-            path = os.path.join(UPLOAD_FOLDER, type, file.filename)
+            path = os.path.join(UPLOAD_FOLDER, type, filename)
             file.save(path)
         except Exception as e:
             return {
