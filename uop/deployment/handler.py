@@ -11,7 +11,7 @@ from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel
+from uop.models import Deployment, ResourceModel, DisconfIns
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
@@ -170,17 +170,6 @@ def upload_files_to_crp(file_paths):
         return {'code': -1}
 
 
-def instance_disconf_list(*args,**kwargs):
-    try:
-        disconf_info = []
-        resource = ResourceModel.objects.get(res_id=resource_id)
-        for instance_info in resource.disconf_list:
-            disconf_info.append(instance_info)
-    except Exception as e:
-        raise ServerError(e.message)
-    return disconf_info
-
-
 def disconf_write_to_file(file_name, file_content, type):
     try:
         upload_dir = current_app.config['UPLOAD_FOLDER']
@@ -233,7 +222,28 @@ class DeploymentListAPI(Resource):
 
         deployments = []
         try:
+
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+
+                disconf = []
+                for disconf_info in deployment.disconf_list:
+                    instance_info = dict(ins_name = disconf_info.ins_name,
+                                         ins_id = disconf_info.ins_name,
+                                         dislist = [dict(disconf_tag = disconf_info.disconf_tag,
+                                                        disconf_name = disconf_info.disconf_name,
+                                                        disconf_content = disconf_info.disconf_content
+                                                        )]
+                                         )
+                    if len(disconf) == 0:
+                        disconf.append(instance_info)
+                    else:
+                        for disconf_choice in disconf:
+                            if disconf_choice.get('ins_name') == instance_info.get('ins_name'):
+                                disconf_choice.get('dislist').extend(instance_info.get('dislist'))
+                                break
+                        else:
+                            disconf.append(instance_info)
+
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -256,6 +266,7 @@ class DeploymentListAPI(Resource):
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
+                    'disconf': disconf,
                 })
         except Exception as e:
             res = {
@@ -297,11 +308,8 @@ class DeploymentListAPI(Resource):
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
-        parser.add_argument('diconf_list',type=list, location='json')
+        parser.add_argument('diconf',type=list, location='json')
 
-        #[{'ins_name':''.'ins_id':'','disconf_tag':'','disconf_name':'','disconf_content':''}]
-        #disconf_tag = tag 为文本形式，为空则为文件形式；
-        #文本形式，disconf_name 是文件名；文件形式，disconf_name 是文件名；
 
         args = parser.parse_args()
 
@@ -322,7 +330,7 @@ class DeploymentListAPI(Resource):
         mongodb_exe_mode = args.mongodb_exe_mode
         mongodb_context = args.mongodb_context
         app_image = args.app_image
-        disconf_list = args.disconf_list
+        disconf = args.disconf
 
         approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
@@ -333,21 +341,6 @@ class DeploymentListAPI(Resource):
         deploy_result = 'not_deployed'
 
         ############
-        #disconf_list = get_instance_disconf_list(resource_id = resource_id)
-        disconf_new_list = []
-        for instance_info in disconf_list:
-            if instance_info.get('disconf_tag'):
-                file_name = instance_info.get('disconf_name')
-                file_content = instance_info.get('disconf_content')
-                upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
-                instance_info['disconf_content'] = upload_file
-            else:
-                upload_dir = current_app.config['UPLOAD_FOLDER']
-                file_name = instance_info.get('disconf_name')
-                upload_file = '{upload_dir}/{file_name}'.format(upload_dir=upload_dir,file_name=file_name)
-            disconf_new_list.append(upload_file)
-        ########
-
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
         def write_file(uid, context, type):
@@ -387,6 +380,7 @@ class DeploymentListAPI(Resource):
                 deploy_obj.deploy_result = deploy_result
                 deploy_obj.save()
             elif action == 'save_to_db':  # 部署申请
+
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -411,6 +405,32 @@ class DeploymentListAPI(Resource):
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
                 )
+
+                for instance_info in disconf:
+                    for disconf_info in instance_info.get('dislist'):
+                        if disconf_info.get('disconf_tag'):
+                            file_name = disconf_info.get('disconf_name')
+                            file_content = disconf_info.get('disconf_content')
+                            upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
+                            disconf_info['disconf_content'] = upload_file
+                        else:
+                            upload_dir = current_app.config['UPLOAD_FOLDER']
+                            file_name = disconf_info.get('disconf_name')
+                            upload_file = '{upload_dir}/{file_name}'.format(upload_dir=upload_dir,file_name=file_name)
+                            disconf_info['disconf_content'] = upload_file
+
+                        ins_name = instance_info.get('ins_name')
+                        ins_id = instance_info.get('ins_id')
+                        disconf_tag=disconf_info.get('disconf_tag')
+                        disconf_name = disconf_info.get('disconf_name')
+                        disconf_content = disconf_info.get('disconf_content')
+                        disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
+                                                 disconf_tag=disconf_tag,
+                                                 disconf_name = disconf_name,
+                                                 disconf_content = disconf_content
+                                                 )
+                        deploy_item.disconf_list.append(disconf_ins)
+
                 deploy_item.save()
 
         except Exception as e:
@@ -562,6 +582,7 @@ class Upload(Resource):
         try:
             file = request.files['file']
             type = request.form['file_type']
+            index = request.form['index'] if request.form['index'] else ''
             path = os.path.join(UPLOAD_FOLDER, type, file.filename)
             file.save(path)
         except Exception as e:
@@ -574,6 +595,7 @@ class Upload(Resource):
             'msg': '上传成功！',
             'type': type,
             'path': path,
+            'index':index,
         }
 
 

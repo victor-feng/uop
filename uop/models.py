@@ -52,6 +52,7 @@ class Deployment(db.Document):
     apply_status = db.StringField()  # 部署申请状态
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
+    disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     meta = {
         'collection': 'deployment',
         'index': [
@@ -100,6 +101,24 @@ class DBIns(db.EmbeddedDocument):
     version = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
+        'index': [
+            {
+                'fields': ['ins_name', 'ins_id'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
+
+
+class DisconfIns(db.EmbeddedDocument):
+    ins_name = db.StringField(required=True)
+    ins_id = db.StringField(required=True, unique=True)
+    disconf_tag = db.StringField(required=False)
+    disconf_name = db.IntField(required=False)
+    disconf_content = db.IntField(required=False)
+    meta = {
+        'collection': 'disconf_ins',
         'index': [
             {
                 'fields': ['ins_name', 'ins_id'],
