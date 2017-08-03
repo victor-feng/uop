@@ -225,7 +225,7 @@ class DeploymentListAPI(Resource):
         try:
 
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
-
+                #####################################
                 disconf = []
                 for disconf_info in deployment.disconf_list:
                     instance_info = dict(ins_name = disconf_info.ins_name,
@@ -244,7 +244,7 @@ class DeploymentListAPI(Resource):
                                 break
                         else:
                             disconf.append(instance_info)
-
+                ##########################################
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,

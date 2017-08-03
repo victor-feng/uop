@@ -29,6 +29,24 @@ class UserInfo(db.Document):
             }
 
 
+class DisconfIns(db.EmbeddedDocument):
+    ins_name = db.StringField(required=True)
+    ins_id = db.StringField(required=True, unique=True)
+    disconf_tag = db.StringField(required=False)
+    disconf_name = db.IntField(required=False)
+    disconf_content = db.IntField(required=False)
+    meta = {
+        'collection': 'disconf_ins',
+        'index': [
+            {
+                'fields': ['ins_name', 'ins_id'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
+
+
 class Deployment(db.Document):
     deploy_id = db.StringField(unique=True)
     deploy_name = db.StringField()
@@ -101,24 +119,6 @@ class DBIns(db.EmbeddedDocument):
     version = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
-        'index': [
-            {
-                'fields': ['ins_name', 'ins_id'],
-                'sparse': True,
-                }
-            ],
-        'index_background': True
-        }
-
-
-class DisconfIns(db.EmbeddedDocument):
-    ins_name = db.StringField(required=True)
-    ins_id = db.StringField(required=True, unique=True)
-    disconf_tag = db.StringField(required=False)
-    disconf_name = db.IntField(required=False)
-    disconf_content = db.IntField(required=False)
-    meta = {
-        'collection': 'disconf_ins',
         'index': [
             {
                 'fields': ['ins_name', 'ins_id'],
