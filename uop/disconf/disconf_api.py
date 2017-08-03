@@ -335,10 +335,12 @@ def disconf_add_app_config_api_content(app_name, filename, filecontent):
         else:
             disconf_filetext_delete(config_id)
             ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
-
+        result = 'success'
+        message = 'instance_name:{ins_name},filename:{filename} success'.format(ins_name=app_name,filename=filename)
     except Exception as e:
-        raise ServerError(e.message)
-    return ret
+        result = 'fail'
+        message = e.message
+    return result,message
 
 
 def disconf_add_app_config_api_file(app_name, filename, myfilerar):
@@ -358,9 +360,12 @@ def disconf_add_app_config_api_file(app_name, filename, myfilerar):
             disconf_filetext_delete(config_id)
             ret = disconf_file(app_id, env_id, version, myfilerar)
 
+        result = 'success'
+        message = 'instance_name:{ins_name},filename:{filename} success'.format(ins_name=app_name,filename=filename)
     except Exception as e:
-        raise ServerError(e.message)
-    return ret
+        result = 'fail'
+        message = e.message
+    return result,message
 
 def disconf_get_app_config_api(app_name):
     try:

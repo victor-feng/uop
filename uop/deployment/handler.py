@@ -172,12 +172,12 @@ def upload_files_to_crp(file_paths):
         return {'code': -1}
 
 
-def disconf_write_to_file(file_name, file_content, type):
+def disconf_write_to_file(file_name, file_content, instance_name, type):
     try:
-        upload_dir = current_app.config['UPLOAD_FOLDER']
-        if os.path.exists(upload_dir):
+        upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
+        if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
-        upload_file = os.path.join(upload_dir, type, file_name)
+        upload_file = os.path.join(upload_dir,file_name)
         with open(upload_file, 'wb') as f:
             f.write(file_content)
     except Exception as e:
@@ -226,7 +226,7 @@ class DeploymentListAPI(Resource):
         try:
 
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
-                #####################################
+                #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
                     instance_info = dict(ins_name = disconf_info.ins_name,
@@ -245,7 +245,7 @@ class DeploymentListAPI(Resource):
                                 break
                         else:
                             disconf.append(instance_info)
-                ##########################################
+                ################
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -361,6 +361,17 @@ class DeploymentListAPI(Resource):
             if action == 'admin_approve_allow':  # 管理员审批通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
+                #disconf配置
+                disconf_result = []
+                for disconf_info in deploy_obj.disconf_list:
+                    result,message = disconf_add_app_config_api_file(
+                                                    app_name=disconf_info.ins_name,
+                                                    filename=disconf_info.disconf_name,
+                                                    myfilerar=disconf_info.disconf_content)
+
+                    disconf_result.append(dict(result=result,message=message))
+                message = disconf_result
+                #CRP配置
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy_obj, resource_info)
@@ -373,15 +384,16 @@ class DeploymentListAPI(Resource):
                     raise Exception(err_msg)
                 deploy_obj.deploy_result = 'deploying'
                 deploy_obj.save()
-
+                #message = 'deploy success'
 
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
                 deploy_obj.deploy_result = deploy_result
                 deploy_obj.save()
-            elif action == 'save_to_db':  # 部署申请
+                message = 'approve_forbid success'
 
+            elif action == 'save_to_db':  # 部署申请
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -412,12 +424,22 @@ class DeploymentListAPI(Resource):
                         if disconf_info.get('disconf_tag') == 'tag':
                             file_name = disconf_info.get('disconf_name')
                             file_content = disconf_info.get('disconf_content')
-                            upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
+                            ins_name = instance_info.get('ins_name')
+                            upload_file = disconf_write_to_file(file_name=file_name,
+                                                                file_content=file_content,
+                                                                instance_name=ins_name,
+                                                                type='disconf')
                             disconf_info['disconf_content'] = upload_file
                         else:
                             upload_dir = current_app.config['UPLOAD_FOLDER']
                             file_name = disconf_info.get('disconf_name')
-                            upload_file = '{upload_dir}/{file_name}'.format(upload_dir=upload_dir,file_name=file_name)
+                            ins_name = instance_info.get('ins_name')
+                            upload_file = '{upload_dir}/{type}/{instance_name}/{file_name}'.format(
+                                                                        file_name=file_name,
+                                                                        upload_dir=upload_dir,
+                                                                        instance_name=ins_name,
+                                                                        type = 'disconf'
+                                                                        )
                             disconf_info['disconf_content'] = upload_file
 
                         ins_name = instance_info.get('ins_name')
@@ -430,11 +452,10 @@ class DeploymentListAPI(Resource):
                                                  disconf_name = disconf_name,
                                                  disconf_content = disconf_content
                                                  )
-                        print disconf_ins
                         deploy_item.disconf_list.append(disconf_ins)
 
                 deploy_item.save()
-
+                message = 'save_to_db success'
         except Exception as e:
             res = {
                 "code": 400,
@@ -448,7 +469,7 @@ class DeploymentListAPI(Resource):
             res = {
                 "code": 200,
                 "result": {
-                    "res": "success",
+                    "res": message,
                 }
             }
             return res, 200
@@ -578,14 +599,24 @@ class DeploymentListByByInitiatorAPI(Resource):
 
 class Upload(Resource):
     def post(self):
-        uid = str(uuid.uuid1())
-        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         try:
+            uid = str(uuid.uuid1())
+            UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+
             file = request.files['file']
             type = request.form['file_type']
-            filename = file.filename + '_' + uid
-            index = request.form.get('index')
-            path = os.path.join(UPLOAD_FOLDER, type, filename)
+
+            if type == 'disconf':
+                instance_name = request.form.get('instance_name')
+                index = request.request.form.get('index')
+                upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
+                if not os.path.exists(upload_path):
+                    os.makedirs(upload_path)
+                path = os.path.join(upload_path,file.filename)
+            else:
+                filename = file.filename + '_' + uid
+                index = request.form.get('index')
+                path = os.path.join(UPLOAD_FOLDER, type, filename)
             file.save(path)
         except Exception as e:
             return {
