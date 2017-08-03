@@ -7,12 +7,13 @@ import datetime
 import os
 import logging
 
-from flask import request
+from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel
+from uop.models import Deployment, ResourceModel, DisconfIns
 from uop.deployment.errors import deploy_errors
+from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
 
 
@@ -117,10 +118,12 @@ def deploy_to_crp(deploy_item, resource_info):
             "image_url": deploy_item.app_image,
             "ip": resource_info['docker']['ip_address']
         }
+    }
 
     err_msg = None
     result = None
     try:
+
         CPR_URL = current_app.config['CRP_URL']
         url = CPR_URL + "api/deploy/deploys"
         headers = {
@@ -170,6 +173,18 @@ def upload_files_to_crp(file_paths):
         return {'code': -1}
 
 
+def disconf_write_to_file(file_name, file_content, type):
+    try:
+        upload_dir = current_app.config['UPLOAD_FOLDER']
+        if os.path.exits(upload_dir):
+            os.makedirs(upload_dir)
+        upload_file = os.path.join(upload_dir, type, file_name)
+        with open(upload_file, 'wb') as f:
+            f.write(file_content)
+    except Exception as e:
+        raise ServerError(e.message)
+    return upload_file
+
 
 class DeploymentListAPI(Resource):
 
@@ -210,7 +225,28 @@ class DeploymentListAPI(Resource):
 
         deployments = []
         try:
+
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+                #####################################
+                disconf = []
+                for disconf_info in deployment.disconf_list:
+                    instance_info = dict(ins_name = disconf_info.ins_name,
+                                         ins_id = disconf_info.ins_name,
+                                         dislist = [dict(disconf_tag = disconf_info.disconf_tag,
+                                                        disconf_name = disconf_info.disconf_name,
+                                                        disconf_content = disconf_info.disconf_content
+                                                        )]
+                                         )
+                    if len(disconf) == 0:
+                        disconf.append(instance_info)
+                    else:
+                        for disconf_choice in disconf:
+                            if disconf_choice.get('ins_name') == instance_info.get('ins_name'):
+                                disconf_choice.get('dislist').extend(instance_info.get('dislist'))
+                                break
+                        else:
+                            disconf.append(instance_info)
+                ##########################################
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -233,6 +269,7 @@ class DeploymentListAPI(Resource):
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
+                    'disconf': disconf,
                 })
         except Exception as e:
             res = {
@@ -274,6 +311,8 @@ class DeploymentListAPI(Resource):
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
+        parser.add_argument('diconf',type=list, location='json')
+
 
         args = parser.parse_args()
 
@@ -294,6 +333,7 @@ class DeploymentListAPI(Resource):
         mongodb_exe_mode = args.mongodb_exe_mode
         mongodb_context = args.mongodb_context
         app_image = args.app_image
+        disconf = args.disconf
 
         approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
@@ -343,6 +383,7 @@ class DeploymentListAPI(Resource):
                 deploy_obj.deploy_result = deploy_result
                 deploy_obj.save()
             elif action == 'save_to_db':  # 部署申请
+
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -367,6 +408,32 @@ class DeploymentListAPI(Resource):
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
                 )
+
+                for instance_info in disconf:
+                    for disconf_info in instance_info.get('dislist'):
+                        if disconf_info.get('disconf_tag'):
+                            file_name = disconf_info.get('disconf_name')
+                            file_content = disconf_info.get('disconf_content')
+                            upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
+                            disconf_info['disconf_content'] = upload_file
+                        else:
+                            upload_dir = current_app.config['UPLOAD_FOLDER']
+                            file_name = disconf_info.get('disconf_name')
+                            upload_file = '{upload_dir}/{file_name}'.format(upload_dir=upload_dir,file_name=file_name)
+                            disconf_info['disconf_content'] = upload_file
+
+                        ins_name = instance_info.get('ins_name')
+                        ins_id = instance_info.get('ins_id')
+                        disconf_tag=disconf_info.get('disconf_tag')
+                        disconf_name = disconf_info.get('disconf_name')
+                        disconf_content = disconf_info.get('disconf_content')
+                        disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
+                                                 disconf_tag=disconf_tag,
+                                                 disconf_name = disconf_name,
+                                                 disconf_content = disconf_content
+                                                 )
+                        deploy_item.disconf_list.append(disconf_ins)
+
                 deploy_item.save()
 
         except Exception as e:
@@ -532,10 +599,27 @@ class Upload(Resource):
             'type': type,
             'path': path,
             'index': index,
+            'index':index,
         }
 
+
+class Download(Resource):
+    def get(self,file_name):
+        try:
+            download_dir = current_app.config['UPLOAD_FOLDER']
+            if os.path.isfile(os.path.join(download_dir, file_name)):
+                return send_from_directory(download_dir, file_name, as_attachment=True)
+            else:
+                raise ServerError('file not exist.')
+        except Exception as e:
+            ret = {
+                    'code': 500,
+                    'msg': e.message
+                  }
+            return ret
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
+deployment_api.add_resource(Download, '/download/<file_name>')
