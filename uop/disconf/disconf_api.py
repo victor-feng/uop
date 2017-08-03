@@ -276,6 +276,17 @@ def disconf_config_id_list(app_id, env_id, version):
     return config_id_list
 
 
+def disconf_config_name_list(app_id, env_id, version):
+    try:
+        config_list = disconf_config_list(app_id, env_id, version)
+        config_id_list = []
+        for config in config_list:
+            config_id_list.append(config.get('configId'))
+    except Exception as e:
+        raise ServerError(e.message)
+    return config_id_list
+
+
 def disconf_config_show(config_id):
     try:
         url = '{config_show}/{config_id}'.format(config_show=CONFIG_SHOW, config_id=config_id)
