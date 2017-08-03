@@ -310,7 +310,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
-        parser.add_argument('diconf',type=list, location='json')
+        parser.add_argument('disconf',type=list, location='json')
 
 
         args = parser.parse_args()
@@ -341,8 +341,8 @@ class DeploymentListAPI(Resource):
             dep_id = args.dep_id
 
         deploy_result = 'not_deployed'
-
-
+        uid = str(uuid.uuid1())
+        '''
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
         def write_file(uid, context, type):
@@ -356,7 +356,7 @@ class DeploymentListAPI(Resource):
             redis_context = write_file(uid, redis_context, 'redis')
         if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
-
+        '''
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
@@ -406,6 +406,7 @@ class DeploymentListAPI(Resource):
                     apply_status=apply_status,
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
+                    disconf_list = []
                 )
 
                 for instance_info in disconf:
@@ -431,7 +432,8 @@ class DeploymentListAPI(Resource):
                                                  disconf_name = disconf_name,
                                                  disconf_content = disconf_content
                                                  )
-                        deploy_item.disconf_list.append(disconf_ins)
+                        print disconf_ins
+                        #deploy_item.disconf_list.append(disconf_ins)
 
                 deploy_item.save()
 
