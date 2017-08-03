@@ -137,12 +137,13 @@ class ResourceApplication(Resource):
         try:
             resource_application.save()
         except Exception as e:
-            code = 500
-            res = {"code": code,
-                   "result": {
+            code = 200
+            res = {
+                "code": code,
+                "result": {
                        'res': 'fail',
-                       'msg': 'Create resource application fail.'
-                   }
+                       'msg': 'Create resource application fail. ' + e.message
+                }
             }
             return res, code
 
