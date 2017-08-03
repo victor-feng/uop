@@ -3,6 +3,7 @@
 import json
 import uuid
 import datetime
+import logging
 
 import requests
 from flask_restful import reqparse, Api, Resource
@@ -53,6 +54,7 @@ class ApprovalList(Resource):
             resource.save()
             code = 200
         except Exception as e:
+            logging.exception("[UOP] ApprovalList failed, Exception: %s", e.args)
             code = 500
             res = "Failed to add a approval"
 

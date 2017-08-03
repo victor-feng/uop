@@ -78,6 +78,9 @@ def get_resource_by_id(resource_id):
                     resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
                 elif item.get('item_id') == 'redis_cluster':
                     resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
+                elif item.get('item_id') == 'docker':
+                    resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
+
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
@@ -87,41 +90,38 @@ def get_resource_by_id(resource_id):
 def deploy_to_crp(deploy_item, resource_info):
     data = {
         "deploy_id": deploy_item.deploy_id,
-        "mysql": {
-            "ip": resource_info['mysql_cluster']['ip'],
+    }
+    if resource_info.get('mysql_cluster'):
+        data['mysql'] = {
+            "ip": resource_info['mysql_cluster']['wvip'],
             "port": resource_info['mysql_cluster']['port'],
             "host_user": "root",
             "host_password": "123456",
             "mysql_user": resource_info['mysql_cluster']['user'],
             "mysql_password": resource_info['mysql_cluster']['password'],
             "database": "mysql",
-        },
-        "redis": {},
-        "mongo": {
-            "deploy_id": deploy_item.deploy_id,
-            "mongodb": {
-                "vip1": resource_info['mongodb_cluster']['vip1'],
-                "vip2": resource_info['mongodb_cluster']['vip2'],
-                "vip3": resource_info['mongodb_cluster']['vip3'],
-                "port": resource_info['mongodb_cluster']['port'],
-                "host_username": "root",
-                "host_password": "123456",
-                "mongodb_username": resource_info['mongodb_cluster']['user'],
-                "mongodb_password": resource_info['mongodb_cluster']['password'],
-                "database": "mongodb",
-                "sql_script": deploy_item.mongodb_context
-            }
-        },
-        "docker": {
-            "image_url": deploy_item.app_image,
-            "ip": resource_info['docker']['ip']
         }
-    }
+    if resource_info.get('mongodb_cluster'):
+        data['mongodb'] = {
+            "vip1": resource_info['mongodb_cluster']['vip1'],
+            "vip2": resource_info['mongodb_cluster']['vip2'],
+            "vip3": resource_info['mongodb_cluster']['vip3'],
+            "port": resource_info['mongodb_cluster']['port'],
+            "host_username": "root",
+            "host_password": "123456",
+            "mongodb_username": resource_info['mongodb_cluster']['user'],
+            "mongodb_password": resource_info['mongodb_cluster']['password'],
+            "database": "mongodb",
+        }
+    if resource_info.get('docker'):
+        data['docker'] = {
+            "image_url": deploy_item.app_image,
+            "ip": resource_info['docker']['ip_address']
+        }
 
     err_msg = None
     result = None
     try:
-
         CPR_URL = current_app.config['CRP_URL']
         url = CPR_URL + "api/deploy/deploys"
         headers = {
@@ -137,10 +137,11 @@ def deploy_to_crp(deploy_item, resource_info):
 
         if file_paths:
             res = upload_files_to_crp(file_paths)
-            if res.code == 200:
-                for type, path_filename in res.file_info.items():
+            cont = json.loads(res.content)
+            if cont.get('code') == 200:
+                for type, path_filename in cont['file_info'].items():
                     data[type]['path_filename'] = path_filename
-            elif res.code == 500:
+            elif cont.get('code') == 500:
                 return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
         data_str = json.dumps(data)
@@ -348,11 +349,11 @@ class DeploymentListAPI(Resource):
             with open(path, 'wb') as f:
                 f.write(context)
             return path
-        if mysql_exe_mode == 'tag' and  (not mysql_context):
+        if mysql_exe_mode == 'tag' and  mysql_context:
             mysql_context = write_file(uid, mysql_context, 'mysql')
-        if redis_exe_mode == 'tag' and  (not redis_context):
+        if redis_exe_mode == 'tag' and  redis_context:
             redis_context = write_file(uid, redis_context, 'redis')
-        if mongodb_exe_mode == 'tag' and  (not mongodb_context):
+        if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
 
         try:

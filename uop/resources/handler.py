@@ -15,7 +15,7 @@ from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
 
-
+# TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
 
@@ -137,12 +137,13 @@ class ResourceApplication(Resource):
         try:
             resource_application.save()
         except Exception as e:
-            code = 500
-            res = {"code": code,
-                   "result": {
+            code = 200
+            res = {
+                "code": code,
+                "result": {
                        'res': 'fail',
-                       'msg': 'Create resource application fail.'
-                   }
+                       'msg': 'Create resource application fail. ' + e.message
+                }
             }
             return res, code
 
