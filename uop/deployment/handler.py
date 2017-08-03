@@ -442,7 +442,7 @@ class DeploymentListAPI(Resource):
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": e.message
+                    "msg": disconf
                 }
             }
             return res, 400
