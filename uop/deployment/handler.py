@@ -516,6 +516,7 @@ class Upload(Resource):
         try:
             file = request.files['file']
             type = request.form['file_type']
+            index = request.form['index'] if request.formp['index'] else ''
             path = os.path.join(UPLOAD_FOLDER, type, file.filename)
             file.save(path)
         except Exception as e:
@@ -528,6 +529,7 @@ class Upload(Resource):
             'msg': '上传成功！',
             'type': type,
             'path': path,
+            'index': index,
         }
 
 
