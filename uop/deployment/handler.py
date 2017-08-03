@@ -585,7 +585,7 @@ class Upload(Resource):
             file = request.files['file']
             type = request.form['file_type']
             filename = file.filename + '_' + uid
-            index = request.form['index'] if request.form['index'] else ''
+            index = request.form.get('index')
             path = os.path.join(UPLOAD_FOLDER, type, filename)
             file.save(path)
         except Exception as e:
