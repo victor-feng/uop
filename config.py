@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
-# APP_ENV = "default"
-APP_ENV = "testing"
+APP_ENV = "default"
+# APP_ENV = "testing"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -37,7 +37,7 @@ class DevelopmentConfig(BaseConfig):
     CRP_URL = "http://172.28.32.32:8001/"
     CMDB_URL = "http://cmdb-dev.syswin.com/"
 
-    UPLOAD_FOLDER = "/tmp/"
+    UPLOAD_FOLDER = "/data/"
     #TODO:  move it to conf
     DISCONF_URL = 'http://172.28.11.111:8081'
 
@@ -81,7 +81,7 @@ class TestingConfig(BaseConfig):
     CRP_URL = "http://crp-test.syswin.com/"
     CMDB_URL = "http://cmdb-test.syswin.com/"
 
-    UPLOAD_FOLDER = "/tmp/"
+    UPLOAD_FOLDER = "/data/"
     #TODO:  move it to conf
     DISCONF_URL = 'http://172.28.11.111:8081'
 
