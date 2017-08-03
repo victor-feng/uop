@@ -175,7 +175,7 @@ def upload_files_to_crp(file_paths):
 def disconf_write_to_file(file_name, file_content, type):
     try:
         upload_dir = current_app.config['UPLOAD_FOLDER']
-        if os.path.exits(upload_dir):
+        if os.path.exists(upload_dir):
             os.makedirs(upload_dir)
         upload_file = os.path.join(upload_dir, type, file_name)
         with open(upload_file, 'wb') as f:
@@ -409,7 +409,7 @@ class DeploymentListAPI(Resource):
 
                 for instance_info in disconf:
                     for disconf_info in instance_info.get('dislist'):
-                        if disconf_info.get('disconf_tag'):
+                        if disconf_info.get('disconf_tag') == 'tag':
                             file_name = disconf_info.get('disconf_name')
                             file_content = disconf_info.get('disconf_content')
                             upload_file = disconf_write_to_file(file_name, file_content, type='disconf')
