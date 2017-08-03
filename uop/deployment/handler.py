@@ -118,7 +118,6 @@ def deploy_to_crp(deploy_item, resource_info):
             "image_url": deploy_item.app_image,
             "ip": resource_info['docker']['ip_address']
         }
-    }
 
     err_msg = None
     result = None
@@ -599,7 +598,6 @@ class Upload(Resource):
             'type': type,
             'path': path,
             'index': index,
-            'index':index,
         }
 
 

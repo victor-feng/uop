@@ -38,7 +38,7 @@ class DisconfAPI(Resource):
 
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            app_name = ins_info.ins_name
+            app_name = resource.ins_name
             app_desc = '{res_name} config generated.'.format(res_name=app_name)
             disconf_app(app_name, app_desc)
             app_id = disconf_app_id(app_name)
@@ -48,7 +48,7 @@ class DisconfAPI(Resource):
 
             code = 200
             res = 'Disconf Success.'
-            message = message
+            message = ret
         except ServerError as e:
             code = 500
             res = "Disconf Failed."
