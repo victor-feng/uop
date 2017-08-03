@@ -31,15 +31,15 @@ class UserInfo(db.Document):
 
 class DisconfIns(db.EmbeddedDocument):
     ins_name = db.StringField(required=True)
-    ins_id = db.StringField(required=True, unique=True)
+    ins_id = db.StringField(required=True)
     disconf_tag = db.StringField(required=False)
-    disconf_name = db.IntField(required=False)
-    disconf_content = db.IntField(required=False)
+    disconf_name = db.StringField(required=False)
+    disconf_content = db.StringField(required=False)
     meta = {
         'collection': 'disconf_ins',
         'index': [
             {
-                'fields': ['ins_name', 'ins_id'],
+                'fields': ['ins_name','ins_id'],
                 'sparse': True,
                 }
             ],

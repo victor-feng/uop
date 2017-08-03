@@ -230,7 +230,7 @@ class DeploymentListAPI(Resource):
                 disconf = []
                 for disconf_info in deployment.disconf_list:
                     instance_info = dict(ins_name = disconf_info.ins_name,
-                                         ins_id = disconf_info.ins_name,
+                                         ins_id = disconf_info.ins_id,
                                          dislist = [dict(disconf_tag = disconf_info.disconf_tag,
                                                         disconf_name = disconf_info.disconf_name,
                                                         disconf_content = disconf_info.disconf_content
@@ -406,7 +406,6 @@ class DeploymentListAPI(Resource):
                     apply_status=apply_status,
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
-                    disconf_list = []
                 )
 
                 for instance_info in disconf:
@@ -433,7 +432,7 @@ class DeploymentListAPI(Resource):
                                                  disconf_content = disconf_content
                                                  )
                         print disconf_ins
-                        #deploy_item.disconf_list.append(disconf_ins)
+                        deploy_item.disconf_list.append(disconf_ins)
 
                 deploy_item.save()
 
@@ -442,7 +441,7 @@ class DeploymentListAPI(Resource):
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": disconf
+                    "msg": e.message
                 }
             }
             return res, 400
