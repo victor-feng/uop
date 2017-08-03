@@ -38,17 +38,12 @@ class DisconfAPI(Resource):
 
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            app_name = ins_info.ins_name
-            app_desc = '{res_name} config generated.'.format(res_name=app_name)
-            disconf_app(app_name, app_desc)
-            app_id = disconf_app_id(app_name)
-            env_id = disconf_env_id('rd')
-            ret = disconf_filetext(app_id, env_id, version, fileContent, fileName)
-
+            app_name = resource.ins_name
+            ret = disconf_add_app_config_api_content(app_name=app_name, filename=fileName, filecontent=fileContent)
 
             code = 200
             res = 'Disconf Success.'
-            message = message
+            message = ret
         except ServerError as e:
             code = 500
             res = "Disconf Failed."
@@ -116,21 +111,6 @@ class DisconfAPI(Resource):
 
 
 class DisconfItem(Resource):
-
-    # @classmethod
-    # def put(cls, config_id):
-    #     parser = reqparse.RequestParser()
-    #     parser.add_argument('filecontent', type=str, location='json')
-    #     args = parser.parse_args()
-    #     filecontent = args.get('filecontent')
-    #
-    #     ret, msg = disconf_session()
-    #     if not ret:
-    #         return msg, 200
-    #
-    #     ret, msg = disconf_filetext_update(config_id, filecontent)
-    #     return msg, 200
-
     @classmethod
     def put(cls, res_id):
         parser = reqparse.RequestParser()
@@ -141,48 +121,24 @@ class DisconfItem(Resource):
         filename = args.get('filename')
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
+            app_name = resource.resource_name
+            ret = disconf_add_app_config_api_content(app_name=app_name, filename=filename, filecontent=filecontent)
+
+            code = 200
+            res = "Disconf put success."
+            message = ret
         except Exception as e:
             code = 500
-            res = "Failed to find the rsource. "
-            ret = {
-                "code": code,
-                "result": {
-                    "res": res + e.message,
-                    "msg": ""
-                }
+            res = "Disconf put error."
+            message = e.message
+        ret = {
+            "code": code,
+            "result": {
+                "res": res,
+                "msg": message
             }
-            return ret, code
-
-        app_name = resource.resource_name
-
-        ret, msg = disconf_session()
-        if not ret:
-            return msg, 200
-        app_id, msg = disconf_app_id(app_name)
-        if app_id is None:
-            return msg, 200
-        app_id = str(app_id)
-        version_id, msg = disconf_version_list(app_id)
-        if version_id is None:
-            return msg, 200
-
-        config_list, msg = disconf_config_list(app_id, '1', version_id)
-        if config_list is None:
-            return msg, 200
-
-        find = False
-        for conf in config_list:
-            config, msg = disconf_config_show(str(conf.get('configId')))
-            if config is not None:
-                if filename == config.get('key'):
-                    ret, msg = disconf_filetext_update(str(config.get('configId')), filecontent)
-                    find = True
-                else:
-                    ret, msg = disconf_filetext_delete(str(config.get('configId')))
-        if not find:
-            ret, msg = disconf_filetext(app_id, '1', version_id, filecontent, filename)
-
-        return msg, 200
+        }
+        return ret, 200
 
 
 disconf_api.add_resource(DisconfAPI, '/')
