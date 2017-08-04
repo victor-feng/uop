@@ -123,8 +123,8 @@ def deploy_to_crp(deploy_item, resource_info):
         for obj in res_obj.compute_list:
             docker_list.append(
                 {
-                    'url': obj.get('url'),
-                    'ip': obj.get('ips'),
+                    'url': obj.url,
+                    'ip': obj.ips,
                 }
             )
         data['docker'] = docker_list
