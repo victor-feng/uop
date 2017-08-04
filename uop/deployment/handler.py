@@ -621,7 +621,7 @@ class Upload(Resource):
         except Exception as e:
             return {
                 'code': 500,
-                'msg': path
+                'msg': e.message
             }
         return {
             'code': 200,
