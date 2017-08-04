@@ -668,20 +668,26 @@ class ResourceProviderCallBack(Resource):
         request_data = json.loads(request.data)
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
-        property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                                                      request_data)
-
-        rpt = ResourceProviderTransitions(property_mappers_list)
-        rpt.start()
-        if rpt.state == "stop":
-            logging.debug("完成停止")
-        else:
-            logging.debug(rpt.state)
-
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
-            resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+
+            is_write_to_cmdb = False
+            # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
+            if status == "ok":
+                is_write_to_cmdb = True
+                property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                              request_data)
+
+                rpt = ResourceProviderTransitions(property_mappers_list)
+                rpt.start()
+                if rpt.state == "stop":
+                    logging.debug("完成停止")
+                else:
+                    logging.debug(rpt.state)
+
+            if is_write_to_cmdb is True:
+                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
             resource.save()
         except Exception as e:
             code = 500
