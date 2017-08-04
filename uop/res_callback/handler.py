@@ -407,6 +407,8 @@ class ResourceProviderTransitions(object):
     @transition_state_logger
     def do_app_cluster(self):
         # 应用集群状态
+        if 'app_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('app_instance', None)
         self._do_one_item_post('app_cluster')
 
     @transition_state_logger
@@ -427,6 +429,12 @@ class ResourceProviderTransitions(object):
     @transition_state_logger
     def do_mysql_cluster(self):
         # MySQL数据库集群状态
+        if 'mysql_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mysql_instance', None)
+        if 'mongodb_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mongodb_instance', None)
+        if 'redis_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('redis_instance', None)
         self._do_one_item_post('mysql_cluster')
 
     @transition_state_logger
@@ -442,6 +450,12 @@ class ResourceProviderTransitions(object):
     @transition_state_logger
     def do_mongodb_cluster(self):
         # MongoDB数据库集群状态
+        if 'mysql_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mysql_instance', None)
+        if 'mongodb_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mongodb_instance', None)
+        if 'redis_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('redis_instance', None)
         self._do_one_item_post('mongodb_cluster')
 
     @transition_state_logger
@@ -457,6 +471,12 @@ class ResourceProviderTransitions(object):
     @transition_state_logger
     def do_redis_cluster(self):
         # Redis数据库集群状态
+        if 'mysql_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mysql_instance', None)
+        if 'mongodb_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('mongodb_instance', None)
+        if 'redis_instance' in self.pcode_mapper:
+            self.pcode_mapper.pop('redis_instance', None)
         self._do_one_item_post('redis_cluster')
 
     @transition_state_logger
