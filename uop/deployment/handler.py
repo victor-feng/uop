@@ -88,6 +88,7 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, resource_info):
+    res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
     }
@@ -114,10 +115,19 @@ def deploy_to_crp(deploy_item, resource_info):
             "database": "mongodb",
         }
     if resource_info.get('docker'):
-        data['docker'] = {
-            "image_url": deploy_item.app_image,
-            "ip": resource_info['docker']['ip_address']
-        }
+        # data['docker'] = {
+        #     "image_url": deploy_item.app_image,
+        #     "ip": resource_info['docker']['ip_address']
+        # }
+        docker_list = []
+        for obj in res_obj.get('compute_list'):
+            docker_list.append(
+                {
+                    'url': obj.get('url'),
+                    'ip': obj.get('ips'),
+                }
+            )
+        data['docker'] = docker_list
 
     err_msg = None
     result = None
@@ -394,7 +404,7 @@ class DeploymentListAPI(Resource):
                     raise Exception(err_msg)
                 deploy_obj.deploy_result = 'deploying'
                 deploy_obj.save()
-                #message = 'deploy success'
+
 
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)

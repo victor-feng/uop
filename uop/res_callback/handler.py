@@ -620,49 +620,191 @@ class ResourceProviderCallBack(Resource):
     @classmethod
     def post(cls):
         """
-        req_data = json.loads(request.data)
-        user_id = req_data.get('user_id')
-        username = req_data.get('username')
-        department = req_data.get('department')
-        unit_id = req_data.get('unit_id')
-        unit_name = req_data.get('unit_name')
-        unit_des = req_data.get('unit_des')
-        cmdb_repo_id = req_data.get('cmdb_repo_id')
-        resource_id = req_data.get('resource_id')
-        resource_name = req_data.get('resource_name')
-        # domain = req_data.get('domain')
-        created_time = req_data.get('created_time')
-        env = req_data.get('env')
-        status = req_data.get('status')
-
-        # get the container and db
-        container = req_data.get('container')
-        db_info = req_data.get('db_info')
-
-        # get the contaner field
-        container_username = container.get('username')
-        container_ins_id = container.get('ins_id')
-        image_addr = container.get('image_addr')
-        container_password = container.get('password')
-        container_cpu = container.get('cpu')
-        container_memory = container.get('memory')
-
-        domain = container.get('domain')
-        container_ip = container.get('ip')
-        container_name = container.get('container_name')
-        physical_server = container.get('physical_server')
-
-        # get the db field
-        mysql_info = db_info.get('mysql')
-        redis_info = db_info.get('redis')
-        mongo_info = db_info.get('mongodb')
-
-        if not mysql_info:
-            mysql_info = {}
-        if not redis_info:
-            redis_info = {}
-        if not mongo_info:
-            mongo_info = {}
+        {
+    "username": "袁航",
+    "unit_name": "real-final",
+    "domain": "",
+    "resource_name": "final85",
+    "user_id": "143483",
+    "resource_id": "7e04ca56-78dc-11e7-879b-fa163e9474c9",
+    "cmdb_repo_id": "39d1c166-782f-11e7-b874-fa163e9474c9",
+    "unit_id": "39d1c166-782f-11e7-b874-fa163e9474c9",
+    "db_info": {
+        "redis": {
+            "username": "root",
+            "password": "123456",
+            "mem": 4,
+            "cluster_type": "redis",
+            "ins_id": "7e051808-78dc-11e7-879b-fa163e9474c9",
+            "port": "6379",
+            "cluster_name": "361b029ac41b1fbc6310d97a5355522a",
+            "instance": [
+                {
+                    "username": "root",
+                    "dbtype": "master",
+                    "ip": "172.28.36.177",
+                    "instance_name": "361b029ac41b1fbc6310d97a5355522a_0",
+                    "instance_type": "redis",
+                    "os_inst_id": "d71de71f-da7f-4e9d-bfa5-1885b2092dff",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "6379"
+                },
+                {
+                    "username": "root",
+                    "dbtype": "slave",
+                    "ip": "172.28.36.178",
+                    "instance_name": "361b029ac41b1fbc6310d97a5355522a_1",
+                    "instance_type": "redis",
+                    "os_inst_id": "014a4024-c4c8-4a6a-b4ce-fa72eca4d668",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "6379"
+                }
+            ],
+            "vip": "172.28.36.180",
+            "version": "Redis2.8",
+            "cluster_id": "7e051808-78dc-11e7-879b-fa163e9474c9",
+            "disk": 50,
+            "cpu": 2,
+            "quantity": 2
+        },
+        "mysql": {
+            "username": "root",
+            "password": "123456",
+            "wvip": "172.28.36.18",
+            "mem": 4,
+            "cluster_type": "mysql",
+            "ins_id": "7e050c6e-78dc-11e7-879b-fa163e9474c9",
+            "port": "3316",
+            "cluster_name": "3105ddb158f0d47381e1e92016294472",
+            "instance": [
+                {
+                    "username": "root",
+                    "dbtype": "master",
+                    "ip": "172.28.36.17",
+                    "instance_name": "3105ddb158f0d47381e1e92016294472_0",
+                    "instance_type": "mysql",
+                    "os_inst_id": "c6d7ac39-c001-4529-abcb-640d76204e06",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "3316"
+                },
+                {
+                    "username": "root",
+                    "dbtype": "slave1",
+                    "ip": "172.28.36.176",
+                    "instance_name": "3105ddb158f0d47381e1e92016294472_1",
+                    "instance_type": "mysql",
+                    "os_inst_id": "a1486aba-c459-4fb5-86fc-6c05a20ea700",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "3316"
+                },
+                {
+                    "username": "root",
+                    "dbtype": "slave2",
+                    "ip": "172.28.36.171",
+                    "instance_name": "3105ddb158f0d47381e1e92016294472_2",
+                    "instance_type": "mysql",
+                    "os_inst_id": "04c36869-5668-41ae-a3a9-cc97f70bfd4d",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "3316"
+                },
+                {
+                    "username": "root",
+                    "dbtype": "lvs1",
+                    "ip": "172.28.36.167",
+                    "instance_name": "3105ddb158f0d47381e1e92016294472_3",
+                    "instance_type": "mycat",
+                    "os_inst_id": "a9c969b7-e02e-484f-8925-4bf2baa14a97",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "3316"
+                },
+                {
+                    "username": "root",
+                    "dbtype": "lvs2",
+                    "ip": "172.28.36.175",
+                    "instance_name": "3105ddb158f0d47381e1e92016294472_4",
+                    "instance_type": "mycat",
+                    "os_inst_id": "c36d6624-b7c0-462e-aaa1-48150a1994df",
+                    "password": "123456",
+                    "physical_server": "osnode011034.syswin.com",
+                    "port": "3316"
+                }
+            ],
+            "rvip": "172.28.36.179",
+            "version": "MYSQL5.6",
+            "cluster_id": "7e050c6e-78dc-11e7-879b-fa163e9474c9",
+            "disk": 50,
+            "cpu": 2,
+            "quantity": 5
+        }
+    },
+    "created_time": "2017-08-04 14:16:46.047000",
+    "status": "ok",
+    "env": "develop",
+    "department": "云服务部",
+    "container": [
+        {
+            "username": "root",
+            "domain": "final85-subcluster.syswin.com",
+            "mem": 4,
+            "cluster_type": "app_cluster",
+            "ins_id": "7e0531ee-78dc-11e7-879b-fa163e9474c9",
+            "port": "80",
+            "cluster_name": "final85-subcluster",
+            "instance": [
+                {
+                    "username": "root",
+                    "domain": "final85-subcluster.syswin.com",
+                    "ip": "172.28.36.166",
+                    "instance_name": "final85-subcluster_0",
+                    "instance_type": "app_cluster",
+                    "os_inst_id": "28e7b634-0e94-4a83-a72c-10bfc9e168cf",
+                    "password": "123456",
+                    "physical_server": "osnode011030.syswin.com",
+                    "port": "80"
+                }
+            ],
+            "cluster_id": "7e0531ee-78dc-11e7-879b-fa163e9474c9",
+            "image_url": "arp.reg.innertoon.com/qitoon.checkin/qitoon.checkin:20170616090015",
+            "password": "123456",
+            "cpu": 2,
+            "quantity": 1
+        },
+        {
+            "username": "root",
+            "domain": "final85.syswin.com",
+            "mem": 4,
+            "cluster_type": "app_cluster",
+            "ins_id": "7e052848-78dc-11e7-879b-fa163e9474c9",
+            "port": "80",
+            "cluster_name": "final85",
+            "instance": [
+                {
+                    "username": "root",
+                    "domain": "final85.syswin.com",
+                    "ip": "172.28.36.165",
+                    "instance_name": "final85_0",
+                    "instance_type": "app_cluster",
+                    "os_inst_id": "521b7f94-d81e-43af-a1e2-e72dfa8296dc",
+                    "password": "123456",
+                    "physical_server": "osnode011030.syswin.com",
+                    "port": "80"
+                }
+            ],
+            "cluster_id": "7e052848-78dc-11e7-879b-fa163e9474c9",
+            "image_url": "arp.reg.innertoon.com/qitoon.checkin/qitoon.checkin:20170616090015",
+            "password": "123456",
+            "cpu": 2,
+            "quantity": 1
+        }
+    ],
+    "unit_des": ""
+}
         """
         code = 2002
         request_data = json.loads(request.data)
@@ -671,6 +813,12 @@ class ResourceProviderCallBack(Resource):
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
+            container = request_data.get('container')
+
+            for i in container:
+                for j in resource.compute_list:
+                    if i.get('ins_id') == j.get('ins_id'):
+                        j['ips'] = [ins.get('ip') for ins in i.get('instance')]
 
             is_write_to_cmdb = False
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
@@ -688,6 +836,7 @@ class ResourceProviderCallBack(Resource):
 
             if is_write_to_cmdb is True:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+
             resource.save()
         except Exception as e:
             code = 500
