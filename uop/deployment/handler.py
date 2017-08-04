@@ -174,12 +174,19 @@ def upload_files_to_crp(file_paths):
 
 def disconf_write_to_file(file_name, file_content, instance_name, type):
     try:
-        upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
-        upload_file = os.path.join(upload_dir,file_name)
-        with open(upload_file, 'wb') as f:
-            f.write(file_content)
+        if (len(file_name) == 0) and (len(file_content) == 0):
+            upload_file = ''
+        elif (len(file_name) == 0) and (len(file_content) != 0):
+            raise ServerError('disconf name can not be null.')
+        elif (len(file_name) != 0) and (len(file_content) == 0):
+            raise ServerError('disconf content can not be null.')
+        else:
+            upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+            upload_file = os.path.join(upload_dir,file_name)
+            with open(upload_file, 'wb') as f:
+                f.write(file_content)
     except Exception as e:
         raise ServerError(e.message)
     return upload_file
@@ -364,10 +371,13 @@ class DeploymentListAPI(Resource):
                 #disconf配置
                 disconf_result = []
                 for disconf_info in deploy_obj.disconf_list:
-                    result,message = disconf_add_app_config_api_file(
-                                                    app_name=disconf_info.ins_name,
-                                                    filename=disconf_info.disconf_name,
-                                                    myfilerar=disconf_info.disconf_content)
+                    if (len(disconf_info.disconf_name) == 0) or (len(disconf_info.disconf_content) == 0):
+                        continue
+                    else:
+                        result,message = disconf_add_app_config_api_file(
+                                                        app_name=disconf_info.ins_name,
+                                                        filename=disconf_info.disconf_name,
+                                                        myfilerar=disconf_info.disconf_content)
 
                     disconf_result.append(dict(result=result,message=message))
                 message = disconf_result
