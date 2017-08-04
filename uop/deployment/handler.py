@@ -608,11 +608,12 @@ class Upload(Resource):
 
             if type == 'disconf':
                 instance_name = request.form.get('instance_name')
-                index = request.request.form.get('index')
+                index = request.form.get('index')
+                filename = file.filename
                 upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
                 if not os.path.exists(upload_path):
                     os.makedirs(upload_path)
-                path = os.path.join(upload_path,file.filename)
+                path = os.path.join(upload_path,filename)
             else:
                 filename = file.filename + '_' + uid
                 index = request.form.get('index')
