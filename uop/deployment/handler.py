@@ -121,12 +121,15 @@ def deploy_to_crp(deploy_item, resource_info):
         # }
         docker_list = []
         for obj in res_obj.compute_list:
-            docker_list.append(
-                {
-                    'url': obj.url,
-                    'ip': obj.ips,
-                }
-            )
+            try:
+                docker_list.append(
+                    {
+                        'url': obj.url,
+                        'ip': obj.ips,
+                    }
+                )
+            except AttributeError as e:
+                print e
         data['docker'] = docker_list
 
     err_msg = None

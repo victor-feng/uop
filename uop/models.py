@@ -94,6 +94,7 @@ class ComputeIns(db.EmbeddedDocument):
     ip = db.StringField(required=False)
     quantity = db.IntField(required=False)
     # version = db.StringField(required=False)
+    ips = db.ListField(required=False)
     url = db.StringField(required=False)
     port = db.StringField(required=False)
     meta = {

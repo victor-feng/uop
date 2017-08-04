@@ -817,8 +817,8 @@ class ResourceProviderCallBack(Resource):
 
             for i in container:
                 for j in resource.compute_list:
-                    if i.get('ins_id') == j.get('ins_id'):
-                        j['ips'] = [ins.get('ip') for ins in i.get('instance')]
+                    if i.get('ins_id') == j.ins_id:
+                        j.ips = [ins.get('ip') for ins in i.get('instance')]
 
             is_write_to_cmdb = False
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
