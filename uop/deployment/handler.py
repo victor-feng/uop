@@ -434,12 +434,8 @@ class DeploymentListAPI(Resource):
                             upload_dir = current_app.config['UPLOAD_FOLDER']
                             file_name = disconf_info.get('disconf_name')
                             ins_name = instance_info.get('ins_name')
-                            upload_file = '{upload_dir}/{type}/{instance_name}/{file_name}'.format(
-                                                                        file_name=file_name,
-                                                                        upload_dir=upload_dir,
-                                                                        instance_name=ins_name,
-                                                                        type = 'disconf'
-                                                                        )
+                            type = 'disconf'
+                            upload_file = os.path.join(upload_dir,type,ins_name,file_name)
                             disconf_info['disconf_content'] = upload_file
 
                         ins_name = instance_info.get('ins_name')
