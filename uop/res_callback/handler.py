@@ -620,7 +620,8 @@ class ResourceProviderCallBack(Resource):
     @classmethod
     def post(cls):
         """
-        {
+Post Request JSON Body：
+{
     "username": "袁航",
     "unit_name": "real-final",
     "domain": "",
