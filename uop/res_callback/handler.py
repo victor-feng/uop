@@ -814,17 +814,19 @@ Post Request JSON Body：
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
-            container = request_data.get('container')
-
-            for i in container:
-                for j in resource.compute_list:
-                    if i.get('ins_id') == j.ins_id:
-                        j.ips = [ins.get('ip') for ins in i.get('instance')]
 
             is_write_to_cmdb = False
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
             if status == "ok":
                 is_write_to_cmdb = True
+
+                container = request_data.get('container')
+                if container is not None:
+                    for i in container:
+                        for j in resource.compute_list:
+                            if i.get('ins_id') == j.ins_id:
+                                j.ips = [ins.get('ip') for ins in i.get('instance')]
+
                 property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                               request_data)
 
