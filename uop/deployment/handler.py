@@ -159,6 +159,7 @@ def deploy_to_crp(deploy_item, resource_info):
                 return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
         data_str = json.dumps(data)
+        logging.debug("Data args is " + str(data))
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
@@ -407,7 +408,6 @@ class DeploymentListAPI(Resource):
                     raise Exception(err_msg)
                 deploy_obj.deploy_result = 'deploying'
                 deploy_obj.save()
-
 
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
