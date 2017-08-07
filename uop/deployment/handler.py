@@ -160,6 +160,7 @@ def deploy_to_crp(deploy_item, resource_info):
         print url + ' ' + json.dumps(headers)
         data_str = json.dumps(data)
         logging.debug("Data args is " + str(data))
+        logging.debug("Data args is " + str(data_str))
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
