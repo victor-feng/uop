@@ -171,6 +171,7 @@ class ResourceApplication(Resource):
         # parser.add_argument('application_status', type=str, location='args')
         parser.add_argument('formStatus', type=str, location='args')
         parser.add_argument('approval_status', type=str, location='args')
+        parser.add_argument('name', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -191,6 +192,8 @@ class ResourceApplication(Resource):
             condition['application_status'] = args.formStatus
         if args.approval_status:
             condition['approval_status'] = args.approval_status
+        if args.name:
+            condition['user_name'] = args.name
 
         if agg_by:
             pipeline = []

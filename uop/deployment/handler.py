@@ -221,6 +221,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('environment', type=str, location='args')
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
+        parser.add_argument('approve_status', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -243,6 +244,8 @@ class DeploymentListAPI(Resource):
         if args.start_time and args.end_time:
             condition['created_time__gte'] = args.start_time
             condition['created_time__lte'] = args.end_time
+        if args.approve_status:
+            condition['approve_status'] = args.approve_status
 
         deployments = []
         try:
