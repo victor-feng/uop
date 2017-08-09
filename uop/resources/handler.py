@@ -144,7 +144,7 @@ class ResourceApplication(Resource):
                     'code': code,
                     'result': {
                         'res': 'fail',
-                        'msg': 'Compute instance name repeat.'
+                        'msg': '集群名称重复'
                     }
                 }
                 return res, code
@@ -156,7 +156,7 @@ class ResourceApplication(Resource):
                         'code': code,
                         'result': {
                             'res': 'fail',
-                            'msg': 'Compute instance name repeat.'
+                            'msg': '集群名称重复'
                         }
                     }
                     return res, code
