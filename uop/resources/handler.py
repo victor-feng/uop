@@ -22,7 +22,7 @@ resources_api = Api(resources_blueprint, errors=resources_errors)
 
 def _match_condition_generator(args):
     match = dict()
-    if args.user_id or args.resource_name or args.project or args.application_status or args.approval_status\
+    if args.user_id or args.resource_name or args.project or args.formStatus or args.approval_status\
             or (args.start_time and args.end_time):
         match_cond = dict()
         match_dict = dict()
@@ -33,8 +33,8 @@ def _match_condition_generator(args):
             match_cond['resource_name'] = args.resource_name
         if args.project:
             match_cond['project'] = args.project
-        if args.application_status:
-            match_cond['application_status'] = args.application_status
+        if args.formStatus:
+            match_cond['application_status'] = args.formStatus
         if args.approval_status:
             match_cond['approval_status'] = args.approval_status
         if args.start_time and args.end_time:
@@ -118,23 +118,61 @@ class ResourceApplication(Resource):
                            quantity=quantity, version=version)
             resource_application.resource_list.append(db_ins)
 
+        ins_name_list = []
+        if compute_list:
+            for compute in compute_list:
+                ins_name = compute.get('ins_name')
+                ins_name_list.append(ins_name)
+                # ins_id = compute.get('ins_id')
+                ins_id = str(uuid.uuid1())
+                cpu = compute.get('cpu')
+                mem = compute.get('mem')
+                url = compute.get('url')
+                domain = compute.get('domain')
+                # ip = dns_env(env)
+                quantity = compute.get('quantity')
+                port = compute.get('port')
+                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
+                                         url=url, domain=domain, quantity=quantity, port=port)
+                resource_application.compute_list.append(compute_ins)
+
+        if ins_name_list:
+            ins_name_list2 = list(set(ins_name_list))
+            if len(ins_name_list) != len(ins_name_list2):
+                code = 200
+                res = {
+                    'code': code,
+                    'result': {
+                        'res': 'fail',
+                        'msg': 'Compute instance name repeat.'
+                    }
+                }
+                return res, code
         try:
-            if compute_list:
-                for compute in compute_list:
-                    ins_name = compute.get('ins_name')
-                    # ins_id = compute.get('ins_id')
-                    ins_id = str(uuid.uuid1())
-                    cpu = compute.get('cpu')
-                    mem = compute.get('mem')
-                    url = compute.get('url')
-                    domain = compute.get('domain')
-                    # ip = dns_env(env)
-                    quantity = compute.get('quantity')
-                    port = compute.get('port')
-                    compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                             url=url, domain=domain, quantity=quantity, port=port)
-                    resource_application.compute_list.append(compute_ins)
-                    resource_application.save()
+            for insname in ins_name_list:
+                if ResourceModel.objects(compute_list__match={'ins_name': insname}).count() > 0:
+                    code = 200
+                    res = {
+                        'code': code,
+                        'result': {
+                            'res': 'fail',
+                            'msg': 'Compute instance name repeat.'
+                        }
+                    }
+                    return res, code
+        except Exception as e:
+            code = 500
+            res = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Query DB error.'
+                }
+            }
+            return res, code
+
+        try:
+            resource_application.save()
         except Exception as e:
             code = 200
             res = {
