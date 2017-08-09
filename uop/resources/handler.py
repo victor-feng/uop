@@ -60,7 +60,7 @@ class ResourceApplication(Resource):
         parser.add_argument('user_id', type=str)
         parser.add_argument('domain', type=str)
         parser.add_argument('env', type=str)
-        parser.add_argument('application_status', type=str)
+        parser.add_argument('formStatus', type=str)
         parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
@@ -77,7 +77,7 @@ class ResourceApplication(Resource):
         domain = args.domain
         env = args.env
         created_date = datetime.datetime.now()
-        application_status = args.application_status
+        application_status = args.formStatus
         approval_status = "unsubmit"
         resource_list = args.resource_list
         compute_list = args.compute_list
