@@ -118,24 +118,23 @@ class ResourceApplication(Resource):
                            quantity=quantity, version=version)
             resource_application.resource_list.append(db_ins)
 
-        if compute_list:
-            for compute in compute_list:
-                ins_name = compute.get('ins_name')
-                # ins_id = compute.get('ins_id')
-                ins_id = str(uuid.uuid1())
-                cpu = compute.get('cpu')
-                mem = compute.get('mem')
-                url = compute.get('url')
-                domain = compute.get('domain')
-                # ip = dns_env(env)
-                quantity = compute.get('quantity')
-                port = compute.get('port')
-                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                         url=url, domain=domain, quantity=quantity, port=port)
-                resource_application.compute_list.append(compute_ins)
-
         try:
-            resource_application.save()
+            if compute_list:
+                for compute in compute_list:
+                    ins_name = compute.get('ins_name')
+                    # ins_id = compute.get('ins_id')
+                    ins_id = str(uuid.uuid1())
+                    cpu = compute.get('cpu')
+                    mem = compute.get('mem')
+                    url = compute.get('url')
+                    domain = compute.get('domain')
+                    # ip = dns_env(env)
+                    quantity = compute.get('quantity')
+                    port = compute.get('port')
+                    compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
+                                             url=url, domain=domain, quantity=quantity, port=port)
+                    resource_application.compute_list.append(compute_ins)
+                    resource_application.save()
         except Exception as e:
             code = 200
             res = {
