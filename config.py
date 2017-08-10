@@ -52,30 +52,36 @@ class TestingConfig(BaseConfig):
     #        'password': 'uop',
     #        }
 
-    MONGODB_SETTINGS = [
-             {
-            'db': 'uop',
-            'host': 'mongo-1',
-            'port': 28010,
-            'username': 'uop',
-            'password': 'uop',
-            },
-             {
-            'db': 'uop',
-            'host': 'mongo-2',
-            'port': 28010,
-            'username': 'uop',
-            'password': 'uop',
-            },
-            {
-            'db': 'uop',
-            'host': 'mongo-3',
-            'port': 28010,
-            'username': 'uop',
-            'password': 'uop',
-            }
-    ]
+    # Connect to mongo cluster. connections_list is invalid. 
+    #MONGODB_SETTINGS = [
+    #         {
+    #        'db': 'uop',
+    #        'host': 'mongo-1',
+    #        'port': 28010,
+    #        'username': 'uop',
+    #        'password': 'uop',
+    #        },
+    #         {
+    #        'db': 'uop',
+    #        'host': 'mongo-2',
+    #        'port': 28010,
+    #        'username': 'uop',
+    #        'password': 'uop',
+    #        },
+    #        {
+    #        'db': 'uop',
+    #        'host': 'mongo-3',
+    #        'port': 28010,
+    #        'username': 'uop',
+    #        'password': 'uop',
+    #        }
+    #]
 
+
+    # Connect to mongo cluster. mongo_url is valid. 
+    MONGODB_SETTINGS = {
+        'host': 'mongodb://uop:uop@mongo-1:28010,mongo-2:28010,mongo-3:28010/uop',
+    }
 
 
     CRP_URL = "http://crp-test.syswin.com/"
