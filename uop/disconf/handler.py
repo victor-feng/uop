@@ -191,18 +191,22 @@ class DisconfEnv(Resource):
         try:
             env_list = disconf_env_list()
             code = 200
-            ret = env_list
+            flag = 'true'
+            res = env_list
+            message = 'disconf_env_list success.'
         except ServerError as e:
             code = 500
+            flag = 'false'
             res = 'disconf_env_list error.'
             message = e.message
-            ret = {
-                "code": code,
-                "result": {
-                    "res": res,
-                    "msg": message
-                }
+        ret = {
+            "code": code,
+            "result": {
+                "flag": flag,
+                "data": res,
+                "msg": message
             }
+        }
         return ret, code
 
 disconf_api.add_resource(DisconfAPI, '/')
