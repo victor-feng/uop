@@ -45,7 +45,6 @@ class DisconfAPI(Resource):
             env_id = disconf_env_id('rd')
             ret = disconf_filetext(app_id, env_id, version, fileContent, fileName)
 
-
             code = 200
             res = 'Disconf Success.'
             message = ret
@@ -116,21 +115,6 @@ class DisconfAPI(Resource):
 
 
 class DisconfItem(Resource):
-
-    # @classmethod
-    # def put(cls, config_id):
-    #     parser = reqparse.RequestParser()
-    #     parser.add_argument('filecontent', type=str, location='json')
-    #     args = parser.parse_args()
-    #     filecontent = args.get('filecontent')
-    #
-    #     ret, msg = disconf_session()
-    #     if not ret:
-    #         return msg, 200
-    #
-    #     ret, msg = disconf_filetext_update(config_id, filecontent)
-    #     return msg, 200
-
     @classmethod
     def put(cls, res_id):
         parser = reqparse.RequestParser()
@@ -197,7 +181,7 @@ class DisconfEnv(Resource):
         except ServerError as e:
             code = 500
             flag = 'false'
-            res = 'disconf_env_list error.'
+            res = []
             message = e.message
         ret = {
             "code": code,

@@ -399,14 +399,14 @@ def disconf_get_app_config_api(app_name, env_id):
 
 if __name__ == '__main__':
     version = "1_0_0"
-    app_name = 'final71'
+    app_name = 'final70'
     filename = 'test2'
     filecontent = 'dsfsdfsfs-new-add'
     myfilerar = '/root/test2'
-    print disconf_env_list()
-    print disconf_env_id('rd')
-    print disconf_env_name(1)
-    #print disconf_add_app_config_api_content(app_name, filename, filecontent)
+    #print disconf_env_list()
+    #print disconf_env_id('rd')
+    #print disconf_env_name(1)
+    print disconf_add_app_config_api_content(app_name, filename, filecontent, version='0_0_0_1', env_id='1')
     #print disconf_add_app_config_api_file(app_name, filename, myfilerar)
     #print disconf_get_app_config_api(app_name)
     #myfilerar = '/vpants/microbolog/test7'
