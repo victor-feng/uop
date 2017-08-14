@@ -102,10 +102,10 @@ class ResourceApplication(Resource):
                                              application_status=application_status, approval_status=approval_status,
                                              reservation_status="unreserved", created_date=created_date)
         for resource in resource_list:
-            m = hashlib.md5()
-            ins_name = resource.get('res_name')
-            m.update(ins_name)
-            ins_name = m.hexdigest()
+            # m = hashlib.md5()
+            ins_name = resource.get('res_name', '未知名称')
+            # m.update(ins_name)
+            # ins_name = m.hexdigest()
             # ins_id = resource.get('res_id')
             ins_id = str(uuid.uuid1())
             ins_type = resource.get('res_type')
