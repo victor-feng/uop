@@ -185,6 +185,26 @@ class DisconfItem(Resource):
         return msg, 200
 
 
+class DisconfEnv(Resource):
+    @classmethod
+    def get(cls):
+        try:
+            env_list = disconf_env_list()
+            code = 200
+            ret = env_list
+        except ServerError as e:
+            code = 500
+            res = 'disconf_env_list error.'
+            message = e.message
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": message
+                }
+            }
+        return ret, code
+
 disconf_api.add_resource(DisconfAPI, '/')
-# disconf_api.add_resource(DisconfItem, '/<string:config_id>/')
 disconf_api.add_resource(DisconfItem, '/<string:res_id>/')
+disconf_api.add_resource(DisconfEnv, '/env_list/')

@@ -258,7 +258,9 @@ class DeploymentListAPI(Resource):
                                          ins_id = disconf_info.ins_id,
                                          dislist = [dict(disconf_tag = disconf_info.disconf_tag,
                                                         disconf_name = disconf_info.disconf_name,
-                                                        disconf_content = disconf_info.disconf_content
+                                                        disconf_content = disconf_info.disconf_content,
+                                                        disconf_version = disconf_info.disconf_version,
+                                                        disconf_env = disconf_env_name(disconf_info.disconf_env)
                                                         )]
                                          )
                     if len(disconf) == 0:
@@ -395,7 +397,10 @@ class DeploymentListAPI(Resource):
                         result,message = disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
                                                         filename=disconf_info.disconf_name,
-                                                        myfilerar=disconf_info.disconf_content)
+                                                        myfilerar=disconf_info.disconf_content,
+                                                        version=disconf_info.disconf_version,
+                                                        env_id=disconf_info.disconf_env
+                                                        )
 
                     disconf_result.append(dict(result=result,message=message))
                 message = disconf_result
@@ -470,10 +475,14 @@ class DeploymentListAPI(Resource):
                         disconf_tag=disconf_info.get('disconf_tag')
                         disconf_name = disconf_info.get('disconf_name')
                         disconf_content = disconf_info.get('disconf_content')
+                        disconf_version = disconf_info.get('disconf_version')
+                        disconf_env = disconf_info.get('disconf_env')
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
                                                  disconf_name = disconf_name,
-                                                 disconf_content = disconf_content
+                                                 disconf_content = disconf_content,
+                                                 disconf_version = disconf_version,
+                                                 disconf_env = disconf_env
                                                  )
                         deploy_item.disconf_list.append(disconf_ins)
 

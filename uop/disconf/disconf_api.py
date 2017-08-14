@@ -200,7 +200,6 @@ def disconf_env_list():
         ret_json = json.loads(rep.text)
         result = ret_json.get('success')
         env_list = ret_json.get('page').get('result')
-
         if result != 'true':
             message = 'ERROR:{result}'.format(result=ret_json)
             raise ServerError(message)
@@ -223,6 +222,21 @@ def disconf_env_id(env_name):
     except Exception as e:
         raise ServerError(e.message)
     return env_id
+
+
+def disconf_env_name(env_id):
+    try:
+        env_name = None
+        disconf_session()
+        env_list = disconf_env_list()
+        if env_list:
+            for env in env_list:
+                if env.get('id') == int(env_id):
+                    env_name = env.get('name')
+                    break
+    except Exception as e:
+        raise ServerError(e.message)
+    return env_name
 
 
 def disconf_version_list(app_id):
@@ -319,16 +333,14 @@ def disconf_config_show(config_id):
     return config
 
 
-def disconf_add_app_config_api_content(app_name, filename, filecontent):
+def disconf_add_app_config_api_content(app_name, filename, filecontent, version, env_id):
     try:
-        version = "1_0_0"
         app_id = disconf_app_id(app_name)
         if app_id is None:
             app_desc = '{res_name} config generated.'.format(res_name=app_name)
             disconf_app(app_name, app_desc)
             app_id = disconf_app_id(app_name)
 
-        env_id = disconf_env_id('rd')
         config_id = disconf_config_id(app_id=app_id, env_id=env_id, config_name=filename,version=version)
         if config_id is None:
             ret = disconf_filetext(app_id, env_id, version, fileContent=filecontent, fileName=filename)
@@ -343,16 +355,14 @@ def disconf_add_app_config_api_content(app_name, filename, filecontent):
     return result,message
 
 
-def disconf_add_app_config_api_file(app_name, filename, myfilerar):
+def disconf_add_app_config_api_file(app_name, filename, myfilerar, version, env_id):
     try:
-        version = "1_0_0"
         app_id = disconf_app_id(app_name)
         if app_id is None:
             app_desc = '{res_name} config generated.'.format(res_name=app_name)
             disconf_app(app_name, app_desc)
             app_id = disconf_app_id(app_name)
 
-        env_id = disconf_env_id('rd')
         config_id = disconf_config_id(app_id=app_id, env_id=env_id, config_name=filename,version=version)
         if config_id is None:
             ret = disconf_file(app_id, env_id, version, myfilerar)
@@ -367,10 +377,9 @@ def disconf_add_app_config_api_file(app_name, filename, myfilerar):
         message = e.message
     return result,message
 
-def disconf_get_app_config_api(app_name):
+def disconf_get_app_config_api(app_name, env_id):
     try:
         app_id = disconf_app_id(app_name=app_name)
-        env_id = disconf_env_id(env_name='rd')
         version_id = disconf_version_list(app_id=app_id)
         config_id_list = disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
 
@@ -394,6 +403,9 @@ if __name__ == '__main__':
     filename = 'test2'
     filecontent = 'dsfsdfsfs-new-add'
     myfilerar = '/root/test2'
+    print disconf_env_list()
+    print disconf_env_id('rd')
+    print disconf_env_name(1)
     #print disconf_add_app_config_api_content(app_name, filename, filecontent)
     #print disconf_add_app_config_api_file(app_name, filename, myfilerar)
     #print disconf_get_app_config_api(app_name)
