@@ -142,6 +142,8 @@ class UserRegister(Resource):
 
 
 def add_person(name, user_id, department, contact_info, privilege):
+    r"""临时跳过"""
+    pass
     success = False
     already_exist = False
 
