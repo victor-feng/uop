@@ -260,7 +260,7 @@ class DeploymentListAPI(Resource):
                                                         disconf_name = disconf_info.disconf_name,
                                                         disconf_content = disconf_info.disconf_content,
                                                         disconf_version = disconf_info.disconf_version,
-                                                        disconf_env = disconf_env_name(disconf_info.disconf_env)
+                                                        disconf_env = disconf_env_name(env_id=disconf_info.disconf_env)
                                                         )]
                                          )
                     if len(disconf) == 0:

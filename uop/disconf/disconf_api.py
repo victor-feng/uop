@@ -227,6 +227,9 @@ def disconf_env_id(env_name):
 def disconf_env_name(env_id):
     try:
         env_name = None
+        if (env_id is None) or (len(env_id) == 0):
+            return ""
+
         disconf_session()
         env_list = disconf_env_list()
         if env_list:
@@ -405,8 +408,8 @@ if __name__ == '__main__':
     myfilerar = '/root/test2'
     #print disconf_env_list()
     #print disconf_env_id('rd')
-    #print disconf_env_name(1)
-    print disconf_add_app_config_api_content(app_name, filename, filecontent, version='0_0_0_1', env_id='1')
+    print disconf_env_name(env_id="")
+    #print disconf_add_app_config_api_content(app_name, filename, filecontent, version='0_0_0_1', env_id='1')
     #print disconf_add_app_config_api_file(app_name, filename, myfilerar)
     #print disconf_get_app_config_api(app_name)
     #myfilerar = '/vpants/microbolog/test7'
