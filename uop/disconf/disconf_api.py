@@ -403,19 +403,15 @@ def disconf_get_app_config_api(app_name, env_id):
 if __name__ == '__main__':
     version = "1_0_0"
     app_name = 'final70'
+    env_id = '1'
     filename = 'test2'
     filecontent = 'dsfsdfsfs-new-add'
     myfilerar = '/root/test2'
+    #print disconf_app_list()
     #print disconf_env_list()
+    #print disconf_version_list(app_id=70)
     #print disconf_env_id('rd')
-    print disconf_env_name(env_id="")
+    #print disconf_env_name(env_id="")
     #print disconf_add_app_config_api_content(app_name, filename, filecontent, version='0_0_0_1', env_id='1')
     #print disconf_add_app_config_api_file(app_name, filename, myfilerar)
-    #print disconf_get_app_config_api(app_name)
-    #myfilerar = '/vpants/microbolog/test7'
-    #print disconf_file(appId='45',envId='1',version=version,myfilerar=myfilerar)
-    #print disconf_config_list(app_id='45', env_id='1', version=version)
-    #app_id = disconf_app_id('final72')
-    #print disconf_config_list(app_id=app_id,env_id='1',version=version)
-    #print disconf_config_id(app_id=app_id,env_id='1',config_name='dsfs',version=version)
-    #print disconf_config_name_list(app_id='45', env_id='1', version=version)
+    #print disconf_get_app_config_api(app_name, env_id)
