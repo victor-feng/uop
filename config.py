@@ -40,6 +40,7 @@ class DevelopmentConfig(BaseConfig):
     UPLOAD_FOLDER = "/data/"
     #TODO:  move it to conf
     DISCONF_URL = 'http://172.28.11.111:8081'
+    DISCONF_USER_INFO = {'name': 'admin', 'password': 'admin', 'remember': '0'}
 
 class TestingConfig(BaseConfig):
     TESTING = True
@@ -90,6 +91,7 @@ class TestingConfig(BaseConfig):
     UPLOAD_FOLDER = "/data/"
     #TODO:  move it to conf
     DISCONF_URL = 'http://172.28.11.111:8081'
+    DISCONF_USER_INFO = {'name': 'admin', 'password': 'admin', 'remember': '0'}
 
 
 configs = {

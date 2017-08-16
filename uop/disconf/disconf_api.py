@@ -3,11 +3,12 @@
 import requests
 import json
 #from uop import models
-#from config import APP_ENV, configs
+from config import APP_ENV, configs
 
 
-DISCONF_URL = 'http://172.28.11.111:8081'
-#DISCONF_URL = configs[APP_ENV].DISCONF_URL
+#DISCONF_URL = 'http://172.28.11.111:8081'
+DISCONF_URL = configs[APP_ENV].DISCONF_URL
+DISCONF_USER_INFO = configs[APP_ENV].DISCONF_USER_INFO
 SIGNIN = DISCONF_URL + '/api/account/signin'
 SESSION = DISCONF_URL + '/api/account/session'
 APP = DISCONF_URL + '/api/app'
@@ -27,7 +28,7 @@ class ServerError(Exception):
 
 
 def disconf_signin():
-    user_info = {'name': 'admin', 'password': 'admin', 'remember': '1'}
+    user_info = DISCONF_USER_INFO
     try:
         rep = requests.post(SIGNIN, data=user_info)
         ret_json = json.loads(rep.text)
@@ -43,7 +44,7 @@ def disconf_signin():
 
 
 def disconf_session():
-    user_info = {'name': 'admin', 'password': 'admin', 'remember': '0'}
+    user_info = DISCONF_USER_INFO
     try:
         res = session.post(SIGNIN, data=user_info)
         ret_json = json.loads(res.text)
