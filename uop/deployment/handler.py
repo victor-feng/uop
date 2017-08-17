@@ -297,6 +297,7 @@ class DeploymentListAPI(Resource):
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
                     'disconf': disconf,
+                    'database_password': deployment.database_password,
                 })
         except Exception as e:
             res = {
