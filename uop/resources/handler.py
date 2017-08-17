@@ -2,6 +2,7 @@
 import json
 
 import copy
+import random
 from flask import request, make_response
 from flask import redirect
 from flask import jsonify
@@ -19,6 +20,10 @@ from uop.resources.errors import resources_errors
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
 
+
+def make_random_database_password():
+    return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
+        random.randint(97, 122))
 
 def _match_condition_generator(args):
     match = dict()
@@ -345,6 +350,8 @@ class ResourceDetail(Resource):
                 result['env'] = resource.env
                 result['application_status'] = resource.application_status
                 result['approval_status'] = resource.approval_status
+                result['database_password'] = make_random_database_password
+
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list
                 if resource_list:

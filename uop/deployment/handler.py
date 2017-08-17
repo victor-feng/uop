@@ -6,6 +6,7 @@ import json
 import datetime
 import os
 import logging
+import random
 
 from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
@@ -87,7 +88,7 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info):
+def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
@@ -96,8 +97,8 @@ def deploy_to_crp(deploy_item, resource_info):
         data['mysql'] = {
             "ip": resource_info['mysql_cluster']['wvip'],
             "port": resource_info['mysql_cluster']['port'],
-            "host_user": "root",
-            "host_password": "123456",
+            "database_user": resource_name,
+            "database_password": database_password,
             "mysql_user": resource_info['mysql_cluster']['user'],
             "mysql_password": resource_info['mysql_cluster']['password'],
             "database": "mysql",
@@ -338,6 +339,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
         parser.add_argument('disconf',type=list, location='json')
+        parser.add_argument('database_password',type=list, location='json')
 
 
         args = parser.parse_args()
@@ -360,6 +362,7 @@ class DeploymentListAPI(Resource):
         mongodb_context = args.mongodb_context
         app_image = args.app_image
         disconf = args.disconf
+        database_password = args.database_password
 
         approve_suggestion = args.approve_suggestion
         apply_status = args.apply_status
@@ -407,7 +410,7 @@ class DeploymentListAPI(Resource):
                 #CRP配置
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
                         print 'deploy_to_crp err: '+err_msg
@@ -449,6 +452,7 @@ class DeploymentListAPI(Resource):
                     apply_status=apply_status,
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
+                    database_password=database_password,
                 )
 
                 for instance_info in disconf:

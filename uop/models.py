@@ -69,6 +69,7 @@ class Deployment(db.Document):
     app_image = db.StringField()
     deploy_result = db.StringField()
     user_id = db.StringField()
+    database_password = db.StringField()  # 数据库用户的密码
     apply_status = db.StringField()  # 部署申请状态
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
