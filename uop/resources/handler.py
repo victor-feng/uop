@@ -350,7 +350,7 @@ class ResourceDetail(Resource):
                 result['env'] = resource.env
                 result['application_status'] = resource.application_status
                 result['approval_status'] = resource.approval_status
-                result['database_password'] = make_random_database_password
+                result['database_password'] = make_random_database_password()
 
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list
