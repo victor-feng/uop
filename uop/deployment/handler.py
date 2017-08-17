@@ -339,7 +339,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('approve_status', type=str, location='json')
         parser.add_argument('dep_id', type=str, location='json')
         parser.add_argument('disconf',type=list, location='json')
-        parser.add_argument('database_password',type=list, location='json')
+        parser.add_argument('database_password',type=str, location='json')
 
 
         args = parser.parse_args()
