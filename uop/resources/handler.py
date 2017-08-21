@@ -639,7 +639,6 @@ class GetDBInfo(Resource):
 
 class GetMyResourcesInfo(Resource):
     def get(self):
-        match = {}
         user_id = request.args.get('user_id')
         resource_type = request.args.get('resource_type')
         resource_name = request.args.get('resource_name')
