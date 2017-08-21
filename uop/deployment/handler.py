@@ -371,7 +371,7 @@ class DeploymentListAPI(Resource):
         if args.dep_id:
             dep_id = args.dep_id
 
-        deploy_result = 'not_deployed'
+        deploy_result = 'deploying'
 
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
@@ -419,13 +419,12 @@ class DeploymentListAPI(Resource):
                         print 'deploy_to_crp response: '+result
                 else:
                     raise Exception(err_msg)
-                deploy_obj.deploy_result = 'deploying'
                 deploy_obj.save()
 
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
-                deploy_obj.deploy_result = deploy_result
+                deploy_obj.deploy_result = 'not_deployed'
                 deploy_obj.save()
                 message = 'approve_forbid success'
 
@@ -655,6 +654,8 @@ class Upload(Resource):
                 filename = file.filename + '_' + uid
                 index = request.form.get('index')
                 path = os.path.join(UPLOAD_FOLDER, type, filename)
+                if not os.path.exists(os.path.join(UPLOAD_FOLDER, type)):
+                    os.makedirs(os.path.join(UPLOAD_FOLDER, type))
             file.save(path)
         except Exception as e:
             return {
