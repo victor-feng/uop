@@ -639,17 +639,24 @@ class GetDBInfo(Resource):
 
 class GetMyResourcesInfo(Resource):
     def get(self):
+        match = {}
         user_id = request.args.get('user_id')
         resource_type = request.args.get('resource_type')
         resource_name = request.args.get('resource_name')
         item_name = request.args.get('item_name')
         item_code = request.args.get('item_code')
-        create_date = request.args.get('create_date')
+        #  create_date = request.args.get('create_date')
+        start_time = request.args.get('start_time')
+        end_time = request.args.get('end_time')
         resource_status = request.args.get('resource_status')
         result_list = []
         query = {
             'approval_status': 'success',
         }
+
+        def comparable_time(s):
+                return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.000Z")
+
         try:
             if user_id:
                 query['user_id'] = user_id
@@ -659,9 +666,8 @@ class GetMyResourcesInfo(Resource):
                 query['project'] = item_name
             if item_code:
                 query['project_id'] = item_code
-            if create_date:
-                query['create_date'] = datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S')
             resources = ResourceModel.objects.filter(**query).order_by('-create_date')
+
         except Exception as e:
             print e
             code = 500
@@ -676,15 +682,21 @@ class GetMyResourcesInfo(Resource):
         if len(resources):
             for res in resources:
                 # TODO: 应该写一个可供批量查询的接口 不能遍历发送请求
+                rcd = res.created_date
+                if start_time:
+                    if res.created_date < comparable_time(start_time):
+                        continue
+                if end_time:
+                    if res.created_date > comparable_time(end_time):
+                        continue
                 err_msg, resource_info = get_resource_by_id(res.res_id)
                 if err_msg or not resource_info:
-                    resource_info['docker'] = {'ip':'127.0.0.1'}
-                    resource_info['mysql_cluster'] = {'ip':'127.0.0.1'}
-                    resource_info['redis_cluster'] = {'ip':'127.0.0.1'}
-                    resource_info['mongo_cluster'] = {'ip':'127.0.0.1'}
-
+                    resource_info['docker'] = {'ip': '127.0.0.1'}
+                    resource_info['mysql_cluster'] = {'ip': '127.0.0.1'}
+                    resource_info['redis_cluster'] = {'ip': '127.0.0.1'}
+                    resource_info['mongo_cluster'] = {'ip': '127.0.0.1'}
                 result = {}
-                result['create_date'] =datetime.datetime.strftime(res.created_date, '%Y-%m-%d %H:%M:%S')
+                result['create_date'] = datetime.datetime.strftime(res.created_date, '%Y-%m-%d %H:%M:%S')
                 result['resource_name'] = res.resource_name
                 result['item_name'] = res.project
                 result['item_code'] = res.project_id
