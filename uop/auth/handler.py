@@ -150,8 +150,7 @@ def add_person(name, user_id, department, contact_info, privilege):
 
     CMDB_URL = current_app.config['CMDB_URL']
     CMDB_API = CMDB_URL+'cmdb/api/'
-    req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
-                             "\"repoitem_string.default_value\":\""+user_id+"\" }"
+    req = CMDB_API + "repo_detail?item_id=person_item&p_code=user_id&value=" + user_id
     res = requests.get(str(req))
     ret_query_decode = res.content.decode('unicode_escape')
     ret = json.loads(ret_query_decode)

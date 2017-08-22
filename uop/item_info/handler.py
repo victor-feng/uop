@@ -177,8 +177,7 @@ class ItemPostInfo(Resource):
 
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_API = CMDB_URL+'cmdb/api/'
-            req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
-                             "\"repoitem_string.default_value\":\""+args.user_id+"\" }"
+            req = CMDB_API + "repo_detail?item_id=person_item&p_code=user_id&value=" + args.user_id
             res = requests.get(req)
             ret = eval(res.content.decode('unicode_escape'))
             user_p_code = None
