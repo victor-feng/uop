@@ -730,10 +730,12 @@ class GetMyResourcesInfo(Resource):
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
         for source in source_list:
+            if source.quantity == 0:
+                continue
             result = copy.copy(result)
             if source_type == 'docker':
                 type = source_type
-                ip = source_type
+                result['resource_ip'] = resource_info.get(source_type, {'ip_address': '127.0.0.1'}).get('ip_address')
             else:
                 if source_type == 'db':
                     type = source.ins_type
@@ -747,14 +749,21 @@ class GetMyResourcesInfo(Resource):
                         type = source.ins_type
                     else:
                         continue
+                _ip = 'ip'
+                if type == 'redis':
+                    _ip = 'vip'
+                elif type == 'mysql':
+                    _ip = 'wvip'
+                elif type == 'mongodb':
+                    _ip = 'vip1'
                 ip = type + '_cluster'
+                result['resource_ip'] = resource_info.get(ip, {}).get(_ip, '127.0.0.1')
             result['resource_type'] = type
             result['resource_config'] = [
                 {'name': 'CPU', 'value': str(source.cpu) + '核'},
                 {'name': '内存', 'value': str(source.mem) + 'GB'},
             ]
             result['resource_status'] = '运行中'
-            result['resource_ip'] = resource_info.get(ip, {'ip':'127.0.0.1'}).get('ip')
             result_list.append(result)
         return result_list
 
