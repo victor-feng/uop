@@ -11,7 +11,7 @@ import datetime
 import hashlib
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 
-from uop.deployment.handler import get_resource_by_id
+from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
@@ -679,8 +679,18 @@ class GetMyResourcesInfo(Resource):
             }
             return ret
         if len(resources):
+            flag, resources_dic= get_resource_by_id_mult([res.cmdb_p_code for res in resources])
+            if not flag:
+                code = 500
+                ret = {
+                    'code': code,
+                    'result': {
+                        'res': 'fail',
+                        'msg': '批量查询CMDB接口失败！'
+                    }
+                }
+                return ret, code
             for res in resources:
-                # TODO: 应该写一个可供批量查询的接口 不能遍历发送请求
                 rcd = res.created_date
                 if start_time:
                     if res.created_date < comparable_time(start_time):
@@ -688,12 +698,7 @@ class GetMyResourcesInfo(Resource):
                 if end_time:
                     if res.created_date > comparable_time(end_time):
                         continue
-                err_msg, resource_info = get_resource_by_id(res.res_id)
-                if err_msg or not resource_info:
-                    resource_info['docker'] = {'ip': '127.0.0.1'}
-                    resource_info['mysql_cluster'] = {'ip': '127.0.0.1'}
-                    resource_info['redis_cluster'] = {'ip': '127.0.0.1'}
-                    resource_info['mongo_cluster'] = {'ip': '127.0.0.1'}
+                resource_info = resources_dic.get(res.cmdb_p_code, {})
                 result = {}
                 result['create_date'] = datetime.datetime.strftime(res.created_date, '%Y-%m-%d %H:%M:%S')
                 result['resource_name'] = res.resource_name
@@ -710,24 +715,6 @@ class GetMyResourcesInfo(Resource):
                         source_list = res.resource_list
                     result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
 
-                # for docker in res.compute_list:
-                #     result['resource_type'] = 'docker'
-                #     result['resource_config'] = [
-                #         {'name': 'CPU','value': str(docker.cpu) + '核'},
-                #         {'name': '内存','value': str(docker.mem) + 'GB'},
-                #     ]
-                #     result['resource_status'] = '运行中'
-                #     result['resource_ip'] = resource_info['docker']['ip']
-                #     result_list.append(result)
-                # for db_info in res.resource_list:
-                #     db_type = db_info.ins_type
-                #     result['resource_type'] = db_type
-                #     result['resource_ip'] = resource_info[db_type+'_cluster']['ip']
-                #     result['resource_config'] = [
-                #         {'name': 'CPU', 'value': str(db_info.cpu) + '核'},
-                #         {'name': '内存', 'value': str(db_info.mem) + 'GB'},
-                #     ]
-                #     result_list.append(result)
 
         code = 200
         ret = {

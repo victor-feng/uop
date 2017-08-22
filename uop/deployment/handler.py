@@ -28,27 +28,102 @@ from config import APP_ENV, configs
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
+def format_resource_info(items):
+    resource_info = {}
+    colunm = {}
+    for item in items.get('items'):
+        for i in item.get('column'):
+            if i.get('p_code') is not None:
+                colunm[i.get('p_code')] = i.get('value')
+
+        resource_info[item.get('item_id')] = {
+            'user': colunm.get('username', 'root'),
+            'password': colunm.get('password', '123456'),
+            'port': colunm.get('port', '3306'),
+        }
+
+        if item.get('item_id') == 'mysql_cluster':
+            resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
+            resource_info[item.get('item_id')]['rvip'] = colunm.get('mysql_cluster_rvip', '127.0.0.1')
+        elif item.get('item_id') == 'mongodb_cluster':
+            resource_info[item.get('item_id')]['vip1'] = colunm.get('mongodb_cluster_ip1', '127.0.0.1')
+            resource_info[item.get('item_id')]['vip2'] = colunm.get('mongodb_cluster_ip2', '127.0.0.1')
+            resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
+        elif item.get('item_id') == 'redis_cluster':
+            resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
+        elif item.get('item_id') == 'docker':
+            resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
+
+    return resource_info
+
+
+def get_resource_by_id_mult(p_codes):
+    CMDB_URL = current_app.config['CMDB_URL']
+    url = CMDB_URL + 'cmdb/api/repo_relation/'
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        'layer_count': 3,
+        'total_count': 50,
+        'reference_sequence': [{'child': 2}, {'bond': 1}],
+        'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster'],
+        'columns_filter': {
+            'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
+            'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username', 'password', 'port'],
+            'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
+            'docker': ['ip_address', 'username', 'password', 'port'],
+        },
+        'p_codes': p_codes,
+    }
+    data_str = json.dumps(data)
+    err_msg = None
+    try:
+        result = requests.post(url, headers=headers, data=data_str)
+    except requests.exceptions.ConnectionError as rq:
+        err_msg = rq.message.message
+    except BaseException as e:
+        err_msg = e.message
+    if err_msg:
+        return False, err_msg
+
+    result = result.json()
+    data = result.get('result', {}).get('res', {})
+    code = result.get('code', -1)
+    if code == 2002:
+        resources_dic = {}
+        for p_code, items in data.items():
+            resource_info = format_resource_info(items)
+            resources_dic[p_code] = resource_info
+
+        return True, resources_dic
+    else:
+        return False, None
+
+
 
 def get_resource_by_id(resource_id):
     err_msg = None
     resource_info = {}
     resource = ResourceModel.objects.get(res_id=resource_id)
     try:
-        # url = CMDB_URL+'cmdb/api/repo_store/?resource_id='+resource_id
-
-        CMDB_URL = current_app.config['CMDB_URL']
-        url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + \
-              '?layer_count=3&total_count=50' +\
-              '&reference_sequence=[{\"child\": 2},{\"bond\": 1}]' +\
-              '&item_filter=docker&item_filter=mongodb_cluster&item_filter=mysql_cluster&item_filter=redis_cluster' +\
-              '&columns_filter={\"mysql_cluster\":[\"mysql_cluster_wvip\",\"mysql_cluster_rvip\",\"username\",\"password\",\"port\"],' +\
-              ' \"mongodb_cluster\":[\"mongodb_cluster_ip1\",\"mongodb_cluster_ip2\",\"mongodb_cluster_ip3\",\"username\",\"password\",\"port\"],' +\
-              ' \"redis_cluster\":[\"redis_cluster_vip\",\"username\",\"password\",\"port\"],' +\
-              ' \"docker\":[\"ip_address\",\"username\",\"password\",\"port\"]}'
-
         headers = {'Content-Type': 'application/json'}
-        print url+' '+json.dumps(headers)
-        result = requests.get(url, headers=headers)
+        data = {
+            'layer_count': 3,
+            'total_count': 50,
+            'reference_sequence': [{'child': 2}, {'bond': 1}],
+            'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster'],
+            'columns_filter': {
+                'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
+                'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username',
+                                    'password', 'port'],
+                'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
+                'docker': ['ip_address', 'username', 'password', 'port'],
+            },
+        }
+        data_str = json.dumps(data)
+        CMDB_URL = current_app.config['CMDB_URL']
+        url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + '/'
+
+        result = requests.get(url, headers=headers, data=data_str)
         result = result.json()
         data = result.get('result', {}).get('res', {})
         code = result.get('code', -1)
@@ -59,29 +134,7 @@ def get_resource_by_id(resource_id):
         err_msg = e.message
     else:
         if code == 2002:
-            for item in data.get('items'):
-                colunm = {}
-                for i in item.get('column'):
-                    if i.get('p_code') is not None:
-                        colunm[i.get('p_code')] = i.get('value')
-
-                resource_info[item.get('item_id')] = {
-                    'user': colunm.get('username', 'root'),
-                    'password': colunm.get('password', '123456'),
-                    'port': colunm.get('port', '3306'),
-                }
-                if item.get('item_id') == 'mysql_cluster':
-                    resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
-                    resource_info[item.get('item_id')]['rvip'] = colunm.get('mysql_cluster_rvip', '127.0.0.1')
-                elif item.get('item_id') == 'mongodb_cluster':
-                    resource_info[item.get('item_id')]['vip1'] = colunm.get('mongodb_cluster_ip1', '127.0.0.1')
-                    resource_info[item.get('item_id')]['vip2'] = colunm.get('mongodb_cluster_ip2', '127.0.0.1')
-                    resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
-                elif item.get('item_id') == 'redis_cluster':
-                    resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
-                elif item.get('item_id') == 'docker':
-                    resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
-
+            resource_info = format_resource_info(data.get('items'))
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
