@@ -183,6 +183,7 @@ class ItemPostInfo(Resource):
             ret = eval(res.content.decode('unicode_escape'))
             user_p_code = None
             if res.status_code == 200:
+                logging.info("[UOP] Get resust: %s", ret.get("result"))
                 result_res = ret.get("result").get("res")
                 if len(result_res) > 0:
                     user_p_code = result_res[0].get("p_code")
