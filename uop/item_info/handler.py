@@ -183,6 +183,7 @@ class ItemPostInfo(Resource):
             ret = eval(res.content.decode('unicode_escape'))
             user_p_code = None
             if res.status_code == 200:
+                logging.info("[UOP] Get resust: %s", ret.get("result"))
                 user_p_code = ret.get("result").get("res")[0].get("p_code")
 
             data = {}
@@ -221,6 +222,7 @@ class ItemPostInfo(Resource):
                     item_description = args.item_description,
                     item_code = args.item_code).save()
         except Exception as e:
+            logging.exception("[UOP] Get item info failed, Exception: %s", e.args)
             code = 500
 
         return ret, code
@@ -242,6 +244,7 @@ class ItemInfoLoacl(Resource):
                 res["item_description"] = i.item_description
                 res_list.append(res)
         except Exception as e:
+            logging.exception("[UOP] Get item info failed, Exception: %s", e.args)
             code = 500
 
         ret = {
