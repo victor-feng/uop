@@ -134,7 +134,7 @@ def get_resource_by_id(resource_id):
         err_msg = e.message
     else:
         if code == 2002:
-            resource_info = format_resource_info(data.get('items'))
+            resource_info = format_resource_info(data)
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
