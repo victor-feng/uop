@@ -313,6 +313,8 @@ class DeploymentListAPI(Resource):
                                          dislist = [dict(disconf_tag = disconf_info.disconf_tag,
                                                         disconf_name = disconf_info.disconf_name,
                                                         disconf_content = disconf_info.disconf_content,
+                                                        disconf_admin_content = disconf_info.disconf_admin_content,
+                                                        disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
                                                         disconf_env = disconf_env_name(env_id=disconf_info.disconf_env)
                                                         )]
