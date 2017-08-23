@@ -134,11 +134,11 @@ class ResourceApplication(Resource):
                 mem = compute.get('mem')
                 url = compute.get('url')
                 domain = compute.get('domain')
-                # ip = dns_env(env)
+                domain_ip = compute.get('domain_ip')
                 quantity = compute.get('quantity')
                 port = compute.get('port')
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                         url=url, domain=domain, quantity=quantity, port=port)
+                                         url=url, domain=domain, domain_ip=domain_ip, quantity=quantity, port=port)
                 resource_application.compute_list.append(compute_ins)
 
         if ins_name_list:
