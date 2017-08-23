@@ -217,6 +217,7 @@ class Reservation(Resource):
                         "image_url": db_com.url,
                         "quantity": db_com.quantity,
                         "domain": db_com.domain,
+                        "domain_ip": db_com.domain_ip,
                         "port": db_com.port
                     }
                 )
