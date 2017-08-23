@@ -7,6 +7,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.options import define, options
 
+from config import APP_ENV
+
 define('port', type=int, default=5000)
 # deploy or debug
 define('mode', default='debug')
@@ -22,12 +24,12 @@ def main():
         from tornado import autoreload
         autoreload.start()
  
-    APP_ENV = 'development'
-    if options.deploy.lower() == 'test':
-        APP_ENV = 'testing'
-    elif options.deploy.lower() == 'prod':
-        # TODO:
-        pass
+    #APP_ENV = 'development'
+    #if options.deploy.lower() == 'test':
+    #    APP_ENV = 'testing'
+    #elif options.deploy.lower() == 'prod':
+    #    # TODO:
+    #    pass
 
     app = create_app(APP_ENV)
     # app.run(host='0.0.0.0', debug=True)
