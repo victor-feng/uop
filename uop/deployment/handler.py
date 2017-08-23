@@ -390,9 +390,30 @@ class DeploymentListAPI(Resource):
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
+            #disconf配置
+                #1、由于管理员要重新上传文件，所以需要重新获取文件名称，disconf_content
+                disconf_content_dict = dict
+                disconf_server_dict = dict
+                for instance_info in disconf:
+                    for disconf_info in instance_info.get('dislist'):
+                        ins_id = instance_info.get('ins_id')
+                        disconf_admin_content = disconf_info.get('disconf_admin_content')
+                        disconf_server_name = disconf_info.get('disconf_server_name')
+                        disconf_content_dict[ins_id] = disconf_admin_content
+                        disconf_server_dict[ins_id] = disconf_server_name
+
+                #2、更新数据库数据
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
-                #disconf配置
+                for disconf_info in deploy_obj.disconf_list:
+                    for item in disconf_content_dict:
+                        if disconf_info.ins_id == item:
+                            disconf_info.disconf_admin_content = disconf_content_dict[item]
+                            disconf_info.disconf_server_name = disconf_server_dict[item]
+                deploy_obj.save()
+
+                #3、把配置推送到disconf
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
                 for disconf_info in deploy_obj.disconf_list:
                     if (len(disconf_info.disconf_name) == 0) or (len(disconf_info.disconf_content) == 0):
@@ -401,14 +422,18 @@ class DeploymentListAPI(Resource):
                         result,message = disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
                                                         filename=disconf_info.disconf_name,
-                                                        myfilerar=disconf_info.disconf_content,
+                                                        myfilerar=disconf_info.disconf_admin_content,
                                                         version=disconf_info.disconf_version,
                                                         env_id=disconf_info.disconf_env
                                                         )
 
                     disconf_result.append(dict(result=result,message=message))
+                deploy_obj.save()
                 message = disconf_result
-                #CRP配置
+
+            #CRP配置
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+                deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
@@ -457,6 +482,7 @@ class DeploymentListAPI(Resource):
 
                 for instance_info in disconf:
                     for disconf_info in instance_info.get('dislist'):
+                        #以内容形式上传，需要将内容转化为文本
                         if disconf_info.get('disconf_tag') == 'tag':
                             file_name = disconf_info.get('disconf_name')
                             file_content = disconf_info.get('disconf_content')
@@ -466,25 +492,30 @@ class DeploymentListAPI(Resource):
                                                                 instance_name=ins_name,
                                                                 type='disconf')
                             disconf_info['disconf_content'] = upload_file
+                            disconf_info['disconf_admin_content'] = ''
+                        #以文本形式上传，只需获取文件名
                         else:
-                            upload_dir = current_app.config['UPLOAD_FOLDER']
                             file_name = disconf_info.get('disconf_name')
-                            ins_name = instance_info.get('ins_name')
-                            type = 'disconf'
-                            upload_file = os.path.join(upload_dir,type,ins_name,file_name)
-                            disconf_info['disconf_content'] = upload_file
+                            if len(file_name.strip()) == 0:
+                                upload_file = ''
+                                disconf_info['disconf_content'] = upload_file
+                                disconf_info['disconf_admin_content'] = upload_file
 
                         ins_name = instance_info.get('ins_name')
                         ins_id = instance_info.get('ins_id')
                         disconf_tag=disconf_info.get('disconf_tag')
                         disconf_name = disconf_info.get('disconf_name')
                         disconf_content = disconf_info.get('disconf_content')
+                        disconf_admin_content = disconf_info.get('disconf_admin_content')
+                        disconf_server_name = disconf_info.get('disconf_server_name')
                         disconf_version = disconf_info.get('disconf_version')
                         disconf_env = disconf_info.get('disconf_env')
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
                                                  disconf_name = disconf_name,
                                                  disconf_content = disconf_content,
+                                                 disconf_admin_content = disconf_admin_content,
+                                                 disconf_server_name = disconf_server_name,
                                                  disconf_version = disconf_version,
                                                  disconf_env = disconf_env
                                                  )
@@ -643,10 +674,12 @@ class Upload(Resource):
             type = request.form['file_type']
 
             if type == 'disconf':
+                disconf_uid = str(uuid.uuid1())
                 instance_name = request.form.get('instance_name')
+                user_id = request.form.get('user_id')
                 index = request.form.get('index')
-                filename = file.filename
-                upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
+                filename = '{file_name}_{uuid}'.format(file_name=file.filename,uuid=disconf_uid)
+                upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name, user_id)
                 if not os.path.exists(upload_path):
                     os.makedirs(upload_path)
                 path = os.path.join(upload_path,filename)

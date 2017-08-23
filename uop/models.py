@@ -35,6 +35,7 @@ class DisconfIns(db.EmbeddedDocument):
     disconf_tag = db.StringField(required=False)
     disconf_name = db.StringField(required=False)
     disconf_content = db.StringField(required=False)
+    disconf_admin_content = db.StringField(required=False)
     disconf_version = db.StringField(required=False)
     disconf_env = db.StringField(required=False)
     meta = {

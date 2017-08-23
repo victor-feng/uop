@@ -2,6 +2,8 @@
 
 import requests
 import json
+import os
+import shutil
 #from uop import models
 from config import APP_ENV, configs
 
@@ -25,6 +27,13 @@ session = requests.Session()
 
 class ServerError(Exception):
     pass
+
+
+def exchange_disconf_name(name):
+    disconf_with_uuid = name
+    disconf_no_uuid = disconf_with_uuid.split('_')[:-2]
+
+
 
 
 def disconf_signin():
