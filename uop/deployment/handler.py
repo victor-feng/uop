@@ -733,7 +733,7 @@ class Upload(Resource):
                 instance_name = request.form.get('instance_name')
                 user_id = request.form.get('user_id')
                 index = request.form.get('index')
-                filename = '{file_name}_{uuid}'.format(file_name=file.filename,uuid=disconf_uid)
+                filename = '{file_name},{uuid}'.format(file_name=file.filename,uuid=disconf_uid)
                 upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name, user_id)
                 if not os.path.exists(upload_path):
                     os.makedirs(upload_path)
