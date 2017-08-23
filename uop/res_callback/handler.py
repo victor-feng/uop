@@ -369,10 +369,10 @@ class ResourceProviderTransitions(object):
             logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
-        condition = '{\"repoitem_string.default_value\":\"'+physical_server+'\"}'
+        condition = 'item_id=physical_server&p_code=hostname&value=' + physical_server
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_URL+'cmdb/api/repo_detail/'
-        request_url = CMDB_REPO_ITEM_CONDITION_GET_URL+'?condition='+condition
+        request_url = CMDB_REPO_ITEM_CONDITION_GET_URL + '?' + condition
         resp_repo_item = requests.get(request_url)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
@@ -380,7 +380,7 @@ class ResourceProviderTransitions(object):
             p_code = item_property.get('result').get('res')[0].get('p_code')
             self.pcode_mapper['physical_server'] = p_code
             logging.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
-                             % (physical_server, p_code))
+                          % (physical_server, p_code))
 
     def start(self):
         self.run()

@@ -177,13 +177,15 @@ class ItemPostInfo(Resource):
 
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_API = CMDB_URL+'cmdb/api/'
-            req = CMDB_API + "repo_detail?condition={" "\"item_id\":\"person_item\"," \
-                             "\"repoitem_string.default_value\":\""+args.user_id+"\" }"
+            req = CMDB_API + "repo_detail?item_id=person_item&p_code=user_id&value=" + args.user_id
             res = requests.get(req)
             ret = eval(res.content.decode('unicode_escape'))
             user_p_code = None
             if res.status_code == 200:
-                user_p_code = ret.get("result").get("res")[0].get("p_code")
+                logging.info("[UOP] Get resust: %s", ret.get("result"))
+                result_res = ret.get("result").get("res")
+                if len(result_res) > 0:
+                    user_p_code = result_res[0].get("p_code")
 
             data = {}
             data["name"] = args.item_name
@@ -198,12 +200,13 @@ class ItemPostInfo(Resource):
             property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             property_list.append({"type": "string", "name": "创建人", "value": args.user_name})
             property_list.append({"type": "string", "name": "创建时间", "value": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
-            property_list.append({
-                            'type': 'reference',
-                            'reference_ci': 'person_item',
-                            'reference_id': user_p_code,
-                            'name': '归属人',
-                            })
+            if user_p_code is not None:
+                property_list.append({
+                                'type': 'reference',
+                                'reference_ci': 'person_item',
+                                'reference_id': user_p_code,
+                                'name': '归属人',
+                                })
             data["property_list"] = property_list
             data_str = json.dumps(data)
 
