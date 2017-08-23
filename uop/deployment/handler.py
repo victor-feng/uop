@@ -134,7 +134,7 @@ def get_resource_by_id(resource_id):
         err_msg = e.message
     else:
         if code == 2002:
-            resource_info = format_resource_info(data.get('items'))
+            resource_info = format_resource_info(data)
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
@@ -471,13 +471,14 @@ class DeploymentListAPI(Resource):
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
                 for disconf_info in deploy_obj.disconf_list:
-                    if (len(disconf_info.disconf_name) == 0) or (len(disconf_info.disconf_content) == 0):
+                    if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
                         continue
                     else:
+                        disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
                         result,message = disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
                                                         filename=disconf_info.disconf_name,
-                                                        myfilerar=disconf_info.disconf_admin_content,
+                                                        myfilerar=disconf_admin_name,
                                                         version=disconf_info.disconf_version,
                                                         env_id=disconf_info.disconf_env
                                                         )

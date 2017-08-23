@@ -36,6 +36,7 @@ class DisconfIns(db.EmbeddedDocument):
     disconf_name = db.StringField(required=False)
     disconf_content = db.StringField(required=False)
     disconf_admin_content = db.StringField(required=False)
+    disconf_server_name = db.StringField(required=False)
     disconf_version = db.StringField(required=False)
     disconf_env = db.StringField(required=False)
     meta = {
@@ -95,7 +96,7 @@ class ComputeIns(db.EmbeddedDocument):
     mem = db.IntField(required=False)
     # disk = db.StringField(required=False)
     domain = db.StringField(required=False)
-    ip = db.StringField(required=False)
+    domain_ip = db.StringField(required=False)
     quantity = db.IntField(required=False)
     # version = db.StringField(required=False)
     ips = db.ListField(required=False)

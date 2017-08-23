@@ -5,12 +5,13 @@ import json
 import os
 import shutil
 #from uop import models
-from config import APP_ENV, configs
+#from config import APP_ENV, configs
 
 
-#DISCONF_URL = 'http://172.28.11.111:8081'
-DISCONF_URL = configs[APP_ENV].DISCONF_URL
-DISCONF_USER_INFO = configs[APP_ENV].DISCONF_USER_INFO
+DISCONF_URL = 'http://172.28.11.111:8081'
+DISCONF_USER_INFO = {'name': 'admin', 'password': 'admin', 'remember': '0'}
+#DISCONF_URL = configs[APP_ENV].DISCONF_URL
+#DISCONF_USER_INFO = configs[APP_ENV].DISCONF_USER_INFO
 SIGNIN = DISCONF_URL + '/api/account/signin'
 SESSION = DISCONF_URL + '/api/account/session'
 APP = DISCONF_URL + '/api/app'
@@ -30,11 +31,15 @@ class ServerError(Exception):
 
 
 def exchange_disconf_name(name):
-    disconf_with_uuid = name
-    disconf_no_uuid = disconf_with_uuid.split('_')[:-2]
-
-
-
+    try:
+        disconf_with_uuid = name
+        disconf_no_uuid = ''.join(disconf_with_uuid.split(',')[:-1])
+        if os.path.isfile(disconf_no_uuid):
+            os.remove(disconf_no_uuid)
+        shutil.copy2(disconf_with_uuid,disconf_no_uuid)
+    except Exception as e:
+        raise ServerError(e.message)
+    return disconf_no_uuid
 
 def disconf_signin():
     user_info = DISCONF_USER_INFO
@@ -417,6 +422,8 @@ if __name__ == '__main__':
     filename = 'test2'
     filecontent = 'dsfsdfsfs-new-add'
     myfilerar = '/root/test2'
+    name = '/opt/test111,147ab190-87af-11e7-af82-fa163e9474c9'
+    print exchange_disconf_name(name)
     #print disconf_app_list()
     #print disconf_env_list()
     #print disconf_version_list(app_id=70)
