@@ -40,10 +40,11 @@ class DisconfAPI(Resource):
             resource = models.ResourceModel.objects.get(res_id=res_id)
             app_name = resource.ins_name
             app_desc = '{res_name} config generated.'.format(res_name=app_name)
-            disconf_app(app_name, app_desc)
-            app_id = disconf_app_id(app_name)
-            env_id = disconf_env_id('rd')
-            ret = disconf_filetext(app_id, env_id, version, fileContent, fileName)
+            disconf_api = DisconfServerApi('172.28.11.111')
+            disconf_api.disconf_app(app_name, app_desc)
+            app_id = disconf_api.disconf_app_id(app_name)
+            env_id = disconf_api.disconf_env_id('rd')
+            ret = disconf_api.disconf_filetext(app_id, env_id, version, fileContent, fileName)
 
             code = 200
             res = 'Disconf Success.'
@@ -81,14 +82,15 @@ class DisconfAPI(Resource):
                 if ins_info is not None:
                     result = {}
                     app_name = getattr(ins_info,'ins_name')
-                    app_id = disconf_app_id(app_name=app_name)
-                    env_id = disconf_env_id(env_name='rd')
-                    version_id = disconf_version_list(app_id=app_id)
-                    config_id_list = disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
+                    disconf_api = DisconfServerApi('172.28.11.111')
+                    app_id = disconf_api.disconf_app_id(app_name=app_name)
+                    env_id = disconf_api.disconf_env_id(env_name='rd')
+                    version_id = disconf_api.disconf_version_list(app_id=app_id)
+                    config_id_list = disconf_api.disconf_config_id_list(app_id=app_id, env_id=env_id, version=version_id)
 
                     configurations = []
                     for config_id in config_id_list:
-                        config = disconf_config_show(config_id)
+                        config = disconf_api.disconf_config_show(config_id)
                         config_value = {}
                         if config is not None:
                             config_value['filename'] = config.get('key')
