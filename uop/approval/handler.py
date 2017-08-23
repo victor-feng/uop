@@ -175,7 +175,8 @@ class Reservation(Resource):
         new_computelist = args.compute_list
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            self.attach_domain_ip(new_computelist, resource)
+            if new_computelist:
+                self.attach_domain_ip(new_computelist, resource)
             #resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
@@ -261,11 +262,15 @@ class Reservation(Resource):
             res = "Failed to reserve resource."
         else:
             resource.reservation_status = "reserving"
-            resource.compute_list = new_computelist
             resource.save()
             code = 200
             res = "Success in reserving resource."
-
+        ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
         return ret, code
 
 
