@@ -101,6 +101,7 @@ class ComputeIns(db.EmbeddedDocument):
     ips = db.ListField(required=False)
     url = db.StringField(required=False)
     port = db.StringField(required=False)
+    domain_ip = db.StringField(required=False)
     meta = {
         'collection': 'compute_ins',
         'index': [
