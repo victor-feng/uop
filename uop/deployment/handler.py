@@ -477,7 +477,6 @@ class DeploymentListAPI(Resource):
                             disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
 
                         server_name = disconf_info.disconf_server_name
-                        print "server_name>>>>>>>>>>>>>>>>>>>>>>",server_name
                         if (server_name is None) or (len(server_name.strip()) == 0):
                             server_name = '172.28.11.111'
                         disconf_api_connect = DisconfServerApi(server_name)
@@ -491,7 +490,7 @@ class DeploymentListAPI(Resource):
                     disconf_result.append(dict(result=result,message=message))
                 deploy_obj.save()
                 message = disconf_result
-                """
+
             #CRP配置
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
@@ -506,7 +505,7 @@ class DeploymentListAPI(Resource):
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
-                """
+
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
