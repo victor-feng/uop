@@ -462,7 +462,7 @@ class DeploymentListAPI(Resource):
                             if disconf_info.disconf_id == disconf_id:
                                 disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
                                 disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
-                disconf_id.save()
+                deploy_obj.save()
 
 
                 """
