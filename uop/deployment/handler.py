@@ -457,7 +457,7 @@ class DeploymentListAPI(Resource):
                 for instance_info in disconf:
                     for disconf_info in instance_info.get('dislist'):
                         disconf_id = instance_info.get('disconf_id')
-                        disconf_obj = DisconfIns.object.get(disconf_id)
+                        disconf_obj = DisconfIns.objects.get(disconf_id)
                         disconf_obj.disconf_admin_content = disconf_info.get('disconf_admin_content')
                         disconf_obj.disconf_server_name = disconf_info.get('disconf_server_name')
                         disconf_obj.save()
