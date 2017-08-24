@@ -9,6 +9,8 @@ DEV_CRP_URL = "http://172.28.32.32:8001/"
 TEST_CRP_URL = "http://172.28.32.32:8001/"
 PROD_CRP_URL = "http://172.28.32.32:8001/"
 
+
+
 class BaseConfig:
     DEBUG = False
 
