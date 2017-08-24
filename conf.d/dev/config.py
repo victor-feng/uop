@@ -4,6 +4,10 @@ import os
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+DEV_CRP_URL = "http://172.28.32.32:8001/"
+DEV_CRP_URL = "http://172.28.32.32:8001/"
+TEST_CRP_URL = "http://172.28.32.32:8001/"
+PROD_CRP_URL = "http://172.28.32.32:8001/"
 
 class BaseConfig:
     DEBUG = False
