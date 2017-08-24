@@ -122,6 +122,7 @@ def get_resource_by_id(resource_id):
         data_str = json.dumps(data)
         CMDB_URL = current_app.config['CMDB_URL']
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + '/'
+        logging.debug('UOP get_db_info: url is %(url)s, data is %(data)', {'url': url, 'data': data})
 
         result = requests.get(url, headers=headers, data=data_str)
         result = result.json()
