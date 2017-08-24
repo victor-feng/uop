@@ -463,8 +463,8 @@ class DeploymentListAPI(Resource):
                 for disconf_info in deploy_obj.disconf_list:
                     for item in disconf_content_dict:
                         if disconf_info.ins_id == item:
-                            disconf_info.disconf_admin_content = disconf_content_dict[item]
-                            disconf_info.disconf_server_name = disconf_server_dict[item]
+                            disconf_info.disconf_admin_content = disconf_content_dict.get(item)
+                            disconf_info.disconf_server_name = disconf_server_dict.get(item)
                 deploy_obj.save()
 
                 #3、把配置推送到disconf
@@ -475,9 +475,10 @@ class DeploymentListAPI(Resource):
                         continue
                     else:
                         disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
-                        result,message = disconf_add_app_config_api_file(
+                        disconf_api_connect = DisconfServerApi('172.28.11.111')
+                        #disconf_api_connect = DisconfServerApi(disconf_info.disconf_server_name)
+                        result,message = disconf_api_connect.disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
-                                                        filename=disconf_info.disconf_name,
                                                         myfilerar=disconf_admin_name,
                                                         version=disconf_info.disconf_version,
                                                         env_id=disconf_info.disconf_env

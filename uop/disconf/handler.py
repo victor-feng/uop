@@ -75,8 +75,6 @@ class DisconfAPI(Resource):
         res_id = args.res_id
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            compute_list = resource.compute_list
-            print compute_list
             message = []
             for ins_info in resource.compute_list:
                 if ins_info is not None:
@@ -140,33 +138,33 @@ class DisconfItem(Resource):
             return ret, code
 
         app_name = resource.resource_name
-
-        ret, msg = disconf_session()
+        disconf_api = DisconfServerApi('172.28.11.111')
+        ret, msg = disconf_api.disconf_session()
         if not ret:
             return msg, 200
-        app_id, msg = disconf_app_id(app_name)
+        app_id, msg = disconf_api.disconf_app_id(app_name)
         if app_id is None:
             return msg, 200
         app_id = str(app_id)
-        version_id, msg = disconf_version_list(app_id)
+        version_id, msg = disconf_api.disconf_version_list(app_id)
         if version_id is None:
             return msg, 200
 
-        config_list, msg = disconf_config_list(app_id, '1', version_id)
+        config_list, msg = disconf_api.disconf_config_list(app_id, '1', version_id)
         if config_list is None:
             return msg, 200
 
         find = False
         for conf in config_list:
-            config, msg = disconf_config_show(str(conf.get('configId')))
+            config, msg = disconf_api.disconf_config_show(str(conf.get('configId')))
             if config is not None:
                 if filename == config.get('key'):
-                    ret, msg = disconf_filetext_update(str(config.get('configId')), filecontent)
+                    ret, msg = disconf_api.disconf_filetext_update(str(config.get('configId')), filecontent)
                     find = True
                 else:
-                    ret, msg = disconf_filetext_delete(str(config.get('configId')))
+                    ret, msg = disconf_api.disconf_filetext_delete(str(config.get('configId')))
         if not find:
-            ret, msg = disconf_filetext(app_id, '1', version_id, filecontent, filename)
+            ret, msg = disconf_api.disconf_filetext(app_id, '1', version_id, filecontent, filename)
 
         return msg, 200
 
@@ -175,7 +173,8 @@ class DisconfEnv(Resource):
     @classmethod
     def get(cls):
         try:
-            env_list = disconf_env_list()
+            disconf_api = DisconfServerApi('172.28.18.48')
+            env_list = disconf_api.disconf_env_list()
             code = 200
             flag = 'true'
             res = env_list
