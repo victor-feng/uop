@@ -453,7 +453,7 @@ class DeploymentListAPI(Resource):
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
             #disconf配置
-                #1、由于管理员要重新上传文件，所以需要重新获取文件名称
+                #1、更新数据库
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 for instance_info in disconf:
                     for disconf_info_front in instance_info.get('dislist'):
@@ -464,16 +464,17 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
                 deploy_obj.save()
 
-                message = 'ok'
-                """
-                #3、把配置推送到disconf
+                #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
                 for disconf_info in deploy_obj.disconf_list:
                     if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
                         continue
                     else:
-                        disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
+                        if len(disconf_info.disconf_admin_content.strip()) == 0:
+                            disconf_admin_name = exchange_disconf_name(disconf_info.disconf_content)
+                        else:
+                            disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
                         #server_name = disconf_info.disconf_server_name
                         server_name = '172.28.11.111'
                         if (server_name is None) or (len(server_name.strip()) == 0):
@@ -489,7 +490,7 @@ class DeploymentListAPI(Resource):
                     disconf_result.append(dict(result=result,message=message))
                 deploy_obj.save()
                 message = disconf_result
-
+                """
             #CRP配置
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
