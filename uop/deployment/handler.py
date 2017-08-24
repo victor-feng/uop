@@ -454,15 +454,16 @@ class DeploymentListAPI(Resource):
             if action == 'admin_approve_allow':  # 管理员审批通过
             #disconf配置
                 #1、由于管理员要重新上传文件，所以需要重新获取文件名称
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 for instance_info in disconf:
-                    for disconf_info in instance_info.get('dislist'):
+                    for disconf_info_front in instance_info.get('dislist'):
                         disconf_id = instance_info.get('disconf_id')
-                        disconf_obj = DisconfIns.objects.get(disconf_id)
-                        disconf_obj.disconf_admin_content = disconf_info.get('disconf_admin_content')
-                        disconf_obj.disconf_server_name = disconf_info.get('disconf_server_name')
-                        disconf_obj.save()
+                        for disconf_info in deploy_obj.disconf_list:
+                            if disconf_info.disconf_id == disconf_id:
+                                disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
+                                disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
+                disconf_id.save()
 
-                print
 
                 """
                 #3、把配置推送到disconf
