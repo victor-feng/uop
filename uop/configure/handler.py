@@ -100,6 +100,7 @@ class Configure(Resource):
         res = {
                 'code': 200,
                 'result': {
+                    'res': id,
                     'msg': u'请求成功'
                     }
                 }
