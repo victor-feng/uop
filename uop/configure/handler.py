@@ -102,6 +102,27 @@ class Configure(Resource):
                 }
         return res
 
+    @classmethod
+    def delete(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str)
+        parser.add_argument('category', type=str)
+        parser.add_argument('id', type=str)
+        args = parser.parse_args()
+        category = parser.parse_args()
+        env = args.env if args.env else 'dev'
+        category = args.category if args.category else 'nginx'
+        id = args.id if args.id else -1 
+        logging.info("[UOP] Modify configs, env:%s, category: %s, id: %s", env, category, id)
+
+        res = {
+                'code': 200,
+                'result': {
+                    'msg': u'请求成功'
+                    }
+                }
+        return res
+
 
 configure_api.add_resource(ConfigureEnv, '/env')
 configure_api.add_resource(Configure, '/')
