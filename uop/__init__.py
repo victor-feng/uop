@@ -17,7 +17,7 @@ from uop.deploy_callback import deploy_cb_blueprint
 from uop.resource_view import resource_view_blueprint
 from uop.disconf import disconf_blueprint
 from uop.configure import configure_blueprint
-
+from uop.pool import pool_blueprint
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -43,5 +43,6 @@ def create_app(config_name):
     app.register_blueprint(resource_view_blueprint, url_prefix='/api/resource_view')
     app.register_blueprint(disconf_blueprint, url_prefix='/api/disconf')
     app.register_blueprint(configure_blueprint, url_prefix='/api/configure')
+    app.register_blueprint(pool_blueprint, url_prefix='/api/pool')
 
     return app
