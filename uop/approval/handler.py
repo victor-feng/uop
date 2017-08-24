@@ -152,6 +152,9 @@ class Reservation(Resource):
 
     def attach_domain_ip(self, compute_list, res):
         old_compute_list = res.compute_list
+        for c in compute_list:
+            if not c.get("domain_ip", ""):
+                return False
         try:
             for i in xrange(0, len(old_compute_list)):
                 match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
@@ -162,6 +165,7 @@ class Reservation(Resource):
             res.save()
         except Exception as e:
             print "attach domain_ip to compute error:{}".format(e)
+        return True
 
     def post(self):
         code = 0
@@ -176,7 +180,17 @@ class Reservation(Resource):
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             if new_computelist:
-                self.attach_domain_ip(new_computelist, resource)
+                flag = self.attach_domain_ip(new_computelist, resource)
+                if not flag:
+                    res = "some application does not deplay the nginx ip."
+                    code = 500
+                    ret = {
+                        "code": code,
+                        "result": {
+                            "res": res
+                        }
+                    }
+                    return ret, code
             #resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
