@@ -310,10 +310,6 @@ class DeploymentListAPI(Resource):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
-                    server_name = disconf_info.disconf_server_name
-                    if (server_name is None) or (len(server_name.strip()) == 0):
-                        server_name = '172.28.11.111'
-                    disconf_api_connect = DisconfServerApi(server_name)
                     instance_info = dict(ins_name = disconf_info.ins_name,
                                          ins_id = disconf_info.ins_id,
                                          dislist = [dict(disconf_tag = disconf_info.disconf_tag,
@@ -323,7 +319,7 @@ class DeploymentListAPI(Resource):
                                                         disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
                                                         disconf_id = disconf_info.disconf_id,
-                                                        disconf_env = disconf_api_connect.disconf_env_name(env_id=disconf_info.disconf_env)
+                                                        disconf_env = disconf_info.disconf_env
                                                         )]
                                          )
                     if len(disconf) == 0:
@@ -462,6 +458,7 @@ class DeploymentListAPI(Resource):
                             if disconf_info.disconf_id == disconf_id:
                                 disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
                                 disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
+                                disconf_info.disconf_env = disconf_info_front.get('disconf_env')
                 deploy_obj.save()
 
                 #2、把配置推送到disconf
@@ -480,11 +477,15 @@ class DeploymentListAPI(Resource):
                         if (server_name is None) or (len(server_name.strip()) == 0):
                             server_name = '172.28.11.111'
                         disconf_api_connect = DisconfServerApi(server_name)
+                        if disconf_info.disconf_env.isdigit():
+                            env_id = disconf_info.disconf_env
+                        else:
+                            env_id = disconf_api_connect.disconf_env_id(env_name=disconf_info.disconf_env)
                         result,message = disconf_api_connect.disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
                                                         myfilerar=disconf_admin_name,
                                                         version=disconf_info.disconf_version,
-                                                        env_id=disconf_info.disconf_env
+                                                        env_id=env_id
                                                         )
 
                     disconf_result.append(dict(result=result,message=message))
@@ -569,7 +570,8 @@ class DeploymentListAPI(Resource):
                         disconf_admin_content = disconf_info.get('disconf_admin_content')
                         disconf_server_name = disconf_info.get('disconf_server_name')
                         disconf_version = disconf_info.get('disconf_version')
-                        disconf_env = disconf_info.get('disconf_env')
+                        #disconf_env = disconf_info.get('disconf_env')
+                        disconf_env = 'rd'
                         disconf_id = str(uuid.uuid1())
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
