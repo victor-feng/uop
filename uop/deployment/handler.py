@@ -139,6 +139,7 @@ def get_resource_by_id(resource_id):
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
+    logging.debug('UOP get_db_info: resource_info is %(ri)s', {'ri': resource_info})
     return err_msg, resource_info
 
 
