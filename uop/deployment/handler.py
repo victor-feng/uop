@@ -464,7 +464,7 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
                 deploy_obj.save()
 
-
+                message = 'ok'
                 """
                 #3、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
