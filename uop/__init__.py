@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from flask import Flask, redirect
 from flask_restful import Resource, Api
+
 from config import configs
 from models import db
 from uop.log import logger_setting, Log
@@ -14,6 +16,7 @@ from uop.approval import approval_blueprint
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.resource_view import resource_view_blueprint
 from uop.disconf import disconf_blueprint
+from uop.configure import configure_blueprint
 
 
 def create_app(config_name):
@@ -39,5 +42,6 @@ def create_app(config_name):
     app.register_blueprint(deploy_cb_blueprint, url_prefix='/api/dep_result')
     app.register_blueprint(resource_view_blueprint, url_prefix='/api/resource_view')
     app.register_blueprint(disconf_blueprint, url_prefix='/api/disconf')
+    app.register_blueprint(configure_blueprint, url_prefix='/api/configure')
 
     return app

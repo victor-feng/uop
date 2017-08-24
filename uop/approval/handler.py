@@ -149,18 +149,38 @@ class ApprovalInfo(Resource):
 
 
 class Reservation(Resource):
+
+    def attach_domain_ip(self, compute_list, res):
+        old_compute_list = res.compute_list
+        try:
+            for i in xrange(0, len(old_compute_list)):
+                match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
+                old_compute_list.remove(old_compute_list[i])
+                compute = models.ComputeIns(ins_name=match_one["ins_name"], ins_id=match_one["ins_id"], cpu=match_one["cpu"], mem=match_one["mem"],
+                                             url=match_one["url"], domain=match_one["domain"], quantity=match_one["quantity"], port=match_one["port"], domain_ip=match_one["domain_ip"])
+                old_compute_list.insert(i, compute)
+            res.save()
+        except Exception as e:
+            print "attach domain_ip to compute error:{}".format(e)
+
     def post(self):
         code = 0
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str)
+        parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         resource_id = args.resource_id
+        new_computelist = args.compute_list
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            if new_computelist:
+                self.attach_domain_ip(new_computelist, resource)
+            #resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
+            print e
             code = 410
             res = "Failed to find the rsource"
             ret = {
@@ -171,7 +191,6 @@ class Reservation(Resource):
                 }
             }
             return ret, code
-
 
         data = dict()
         data['unit_id'] = resource.project_id
@@ -217,8 +236,8 @@ class Reservation(Resource):
                         "image_url": db_com.url,
                         "quantity": db_com.quantity,
                         "domain": db_com.domain,
-                        "domain_ip": db_com.domain_ip,
-                        "port": db_com.port
+                        "port": db_com.port,
+                        "domain_ip": db_com.domain_ip
                     }
                 )
             data['compute_list'] = com
