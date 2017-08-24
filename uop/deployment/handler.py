@@ -322,6 +322,7 @@ class DeploymentListAPI(Resource):
                                                         disconf_admin_content = disconf_info.disconf_admin_content,
                                                         disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
+                                                        disconf_id = disconf_info.disconf_id,
                                                         disconf_env = disconf_api_connect.disconf_env_name(env_id=disconf_info.disconf_env)
                                                         )]
                                          )
@@ -452,27 +453,18 @@ class DeploymentListAPI(Resource):
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
             #disconf配置
-                #1、由于管理员要重新上传文件，所以需要重新获取文件名称，disconf_content
-                disconf_content_dict = dict
-                disconf_server_dict = dict
+                #1、由于管理员要重新上传文件，所以需要重新获取文件名称
                 for instance_info in disconf:
                     for disconf_info in instance_info.get('dislist'):
-                        ins_id = instance_info.get('ins_id')
-                        disconf_admin_content = disconf_info.get('disconf_admin_content')
-                        disconf_server_name = disconf_info.get('disconf_server_name')
-                        disconf_content_dict[ins_id] = disconf_admin_content
-                        disconf_server_dict[ins_id] = disconf_server_name
+                        disconf_id = instance_info.get('disconf_id')
+                        disconf_obj = DisconfIns.object.get(disconf_id)
+                        disconf_obj.disconf_admin_content = disconf_info.get('disconf_admin_content')
+                        disconf_obj.disconf_server_name = disconf_info.get('disconf_server_name')
+                        disconf_obj.save()
 
-                #2、更新数据库数据
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.approve_status = 'success'
-                for disconf_info in deploy_obj.disconf_list:
-                    for item in disconf_content_dict:
-                        if disconf_info.ins_id == item:
-                            disconf_info.disconf_admin_content = disconf_content_dict.get(item)
-                            disconf_info.disconf_server_name = disconf_server_dict.get(item)
-                deploy_obj.save()
+                print
 
+                """
                 #3、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
@@ -511,7 +503,7 @@ class DeploymentListAPI(Resource):
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
-
+                """
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
@@ -576,6 +568,7 @@ class DeploymentListAPI(Resource):
                         disconf_server_name = disconf_info.get('disconf_server_name')
                         disconf_version = disconf_info.get('disconf_version')
                         disconf_env = disconf_info.get('disconf_env')
+                        disconf_id = str(uuid.uuid1())
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
                                                  disconf_name = disconf_name,
@@ -583,7 +576,8 @@ class DeploymentListAPI(Resource):
                                                  disconf_admin_content = disconf_admin_content,
                                                  disconf_server_name = disconf_server_name,
                                                  disconf_version = disconf_version,
-                                                 disconf_env = disconf_env
+                                                 disconf_env = disconf_env,
+                                                 disconf_id = disconf_id,
                                                  )
                         deploy_item.disconf_list.append(disconf_ins)
 

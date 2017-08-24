@@ -39,6 +39,7 @@ class DisconfIns(db.EmbeddedDocument):
     disconf_server_name = db.StringField(required=False)
     disconf_version = db.StringField(required=False)
     disconf_env = db.StringField(required=False)
+    disconf_id = db.StringField(required=False)
     meta = {
         'collection': 'disconf_ins',
         'index': [
