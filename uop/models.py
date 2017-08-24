@@ -212,3 +212,48 @@ class ItemInformation(db.DynamicDocument):
             ],
         'index_background': True
     }
+
+#class ConfigureEnv(db.DynamicDocument):
+class ConfigureEnvModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    name = db.StringField(required=False, max_length=50)
+
+    meta = {
+            "collection": "configure_env",
+            "index": [{
+                'fields': ['id'],
+                'unique': True,
+                }]
+            }
+
+class ConfigureDisconfModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    env = db.StringField(required=False, max_length=50)
+    name = db.StringField(required=False, max_length=50)
+    username = db.StringField(required=False, max_length=50)
+    password = db.StringField(required=False, max_length=50)
+    url = db.StringField(required=False, max_length=50)
+
+    meta = {
+            "collection": "configure_disconf",
+            "index": [{
+                'fields': ['id'],
+                'unique': True,
+                }]
+            }
+
+
+class ConfigureNginxModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    env = db.StringField(required=False, max_length=50)
+    name = db.StringField(required=False, max_length=50)
+    url = db.StringField(required=False, max_length=50)
+
+    meta = {
+            "collection": "configure_nginx",
+            "index": [{
+                'fields': ['id'],
+                'unique': True,
+                }]
+            }
+
