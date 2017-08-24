@@ -173,7 +173,14 @@ class DisconfEnv(Resource):
     @classmethod
     def get(cls):
         try:
-            disconf_api = DisconfServerApi('172.28.18.48')
+            parser = reqparse.RequestParser()
+            parser.add_argument('disconf_server', type=str, location='args')
+            args = parser.parse_args()
+            disconf_server = args.disconf_server
+            print disconf_server
+            if (disconf_server is None) or (len(disconf_server.strip()) == 0):
+                disconf_server = '172.28.11.111'
+            disconf_api = DisconfServerApi(disconf_server)
             env_list = disconf_api.disconf_env_list()
             code = 200
             flag = 'true'
