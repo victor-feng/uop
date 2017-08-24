@@ -311,7 +311,7 @@ class DeploymentListAPI(Resource):
                 disconf = []
                 for disconf_info in deployment.disconf_list:
                     server_name = disconf_info.disconf_server_name
-                    if len(server_name.strip()) == 0:
+                    if (server_name is None) or (len(server_name.strip()) == 0):
                         server_name = '172.28.11.111'
                     disconf_api_connect = DisconfServerApi(server_name)
                     instance_info = dict(ins_name = disconf_info.ins_name,
