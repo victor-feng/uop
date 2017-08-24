@@ -477,6 +477,7 @@ class DeploymentListAPI(Resource):
                             disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
 
                         server_name = disconf_info.disconf_server_name
+                        print "server_name>>>>>>>>>>>>>>>>>>>>>>",server_name
                         if (server_name is None) or (len(server_name.strip()) == 0):
                             server_name = '172.28.11.111'
                         disconf_api_connect = DisconfServerApi(server_name)
