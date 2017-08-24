@@ -491,7 +491,7 @@ class DeploymentListAPI(Resource):
                     disconf_result.append(dict(result=result,message=message))
                 deploy_obj.save()
                 message = disconf_result
-
+                """
             #CRP配置
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
@@ -506,7 +506,7 @@ class DeploymentListAPI(Resource):
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
-
+                """
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
