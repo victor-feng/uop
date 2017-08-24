@@ -310,6 +310,8 @@ class DeploymentListAPI(Resource):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
+                    disconf_api_connect = DisconfServerApi('172.28.18.48')
+                    #disconf_api_connect = DisconfServerApi(disconf_info.disconf_server_name)
                     instance_info = dict(ins_name = disconf_info.ins_name,
                                          ins_id = disconf_info.ins_id,
                                          dislist = [dict(disconf_tag = disconf_info.disconf_tag,
@@ -318,7 +320,7 @@ class DeploymentListAPI(Resource):
                                                         disconf_admin_content = disconf_info.disconf_admin_content,
                                                         disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
-                                                        disconf_env = disconf_env_name(env_id=disconf_info.disconf_env)
+                                                        disconf_env = disconf_api_connect.disconf_env_name(env_id=disconf_info.disconf_env)
                                                         )]
                                          )
                     if len(disconf) == 0:
