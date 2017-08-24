@@ -481,8 +481,11 @@ class DeploymentListAPI(Resource):
                         continue
                     else:
                         disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
-                        disconf_api_connect = DisconfServerApi('172.28.11.111')
-                        #disconf_api_connect = DisconfServerApi(disconf_info.disconf_server_name)
+                        #server_name = disconf_info.disconf_server_name
+                        server_name = '172.28.11.111'
+                        if (server_name is None) or (len(server_name.strip()) == 0):
+                            server_name = '172.28.11.111'
+                        disconf_api_connect = DisconfServerApi(server_name)
                         result,message = disconf_api_connect.disconf_add_app_config_api_file(
                                                         app_name=disconf_info.ins_name,
                                                         myfilerar=disconf_admin_name,
