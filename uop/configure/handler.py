@@ -40,7 +40,7 @@ class Configure(Resource):
         logging.info("[UOP] Get configs, env:%s, category: %s", env, category)
         if env == 'dev':
             if category == 'nginx':
-                envs = [dict(name=u'开发环境Nginx', url='192.168.2.1', id=1),
+                envs = [dict(name=u'开发环境Nginx', url='172.28.20.98', id=1),
                         ]
             else:
                 envs = [dict(name=u'开发环境Disconf', url='172.28.18.48', id=1),
