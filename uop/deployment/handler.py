@@ -473,16 +473,19 @@ class DeploymentListAPI(Resource):
                         else:
                             disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
 
-                        #server_info = {'disconf_server_name':disconf_info.disconf_server_name,
-                        #               'disconf_server_url':disconf_info.disconf_server_url,
-                        #               'disconf_server_user':disconf_info.disconf_server_user,
-                        #               'disconf_server_password':disconf_info.disconf_server_password,
-                        #               }
+                        server_info = {'disconf_server_name':disconf_info.disconf_server_name,
+                                       'disconf_server_url':disconf_info.disconf_server_url,
+                                       'disconf_server_user':disconf_info.disconf_server_user,
+                                       'disconf_server_password':disconf_info.disconf_server_password,
+                                       }
+
+                        '''
                         server_info = {'disconf_server_name':'172.28.11.111',
                                        'disconf_server_url':'http://172.28.11.111:8081',
                                        'disconf_server_user':'admin',
                                        'disconf_server_password':'admin',
                                        }
+                        '''
                         disconf_api_connect = DisconfServerApi(server_info)
                         if disconf_info.disconf_env.isdigit():
                             env_id = disconf_info.disconf_env
