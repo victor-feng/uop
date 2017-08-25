@@ -500,7 +500,7 @@ class DeploymentListAPI(Resource):
                 message = disconf_result
 
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                #deploy_obj.approve_status = 'success'
+                deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
