@@ -232,6 +232,7 @@ class ConfigureDisconfModel(db.Document):
     name = db.StringField(required=False, max_length=50)
     username = db.StringField(required=False, max_length=50)
     password = db.StringField(required=False, max_length=50)
+    ip = db.StringField(required=False, max_length=50)
     url = db.StringField(required=False, max_length=50)
 
     meta = {
@@ -247,7 +248,7 @@ class ConfigureNginxModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     env = db.StringField(required=False, max_length=50)
     name = db.StringField(required=False, max_length=50)
-    url = db.StringField(required=False, max_length=50)
+    ip = db.StringField(required=False, max_length=50)
 
     meta = {
             "collection": "configure_nginx",
