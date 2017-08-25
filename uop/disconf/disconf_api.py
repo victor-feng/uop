@@ -4,8 +4,6 @@ import requests
 import json
 import os
 import shutil
-#from uop import models
-from config import APP_ENV, configs
 
 session = requests.Session()
 
@@ -27,12 +25,12 @@ def exchange_disconf_name(name):
 
 
 class DisconfServerApi(object):
-    def __init__(self,disconf_server_name):
-        self.disconf_server_name = disconf_server_name
+    def __init__(self,disconf_server_info):
+        self.disconf_server_name = disconf_server_info.get('disconf_server_name')
         #self.disconf_url = 'http://172.28.18.48:8081'
         #self.disconf_user_info = {'name': 'admin', 'password': 'admin', 'remember': '0'}
-        self.disconf_url = configs[APP_ENV].DISCONF_USER_CONFIG.get(disconf_server_name).get('server_url')
-        self.disconf_user_info = configs[APP_ENV].DISCONF_USER_CONFIG.get(disconf_server_name).get('user_info')
+        self.disconf_url = disconf_server_info.get('disconf_server_url')
+        self.disconf_user_info = {'name':disconf_server_info.get('disconf_server_user'),'password':disconf_server_info.get('disconf_server_password'),'remember':'0'}
         self.SIGNIN = self.disconf_url + '/api/account/signin'
         self.SESSION = self.disconf_url + '/api/account/session'
         self.APP = self.disconf_url + '/api/app'
@@ -432,9 +430,17 @@ if __name__ == '__main__':
     filecontent = 'dsfsdfsfs-new-add>>>>>>>>>>>>>>>>>'
     myfilerar = '/root/test.py'
     name = '/opt/test111,147ab190-87af-11e7-af82-fa163e9474c9'
-    disconf_api = DisconfServerApi('172.28.11.111')
-    #print disconf_api.disconf_app_list()
-    #print disconf_api.disconf_env_list()
+    server_info = {'disconf_server_name':'172.28.11.111',
+                   'disconf_server_url':'http://172.28.11.111:8081',
+                   'disconf_server_user':'admin',
+                   'disconf_server_password':'admin',
+                   }
+    disconf_api = DisconfServerApi(server_info)
+    print disconf_api.disconf_server_name
+    print disconf_api.disconf_url
+    print disconf_api.disconf_user_info
+    print disconf_api.disconf_app_list()
+    print disconf_api.disconf_env_list()
     #print disconf_api.disconf_app(app_name='final71',desc='sfsdf')
     #print disconf_api.disconf_get_app_config_api(app_name='final71',env_id='1')
     #print disconf_api.disconf_env_name(env_id='2')

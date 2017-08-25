@@ -473,10 +473,17 @@ class DeploymentListAPI(Resource):
                         else:
                             disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
 
-                        server_name = disconf_info.disconf_server_name
-                        if (server_name is None) or (len(server_name.strip()) == 0):
-                            server_name = '172.28.11.111'
-                        disconf_api_connect = DisconfServerApi(server_name)
+                        #server_info = {'disconf_server_name':disconf_info.disconf_server_name,
+                        #               'disconf_server_url':disconf_info.disconf_server_url,
+                        #               'disconf_server_user':disconf_info.disconf_server_user,
+                        #               'disconf_server_password':disconf_info.disconf_server_password,
+                        #               }
+                        server_info = {'disconf_server_name':'172.28.11.111',
+                                       'disconf_server_url':'http://172.28.11.111:8081',
+                                       'disconf_server_user':'admin',
+                                       'disconf_server_password':'admin',
+                                       }
+                        disconf_api_connect = DisconfServerApi(server_info)
                         if disconf_info.disconf_env.isdigit():
                             env_id = disconf_info.disconf_env
                         else:
@@ -493,7 +500,7 @@ class DeploymentListAPI(Resource):
                 message = disconf_result
 
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.approve_status = 'success'
+                #deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
@@ -568,9 +575,11 @@ class DeploymentListAPI(Resource):
                         disconf_content = disconf_info.get('disconf_content')
                         disconf_admin_content = disconf_info.get('disconf_admin_content')
                         disconf_server_name = disconf_info.get('disconf_server_name')
+                        disconf_server_url = disconf_info.get('disconf_server_url')
+                        disconf_server_user = disconf_info.get('disconf_server_user')
+                        disconf_server_password = disconf_info.get('disconf_server_password')
                         disconf_version = disconf_info.get('disconf_version')
-                        #disconf_env = disconf_info.get('disconf_env')
-                        disconf_env = 'rd'
+                        disconf_env = disconf_info.get('disconf_env')
                         disconf_id = str(uuid.uuid1())
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
@@ -578,6 +587,9 @@ class DeploymentListAPI(Resource):
                                                  disconf_content = disconf_content,
                                                  disconf_admin_content = disconf_admin_content,
                                                  disconf_server_name = disconf_server_name,
+                                                 disconf_server_url = disconf_server_url,
+                                                 disconf_server_user = disconf_server_user,
+                                                 disconf_server_password = disconf_server_password,
                                                  disconf_version = disconf_version,
                                                  disconf_env = disconf_env,
                                                  disconf_id = disconf_id,
