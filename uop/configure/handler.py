@@ -48,7 +48,7 @@ class Configure(Resource):
             for env in ret: 
                 envs.append(dict(id=env.id, 
                                  name=env.name,
-                                 url=env.url))
+                                 ip=env.ip))
         else: # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret: 
@@ -56,6 +56,7 @@ class Configure(Resource):
                                  name=env.name,
                                  username=env.username,
                                  password=env.password,
+                                 ip=env.ip,
                                  url=env.url))
         res = {
                 'code': 200,
@@ -72,6 +73,7 @@ class Configure(Resource):
         parser.add_argument('env', type=str)
         parser.add_argument('category', type=str)
         parser.add_argument('url', type=str)
+        parser.add_argument('ip', type=str)
         parser.add_argument('name', type=str)
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
@@ -87,12 +89,13 @@ class Configure(Resource):
         id = str(uuid.uuid1())
         if category == 'nginx':
             ret = ConfigureNginxModel(env=env,
-                                     url=url,
+                                     ip=ip,
                                      name=name,
                                      id=id).save()
         else:
             ret = ConfigureDisconfModel(env=env,
                                      url=url,
+                                     ip=ip,
                                      name=name,
                                      username=username,
                                      password=password,
@@ -112,6 +115,7 @@ class Configure(Resource):
         parser.add_argument('env', type=str)
         parser.add_argument('category', type=str)
         parser.add_argument('url', type=str)
+        parser.add_argument('ip', type=str)
         parser.add_argument('name', type=str)
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
@@ -121,6 +125,7 @@ class Configure(Resource):
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
         url = args.url if args.url else ''
+        ip = args.ip if args.ip else ''
         name = args.name if args.name else ''
         category = args.category if args.category else 'nginx'
         username = args.username if args.username else ''
@@ -129,10 +134,10 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
-            ret.update(name=name,url=url)
+            ret.update(name=name,ip=ip)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
-            ret.update(name=name,url=url,username=username,password=password)
+            ret.update(name=name,url=url,ip=ip,username=username,password=password)
 
         res = {
                 'code': 200,
