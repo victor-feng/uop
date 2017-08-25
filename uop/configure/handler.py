@@ -79,7 +79,8 @@ class Configure(Resource):
         parser.add_argument('password', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
-        url = args.url if args.url else 'dev'
+        url = args.url if args.url else ''
+        ip = args.ip if args.ip else ''
         name = args.name if args.name else ''
         username = args.username if args.username else 'dev'
         password = args.password if args.password else 'dev'
