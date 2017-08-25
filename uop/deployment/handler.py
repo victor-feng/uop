@@ -164,8 +164,8 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
             "vip2": resource_info['mongodb_cluster']['vip2'],
             "vip3": resource_info['mongodb_cluster']['vip3'],
             "port": resource_info['mongodb_cluster']['port'],
-            "host_username": "root",
-            "host_password": "123456",
+            "db_username": resource_name,
+            "db_password": database_password,
             "mongodb_username": resource_info['mongodb_cluster']['user'],
             "mongodb_password": resource_info['mongodb_cluster']['password'],
             "database": "mongodb",
@@ -498,8 +498,7 @@ class DeploymentListAPI(Resource):
                     disconf_result.append(dict(result=result,message=message))
                 deploy_obj.save()
                 message = disconf_result
-                """
-            #CRP配置
+
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
@@ -513,7 +512,7 @@ class DeploymentListAPI(Resource):
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
-                """
+
             elif action == 'admin_approve_forbid':  # 管理员审批不通过
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'fail'
