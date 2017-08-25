@@ -177,10 +177,12 @@ class DisconfEnv(Resource):
             parser.add_argument('disconf_server', type=str, location='args')
             args = parser.parse_args()
             disconf_server = args.disconf_server
-            print disconf_server
-            if (disconf_server is None) or (len(disconf_server.strip()) == 0):
-                disconf_server = '172.28.11.111'
-            disconf_api = DisconfServerApi(disconf_server)
+            server_info = {'disconf_server_name':'172.28.11.111',
+                           'disconf_server_url':'http://172.28.11.111:8081',
+                           'disconf_server_user':'admin',
+                           'disconf_server_password':'admin',
+                           }
+            disconf_api = DisconfServerApi(server_info)
             env_list = disconf_api.disconf_env_list()
             code = 200
             flag = 'true'
