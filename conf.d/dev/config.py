@@ -5,7 +5,6 @@ APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEV_CRP_URL = "http://172.28.32.32:8001/"
-DEV_CRP_URL = "http://172.28.32.32:8001/"
 TEST_CRP_URL = "http://172.28.32.32:8001/"
 PROD_CRP_URL = "http://172.28.32.32:8001/"
 
@@ -24,7 +23,11 @@ class DevelopmentConfig(BaseConfig):
             'username': 'uop',
             'password': 'uop',
             }
-    CRP_URL = "http://172.28.32.32:8001/"
+    CRP_URL = {
+        'dev': DEV_CRP_URL,
+        'test': TEST_CRP_URL,
+        'prod': PROD_CRP_URL,
+    }
     CMDB_URL = "http://cmdb-dev.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"

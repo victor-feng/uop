@@ -16,15 +16,9 @@ from uop.models import Deployment, ResourceModel, DisconfIns
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
+from uop.util import get_CRP_url
 
 
-#CPR_URL = configs[APP_ENV].CRP_URL
-#CMDB_URL = configs[APP_ENV].CMDB_URL
-#UPLOAD_FOLDER = configs[APP_ENV].UPLOAD_FOLDER
-
-#CPR_URL = current_app.config['CRP_URL']
-#CMDB_URL = current_app.config['CMDB_URL']
-#UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
@@ -191,8 +185,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
     err_msg = None
     result = None
     try:
-
-        CPR_URL = current_app.config['CRP_URL']
+        CPR_URL = get_CRP_url(res_obj['env'])
         url = CPR_URL + "api/deploy/deploys"
         headers = {
             'Content-Type': 'application/json',
@@ -206,7 +199,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
             file_paths.append(('mongodb', deploy_item.mongodb_context))
 
         if file_paths:
-            res = upload_files_to_crp(file_paths)
+            res = upload_files_to_crp(file_paths, res_obj['env'])
             cont = json.loads(res.content)
             if cont.get('code') == 200:
                 for type, path_filename in cont['file_info'].items():
@@ -227,9 +220,9 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
     return err_msg, result
 
 
-def upload_files_to_crp(file_paths):
+def upload_files_to_crp(file_paths, env):
 
-    CPR_URL = current_app.config['CRP_URL']
+    CPR_URL = get_CRP_url(env)
     url = CPR_URL + "api/deploy/upload"
     files = []
     for db_type, path in file_paths:

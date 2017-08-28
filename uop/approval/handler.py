@@ -12,13 +12,10 @@ from flask import current_app
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-#from config import APP_ENV, configs
-
+from uop.util import get_CRP_url
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
-#CPR_URL = current_app.config['CRP_URL']
-#CPR_URL = configs[APP_ENV].CRP_URL
 
 
 class ApprovalList(Resource):
@@ -259,7 +256,7 @@ class Reservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            CPR_URL = current_app.config['CRP_URL']
+            CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service."
@@ -357,7 +354,7 @@ class ReservationAPI(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            CPR_URL = current_app.config['CRP_URL']
+            CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service."
