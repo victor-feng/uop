@@ -12,10 +12,13 @@ from flask import current_app
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-from uop.util import get_CRP_url
+#from config import APP_ENV, configs
+
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
+#CPR_URL = current_app.config['CRP_URL']
+#CPR_URL = configs[APP_ENV].CRP_URL
 
 
 class ApprovalList(Resource):
@@ -176,18 +179,18 @@ class Reservation(Resource):
         new_computelist = args.compute_list
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            if new_computelist:
-                flag = self.attach_domain_ip(new_computelist, resource)
-                if not flag:
-                    res = "some application does not deplay the nginx ip."
-                    code = 500
-                    ret = {
-                        "code": code,
-                        "result": {
-                            "res": res
-                        }
-                    }
-                    return ret, code
+            # if new_computelist:
+            #     flag = self.attach_domain_ip(new_computelist, resource)
+            #     if not flag:
+            #         res = "some application does not deplay the nginx ip."
+            #         code = 500
+            #         ret = {
+            #             "code": code,
+            #             "result": {
+            #                 "res": res
+            #             }
+            #         }
+            #         return ret, code
             #resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
@@ -256,7 +259,7 @@ class Reservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            CPR_URL = get_CRP_url(data['env'])
+            CPR_URL = current_app.config['CRP_URL']
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service."
@@ -354,7 +357,7 @@ class ReservationAPI(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            CPR_URL = get_CRP_url(data['env'])
+            CPR_URL = current_app.config['CRP_URL']
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service."

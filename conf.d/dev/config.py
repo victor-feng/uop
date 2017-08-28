@@ -4,7 +4,7 @@ import os
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-DEV_CRP_URL = "http://172.28.32.32:8001/"
+DEV_CRP_URL = "http://127.0.0.1:8001/"
 TEST_CRP_URL = "http://172.28.32.32:8001/"
 PROD_CRP_URL = "http://172.28.32.32:8001/"
 
@@ -18,7 +18,7 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     MONGODB_SETTINGS = {
             'db': 'uop',
-            'host': '172.28.20.124',
+            'host': '127.0.0.1',
             'port': 27017,
             'username': 'uop',
             'password': 'uop',
@@ -28,7 +28,7 @@ class DevelopmentConfig(BaseConfig):
         'test': TEST_CRP_URL,
         'prod': PROD_CRP_URL,
     }
-    CMDB_URL = "http://cmdb-dev.syswin.com/"
+    CMDB_URL = "http://127.0.0.1:5000/"
 
     UPLOAD_FOLDER = "/data/"
     #TODO:  move it to conf
