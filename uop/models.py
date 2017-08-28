@@ -141,7 +141,7 @@ class DBIns(db.EmbeddedDocument):
 
 
 class ResourceModel(db.DynamicDocument):
-    resource_name = db.StringField(required=True, unique=True)
+    resource_name = db.StringField(required=True)
     project = db.StringField(required=True)
     project_id = db.StringField(required=False)
     department = db.StringField(required=True)
@@ -152,7 +152,7 @@ class ResourceModel(db.DynamicDocument):
     # created_date = db.DateTimeField(default=datetime.datetime.now())
     created_date = db.DateTimeField(required=False)
     domain = db.StringField(required=False)
-    env = db.StringField(required=False)
+    env = db.StringField(required=True, unique_with= 'resource_name')
     application_status = db.StringField(required=False)
     approval_status = db.StringField(required=False)
     reservation_status = db.StringField(required=False)
@@ -162,9 +162,9 @@ class ResourceModel(db.DynamicDocument):
 
     meta = {
         'collection': 'resources',
-        'index': [
+        'indexes': [
             {
-                'fields': ['resource_name', 'res_id'],
+                'fields': ['res_id', ('resource_name', 'env')],
                 'sparse': True,
                 }
             ],
