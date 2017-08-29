@@ -570,7 +570,7 @@ class DeploymentListAPI(Resource):
                     redis_context=redis_context,
                     mongodb_tag=mongodb_exe_mode,
                     mongodb_context=mongodb_context,
-                    app_image=app_image,
+                    app_image=str(app_image),
                     deploy_result=deploy_result,
                     apply_status=apply_status,
                     approve_status=approve_status,
