@@ -139,17 +139,15 @@ def get_resource_by_id(resource_id):
 
 def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
-    deploy_obj = Deployment.objects.get(deploy_id=deploy_item.deploy_id)
-
     data = {
         "deploy_id": deploy_item.deploy_id,
         "appinfo": appinfo,
         "dns":[],
     }
 
-    for app_info in deploy_obj.app_image:
-        dns_info = {'domain': app_info.get('domain'),
-                    'domain_ip': app_info.get('doamin_ip')
+    for app_info in res_obj.compute_list:
+        dns_info = {'domain': app_info.domain,
+                    'domain_ip': app_info.domain_ip
                     }
         data['dns'].append(dns_info)
 
