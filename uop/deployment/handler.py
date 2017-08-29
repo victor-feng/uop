@@ -137,10 +137,11 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
+def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
+        "appinfo": appinfo
     }
     if resource_info.get('mysql_cluster'):
         data['mysql'] = {
@@ -259,14 +260,11 @@ def disconf_write_to_file(file_name, file_content, instance_name, type):
 def attach_domain_ip(compute_list, res):
         old_compute_list = res.compute_list
         appinfo = []
-        print old_compute_list
-        print compute_list
         for c in compute_list:
             if not c.get("domain_ip", ""):
-                return False
+                return False, appinfo
         try:
             for i in old_compute_list:
-                print i.ins_id
                 tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id)][0]
                 tmp["ips"] = i.ips
                 appinfo.append(tmp)
@@ -280,7 +278,8 @@ def attach_domain_ip(compute_list, res):
             res.save()
         except Exception as e:
             print "attach domain_ip to appinfo error:{}".format(e)
-        return True
+        return True, appinfo
+
 
 class DeploymentListAPI(Resource):
 
@@ -483,11 +482,10 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                                 disconf_info.disconf_env = disconf_info_front.get('disconf_env')
                 deploy_obj.app_image = str(app_image)
-                appinfo = attach_domain_ip(app_image, resource)
-                if not appinfo:
+                flag, appinfo = attach_domain_ip(app_image, resource)
+                if not flag:
                     return {"code": 403, "msg": "some app doesn't deploy nginx ip"}, 403
                 deploy_obj.save()
-                logging.debug("deploy nginx ip to crp result:{}".format(result))
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
@@ -532,8 +530,9 @@ class DeploymentListAPI(Resource):
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+                print "$$$$$$$$$$$", resource_info, err_msg
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
                         print 'deploy_to_crp err: '+ err_msg
