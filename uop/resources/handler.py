@@ -88,7 +88,7 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
 
         try:
-            if ResourceModel.objects.filter(resource_name=resource_name).count():
+            if ResourceModel.objects.filter(resource_name=resource_name, env=env).count():
                 res = {
                     'code': 200,
                     'result': {
