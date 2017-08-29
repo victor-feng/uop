@@ -18,5 +18,4 @@
 
 
 # keepalived
-172.28.32.57 cmdb.com uop.com crp.com mpc.com mpc-cmdb.com mpc-crp.com
-~
+172.28.32.57 cmdb-test.syswin.com uop-test.syswin.com
