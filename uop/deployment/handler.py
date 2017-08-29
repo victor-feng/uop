@@ -12,7 +12,7 @@ from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel, DisconfIns
+from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
@@ -137,10 +137,11 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, resource_name, database_password):
+def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
+        "appinfo": appinfo
     }
     if resource_info.get('mysql_cluster'):
         data['mysql'] = {
@@ -258,6 +259,30 @@ def disconf_write_to_file(file_name, file_content, instance_name, type):
     return upload_file
 
 
+def attach_domain_ip(compute_list, res):
+        old_compute_list = res.compute_list
+        appinfo = []
+        for c in compute_list:
+            if not c.get("domain_ip", ""):
+                return False, appinfo
+        try:
+            for i in old_compute_list:
+                tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id)][0]
+                tmp["ips"] = i.ips
+                appinfo.append(tmp)
+            for i in xrange(0, len(old_compute_list)):
+                match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
+                o = old_compute_list[i]
+                old_compute_list.remove(old_compute_list[i])
+                compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
+                                             url=o.url, domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one["domain_ip"])
+                old_compute_list.insert(i, compute)
+            res.save()
+        except Exception as e:
+            print "attach domain_ip to appinfo error:{}".format(e)
+        return True, appinfo
+
+
 class DeploymentListAPI(Resource):
 
     def get(self):
@@ -344,7 +369,8 @@ class DeploymentListAPI(Resource):
                     'redis_context': deployment.redis_context,
                     'mongodb_tag': deployment.mongodb_tag,
                     'mongodb_context': deployment.mongodb_context,
-                    'app_image': deployment.app_image,
+                    'app_image': eval(str(deployment.app_image)),
+                    # 'app_image': type(deployment.app_image),
                     'created_time': str(deployment.created_time),
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
@@ -386,7 +412,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('redis_context', type=str, location='json')
         parser.add_argument('mongodb_exe_mode', type=str, location='json')
         parser.add_argument('mongodb_context', type=str, location='json')
-        parser.add_argument('app_image', type=str, location='json')
+        parser.add_argument('app_image', type=list, location='json')
 
         parser.add_argument('approve_suggestion', type=str, location='json')
         parser.add_argument('apply_status', type=str, location='json')
@@ -439,7 +465,7 @@ class DeploymentListAPI(Resource):
             redis_context = write_file(uid, redis_context, 'redis')
         if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
-
+        resource = ResourceModel.objects.get(res_id=resource_id)
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
@@ -457,8 +483,11 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
                                 disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                                 disconf_info.disconf_env = disconf_info_front.get('disconf_env')
+                deploy_obj.app_image = str(app_image)
+                flag, appinfo = attach_domain_ip(app_image, resource)
+                if not flag:
+                    return {"code": 403, "msg": "some app doesn't deploy nginx ip"}, 403
                 deploy_obj.save()
-
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
@@ -503,13 +532,14 @@ class DeploymentListAPI(Resource):
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+                print "$$$$$$$$$$$", resource_info, err_msg
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
-                        print 'deploy_to_crp err: '+err_msg
+                        print 'deploy_to_crp err: '+ err_msg
                     else:
-                        print 'deploy_to_crp response: '+result
+                        print 'deploy_to_crp response: '+ result
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
@@ -540,7 +570,7 @@ class DeploymentListAPI(Resource):
                     redis_context=redis_context,
                     mongodb_tag=mongodb_exe_mode,
                     mongodb_context=mongodb_context,
-                    app_image=app_image,
+                    app_image=str(app_image),
                     deploy_result=deploy_result,
                     apply_status=apply_status,
                     approve_status=approve_status,
