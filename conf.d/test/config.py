@@ -26,9 +26,6 @@ class TestingConfig(BaseConfig):
     CMDB_URL = "http://cmdb-test.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"
-    #TODO:  move it to conf
-    DISCONF_URL = 'http://172.28.11.111:8081'
-    DISCONF_USER_INFO = {'name': 'admin', 'password': 'admin', 'remember': '0'}
 
 
 configs = {
