@@ -177,6 +177,8 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
                     {
                         'url': obj.url,
                         'ip': obj.ips,
+                        'domain_name':obj.domain_name,
+                        'domain_ip': obj.domain_ip,
                     }
                 )
             except AttributeError as e:
