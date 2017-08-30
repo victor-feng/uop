@@ -22,7 +22,12 @@ class TestingConfig(BaseConfig):
     }
 
 
-    CRP_URL = "http://crp-test.syswin.com/"
+    CRP_URL = {
+        'dev': DEV_CRP_URL,
+        'test': TEST_CRP_URL,
+        'prod': PROD_CRP_URL,
+    }
+    
     CMDB_URL = "http://cmdb-test.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"
