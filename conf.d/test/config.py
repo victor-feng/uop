@@ -4,9 +4,9 @@ import os
 APP_ENV = "testing"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-DEV_CRP_URL = "http://172.28.32.32:8001/"
-TEST_CRP_URL = "http://172.28.32.32:8001/"
-PROD_CRP_URL = "http://172.28.32.32:8001/"
+DEV_CRP_URL = "http://crp-dev.syswin.com/"
+TEST_CRP_URL = "http://crp-test.syswin.com/"
+PROD_CRP_URL = "http://crp.syswin.com/"
 
 
 class BaseConfig:
@@ -22,7 +22,12 @@ class TestingConfig(BaseConfig):
     }
 
 
-    CRP_URL = "http://crp-test.syswin.com/"
+    CRP_URL = {
+        'dev': DEV_CRP_URL,
+        'test': TEST_CRP_URL,
+        'prod': PROD_CRP_URL,
+    }
+    
     CMDB_URL = "http://cmdb-test.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"

@@ -22,8 +22,7 @@ class StatisticAPI(Resource):
     @classmethod
     def get(cls):
         try:
-            #url = current_app.config['CRP_URL']+'api/az/uopStatistics'
-	    dev_url = '%s%s'%(DEV_CRP_URL, 'api/az/uopStatistics')
+            dev_url = '%s%s'%(DEV_CRP_URL, 'api/az/uopStatistics')
             test_url = '%s%s'%(TEST_CRP_URL, 'api/az/uopStatistics')
             prod_url = '%s%s'%(PROD_CRP_URL, 'api/az/uopStatistics')
 
