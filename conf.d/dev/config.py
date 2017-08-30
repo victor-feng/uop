@@ -30,15 +30,7 @@ class DevelopmentConfig(BaseConfig):
     }
     CMDB_URL = "http://cmdb-dev.syswin.com/"
 
-
     UPLOAD_FOLDER = "/data/"
-    #TODO:  move it to conf
-    DISCONF_URL = 'http://172.28.11.111:8081'
-    DISCONF_USER_INFO = {'name': 'admin', 'password': 'admin', 'remember': '0'}
-    DISCONF_USER_CONFIG ={
-                        '172.28.11.111':{'server_url':'http://172.28.11.111:8081','user_info':{'name': 'admin', 'password': 'admin', 'remember': '0'}},
-                        '172.28.18.48':{'server_url':'http://172.28.18.48:8081','user_info':{'name': 'admin', 'password': 'admin', 'remember': '0'}},
-                        }
 
 configs = {
     'development': DevelopmentConfig,
