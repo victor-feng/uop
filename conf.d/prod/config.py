@@ -5,8 +5,8 @@ APP_ENV = "prod"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEV_CRP_URL = "http://crp-dev.syswin.com/"
-TEST_CRP_URL = "http://crp-test.syswin.com/"
-PROD_CRP_URL = "http://crp.syswin.com/"
+TEST_CRP_URL = "http://crp.syswin.com/"
+PROD_CRP_URL = "http://crp-dx.syswin.com/"
 
 
 class BaseConfig:
