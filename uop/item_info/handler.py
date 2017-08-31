@@ -215,14 +215,22 @@ class ItemPostInfo(Resource):
             res = requests.post(CMDB_API + "repo/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
-                ItemInformation(
-                    user = args.user_name,
-                    user_id = args.user_id,
-                    item_id = ret.get("result").get("id"),
-                    item_name = args.item_name,
-                    item_depart= args.item_department,
-                    item_description = args.item_description,
-                    item_code = args.item_code).save()
+                if ItemInformation.objects.filter(item_name = args.item_name).count() ==0:
+                    ItemInformation(
+                        user = args.user_name,
+                        user_id = args.user_id,
+                        item_id = ret.get("result").get("id"),
+                        item_name = args.item_name,
+                        item_depart= args.item_department,
+                        item_description = args.item_description,
+                        item_code = args.item_code).save()
+                else:
+                    ret = {
+                        'code': 2017,
+                        'result': {
+                            'msg': '部署单元名称重复',
+                        }
+                    }
         except Exception as e:
             code = 500
 
