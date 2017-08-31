@@ -92,8 +92,8 @@ class ResourceApplication(Resource):
                 res = {
                     'code': 200,
                     'result': {
-                        'res': 'success',
-                        'msg': 'Resource already exist.',
+                        'res': 'fail',
+                        'msg': '该资源名称在所选环境已存在',
                         'res_name': resource_name
                     }
                 }
