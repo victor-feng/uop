@@ -137,11 +137,12 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo):
+def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo, disconf_server_info):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
         "appinfo": appinfo,
+        "disconf_server_info": disconf_server_info,
         "dns":[],
     }
 
@@ -474,12 +475,12 @@ class DeploymentListAPI(Resource):
             redis_context = write_file(uid, redis_context, 'redis')
         if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
-        resource = ResourceModel.objects.get(res_id=resource_id)
+
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
             #disconf配置
-                #1、更新数据库
+                #1、将disconf信息更新到数据库
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 for instance_info in disconf:
                     for disconf_info_front in instance_info.get('dislist'):
@@ -492,14 +493,21 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
                                 disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                                 disconf_info.disconf_env = disconf_info_front.get('disconf_env')
+                deploy_obj.save()
+
+                #将computer信息如IP，更新到数据库
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.app_image = str(app_image)
+                deploy_obj.save()
+                resource = ResourceModel.objects.get(res_id=resource_id)
                 flag, appinfo = attach_domain_ip(app_image, resource)
                 if not flag:
                     return {"code": 403, "msg": "some app doesn't deploy nginx ip"}, 403
-                deploy_obj.save()
+
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 disconf_result = []
+                disconf_server_info = []
                 for disconf_info in deploy_obj.disconf_list:
                     if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
                         continue
@@ -522,6 +530,7 @@ class DeploymentListAPI(Resource):
                                        'disconf_server_password':'admin',
                                        }
                         '''
+                        disconf_server_info.append(server_info)
                         disconf_api_connect = DisconfServerApi(server_info)
                         if disconf_info.disconf_env.isdigit():
                             env_id = disconf_info.disconf_env
@@ -536,14 +545,16 @@ class DeploymentListAPI(Resource):
 
                     disconf_result.append(dict(result=result,message=message))
                 deploy_obj.save()
-                message = disconf_result
+                #message = disconf_result
+                message = disconf_server_info
 
+            ##推送到crp
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
-                print "$$$$$$$$$$$", resource_info, err_msg
+
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo)
+                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo, disconf_server_info)
                     if err_msg:
                         deploy_obj.deploy_result = 'fail'
                         print 'deploy_to_crp err: '+ err_msg
