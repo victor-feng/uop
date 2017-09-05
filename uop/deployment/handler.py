@@ -558,17 +558,11 @@ class DeploymentListAPI(Resource):
 
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                disconf_result = []
                 disconf_server_info = []
                 for disconf_info in deploy_obj.disconf_list:
                     if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
                         continue
                     else:
-                        if len(disconf_info.disconf_admin_content.strip()) == 0:
-                            disconf_admin_name = exchange_disconf_name(disconf_info.disconf_content)
-                        else:
-                            disconf_admin_name = exchange_disconf_name(disconf_info.disconf_admin_content)
-
                         server_info = {'disconf_server_name':disconf_info.disconf_server_name,
                                        'disconf_server_url':disconf_info.disconf_server_url,
                                        'disconf_server_user':disconf_info.disconf_server_user,
