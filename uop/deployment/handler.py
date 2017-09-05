@@ -203,6 +203,9 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
         headers = {
             'Content-Type': 'application/json',
         }
+        #上传disconf配置文件
+        upload_disconf_files_to_crp(disconf_info_list=disconf_server_info,env=res_obj['env'])
+
         file_paths = []
         if deploy_item.mysql_context:
             file_paths.append(('mysql',deploy_item.mysql_context))
@@ -247,6 +250,55 @@ def upload_files_to_crp(file_paths, env):
         return result
     else:
         return {'code': -1}
+
+
+def upload_disconf_files_to_crp(disconf_info_list,env):
+    """
+    上传disconf文件到crp
+    :param disconf_info:
+    :param env:
+    :return:
+    """
+    CPR_URL = get_CRP_url(env)
+    url = CPR_URL + "api/deploy/upload"
+    try:
+        res = []
+        for disconf_info in disconf_info_list:
+            disconf_type = 'disconf'
+            disconf_admin_content = disconf_info.get('disconf_admin_content','')
+            disconf_content = disconf_info.get('disconf_content','')
+            if len(disconf_admin_content.strip()) == 0 and len(disconf_content.strip()) == 0:
+                continue
+            else:
+                if len(disconf_admin_content.strip()) != 0:
+                    if os.path.exists(disconf_admin_content):
+                        data = dict(
+                            type = disconf_type,
+                            disconf_file_path = disconf_admin_content,
+                        )
+                        files = {'file': open(disconf_admin_content,'rb')}
+                        result = requests.post(url=url, files=files, data=data)
+
+                    else:
+                        raise ServerError('disconf admin file does not exist')
+                else:
+                    if os.path.exists(disconf_content):
+                        data = dict(
+                            type = disconf_type,
+                            disconf_file_path = disconf_content,
+                        )
+                        files = {'file': open(disconf_content,'rb')}
+                        result = requests.post(url=url, files=files, data=data)
+                    else:
+                        raise ServerError('disconf content file does not exist')
+                res.append(result)
+        return res
+    except Exception as e:
+        raise ServerError(e.args)
+
+
+
+
 
 
 def disconf_write_to_file(file_name, file_content, instance_name, type):
@@ -521,16 +573,20 @@ class DeploymentListAPI(Resource):
                                        'disconf_server_url':disconf_info.disconf_server_url,
                                        'disconf_server_user':disconf_info.disconf_server_user,
                                        'disconf_server_password':disconf_info.disconf_server_password,
+                                       'disconf_admin_content':disconf_info.disconf_admin_content,
+                                       'disconf_content':disconf_info.disconf_content,
+                                       'disconf_env':disconf_info.disconf_env,
+                                       'disconf_version':disconf_info.disconf_version,
+                                       'ins_name':disconf_info.ins_name,
                                        }
-
+                        disconf_server_info.append(server_info)
                         '''
                         server_info = {'disconf_server_name':'172.28.11.111',
                                        'disconf_server_url':'http://172.28.11.111:8081',
                                        'disconf_server_user':'admin',
                                        'disconf_server_password':'admin',
                                        }
-                        '''
-                        disconf_server_info.append(server_info)
+
                         disconf_api_connect = DisconfServerApi(server_info)
                         if disconf_info.disconf_env.isdigit():
                             env_id = disconf_info.disconf_env
@@ -544,6 +600,7 @@ class DeploymentListAPI(Resource):
                                                         )
 
                     disconf_result.append(dict(result=result,message=message))
+                        '''
                 deploy_obj.save()
                 #message = disconf_result
                 message = disconf_server_info
@@ -795,7 +852,6 @@ class Upload(Resource):
         try:
             uid = str(uuid.uuid1())
             UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
-
             file = request.files['file']
             type = request.form['file_type']
 
@@ -819,7 +875,7 @@ class Upload(Resource):
         except Exception as e:
             return {
                 'code': 500,
-                'msg': e.message
+                'msg': e.args
             }
         return {
             'code': 200,
