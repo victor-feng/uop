@@ -137,8 +137,21 @@ class ResourceApplication(Resource):
                 domain_ip = compute.get('domain_ip')
                 quantity = compute.get('quantity')
                 port = compute.get('port')
-                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,
-                                         url=url, domain=domain, domain_ip=domain_ip, quantity=quantity, port=port)
+                meta_str = compute.get('meta')
+                try:
+                    meta = json.dumps(meta_str)
+                except Exception as e:
+                    code = 500
+                    res = {
+                        'code': code,
+                        'result': {
+                            'res': 'fail',
+                            'msg': 'meta is not JSON object!'
+                        }
+                    }
+                    return res, code
+                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem,url=url, domain=domain,
+                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str)
                 resource_application.compute_list.append(compute_ins)
 
         if ins_name_list:
@@ -381,7 +394,8 @@ class ResourceDetail(Resource):
                                 "url": db_com.url,
                                 "domain": db_com.domain,
                                 "quantity": db_com.quantity,
-                                "port": db_com.port
+                                "port": db_com.port,
+                                "meta": db_com.docker_meta,
                             }
                         )
                 result['resource_list'] = res

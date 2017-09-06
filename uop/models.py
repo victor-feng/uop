@@ -107,6 +107,7 @@ class ComputeIns(db.EmbeddedDocument):
     url = db.StringField(required=False)
     port = db.StringField(required=False)
     domain_ip = db.StringField(required=False)
+    docker_meta = db.StringField(required=False)
     meta = {
         'collection': 'compute_ins',
         'index': [

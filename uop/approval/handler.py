@@ -241,6 +241,7 @@ class Reservation(Resource):
             com = []
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
+                meta = json.dumps(db_com.docker_meta)
                 com.append(
                     {
                         "instance_name": db_com.ins_name,
@@ -251,7 +252,8 @@ class Reservation(Resource):
                         "quantity": db_com.quantity,
                         "domain": db_com.domain,
                         "port": db_com.port,
-                        "domain_ip": db_com.domain_ip
+                        "domain_ip": db_com.domain_ip,
+                        "meta": meta,
                     }
                 )
             data['compute_list'] = com
@@ -341,6 +343,7 @@ class ReservationAPI(Resource):
             com = []
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
+                meta = json.dumps(db_com.docker_meta)
                 com.append(
                     {
                         "instance_name": db_com.ins_name,
@@ -349,7 +352,8 @@ class ReservationAPI(Resource):
                         "mem": db_com.mem,
                         "image_url": db_com.url,
                         "quantity": db_com.quantity,
-                        "port": db_com.port
+                        "port": db_com.port,
+                        "meta": meta,
                     }
                 )
             data['compute_list'] = com
