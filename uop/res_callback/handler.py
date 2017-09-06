@@ -843,6 +843,7 @@ Post Request JSON Body：
 
             resource.save()
         except Exception as e:
+            logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
