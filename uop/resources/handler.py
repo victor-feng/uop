@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-
+import requests
 import copy
 import random
 from flask import request, make_response
@@ -15,6 +15,7 @@ from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
+from uop.util import get_CRP_url
 
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
@@ -47,6 +48,7 @@ def _match_condition_generator(args):
             created_date_dict['$gte'] = datetime.datetime.strptime(args.start_time, "%Y-%m-%d %H:%M:%S")
             created_date_dict['$lte'] = datetime.datetime.strptime(args.end_time, "%Y-%m-%d %H:%M:%S")
             match_cond['created_date'] = created_date_dict
+        match_cond['deleted'] = 0
         match_list.append(match_cond)
         match_dict['$and'] = match_list
         match['$match'] = match_dict
@@ -88,7 +90,7 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
 
         try:
-            if ResourceModel.objects.filter(resource_name=resource_name, env=env).count():
+            if ResourceModel.objects.filter(resource_name=resource_name, env=env, deleted=0).count():
                 res = {
                     'code': 200,
                     'result': {
@@ -168,7 +170,7 @@ class ResourceApplication(Resource):
                 return res, code
         try:
             for insname in ins_name_list:
-                if ResourceModel.objects(compute_list__match={'ins_name': insname}).count() > 0:
+                if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(deleted=0).count() > 0:
                     code = 200
                     res = {
                         'code': code,
@@ -295,7 +297,7 @@ class ResourceApplication(Resource):
 
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+            resources = ResourceModel.objects.filter(**condition).filter(deleted=0).order_by('-created_date')
         except Exception as e:
             print e
             code = 500
@@ -330,6 +332,62 @@ class ResourceApplication(Resource):
             }
         }
         return ret, code
+        
+    @classmethod
+    def delete(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str)
+        args = parser.parse_args()
+        res_id = args.res_id
+
+        try:
+            resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
+            if len(resources):
+                env_ = get_CRP_url(resources.env)
+                os_ins_list = resources.os_ins_list
+                import logging
+                logging.info('os_ins_list %s'%(os_ins_list))
+                # TODO 调用crp接口 删除资源
+                crp_url = '%s%s'%(env_, '/api/resource/deletes')
+                crp_data = {
+                        "resource_id": resources.res_id,
+                       "os_inst_id_list": resources.os_ins_list
+                }
+                requests.delete(crp_url, data=crp_data)
+                resources.deleted = 1
+                resources.save()
+                #TODO 调用cmdb接口 删除cmdb 数据
+                #cmdb_url = '%s%s'%(env_, 'api/az/uopStatistics')
+                #cmdb_data = {'resource_id': resources.res_id}
+                #requests.delete(crp_url, data=cmdb_data)
+                
+            else:
+                ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'Resource not found.'
+                    }
+                }
+                return ret, 200
+        except Exception as e:
+            print e
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Delete resource application failed.'
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Delete resource application success.'
+            }
+        }
+        return ret, 200
 
 
 class ResourceDetail(Resource):
@@ -337,7 +395,7 @@ class ResourceDetail(Resource):
     def get(cls, res_id):
         result = {}
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.filter(res_id=res_id, deleted=0)
         except Exception as e:
             print e
             code = 500
@@ -423,7 +481,7 @@ class ResourceDetail(Resource):
     @classmethod
     def put(cls, res_id):
         try:
-            resource_application = ResourceModel.objects.get(res_id=res_id)
+            resource_application = ResourceModel.objects.get(res_id=res_id, deleted=0)
         except Exception as e:
             print e
             code = 500
@@ -538,7 +596,7 @@ class ResourceDetail(Resource):
     @classmethod
     def delete(cls, res_id):
         try:
-            resources = ResourceModel.objects.get(res_id=res_id)
+            resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
             if len(resources):
                 resources.delete()
             else:
@@ -575,7 +633,7 @@ class ResourceRecord(Resource):
     def get(cls, user_id):
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(user_id=user_id)
+            resources = ResourceModel.objects.filter(user_id=user_id, deleted=0)
         except Exception as e:
             print e
             code = 500
