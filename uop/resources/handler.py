@@ -350,7 +350,7 @@ class ResourceApplication(Resource):
                 # TODO 调用crp接口 删除资源
                 crp_url = '%s%s'%(env_, '/api/resource/deletes')
                 crp_data = {
-                        "resource_id": resources.res_id,
+                        "resources_id": resources.res_id,
                        "os_inst_id_list": resources.os_ins_list
                 }
                 crp_data = json.dumps(crp_data)
