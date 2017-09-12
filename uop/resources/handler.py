@@ -347,20 +347,22 @@ class ResourceApplication(Resource):
                 os_ins_list = resources.os_ins_list
                 import logging
                 logging.info('os_ins_list %s'%(os_ins_list))
-                # TODO 调用crp接口 删除资源
                 crp_url = '%s%s'%(env_, '/api/resource/deletes')
                 crp_data = {
                         "resources_id": resources.res_id,
                        "os_inst_id_list": resources.os_ins_list
                 }
+                # 调用CRP 删除资源
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 resources.deleted = 1
                 resources.save()
-                #TODO 调用cmdb接口 删除cmdb 数据
-                #cmdb_url = '%s%s'%(env_, 'api/az/uopStatistics')
-                #cmdb_data = {'resource_id': resources.res_id}
-                #requests.delete(crp_url, data=cmdb_data)
+                 
+                # 回写CMDB
+                cmdb_url = '%s%s%s'%(env_, 'api/repores_delete/', resources.res_id)
+                #cmdb_data = {'resources_id': resources.res_id}
+                #cmdb_data = json.dumps(cmdb_data)
+                requests.delete(crp_url)
                 
             else:
                 ret = {
