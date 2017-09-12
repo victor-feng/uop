@@ -341,6 +341,7 @@ class ResourceApplication(Resource):
         res_id = args.res_id
 
         try:
+            import pdb;pdb.set_trace()
             resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
             if len(resources):
                 env_ = get_CRP_url(resources.env)
@@ -353,6 +354,7 @@ class ResourceApplication(Resource):
                         "resource_id": resources.res_id,
                        "os_inst_id_list": resources.os_ins_list
                 }
+                crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 resources.deleted = 1
                 resources.save()
