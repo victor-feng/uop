@@ -16,7 +16,9 @@ from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns
 from uop.resources.errors import resources_errors
 from uop.util import get_CRP_url
+from config import APP_ENV, configs
 
+CMDB_URL = configs[APP_ENV].CMDB_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
@@ -357,12 +359,10 @@ class ResourceApplication(Resource):
                 requests.delete(crp_url, data=crp_data)
                 resources.deleted = 1
                 resources.save()
-                 
                 # 回写CMDB
-                cmdb_url = '%s%s%s'%(env_, 'api/repores_delete/', resources.res_id)
-                #cmdb_data = {'resources_id': resources.res_id}
-                #cmdb_data = json.dumps(cmdb_data)
-                requests.delete(crp_url)
+                import pdb;pdb.set_trace()
+                cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
+                requests.delete(cmdb_url)
                 
             else:
                 ret = {
