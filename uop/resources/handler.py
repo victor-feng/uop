@@ -341,7 +341,6 @@ class ResourceApplication(Resource):
         res_id = args.res_id
 
         try:
-            import pdb;pdb.set_trace()
             resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
             if len(resources):
                 env_ = get_CRP_url(resources.env)
