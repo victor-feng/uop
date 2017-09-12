@@ -812,25 +812,6 @@ Post Request JSON Body：
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
         try:
-            import pdb;pdb.set_trace()
-            os_ids = [] 
-            container = request_data.get('container')
-            for _container in container:
-                instances = _container.get('instance')
-                for instance in instances:
-                    print 'instance', instance
-                    os_ins_id = instance.get('os_inst_id')
-                    os_ids.append(os_ins_id)
-                
-            db_info = request_data.get('db_info')
-            for key, value in db_info.items():
-                os_ins_ids = []
-                for instance in value.get('instance'):
-                    os_ins_id = instance.get('os_inst_id')
-                    os_ids.append(os_ins_id)
-                if os_ins_ids:
-                    os_ids.append(os_ins_ids)
-
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
 
@@ -860,13 +841,11 @@ Post Request JSON Body：
             if is_write_to_cmdb is True:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
          
-            #import pdb;pdb.set_trace()
             os_ids = [] 
             container = request_data.get('container')
             for _container in container:
                 instances = _container.get('instance')
                 for instance in instances:
-                    print 'instance', instance
                     os_ins_id = instance.get('os_inst_id')
                     os_ids.append(os_ins_id)
                 
