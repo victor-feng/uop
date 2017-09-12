@@ -160,6 +160,9 @@ class ResourceModel(db.DynamicDocument):
     resource_list = db.ListField(db.EmbeddedDocumentField('DBIns'))
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
     cmdb_p_code = db.StringField(requeired=False)
+    os_ins_list = db.ListField(db.StringField(requeired=False))
+    deleted = db.IntField(required=False, default=0)
+
 
     meta = {
         'collection': 'resources',
