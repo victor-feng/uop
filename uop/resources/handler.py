@@ -374,7 +374,7 @@ class ResourceApplication(Resource):
                 resources.compute_list = compute_list
                 resources.save()
                 # 回写CMDB
-                cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', resources.res_id)
+                cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', resources.cmdb_p_code)
                 requests.delete(cmdb_url)
                 
             else:
