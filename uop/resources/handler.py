@@ -361,6 +361,12 @@ class ResourceApplication(Resource):
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 resources.deleted = 1
+                # 修改ins_name 唯一键
+                compute_list = resources.compute_list
+                for compute_ compute_list:
+                     ins_name = 'delete_%s_%s'%(compute_.ins_name, time.time())
+                     compute_.ins_name = ins_name
+                resources.compute_list = compute_list
                 resources.save()
                 # 回写CMDB
                 cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
