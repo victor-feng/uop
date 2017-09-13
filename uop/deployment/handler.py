@@ -388,7 +388,7 @@ class DeploymentListAPI(Resource):
         deployments = []
         try:
 
-            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+            for deployment in Deployment.objects.filter(**condition).filter(deleted=0).order_by('-created_time'):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
@@ -818,6 +818,7 @@ class DeploymentListByByInitiatorAPI(Resource):
         condition = {}
         if args.initiator:
             condition['initiator'] = args.initiator
+        condition['deleted'] = 0
 
         pipeline = [
             {
