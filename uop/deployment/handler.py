@@ -738,7 +738,8 @@ class DeploymentListAPI(Resource):
                 }
                 res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
                 if res:
-                    crp_data['disconf_list'] = res.disconf_list
+                    if hasattr(res, 'disconf_list'):
+                        crp_data['disconf_list'] = res.disconf_list
                     crp_data['resources_id'] = res.res_id
                     compute_list = res.compute_list
                     domain_list = []
