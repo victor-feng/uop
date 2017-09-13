@@ -730,8 +730,13 @@ class DeploymentListAPI(Resource):
             if len(deploy):
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s'%(env_, 'api/deploy/deploys')
+                disconf_list = deploy.disconf_list
+                disconfs = []
+                for dis in disconf_list:
+                    dis_ = dis.to_json()
+                    disconfs.append(dis_)
                 crp_data = {
-                        "disconf_list" : deploy.disconf_list,
+                        "disconf_list" : disconfs,
                         "resources_id": '',
                         "domain_list":[],
                         "resources_id": ''
