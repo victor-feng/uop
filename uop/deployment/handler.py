@@ -12,7 +12,7 @@ from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns
+from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns, Deployment
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
@@ -717,6 +717,73 @@ class DeploymentListAPI(Resource):
                 }
             }
             return res, 200
+    
+    @classmethod
+    def delete(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_id', type=str)
+        args = parser.parse_args()
+        deploy_id = args.deploy_id
+
+        try:
+            deploy = Deployment.objects.filter(deleted=0).get(deploy_id=deploy_id)
+            if len(deploy):
+                env_ = get_CRP_url(deploy.environment)
+                crp_url = '%s%s'%(env_, '/api/resource/deletes')
+                crp_data = {
+                        "disconf_list" : [],
+                        "resources_id": '',
+                        "domain_list":[],
+                        "resources_id": ''
+                }
+                res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
+                if res:
+                    crp_data['disconf_list'] = res.disconf_list
+                    crp_data['resources_id'] = res.res_id
+                    compute_list = res.compute_list
+                    domain_list = []
+                    for compute in compute_list:
+                        domain = compute.domain
+                        domain_ip = compute.domain_ip
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                    crp_data['domain_list'] = domain_list
+                    
+                deploy.deleted = 1
+                deploy.save()
+                # 调用CRP 删除资源
+                crp_data = json.dumps(crp_data)
+                requests.delete(crp_url, data=crp_data)
+                # 回写CMDB
+                #cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
+                #requests.delete(cmdb_url)
+                
+            else:
+                ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'deployment not found.'
+                    }
+                }
+                return ret, 200
+        except Exception as e:
+            print e
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Delete deployment  application failed.'
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Delete deployment application success.'
+            }
+        }
+        return ret, 200
 
 
 class DeploymentAPI(Resource):

@@ -343,22 +343,18 @@ class ResourceApplication(Resource):
         res_id = args.res_id
 
         try:
-            resources = ResourceModel.objects.get(res_id=res_id).filter(deleted=0)
+            resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
             if len(resources):
                 env_ = get_CRP_url(resources.env)
                 os_ins_list = resources.os_ins_list
-                deploy = Deployment.objects.get(resource_id=res_id).filter(deleted=0)
                 crp_url = '%s%s'%(env_, '/api/resource/deletes')
                 crp_data = {
-                        "status": 0,
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
-                        "disconf_list" : []
+                        "vid_list": resources.vid_list,
                 }
-                deploy = Deployment.objects.get(resource_id=res_id).filter(deleted=0)
+                deploy = Deployment.objects.filter(deleted=0).get(resource_id=res_id)
                 if deploy:
-                    crp_data['status'] = '1'
-                    crp_data['disconf_list'] = deploy.disconf_list
                     deploy.deleted = 1
                     deploy.save()
                 # 调用CRP 删除资源
