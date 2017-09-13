@@ -348,7 +348,7 @@ class ResourceApplication(Resource):
             if len(resources):
                 env_ = get_CRP_url(resources.env)
                 os_ins_list = resources.os_ins_list
-                crp_url = '%s%s'%(env_, '/api/resource/deletes')
+                crp_url = '%s%s'%(env_, 'api/resource/deletes')
                 crp_data = {
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
