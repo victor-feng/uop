@@ -731,15 +731,15 @@ class DeploymentListAPI(Resource):
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s'%(env_, 'api/deploy/deploys')
                 crp_data = {
-                        "disconf_list" : [],
+                        "disconf_list" : deploy.disconf_list,
                         "resources_id": '',
                         "domain_list":[],
                         "resources_id": ''
                 }
                 res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
                 if res:
-                    if hasattr(res, 'disconf_list'):
-                        crp_data['disconf_list'] = res.disconf_list
+                    #if hasattr(res, 'disconf_list'):
+                    #crp_data['disconf_list'] = res.disconf_list
                     crp_data['resources_id'] = res.res_id
                     compute_list = res.compute_list
                     domain_list = []
