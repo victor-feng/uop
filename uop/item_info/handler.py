@@ -138,20 +138,15 @@ class ItemInfo(Resource):
     def delete(cls, item_id):
         ret = {}
         code = 200
-        #parser = reqparse.RequestParser()
-        #parser.add_argument('item_id', type=str)
-        #args = parser.parse_args()
-        #item_id = args.item_id
-
         try:
-            import pdb;pdb.set_trace()
             items = ItemInformation.objects.filter(item_id=item_id).filter(deleted=0)
             ResourceModel
             if items:
                 item = items[0]
                 res = ResourceModel.objects.filter(project_id=item_id).filter(deleted=0)
                 if not res:
-                    item.delete()
+                    item.deleted = 1
+                    item.save()
                     code = 200
                     msg = '部署单元删除成功'
                     CMDB_URL = current_app.config['CMDB_URL']
