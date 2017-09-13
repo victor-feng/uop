@@ -850,14 +850,26 @@ Post Request JSON Body：
                     os_ids.append(os_ins_id)
                 
             db_info = request_data.get('db_info')
+            vid_list = []
             for key, value in db_info.items():
                 os_ins_ids = []
+                wid = value.get("wid", '')
+                rid = value.get("rid", '')
+                vid = value.get("vid", '')
+                if wid:
+                    vid_list.append(wid)
+                if rid:
+                    vid_list.append(rid)
+                if vid:
+                    vid_list.append(vid)
+
                 for instance in value.get('instance'):
                     os_ins_id = instance.get('os_inst_id')
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
                     os_ids.append(os_ins_ids)
             resource.os_ins_list = os_ids
+            resource.vid_list = vid_list
             resource.save()
         except Exception as e:
             logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
