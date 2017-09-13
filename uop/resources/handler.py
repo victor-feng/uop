@@ -353,7 +353,11 @@ class ResourceApplication(Resource):
                         "os_inst_id_list": resources.os_ins_list,
                         "vid_list": resources.vid_list,
                 }
-                deploy = Deployment.objects.filter(deleted=0).get(resource_id=res_id)
+                try:
+                    deploy = Deployment.objects.filter(deleted=0).get(resource_id=res_id)
+                except Exception as e:
+                    deploy = None
+
                 if deploy:
                     deploy.deleted = 1
                     deploy.save()
