@@ -734,7 +734,7 @@ class DeploymentListAPI(Resource):
                 disconfs = []
                 for dis in disconf_list:
                     dis_ = dis.to_json()
-                    disconfs.append(dis_)
+                    disconfs.append(eval(dis_))
                 crp_data = {
                         "disconf_list" : disconfs,
                         "resources_id": '',
