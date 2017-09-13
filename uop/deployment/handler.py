@@ -729,7 +729,7 @@ class DeploymentListAPI(Resource):
             deploy = Deployment.objects.filter(deleted=0).get(deploy_id=deploy_id)
             if len(deploy):
                 env_ = get_CRP_url(deploy.environment)
-                crp_url = '%s%s'%(env_, '/api/resource/deletes')
+                crp_url = '%s%s'%(env_, '/api/deploy/deploys')
                 crp_data = {
                         "disconf_list" : [],
                         "resources_id": '',
