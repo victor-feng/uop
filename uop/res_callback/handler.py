@@ -853,8 +853,8 @@ Post Request JSON Body：
             vid_list = []
             for key, value in db_info.items():
                 os_ins_ids = []
-                wid = value.get("wid", '')
-                rid = value.get("rid", '')
+                wid = value.get("wvid", '')
+                rid = value.get("rvid", '')
                 vid = value.get("vid", '')
                 if wid:
                     vid_list.append(wid)
