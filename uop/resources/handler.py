@@ -26,7 +26,7 @@ resources_api = Api(resources_blueprint, errors=resources_errors)
 
 def make_random_database_password():
     return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
-        random.randint(97, 122))
+        random.randint(97, 122)) + '!'
 
 def _match_condition_generator(args):
     match = dict()
