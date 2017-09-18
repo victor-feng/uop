@@ -337,7 +337,7 @@ def attach_domain_ip(compute_list, res):
                 o = old_compute_list[i]
                 old_compute_list.remove(old_compute_list[i])
                 compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
-                                             url=o.url, domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one["domain_ip"])
+                                             url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one["domain_ip"])
                 old_compute_list.insert(i, compute)
             res.save()
         except Exception as e:
