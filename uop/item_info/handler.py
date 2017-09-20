@@ -10,7 +10,7 @@ from flask import current_app
 
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
-from uop.models import ItemInformation
+from uop.models import ItemInformation, ResourceModel
 from config import APP_ENV, configs
 import sys
 reload(sys)
@@ -56,7 +56,7 @@ class ItemInfo(Resource):
             if args.start_time and args.end_time:
                 args_dict['create_date__gte'] = args.start_time
                 args_dict['create_date__lt'] = args.end_time
-            items = ItemInformation.objects.filter(**args_dict).order_by('-create_date')
+            items = ItemInformation.objects.filter(**args_dict).filter(deleted=0).order_by('-create_date')
 
             for item in items:
                 res = {}
@@ -118,7 +118,7 @@ class ItemInfo(Resource):
             res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
-                item = ItemInformation.objects.get(item_id=item_id)
+                item = ItemInformation.objects.filter(deleted=0).get(item_id=item_id)
                 if args.item_code:
                     item.item_code = args.item_code
                 if args.item_name:
@@ -139,22 +139,31 @@ class ItemInfo(Resource):
         ret = {}
         code = 200
         try:
-            CMDB_URL = current_app.config['CMDB_URL']
-            CMDB_API = CMDB_URL+'cmdb/api/'
-            res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
-            #ret = eval(res.content.decode('unicode_escape'))
-
-            items = ItemInformation.objects.filter(item_id=item_id)
-            for item in items:
-                item.delete()
+            items = ItemInformation.objects.filter(item_id=item_id).filter(deleted=0)
+            ResourceModel
+            if items:
+                item = items[0]
+                res = ResourceModel.objects.filter(project_id=item_id).filter(deleted=0)
+                if not res:
+                    item.deleted = 1
+                    item.save()
+                    code = 200
+                    msg = '部署单元删除成功'
+                    CMDB_URL = current_app.config['CMDB_URL']
+                    CMDB_API = CMDB_URL+'cmdb/api/'
+                    res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
+                else:
+                    code = 200
+                    msg = '该部署单元拥有部署实例，需要清除后方可删除部署单元'
         except Exception as e:
             code = 500
+            msg = '后端出现异常'
 
         ret = {
             'code': code,
             'result': {
                 'res': "",
-                'msg': ""
+                'msg': msg
             }
         }
         return ret, code
@@ -215,7 +224,7 @@ class ItemPostInfo(Resource):
             res = requests.post(CMDB_API + "repo/", data=data_str)
             ret = eval(res.content.decode('unicode_escape'))
             if res.status_code == 200:
-                if ItemInformation.objects.filter(item_name = args.item_name).count() ==0:
+                if ItemInformation.objects.filter(item_name = args.item_name).filter(deleted=0).count() ==0:
                     ItemInformation(
                         user = args.user_name,
                         user_id = args.user_id,
@@ -241,7 +250,7 @@ class ItemInfoLoacl(Resource):
         code = 200
         res_list = []
         try:
-            items = ItemInformation.objects.filter(user_id = user_id)
+            items = ItemInformation.objects.filter(user_id = user_id).filter(deleted=0)
             for i in items:
                 res = {}
                 res["user"] = i.user

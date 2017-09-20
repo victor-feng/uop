@@ -80,6 +80,8 @@ class Deployment(db.Document):
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
+    deleted = db.IntField(required=False, default=0)
+
     meta = {
         'collection': 'deployment',
         'index': [
@@ -161,6 +163,7 @@ class ResourceModel(db.DynamicDocument):
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
     cmdb_p_code = db.StringField(requeired=False)
     os_ins_list = db.ListField(db.StringField(requeired=False))
+    vid_list = db.ListField(db.StringField(requeired=False))
     deleted = db.IntField(required=False, default=0)
 
 
@@ -208,6 +211,8 @@ class ItemInformation(db.DynamicDocument):
     item_depart = db.StringField(required=True)
     item_description = db.StringField(required=False)
     create_date = db.DateTimeField(default=datetime.datetime.now)
+    deleted = db.IntField(required=False, default=0)
+
 
     meta = {
         'collection': 'item_information',

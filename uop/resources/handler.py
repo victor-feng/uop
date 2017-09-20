@@ -2,6 +2,7 @@
 import json
 import requests
 import copy
+import time
 import random
 from flask import request, make_response
 from flask import redirect
@@ -13,7 +14,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 
 from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
-from uop.models import ResourceModel, DBIns, ComputeIns
+from uop.models import ResourceModel, DBIns, ComputeIns, Deployment
 from uop.resources.errors import resources_errors
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
@@ -92,7 +93,7 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
 
         try:
-            if ResourceModel.objects.filter(resource_name=resource_name, env=env, deleted=0).count():
+            if ResourceModel.objects.filter(resource_name=resource_name, env=env).filter(deleted=0).count():
                 res = {
                     'code': 200,
                     'result': {
@@ -343,24 +344,36 @@ class ResourceApplication(Resource):
         res_id = args.res_id
 
         try:
-            resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
+            resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
             if len(resources):
                 env_ = get_CRP_url(resources.env)
                 os_ins_list = resources.os_ins_list
-                import logging
-                logging.info('os_ins_list %s'%(os_ins_list))
                 crp_url = '%s%s'%(env_, '/api/resource/deletes')
                 crp_data = {
                         "resources_id": resources.res_id,
-                       "os_inst_id_list": resources.os_ins_list
+                        "os_inst_id_list": resources.os_ins_list,
+                        "vid_list": resources.vid_list,
                 }
+                try:
+                    deploy = Deployment.objects.filter(deleted=0).get(resource_id=res_id)
+                except Exception as e:
+                    deploy = None
+
+                if deploy:
+                    deploy.deleted = 1
+                    deploy.save()
                 # 调用CRP 删除资源
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 resources.deleted = 1
+                # 修改ins_name 唯一键
+                compute_list = resources.compute_list
+                for compute_ in compute_list:
+                     ins_name = 'delete_%s_%s'%(compute_.ins_name, time.time())
+                     compute_.ins_name = ins_name
+                resources.compute_list = compute_list
                 resources.save()
                 # 回写CMDB
-                import pdb;pdb.set_trace()
                 cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
                 requests.delete(cmdb_url)
                 
