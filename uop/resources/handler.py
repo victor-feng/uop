@@ -441,7 +441,7 @@ class ResourceDetail(Resource):
             }
             return ret
         if len(resources):
-            deploies = Deployment.objects.filter(resource_id=resource_id).order_by('+created_date')
+            deploies = Deployment.objects.filter(resource_id=res_id).order_by('+created_date')
             if len(deploies):
                 deploy = deploies.first()
                 database_password = deploy.database_password
