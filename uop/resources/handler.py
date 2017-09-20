@@ -441,6 +441,13 @@ class ResourceDetail(Resource):
             }
             return ret
         if len(resources):
+            deploies = Deployment.objects.filter(resource_id=resource_id).order_by('+created_date')
+            if len(deploies):
+                deploy = deploies.first()
+                database_password = deploy.database_password
+            else:
+                database_password = make_random_database_password()
+
             for resource in resources:
                 result['resource_name'] = resource.resource_name
                 result['project'] = resource.project
@@ -454,7 +461,7 @@ class ResourceDetail(Resource):
                 result['env'] = resource.env
                 result['application_status'] = resource.application_status
                 result['approval_status'] = resource.approval_status
-                result['database_password'] = make_random_database_password()
+                result['database_password'] = database_password
 
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list

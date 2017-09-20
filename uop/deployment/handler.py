@@ -631,9 +631,9 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
 
             elif action == 'save_to_db':  # 部署申请
-                deploies = Deployment.objects.filter(resource_id=resource_id).order_by('+created_date')
-                deploy = deploies.first()
-                database_password = deploy.database_password
+                #deploies = Deployment.objects.filter(resource_id=resource_id).order_by('+created_date')
+                #deploy = deploies.first()
+                #database_password = deploy.database_password
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
