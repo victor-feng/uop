@@ -141,7 +141,6 @@ class ItemInfo(Resource):
         status = 0
         try:
             items = ItemInformation.objects.filter(item_id=item_id).filter(deleted=0)
-            ResourceModel
             if items:
                 item = items[0]
                 res = ResourceModel.objects.filter(project_id=item_id).filter(deleted=0)
