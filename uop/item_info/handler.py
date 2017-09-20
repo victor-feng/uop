@@ -78,7 +78,7 @@ class ItemInfo(Resource):
         ret = {
             'code': code,
             'result': {
-                'status': status,
+                'res': res_list,
                 'msg': ""
             }
         }
