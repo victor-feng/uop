@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from flask import request
+from flask import request, current_app
 from flask import redirect
 from flask import jsonify
 import uuid
@@ -59,7 +59,8 @@ class DeployCallback(Resource):
             dep.save()
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
-            deployment_url = "http://cmdb-dev.syswin.com/cmdb/api/repo/%s/" % p_code
+            CMDB_URL = current_app.config['CMDB_URL']
+            deployment_url = CMDB_URL + "cmdb/api/repo/%s/"  % p_code
             print 'status', dep.deploy_result, p_code
             data = {
                 'property_list': [
