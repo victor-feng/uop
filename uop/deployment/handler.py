@@ -324,25 +324,32 @@ def disconf_write_to_file(file_name, file_content, instance_name, type):
 def attach_domain_ip(compute_list, res):
         old_compute_list = res.compute_list
         appinfo = []
-        for c in compute_list:
-            if not c.get("domain_ip", ""):
-                return False, appinfo
+        # flag = False
+        # for c in compute_list:
+        #     # if not c.get("domain_ip", ""):
+        #     #     return False, appinfo
+        #     if c.get("domain_ip", ""):
+        #         flag = True
+        #         break
+        # if not flag:
+        #     return False, appinfo #不需要上传nginx配置，直接返回，不做入库操作
         try:
             for i in old_compute_list:
-                tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id)][0]
+                tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id) and x.get("domain_ip", "")][0]
                 tmp["ips"] = i.ips
-                appinfo.append(tmp)
-            for i in xrange(0, len(old_compute_list)):
+                appinfo.append(tmp) # 将配置了nginx IP的 app传回，以便传回crp进行配置推送
+            for i in xrange(0, len(old_compute_list)): # 更新resources表中的镜像url和可能配置nginx IP信息
                 match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
                 o = old_compute_list[i]
                 old_compute_list.remove(old_compute_list[i])
                 compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
-                                             url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one["domain_ip"])
+                                             url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one.get("domain_ip", ""))
                 old_compute_list.insert(i, compute)
             res.save()
+            return appinfo
         except Exception as e:
-            print "attach domain_ip to appinfo error:{}".format(e)
-        return True, appinfo
+            logging.error( "attach domain_ip to appinfo error:{}".format(e.args))
+            return []
 
 
 class DeploymentListAPI(Resource):
@@ -552,9 +559,7 @@ class DeploymentListAPI(Resource):
                 deploy_obj.app_image = str(app_image)
                 deploy_obj.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
-                flag, appinfo = attach_domain_ip(app_image, resource)
-                if not flag:
-                    return {"code": 403, "msg": "some app doesn't deploy nginx ip"}, 403
+                appinfo = attach_domain_ip(app_image, resource)
 
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
