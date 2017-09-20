@@ -387,9 +387,10 @@ class ResourceApplication(Resource):
                 #     ins_name = 'delete_%s_%s'%(compute_.ins_name, time.time())
                 #     compute_.ins_name = ins_name
                 #resources.compute_list = compute_list
+                cmdb_p_code = resources.cmdb_p_code
                 resources.delete()
                 # 回写CMDB
-                cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', resources.cmdb_p_code)
+                cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
                 requests.delete(cmdb_url)
                 
             else:
