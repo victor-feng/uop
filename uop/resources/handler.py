@@ -346,9 +346,7 @@ class ResourceApplication(Resource):
             #resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
-                env_ = get_CRP_url(resources.env)
                 os_ins_list = resources.os_ins_list
-                crp_url = '%s%s'%(env_, 'api/resource/deletes')
                 deploy = Deployment.objects.get(resource_id=res_id)
                 if len(deploy):
                     env_ = get_CRP_url(deploy.environment)
@@ -379,6 +377,8 @@ class ResourceApplication(Resource):
                         "os_inst_id_list": resources.os_ins_list,
                         "vid_list": resources.vid_list,
                 }
+                env_ = get_CRP_url(resources.env)
+                crp_url = '%s%s'%(env_, 'api/resource/deletes')
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 # 修改ins_name 唯一键
