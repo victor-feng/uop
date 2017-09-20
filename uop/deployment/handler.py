@@ -408,7 +408,8 @@ class DeploymentListAPI(Resource):
                                                         disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
                                                         disconf_id = disconf_info.disconf_id,
-                                                        disconf_env = disconf_info.disconf_env
+                                                        disconf_env = disconf_info.disconf_env,
+                                                        disconf_app_name= disconf_info.disconf_app_name
                                                         )]
                                          )
                     if len(disconf) == 0:
@@ -552,6 +553,7 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
                                 disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                                 disconf_info.disconf_env = disconf_info_front.get('disconf_env')
+                                disconf_info.disconf_app_name = disconf_info_front.get('disconf_app_name')
                 deploy_obj.save()
 
                 #将computer信息如IP，更新到数据库
@@ -577,6 +579,7 @@ class DeploymentListAPI(Resource):
                                        'disconf_env':disconf_info.disconf_env,
                                        'disconf_version':disconf_info.disconf_version,
                                        'ins_name':disconf_info.ins_name,
+                                       'disconf_app_name':disconf_info.disconf_app_name,
                                        }
                         disconf_server_info.append(server_info)
                         '''
@@ -690,6 +693,7 @@ class DeploymentListAPI(Resource):
                         disconf_server_password = disconf_info.get('disconf_server_password')
                         disconf_version = disconf_info.get('disconf_version')
                         disconf_env = disconf_info.get('disconf_env')
+                        disconf_app_name = disconf_info.get('disconf_app_name')
                         disconf_id = str(uuid.uuid1())
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
@@ -703,6 +707,7 @@ class DeploymentListAPI(Resource):
                                                  disconf_version = disconf_version,
                                                  disconf_env = disconf_env,
                                                  disconf_id = disconf_id,
+                                                 disconf_app_name=disconf_app_name,
                                                  )
                         deploy_item.disconf_list.append(disconf_ins)
 
