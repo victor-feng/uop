@@ -344,10 +344,10 @@ class ResourceApplication(Resource):
 
         try:
             #resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
-            resources = ResourceModel.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
                 os_ins_list = resources.os_ins_list
-                deploy = Deployment.objects.get(resource_id=res_id)
+                deploy = Deployment.objects.filter(resource_id=res_id)
                 if len(deploy):
                     env_ = get_CRP_url(deploy.environment)
                     crp_url = '%s%s'%(env_, 'api/deploy/deploys')
