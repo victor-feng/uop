@@ -395,7 +395,7 @@ class DeploymentListAPI(Resource):
         deployments = []
         try:
 
-            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+            for deployment in Deployment.objects.filter(**condition).filter(deleted=0).order_by('-created_time'):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
@@ -734,16 +734,22 @@ class DeploymentListAPI(Resource):
             deploy = Deployment.objects.filter(deleted=0).get(deploy_id=deploy_id)
             if len(deploy):
                 env_ = get_CRP_url(deploy.environment)
-                crp_url = '%s%s'%(env_, '/api/deploy/deploys')
+                crp_url = '%s%s'%(env_, 'api/deploy/deploys')
+                disconf_list = deploy.disconf_list
+                disconfs = []
+                for dis in disconf_list:
+                    dis_ = dis.to_json()
+                    disconfs.append(eval(dis_))
                 crp_data = {
-                        "disconf_list" : [],
+                        "disconf_list" : disconfs,
                         "resources_id": '',
                         "domain_list":[],
                         "resources_id": ''
                 }
                 res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
                 if res:
-                    crp_data['disconf_list'] = res.disconf_list
+                    #if hasattr(res, 'disconf_list'):
+                    #crp_data['disconf_list'] = res.disconf_list
                     crp_data['resources_id'] = res.res_id
                     compute_list = res.compute_list
                     domain_list = []
@@ -817,6 +823,7 @@ class DeploymentListByByInitiatorAPI(Resource):
         condition = {}
         if args.initiator:
             condition['initiator'] = args.initiator
+        condition['deleted'] = 0
 
         pipeline = [
             {

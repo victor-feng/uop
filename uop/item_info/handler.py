@@ -138,9 +138,9 @@ class ItemInfo(Resource):
     def delete(cls, item_id):
         ret = {}
         code = 200
+        status = 0
         try:
             items = ItemInformation.objects.filter(item_id=item_id).filter(deleted=0)
-            ResourceModel
             if items:
                 item = items[0]
                 res = ResourceModel.objects.filter(project_id=item_id).filter(deleted=0)
@@ -148,19 +148,22 @@ class ItemInfo(Resource):
                     item.deleted = 1
                     item.save()
                     code = 200
+                    status = 0
                     msg = '部署单元删除成功'
                     CMDB_URL = current_app.config['CMDB_URL']
                     CMDB_API = CMDB_URL+'cmdb/api/'
                     res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
                 else:
                     code = 200
+                    status = 1
                     msg = '该部署单元拥有部署实例，需要清除后方可删除部署单元'
         except Exception as e:
             code = 500
-            msg = '后端出现异常'
+            msg = '后端出现异常, 请联系管理员'
 
         ret = {
             'code': code,
+            'status': status,
             'result': {
                 'res': "",
                 'msg': msg
