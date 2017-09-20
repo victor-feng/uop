@@ -51,7 +51,6 @@ def _match_condition_generator(args):
             created_date_dict['$gte'] = datetime.datetime.strptime(args.start_time, "%Y-%m-%d %H:%M:%S")
             created_date_dict['$lte'] = datetime.datetime.strptime(args.end_time, "%Y-%m-%d %H:%M:%S")
             match_cond['created_date'] = created_date_dict
-        match_cond['deleted'] = 0
         match_list.append(match_cond)
         match_dict['$and'] = match_list
         match['$match'] = match_dict
@@ -93,7 +92,7 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
 
         try:
-            if ResourceModel.objects.filter(resource_name=resource_name, env=env).filter(deleted=0).count():
+            if ResourceModel.objects.filter(resource_name=resource_name, env=env).count():
                 res = {
                     'code': 200,
                     'result': {
@@ -173,7 +172,7 @@ class ResourceApplication(Resource):
                 return res, code
         try:
             for insname in ins_name_list:
-                if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(deleted=0).count() > 0:
+                if ResourceModel.objects(compute_list__match={'ins_name': insname}).count() > 0:
                     code = 200
                     res = {
                         'code': code,
@@ -300,7 +299,7 @@ class ResourceApplication(Resource):
 
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(**condition).filter(deleted=0).order_by('-created_date')
+            resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
         except Exception as e:
             print e
             code = 500
@@ -344,35 +343,51 @@ class ResourceApplication(Resource):
         res_id = args.res_id
 
         try:
-            resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
+            #resources = ResourceModel.objects.filter(deleted=0).get(res_id=res_id)
+            resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
                 env_ = get_CRP_url(resources.env)
                 os_ins_list = resources.os_ins_list
                 crp_url = '%s%s'%(env_, 'api/resource/deletes')
+                deploy = Deployment.objects.get(resource_id=res_id)
+                if len(deploy):
+                    env_ = get_CRP_url(deploy.environment)
+                    crp_url = '%s%s'%(env_, 'api/deploy/deploys')
+                    disconf_list = deploy.disconf_list
+                    disconfs = []
+                    for dis in disconf_list:
+                        dis_ = dis.to_json()
+                        disconfs.append(eval(dis_))
+                    crp_data = {
+                        "disconf_list" : disconfs,
+                        "resources_id": res_id,
+                        "domain_list":[],
+                    }
+                    compute_list = resources.compute_list
+                    domain_list = []
+                    for compute in compute_list:
+                        domain = compute.domain
+                        domain_ip = compute.domain_ip
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                    crp_data['domain_list'] = domain_list
+                    crp_data = json.dumps(crp_data)
+                    requests.delete(crp_url, data=crp_data)
+                    deploy.delete()
+                # 调用CRP 删除资源
                 crp_data = {
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
                         "vid_list": resources.vid_list,
                 }
-                try:
-                    deploy = Deployment.objects.filter(deleted=0).get(resource_id=res_id)
-                except Exception as e:
-                    deploy = None
-
-                if deploy:
-                    deploy.deleted = 1
-                    deploy.save()
-                # 调用CRP 删除资源
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
-                resources.deleted = 1
                 # 修改ins_name 唯一键
-                compute_list = resources.compute_list
-                for compute_ in compute_list:
-                     ins_name = 'delete_%s_%s'%(compute_.ins_name, time.time())
-                     compute_.ins_name = ins_name
-                resources.compute_list = compute_list
-                resources.save()
+                #compute_list = resources.compute_list
+                #for compute_ in compute_list:
+                #     ins_name = 'delete_%s_%s'%(compute_.ins_name, time.time())
+                #     compute_.ins_name = ins_name
+                #resources.compute_list = compute_list
+                resources.delete()
                 # 回写CMDB
                 cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', resources.cmdb_p_code)
                 requests.delete(cmdb_url)
@@ -411,7 +426,7 @@ class ResourceDetail(Resource):
     def get(cls, res_id):
         result = {}
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id, deleted=0)
+            resources = ResourceModel.objects.filter(res_id=res_id)
         except Exception as e:
             print e
             code = 500
@@ -497,7 +512,7 @@ class ResourceDetail(Resource):
     @classmethod
     def put(cls, res_id):
         try:
-            resource_application = ResourceModel.objects.get(res_id=res_id, deleted=0)
+            resource_application = ResourceModel.objects.get(res_id=res_id)
         except Exception as e:
             print e
             code = 500
@@ -612,7 +627,7 @@ class ResourceDetail(Resource):
     @classmethod
     def delete(cls, res_id):
         try:
-            resources = ResourceModel.objects.get(res_id=res_id, deleted=0)
+            resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
                 resources.delete()
             else:
@@ -649,7 +664,7 @@ class ResourceRecord(Resource):
     def get(cls, user_id):
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(user_id=user_id, deleted=0)
+            resources = ResourceModel.objects.filter(user_id=user_id)
         except Exception as e:
             print e
             code = 500

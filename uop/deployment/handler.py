@@ -388,7 +388,7 @@ class DeploymentListAPI(Resource):
         deployments = []
         try:
 
-            for deployment in Deployment.objects.filter(**condition).filter(deleted=0).order_by('-created_time'):
+            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
@@ -726,7 +726,7 @@ class DeploymentListAPI(Resource):
         deploy_id = args.deploy_id
 
         try:
-            deploy = Deployment.objects.filter(deleted=0).get(deploy_id=deploy_id)
+            deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s'%(env_, 'api/deploy/deploys')
@@ -741,10 +741,8 @@ class DeploymentListAPI(Resource):
                         "domain_list":[],
                         "resources_id": ''
                 }
-                res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
+                res = ResourceModel.objects.get(res_id=deploy.resource_id)
                 if res:
-                    #if hasattr(res, 'disconf_list'):
-                    #crp_data['disconf_list'] = res.disconf_list
                     crp_data['resources_id'] = res.res_id
                     compute_list = res.compute_list
                     domain_list = []
@@ -754,8 +752,7 @@ class DeploymentListAPI(Resource):
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip})
                     crp_data['domain_list'] = domain_list
                     
-                deploy.deleted = 1
-                deploy.save()
+                deploy.delete()
                 # 调用CRP 删除资源
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
@@ -818,7 +815,6 @@ class DeploymentListByByInitiatorAPI(Resource):
         condition = {}
         if args.initiator:
             condition['initiator'] = args.initiator
-        condition['deleted'] = 0
 
         pipeline = [
             {
