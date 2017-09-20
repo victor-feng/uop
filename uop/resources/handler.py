@@ -347,8 +347,9 @@ class ResourceApplication(Resource):
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
                 os_ins_list = resources.os_ins_list
-                deploy = Deployment.objects.filter(resource_id=res_id)
-                if len(deploy):
+                deploys = Deployment.objects.filter(resource_id=res_id)
+                if len(deploys):
+                    deploy = deploys[0]
                     env_ = get_CRP_url(deploy.environment)
                     crp_url = '%s%s'%(env_, 'api/deploy/deploys')
                     disconf_list = deploy.disconf_list
