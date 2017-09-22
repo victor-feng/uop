@@ -145,12 +145,12 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
         "disconf_server_info": disconf_server_info,
         "dns":[],
     }
-
-    for app_info in res_obj.compute_list:
-        dns_info = {'domain': app_info.domain,
-                    'domain_ip': app_info.domain_ip
-                    }
-        data['dns'].append(dns_info)
+    if appinfo: # 判断nginx信息，没有则不推送dns配置
+        for app_info in res_obj.compute_list:
+            dns_info = {'domain': app_info.domain,
+                        'domain_ip': app_info.domain_ip
+                        }
+            data['dns'].append(dns_info)
 
     if resource_info.get('mysql_cluster'):
         data['mysql'] = {
