@@ -124,7 +124,7 @@ def get_resource_by_id(resource_id):
         result = result.json()
         data = result.get('result', {}).get('res', {})
         code = result.get('code', -1)
-        print 'data: '+json.dumps(result)
+        logging.info('data: '+json.dumps(result))
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
     except BaseException as e:
