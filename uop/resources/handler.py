@@ -772,6 +772,7 @@ class GetMyResourcesInfo(Resource):
             flag, resources_dic= get_resource_by_id_mult([res.cmdb_p_code for res in resources])
             if not flag:
                 code = 500
+                logging.error("@@@@result:{}".format(resources_dic))
                 ret = {
                     'code': code,
                     'result': {

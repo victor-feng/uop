@@ -75,9 +75,10 @@ def get_resource_by_id_mult(p_codes):
     err_msg = None
     try:
         result = requests.post(url, headers=headers, data=data_str)
+        logging.info("@@@@result:{}".format(result))
     except requests.exceptions.ConnectionError as rq:
-        err_msg = rq.message.message
-    except BaseException as e:
+        err_msg = rq.message
+    except Exception as e:
         err_msg = e.message
     if err_msg:
         return False, err_msg
