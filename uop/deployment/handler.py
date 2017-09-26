@@ -108,7 +108,7 @@ def get_resource_by_id(resource_id):
             'columns_filter': {
                 'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
                 'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username',
-                                    'password', 'port'],
+                                    'password', 'port','ip_address'],
                 'mongodb_instance': ['ip_address'],
                 'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
                 'docker': ['ip_address', 'username', 'password', 'port'],
