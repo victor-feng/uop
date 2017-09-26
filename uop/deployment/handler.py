@@ -70,6 +70,7 @@ def get_resource_by_id_mult(p_codes):
             'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
             'docker': ['ip_address', 'username', 'password', 'port'],
         },
+        'p_codes': p_codes
     }
     data_str = json.dumps(data)
     err_msg = None
