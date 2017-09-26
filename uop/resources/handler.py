@@ -854,7 +854,7 @@ class GetMyResourcesInfo(Resource):
                 ins = type + '_instance'
                 tempip = resource_info.get(ip, {}).get(_ip)
                 tempip_ = resource_info.get(ins, {}).get(_ip_)
-                relip = tempip or tempip_
+                relip = tempip_ if tempip == '127.0.0.1' else tempip
                 if not relip:
                     continue
                 result['resource_ip'] = relip
