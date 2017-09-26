@@ -101,15 +101,15 @@ def get_resource_by_id(resource_id):
     try:
         headers = {'Content-Type': 'application/json'}
         data = {
-            'layer_count': 3,
+            'layer_count': 4,
             'total_count': 50,
-            'reference_sequence': [{'child': 2}, {'bond': 1}],
+            'reference_sequence': [{'child': 3}, {'bond': 1}],
             'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster', 'mongodb_instance'],
             'columns_filter': {
                 'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
                 'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username',
                                     'password', 'port','ip_address'],
-                'mongodb_instance': ['ip_address'],
+                'mongodb_instance': ['ip_address', 'username', 'password', 'port'],
                 'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
                 'docker': ['ip_address', 'username', 'password', 'port'],
             },
