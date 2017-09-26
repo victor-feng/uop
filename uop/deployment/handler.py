@@ -104,11 +104,12 @@ def get_resource_by_id(resource_id):
             'layer_count': 3,
             'total_count': 50,
             'reference_sequence': [{'child': 2}, {'bond': 1}],
-            'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster'],
+            'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster', 'mongodb_instance'],
             'columns_filter': {
                 'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
                 'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username',
                                     'password', 'port'],
+                'mongodb_instance': ['ip_address'],
                 'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
                 'docker': ['ip_address', 'username', 'password', 'port'],
             },
@@ -395,7 +396,7 @@ class DeploymentListAPI(Resource):
         deployments = []
         try:
 
-            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+            for deployment in Deployment.objects.filter(**condition).filter(deleted=0).order_by('-created_time'):
                 #返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
@@ -408,8 +409,7 @@ class DeploymentListAPI(Resource):
                                                         disconf_server_name = disconf_info.disconf_server_name,
                                                         disconf_version = disconf_info.disconf_version,
                                                         disconf_id = disconf_info.disconf_id,
-                                                        disconf_env = disconf_info.disconf_env,
-                                                        disconf_app_name= disconf_info.disconf_app_name
+                                                        disconf_env = disconf_info.disconf_env
                                                         )]
                                          )
                     if len(disconf) == 0:
@@ -553,7 +553,6 @@ class DeploymentListAPI(Resource):
                                 disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
                                 disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                                 disconf_info.disconf_env = disconf_info_front.get('disconf_env')
-                                disconf_info.disconf_app_name = disconf_info_front.get('disconf_app_name')
                 deploy_obj.save()
 
                 #将computer信息如IP，更新到数据库
@@ -579,7 +578,6 @@ class DeploymentListAPI(Resource):
                                        'disconf_env':disconf_info.disconf_env,
                                        'disconf_version':disconf_info.disconf_version,
                                        'ins_name':disconf_info.ins_name,
-                                       'disconf_app_name':disconf_info.disconf_app_name,
                                        }
                         disconf_server_info.append(server_info)
                         '''
@@ -631,9 +629,6 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
 
             elif action == 'save_to_db':  # 部署申请
-                #deploies = Deployment.objects.filter(resource_id=resource_id).order_by('+created_date')
-                #deploy = deploies.first()
-                #database_password = deploy.database_password
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -693,7 +688,6 @@ class DeploymentListAPI(Resource):
                         disconf_server_password = disconf_info.get('disconf_server_password')
                         disconf_version = disconf_info.get('disconf_version')
                         disconf_env = disconf_info.get('disconf_env')
-                        disconf_app_name = disconf_info.get('disconf_app_name')
                         disconf_id = str(uuid.uuid1())
                         disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
                                                  disconf_tag=disconf_tag,
@@ -707,7 +701,6 @@ class DeploymentListAPI(Resource):
                                                  disconf_version = disconf_version,
                                                  disconf_env = disconf_env,
                                                  disconf_id = disconf_id,
-                                                 disconf_app_name=disconf_app_name,
                                                  )
                         deploy_item.disconf_list.append(disconf_ins)
 
@@ -739,7 +732,7 @@ class DeploymentListAPI(Resource):
         deploy_id = args.deploy_id
 
         try:
-            deploy = Deployment.objects.get(deploy_id=deploy_id)
+            deploy = Deployment.objects.filter(deleted=0).get(deploy_id=deploy_id)
             if len(deploy):
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s'%(env_, 'api/deploy/deploys')
@@ -754,8 +747,10 @@ class DeploymentListAPI(Resource):
                         "domain_list":[],
                         "resources_id": ''
                 }
-                res = ResourceModel.objects.get(res_id=deploy.resource_id)
+                res = ResourceModel.objects.filter(deleted=0).get(res_id=deploy.resource_id)
                 if res:
+                    #if hasattr(res, 'disconf_list'):
+                    #crp_data['disconf_list'] = res.disconf_list
                     crp_data['resources_id'] = res.res_id
                     compute_list = res.compute_list
                     domain_list = []
@@ -765,7 +760,8 @@ class DeploymentListAPI(Resource):
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip})
                     crp_data['domain_list'] = domain_list
                     
-                deploy.delete()
+                deploy.deleted = 1
+                deploy.save()
                 # 调用CRP 删除资源
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
@@ -828,6 +824,7 @@ class DeploymentListByByInitiatorAPI(Resource):
         condition = {}
         if args.initiator:
             condition['initiator'] = args.initiator
+        condition['deleted'] = 0
 
         pipeline = [
             {
