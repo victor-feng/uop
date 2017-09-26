@@ -851,8 +851,9 @@ class GetMyResourcesInfo(Resource):
                 elif type == 'mongodb':
                     _ip = 'vip1'
                 ip = type + '_cluster'
+                ins = type + '_instance'
                 tempip = resource_info.get(ip, {}).get(_ip)
-                tempip_ = resource_info.get(ip, {}).get(_ip_)
+                tempip_ = resource_info.get(ins, {}).get(_ip_)
                 relip = tempip or tempip_
                 if not relip:
                     continue
