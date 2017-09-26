@@ -688,7 +688,6 @@ class ResourceRecord(Resource):
 class GetDBInfo(Resource):
     def get(cls, res_id):
         err_msg, resource_info = get_resource_by_id(res_id)
-        logging.info("####resource_info:{}".format(resource_info))
         mysql_ip = {
             'wvip': resource_info.get('mysql_cluster', {'wvip': '127.0.0.1'}).get('wvip'),
             'rvip': resource_info.get('mysql_cluster', {'rvip': '127.0.0.1'}).get('rvip'),
@@ -784,10 +783,10 @@ class GetMyResourcesInfo(Resource):
             for res in resources:
                 rcd = res.created_date
                 if start_time:
-                    if res.created_date < comparable_time(start_time):
+                    if rcd < comparable_time(start_time):
                         continue
                 if end_time:
-                    if res.created_date > comparable_time(end_time):
+                    if rcd > comparable_time(end_time):
                         continue
                 resource_info = resources_dic.get(res.cmdb_p_code, {})
                 result = {}
@@ -826,6 +825,8 @@ class GetMyResourcesInfo(Resource):
             result = copy.copy(result)
             if source_type == 'docker':
                 type = source_type
+                if resource_info.get(source_type, {'ip_address': '127.0.0.1'}).get('ip_address') == '127.0.0.1':
+                    continue
                 result['resource_ip'] = resource_info.get(source_type, {'ip_address': '127.0.0.1'}).get('ip_address')
             else:
                 if source_type == 'db':
@@ -841,6 +842,7 @@ class GetMyResourcesInfo(Resource):
                     else:
                         continue
                 _ip = 'ip'
+                _ip_ = 'vip'
                 if type == 'redis':
                     _ip = 'vip'
                 elif type == 'mysql':
@@ -848,7 +850,12 @@ class GetMyResourcesInfo(Resource):
                 elif type == 'mongodb':
                     _ip = 'vip1'
                 ip = type + '_cluster'
-                result['resource_ip'] = resource_info.get(ip, {}).get(_ip, '127.0.0.1')
+                tempip = resource_info.get(ip, {}).get(_ip)
+                tempip_ = resource_info.get(ip, {}).get(_ip_)
+                relip = tempip or tempip_
+                if not relip:
+                    continue
+                result['resource_ip'] = relip
             result['resource_type'] = type
             result['resource_config'] = [
                 {'name': 'CPU', 'value': str(source.cpu) + '核'},
