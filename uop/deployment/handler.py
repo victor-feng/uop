@@ -47,7 +47,8 @@ def format_resource_info(items):
             resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
         elif item.get('item_id') == 'docker':
             resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
-
+        elif item.get('item_id') == 'mongodb_instance':
+            resource_info[item.get('item_id')]['vip'] = colunm.get('ip_address', '127.0.0.1')
     return resource_info
 
 
