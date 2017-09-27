@@ -280,6 +280,34 @@ class ItemInfoLoacl(Resource):
         }
         return ret, code
 
+class CheckImageUrl(Resource):
+    def get(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('image_url', type=str)
+            args = parser.parse_args()
+            image_url=args.image_url
+            num = image_url.count(':')
+            if num ==1:
+                code=200
+                msg='image url check success'
+            else:
+                code=400
+                msg = 'image url check failed'
+        except Exception as e:
+            code = 500
+            msg = 'image url check failed'
+
+        ret = {
+            'code': code,
+            'result': {
+                'msg': msg
+            }
+        }
+        return ret, code
+
+
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
 iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
+iteminfo_api.add_resource(CheckImageUrl, '/check_image_url')
