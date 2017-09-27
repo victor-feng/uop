@@ -325,6 +325,7 @@ class ResourceApplication(Resource):
                 result['id'] = res.res_id
                 result['reservation_status'] = res.reservation_status
                 result['env'] = res.env
+                result['is_deleted'] = res.is_deleted
                 result_list.append(result)
         code = 200
         ret = {
