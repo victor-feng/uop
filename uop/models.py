@@ -81,7 +81,8 @@ class Deployment(db.Document):
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
-    deleted = db.IntField(required=False, default=0)
+    is_deleted = db.IntField(required=False, default=0)
+    deleted_time = db.DateTimeField(default=datetime.datetime.now())
 
     meta = {
         'collection': 'deployment',
@@ -165,7 +166,8 @@ class ResourceModel(db.DynamicDocument):
     cmdb_p_code = db.StringField(requeired=False)
     os_ins_list = db.ListField(db.StringField(requeired=False))
     vid_list = db.ListField(db.StringField(requeired=False))
-    deleted = db.IntField(required=False, default=0)
+    is_deleted = db.IntField(required=False, default=0)
+    deleted_date = db.DateTimeField(required=False)
 
 
     meta = {

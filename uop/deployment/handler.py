@@ -808,6 +808,54 @@ class DeploymentListAPI(Resource):
         }
         return ret, 200
 
+    @classmethod
+    def put(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_id', type=str)
+        parser.add_argument('action', type=str)
+        args = parser.parse_args()
+        deploy_id = args.deploy_id
+        action=args.action
+
+        try:
+            deploy = Deployment.objects.get(deploy_id=deploy_id)
+            if len(deploy):
+                if action == 'delete':
+                    delete_time = datetime.datetime.now()
+                    deploy.is_deleted = 1
+                    deploy.deleted_date = delete_time
+                elif action=='revoke':
+                    deploy.is_deleted = 0
+                deploy.save()
+
+            else:
+                ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'deployment not found.'
+                    }
+                }
+                return ret, 200
+        except Exception as e:
+            print e
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Put deployment  application failed.'
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Put deployment application success.'
+            }
+        }
+        return ret, 200
+
 
 class DeploymentAPI(Resource):
 

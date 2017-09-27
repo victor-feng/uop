@@ -414,6 +414,52 @@ class ResourceApplication(Resource):
         }
         return ret, 200
 
+    @classmethod
+    def put(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str)
+        parser.add_argument('action', type=str)
+        args = parser.parse_args()
+        res_id = args.res_id
+        action=args.action
+        try:
+            resources = ResourceModel.objects.get(res_id=res_id)
+            if len(resources):
+                if action=='delete':
+                    delete_time=datetime.datetime.now()
+                    resources.is_deleted=1
+                    resources.deleted_date=delete_time
+                elif action=='revoke':
+                    resources.is_deleted = 0
+                resources.save()
+            else:
+                ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'Resource not found.'
+                    }
+                }
+                return ret, 200
+        except Exception as e:
+            print e
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Put resource application failed.'
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Put resource application success.'
+            }
+        }
+        return ret, 200
+
 
 class ResourceDetail(Resource):
     @classmethod
