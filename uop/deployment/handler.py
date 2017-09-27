@@ -311,22 +311,27 @@ def upload_disconf_files_to_crp(disconf_info_list,env):
 
 def disconf_write_to_file(file_name, file_content, instance_name, type):
     try:
-        if (len(file_name) == 0) and (len(file_content) == 0):
-            upload_file = ''
-        elif (len(file_name) == 0) and (len(file_content) != 0):
-            raise ServerError('disconf name can not be null.')
-        elif (len(file_name) != 0) and (len(file_content) == 0):
-            raise ServerError('disconf content can not be null.')
-        else:
-            upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
-            if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-            upload_file = os.path.join(upload_dir,file_name)
-            with open(upload_file, 'wb') as f:
-                f.write(file_content)
+        # if (len(file_name) == 0) and (len(file_content) == 0):
+        #     upload_file = ''
+        # elif (len(file_name) == 0) and (len(file_content) != 0):
+        #     raise ServerError('disconf name can not be null.')
+        # elif (len(file_name) != 0) and (len(file_content) == 0):
+        #     raise ServerError('disconf content can not be null.')
+        # else:
+        #     upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], type, instance_name)
+        #     if not os.path.exists(upload_dir):
+        #         os.makedirs(upload_dir)
+        #     upload_file = os.path.join(upload_dir,file_name)
+        #     with open(upload_file, 'ab') as f:
+        #         f.write(file_content)
+        if not os.path.exists(file_name):
+            raise ServerError('disconf_last_name not found.')
+        with open(file_name, 'ab') as f:
+            f.write(file_content)
     except Exception as e:
+        logging.error("###appending content to disconf_file:{},error:{}".format(file_name, e.args))
         raise ServerError(e.message)
-    return upload_file
+    return file_name
 
 
 def attach_domain_ip(compute_list, res):
@@ -556,6 +561,26 @@ class DeploymentListAPI(Resource):
                         disconf_id = disconf_info_front.get('disconf_id')
                         for disconf_info in deploy_obj.disconf_list:
                             if disconf_info.disconf_id == disconf_id:
+                                logging.info("####admin disconf_tag is:{}".format(disconf_info.get('disconf_tag')))
+                                if disconf_info.get('disconf_tag') == 'appending':  # 管理员追加
+                                    file_name = disconf_info.get('disconf_last_name')
+                                    if not file_name:
+                                        return {
+                                                   "code": 400,
+                                                   "result": {
+                                                       "res": "failed",
+                                                       "msg": "not found disconf_last_name from the dislist parameter"
+                                                   }
+                                               }, 200
+                                    file_content = disconf_info.get('disconf_admin_content')  # 获取管理员追加的内容
+                                    logging.info(
+                                        "###admin will appending to disconf file,content:{}".format(file_content))
+                                    ins_name = instance_info.get('ins_name')
+                                    upload_file = disconf_write_to_file(file_name=file_name,
+                                                                        file_content=file_content,
+                                                                        instance_name=ins_name,
+                                                                        type='disconf')
+                                    disconf_info['disconf_admin_content'] = upload_file
                                 disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
                                 disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
                                 disconf_info.disconf_server_url = disconf_info_front.get('disconf_server_url')
@@ -668,10 +693,19 @@ class DeploymentListAPI(Resource):
 
                 for instance_info in disconf:
                     for disconf_info in instance_info.get('dislist'):
-                        #以内容形式上传，需要将内容转化为文本
-                        if disconf_info.get('disconf_tag') == 'tag':
-                            file_name = disconf_info.get('disconf_name')
+                        # 以追加形式上传
+                        if disconf_info.get('disconf_tag') == 'appending':
+                            file_name = disconf_info.get('disconf_last_name')
+                            if not file_name:
+                                return {
+                                           "code": 400,
+                                           "result": {
+                                               "res": "failed",
+                                               "msg": "not found disconf_last_name from dislist"
+                                           }
+                                       }, 200
                             file_content = disconf_info.get('disconf_content')
+                            logging.info("###will appending to disconf,content:{}".format(file_content))
                             ins_name = instance_info.get('ins_name')
                             upload_file = disconf_write_to_file(file_name=file_name,
                                                                 file_content=file_content,
@@ -679,13 +713,15 @@ class DeploymentListAPI(Resource):
                                                                 type='disconf')
                             disconf_info['disconf_content'] = upload_file
                             disconf_info['disconf_admin_content'] = ''
-                        #以文本形式上传，只需获取文件名
-                        else:
+                        # 以文本形式上传，只需获取文件名
+                        elif disconf_info.get('disconf_tag') == 'attachment':
                             file_name = disconf_info.get('disconf_name')
                             if len(file_name.strip()) == 0:
                                 upload_file = ''
                                 disconf_info['disconf_content'] = upload_file
                                 disconf_info['disconf_admin_content'] = upload_file
+                        else:
+                            logging.error("###disconf_tag:{} not invalid".format(disconf_info.get('disconf_tag')))
 
                         ins_name = instance_info.get('ins_name')
                         ins_id = instance_info.get('ins_id')
