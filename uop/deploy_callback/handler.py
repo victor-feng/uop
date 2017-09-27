@@ -4,6 +4,7 @@ from flask import request, current_app
 from flask import redirect
 from flask import jsonify
 import uuid
+import logging
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.deploy_callback.errors import deploy_cb_errors
@@ -25,7 +26,7 @@ class DeployCallback(Resource):
         try:
             dep = Deployment.objects.get(deploy_id=deploy_id)
         except Exception as e:
-            print e
+            logging.error("###Deployment error:{}".format(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -50,7 +51,7 @@ class DeployCallback(Resource):
             parser.add_argument('result', type=str)
             args = parser.parse_args()
         except Exception as e:
-            print e
+            logging.error("###parser error:{}".format(e.args))
             return
 
         dep.deploy_result = args.result
@@ -61,7 +62,7 @@ class DeployCallback(Resource):
             # 修改cmdb部署状态信息
             CMDB_URL = current_app.config['CMDB_URL']
             deployment_url = CMDB_URL + "cmdb/api/repo/%s/"  % p_code
-            print 'status', dep.deploy_result, p_code
+            logging.info('deploy status: {}, {}'.format(dep.deploy_result, p_code))
             data = {
                 'property_list': [
                     {
@@ -72,7 +73,7 @@ class DeployCallback(Resource):
                 ]
             }
             req = requests.put(deployment_url, data=json.dumps(data))
-            print '-----', req.text
+            logging.info('----- {}'.format(req.text))
         except Exception as e:
             code = 500
             ret = {
