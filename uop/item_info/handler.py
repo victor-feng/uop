@@ -289,19 +289,22 @@ class CheckImageUrl(Resource):
             image_url=args.image_url
             num = image_url.count(':')
             if num ==1:
-                code=200
+                status='success'
                 msg='image url check success'
             else:
-                code=400
+                status = 'failed'
                 msg = 'image url check failed'
+            code = 200
         except Exception as e:
             code = 500
-            msg = 'image url check failed'
+            status = 'error'
+            msg = 'image url check error'
 
         ret = {
             'code': code,
             'result': {
-                'msg': msg
+                'msg': msg,
+                'status':status,
             }
         }
         return ret, code
