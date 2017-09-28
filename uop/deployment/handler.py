@@ -860,7 +860,7 @@ class DeploymentListAPI(Resource):
                 if action == 'delete':
                     delete_time = datetime.datetime.now()
                     deploy.is_deleted = 1
-                    deploy.deleted_date = delete_time
+                    deploy.deleted_time = delete_time
                 elif action=='revoke':
                     deploy.is_deleted = 0
                 deploy.save()
