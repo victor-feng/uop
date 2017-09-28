@@ -27,7 +27,7 @@ class Config(object):
             'func': 'uop.scheduler_util:delete_res_handler',
             #'args': (1, 2),
             'trigger': 'interval',
-            'seconds': 120
+            'seconds': 60
         }
     ]
 

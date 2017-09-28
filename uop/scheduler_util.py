@@ -6,10 +6,12 @@ from uop.models import ResourceModel, Deployment
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
-    import pdb;pdb.set_trace()
+    logging.info('----------------delete_res_handler----------------')
     yestoday = datetime.datetime.now() - datetime.timedelta(days = 1)
     resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
     deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
+    logging.info('-----------deploies---------------:%s'%(deploies))
+    logging.info('-----------resources---------------:%s'%(resources))
     for resource in resources:
         _delete_res(resource.res_id)
     for deploy in deploies:
@@ -47,6 +49,7 @@ def _delete_deploy(deploy_id):
             # 调用CRP 删除资源
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
+            logging.info('wwwwwwwwwwwwwwww')
             # 回写CMDB
             #cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
             #requests.delete(cmdb_url)
@@ -97,6 +100,7 @@ def _delete_res(res_id):
             # 回写CMDB
             cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
             requests.delete(cmdb_url)   
+            logging.info('fffffffffffffffffff')
     except Exception as e:
         logging.info('---- Scheduler_utuls  _delete_res  function Exception info is %s'%(e))
 
