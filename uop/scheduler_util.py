@@ -2,21 +2,29 @@
 
 import datetime
 import logging
+import json
+import requests
+from models import db
+from uop.util import get_CRP_url
 from uop.models import ResourceModel, Deployment
+from config import APP_ENV, configs
+
+CMDB_URL = configs[APP_ENV].CMDB_URL
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
     logging.info('----------------delete_res_handler----------------')
     yestoday = datetime.datetime.now() - datetime.timedelta(days = 1)
-    resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
+    resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_date__lte=yestoday)
     deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
     logging.info('-----------deploies---------------:%s'%(deploies))
     logging.info('-----------resources---------------:%s'%(resources))
-    for resource in resources:
-        _delete_res(resource.res_id)
-    for deploy in deploies:
-        _delete_deploy(deploy.deploy_id)
- 
+    with db.app.app_context():
+        for resource in resources:
+            _delete_res(resource.res_id)
+        for deploy in deploies:
+            _delete_deploy(deploy.deploy_id)
+
 def _delete_deploy(deploy_id):
     try:
         deploy = Deployment.objects.get(deploy_id=deploy_id)
