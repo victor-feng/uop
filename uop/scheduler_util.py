@@ -8,6 +8,9 @@ from models import db
 from uop.util import get_CRP_url
 from uop.a import delete_res
 from uop.models import ResourceModel, Deployment
+from config import APP_ENV, configs
+
+CMDB_URL = configs[APP_ENV].CMDB_URL
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
