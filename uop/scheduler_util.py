@@ -9,7 +9,7 @@ def delete_res_handler():
     logging.info('----------------delete_res_handler----------------')
     yestoday = datetime.datetime.now() - datetime.timedelta(days = 1)
     resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_date__lte=yestoday)
-    deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_date__lte=yestoday)
+    deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
     logging.info('-----------deploies---------------:%s'%(deploies))
     logging.info('-----------resources---------------:%s'%(resources))
     for resource in resources:
