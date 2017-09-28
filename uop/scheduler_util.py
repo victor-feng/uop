@@ -13,9 +13,8 @@ def delete_res_handler():
     deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
     logging.info('-----------deploies---------------:%s'%(deploies))
     logging.info('-----------resources---------------:%s'%(resources))
-    with app.app_context():
-        for resource in resources:
-            _delete_res(resource.res_id)
+    for resource in resources:
+        _delete_res(resource.res_id)
     for deploy in deploies:
         _delete_deploy(deploy.deploy_id)
  
