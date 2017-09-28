@@ -273,3 +273,44 @@ class ConfigureNginxModel(db.Document):
                 }]
             }
 
+class StatusRecord(db.Document):
+    deploy_id = db.StringField()
+    res_id = db.StringField()
+    resource_name = db.StringField()
+    deploy_name = db.StringField()
+    created_time = db.DateTimeField(default=datetime.datetime.now())
+    status = db.StringField()  # 状态
+    docker = db.ListField(db.StringField())
+    mongo = db.ListField(db.StringField())
+    redis = db.ListField(db.StringField())
+    mysql = db.ListField(db.StringField())
+    is_deleted = db.IntField(required=False, default=0)
+
+    meta = {
+        'collection': 'status_record',
+        'index': [
+            {
+                'fields': ['status', 'resource_name', 'deploy_name'],
+                'sparse': True,
+            }
+        ],
+        'index_background': True
+    }
+
+class OperationLog(db.Document):
+    deploy_id = db.StringField()
+    res_id = db.StringField()
+    created_time = db.DateTimeField(default=datetime.datetime.now())
+    msg = db.StringField()  
+
+    meta = {
+        'collection': 'operation_log',
+        'index': [
+            {
+                'fields': ['res_id', 'deploy_id'],
+                'sparse': True,
+            }
+        ],
+        'index_background': True
+    }
+

@@ -2,6 +2,7 @@
 
 from flask import Flask, redirect
 from flask_restful import Resource, Api
+from flask_apscheduler import APScheduler
 
 from config import configs
 from models import db
@@ -19,11 +20,32 @@ from uop.disconf import disconf_blueprint
 from uop.configure import configure_blueprint
 from uop.pool import pool_blueprint
 
+class Config(object):
+    JOBS = [
+        {
+            'id': 'delete_res_handler',
+            'func': 'uop.scheduler_util:delete_res_handler',
+            #'args': (1, 2),
+            'trigger': 'interval',
+            'seconds': 120
+        }
+    ]
+
+    SCHEDULER_API_ENABLED = True
+
 def create_app(config_name):
     app = Flask(__name__)
 
     app.config.from_object(configs[config_name])
+
     db.init_app(app)
+    app.config.from_object(Config())
+
+    scheduler = APScheduler()
+    # it is also possible to enable the API directly
+    # scheduler.api_enabled = True
+    scheduler.init_app(app)
+    scheduler.start()
 
     logger_setting(app)
 
