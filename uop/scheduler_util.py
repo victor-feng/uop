@@ -6,7 +6,6 @@ import json
 import requests
 from models import db
 from uop.util import get_CRP_url
-from uop.a import delete_res
 from uop.models import ResourceModel, Deployment
 from config import APP_ENV, configs
 
