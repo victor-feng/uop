@@ -3,6 +3,7 @@
 import datetime
 import logging
 import json
+import requests
 from models import db
 from uop.util import get_CRP_url
 from uop.a import delete_res
