@@ -58,6 +58,7 @@ def _delete_deploy(deploy_id):
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
             logging.info('wwwwwwwwwwwwwwww')
+
             # 回写CMDB
             #cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
             #requests.delete(cmdb_url)

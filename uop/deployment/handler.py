@@ -352,7 +352,7 @@ def attach_domain_ip(compute_list, res):
                 compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
                                              url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one.get("domain_ip", ""))
                 old_compute_list.insert(i, compute)
-            res.save()
+                res.save()
             return appinfo
         except Exception as e:
             logging.error( "attach domain_ip to appinfo error:{}".format(e.args))
