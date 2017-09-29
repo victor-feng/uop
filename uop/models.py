@@ -280,6 +280,7 @@ class StatusRecord(db.Document):
     deploy_name = db.StringField()
     created_time = db.DateTimeField(default=datetime.datetime.now())
     status = db.StringField()  # 状态
+    msg = db.StringField()  # 状态信息
     docker = db.ListField(db.StringField())
     mongo = db.ListField(db.StringField())
     redis = db.ListField(db.StringField())
