@@ -49,7 +49,7 @@ def format_resource_info(items):
             resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
         elif item.get('item_id') == 'mongodb_instance':
             resource_info[item.get('item_id')]['vip'] = colunm.get('ip_address', '127.0.0.1')
-    logging.info("####resource_info:{}".format(resource_info))
+    # logging.info("####resource_info:{}".format(resource_info))
     return resource_info
 
 
