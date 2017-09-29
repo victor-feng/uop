@@ -11,7 +11,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import current_app
 
 from uop.res_callback import res_callback_blueprint
-from uop.models import User, ResourceModel
+from uop.models import User, ResourceModel, StatusRecord
 from uop.res_callback.errors import res_callback_errors
 from config import APP_ENV, configs
 from transitions import Machine
@@ -199,6 +199,13 @@ property_json_mapper_config = {
     },
 }
 
+mapping_type_status = {
+           'mysql' : 'mysql',
+           'mycat' : 'mysql',
+           'mongodb' : 'mongodb',
+           'redis' : 'redis',
+           'app_cluster' : 'docker',
+}
 
 # Transition state Log debug decorator
 def transition_state_logger(func):
@@ -892,5 +899,70 @@ Post Request JSON Body：
         }
         return res, 200
 
+class ResourceStatusProviderCallBack(Resource):
+    """
+    资源预留状态记录回调
+    """
+    @classmethod
+    def post(cls):
+        code = 2002
+        request_data = json.loads(request.data)
+        instance = request_data.get('instance', '')
+        db_push = request_data.get('db_push', '')
+        try:
+            if instance:
+                resource_id = request_data.get('resource_id')
+                resource = ResourceModel.objects.filter(res_id=resource_id)
+                resource_name = resource.resource_name if resource else ''
+                os_inst_id = request_data.get('os_inst_id', '')
+                instance_type = request_data.get('instance_type')
+                quantity = int(request_data.get('quantity', '0'))
+                cur_instance_type = mapping_type_status.get('instance_type', '')
+                status_record = StatusRecord.objects.filter(res_id=resource_id)
+                if status_record:
+                    cur_instance_type_list = getattr(status_record, cur_instance_type)
+                    if len(cur_instance_type_list)==(quantity-1):
+                        status_record.status = '%s预留完成'%(cur_instance_type)
+                        status_record.msg='%s预留完成'%(cur_instance_type)
+                        # TODO 修改资源预留状态
+                        resource.reservation_status = ''
+                        resource.save()
+                    else:
+                        cur_instance_type_list.append(os_inst_id)
+                else:
+                    status_record = StatusRecord()
+                    status_record.res_id = resource_id
+                    status_record.status = 'docker预留中'
+                    status_record.msg = 'docker预留中'
+                    cur_instance_type_list = [os_inst_id]
+                setattr(status_record, cur_instance_type, cur_instance_type_list)
+                status_record.save()
+                
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.reservation_status = status
+            resource.os_ins_list = os_ids
+            resource.vid_list = vid_list
+            resource.save()
+        except Exception as e:
+            logging.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "test info"
+            }
+        }
+        return res, 200
 
 res_callback_api.add_resource(ResourceProviderCallBack, '/res')
+res_callback_api.add_resource(ResourceStatusProviderCallBack, '/status')

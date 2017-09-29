@@ -276,11 +276,11 @@ class ConfigureNginxModel(db.Document):
 class StatusRecord(db.Document):
     deploy_id = db.StringField()
     res_id = db.StringField()
-    resource_name = db.StringField()
-    deploy_name = db.StringField()
+    #resource_name = db.StringField()
+    #deploy_name = db.StringField()
     created_time = db.DateTimeField(default=datetime.datetime.now())
-    status = db.StringField()  # 状态
-    msg = db.StringField()  # 状态信息
+    status = db.StringField(default='')  # 状态
+    msg = db.StringField(default='')  # 状态信息
     docker = db.ListField(db.StringField())
     mongo = db.ListField(db.StringField())
     redis = db.ListField(db.StringField())
