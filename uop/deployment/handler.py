@@ -60,7 +60,7 @@ def get_resource_by_id_mult(p_codes):
     data = {
         'layer_count': 3,
         'total_count': 50,
-        'reference_sequence': [{'child': 3}, {'bond': 2}],
+        'reference_sequence': [{'child': 3}],
         'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster', 'mongodb_instance'],
         'columns_filter': {
             'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
