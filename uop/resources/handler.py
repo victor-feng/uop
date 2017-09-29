@@ -881,15 +881,21 @@ class GetMyResourcesInfo(Resource):
 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
+        if source_type == 'docker':
+            docker_counts_ip_list = resource_info.get(source_type, [])
         for source in source_list:
             if source.quantity == 0:
                 continue
             result = copy.copy(result)
             if source_type == 'docker':
                 type = source_type
-                if resource_info.get(source_type, {'ip_address': '127.0.0.1'}).get('ip_address') == '127.0.0.1':
-                    continue
-                result['resource_ip'] = resource_info.get(source_type, {'ip_address': '127.0.0.1'}).get('ip_address')
+                try:
+                    current_ip = docker_counts_ip_list.pop().get("ip_address")
+                    if current_ip == '127.0.0.1':
+                        continue
+                    result['resource_ip'] = current_ip
+                except Exception as exc:
+                    logging.error("$$$get_source_item docker ip error:{}".format(exc))
             else:
                 if source_type == 'db':
                     type = source.ins_type

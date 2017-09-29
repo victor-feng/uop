@@ -29,26 +29,28 @@ def format_resource_info(items):
         for i in item.get('column'):
             if i.get('p_code') is not None:
                 colunm[i.get('p_code')] = i.get('value')
-
-        resource_info[item.get('item_id')] = {
-            'user': colunm.get('username', 'root'),
-            'password': colunm.get('password', '123456'),
-            'port': colunm.get('port', '3306'),
-        }
-
-        if item.get('item_id') == 'mysql_cluster':
-            resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
-            resource_info[item.get('item_id')]['rvip'] = colunm.get('mysql_cluster_rvip', '127.0.0.1')
-        elif item.get('item_id') == 'mongodb_cluster':
-            resource_info[item.get('item_id')]['vip1'] = colunm.get('mongodb_cluster_ip1', '127.0.0.1')
-            resource_info[item.get('item_id')]['vip2'] = colunm.get('mongodb_cluster_ip2', '127.0.0.1')
-            resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
-        elif item.get('item_id') == 'redis_cluster':
-            resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
-        elif item.get('item_id') == 'docker':
-            resource_info[item.get('item_id')]['ip_address'] = colunm.get('ip_address', '127.0.0.1')
-        elif item.get('item_id') == 'mongodb_instance':
-            resource_info[item.get('item_id')]['vip'] = colunm.get('ip_address', '127.0.0.1')
+        if item.get('item_id') == "docker":
+            resource_info['docker'] = []
+            resource_info['docker'].append({
+                'ip_address': colunm.get('ip_address', '127.0.0.1')
+            })
+        else:
+            resource_info[item.get('item_id')] = {
+                'user': colunm.get('username', 'root'),
+                'password': colunm.get('password', '123456'),
+                'port': colunm.get('port', '3306'),
+            }
+            if item.get('item_id') == 'mysql_cluster':
+                resource_info[item.get('item_id')]['wvip'] = colunm.get('mysql_cluster_wvip', '127.0.0.1')
+                resource_info[item.get('item_id')]['rvip'] = colunm.get('mysql_cluster_rvip', '127.0.0.1')
+            elif item.get('item_id') == 'mongodb_cluster':
+                resource_info[item.get('item_id')]['vip1'] = colunm.get('mongodb_cluster_ip1', '127.0.0.1')
+                resource_info[item.get('item_id')]['vip2'] = colunm.get('mongodb_cluster_ip2', '127.0.0.1')
+                resource_info[item.get('item_id')]['vip3'] = colunm.get('mongodb_cluster_ip3', '127.0.0.1')
+            elif item.get('item_id') == 'redis_cluster':
+                resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
+            elif item.get('item_id') == 'mongodb_instance':
+                resource_info[item.get('item_id')]['vip'] = colunm.get('ip_address', '127.0.0.1')
     # logging.info("####resource_info:{}".format(resource_info))
     return resource_info
 
@@ -60,13 +62,13 @@ def get_resource_by_id_mult(p_codes):
     data = {
         'layer_count': 3,
         'total_count': 50,
-        'reference_sequence': [{'child': 3}],
+        'reference_sequence': [{'child': 2}, {'bond': 1}],
         'item_filter': ['docker', 'mongodb_cluster', 'mysql_cluster', 'redis_cluster', 'mongodb_instance'],
         'columns_filter': {
             'mysql_cluster': ['mysql_cluster_wvip', 'mysql_cluster_rvip', 'username', 'password', 'port'],
             'mongodb_cluster': ['mongodb_cluster_ip1', 'mongodb_cluster_ip2', 'mongodb_cluster_ip3', 'username',
-                                'password', 'port', 'ip_address'],
-            'mongodb_instance': ['ip_address', 'username', 'password', 'port', "dbtype"],
+                                'password', 'port'],
+            'mongodb_instance': ['ip_address', 'username', 'password', 'port'],
             'redis_cluster': ['redis_cluster_vip', 'username', 'password', 'port'],
             'docker': ['ip_address', 'username', 'password', 'port'],
         },
