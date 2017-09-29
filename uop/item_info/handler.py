@@ -289,8 +289,14 @@ class CheckImageUrl(Resource):
             image_url=args.image_url
             num = image_url.count(':')
             if num ==1:
-                status='success'
-                msg='image url check success'
+                image_info=image_url.strip().split(':')
+                image_tag=image_info[1]
+                if image_tag:
+                    status='success'
+                    msg='image url check success'
+                else:
+                    status = 'failed'
+                    msg = 'image url check failed'
             else:
                 status = 'failed'
                 msg = 'image url check failed'
