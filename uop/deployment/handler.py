@@ -31,9 +31,9 @@ def format_resource_info(items):
                 colunm[i.get('p_code')] = i.get('value')
         if item.get('item_id') == "docker":
             resource_info['docker'] = []
-            resource_info['docker'].append({
+            resource_info.setdefault('docker', [{
                 'ip_address': colunm.get('ip_address', '127.0.0.1')
-            })
+            }]).append({'ip_address': colunm.get('ip_address', '127.0.0.1')})
         else:
             resource_info[item.get('item_id')] = {
                 'user': colunm.get('username', 'root'),
