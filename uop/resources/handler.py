@@ -889,11 +889,21 @@ class GetMyResourcesInfo(Resource):
             result = copy.copy(result)
             if source_type == 'docker':
                 type = source_type
+                if not docker_counts_ip_list:
+                    continue
                 try:
-                    current_ip = docker_counts_ip_list.pop().get("ip_address")
-                    if current_ip == '127.0.0.1':
-                        continue
-                    result['resource_ip'] = current_ip
+                    for i in range(source.quantity):
+                        current_ip = docker_counts_ip_list.pop().get("ip_address")
+                        if current_ip == '127.0.0.1':
+                            continue
+                        result['resource_ip'] = current_ip
+                        result['resource_type'] = type
+                        result['resource_config'] = [
+                            {'name': 'CPU', 'value': str(source.cpu) + '核'},
+                            {'name': '内存', 'value': str(source.mem) + 'GB'},
+                        ]
+                        result['resource_status'] = '运行中'
+                        result_list.append(result)
                 except Exception as exc:
                     logging.error("$$$get_source_item docker ip error:{}".format(exc))
             else:
@@ -925,13 +935,13 @@ class GetMyResourcesInfo(Resource):
                 if not relip:
                     continue
                 result['resource_ip'] = relip
-            result['resource_type'] = type
-            result['resource_config'] = [
-                {'name': 'CPU', 'value': str(source.cpu) + '核'},
-                {'name': '内存', 'value': str(source.mem) + 'GB'},
-            ]
-            result['resource_status'] = '运行中'
-            result_list.append(result)
+                result['resource_type'] = type
+                result['resource_config'] = [
+                    {'name': 'CPU', 'value': str(source.cpu) + '核'},
+                    {'name': '内存', 'value': str(source.mem) + 'GB'},
+                ]
+                result['resource_status'] = '运行中'
+                result_list.append(result)
         return result_list
 
 
