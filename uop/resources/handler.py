@@ -887,7 +887,7 @@ class GetMyResourcesInfo(Resource):
         for source in source_list:
             if source.quantity == 0:
                 continue
-            result = copy.copy(result)
+            # result = copy.copy(result)
             if source_type == 'docker':
                 logging.info("&&&resource info:{}".format(resource_info))
                 type = source_type
