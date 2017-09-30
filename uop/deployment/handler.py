@@ -25,6 +25,7 @@ deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 def format_resource_info(items):
     resource_info = {}
     colunm = {}
+    logging.info("####items:{}".format(items))
     for item in items.get('items'):
         for i in item.get('column'):
             if i.get('p_code') is not None:
