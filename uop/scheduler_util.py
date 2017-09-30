@@ -16,14 +16,14 @@ def delete_res_handler():
     logging.info('----------------delete_res_handler----------------')
     yestoday = datetime.datetime.now() - datetime.timedelta(days = 1)
     resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_date__lte=yestoday)
-    deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
-    logging.info('-----------deploies---------------:%s'%(deploies))
+    #deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
+    #logging.info('-----------deploies---------------:%s'%(deploies))
     logging.info('-----------resources---------------:%s'%(resources))
     with db.app.app_context():
         for resource in resources:
             _delete_res(resource.res_id)
-        for deploy in deploies:
-            _delete_deploy(deploy.deploy_id)
+        #for deploy in deploies:
+        #    _delete_deploy(deploy.deploy_id)
 
 def _delete_deploy(deploy_id):
     try:
@@ -93,7 +93,7 @@ def _delete_res(res_id):
                     crp_data['domain_list'] = domain_list
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
-                deploy.delete()
+                #deploy.delete()
             # 调用CRP 删除资源
             crp_data = {
                     "resources_id": resources.res_id,
