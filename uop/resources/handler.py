@@ -895,7 +895,7 @@ class GetMyResourcesInfo(Resource):
                     continue
                 try:
                     for i in range(source.quantity):
-                        tmp_result = result
+                        tmp_result = copy.copy(result)
                         current_ip = docker_counts_ip_list.pop().get("ip_address")
                         if current_ip == '127.0.0.1':
                             continue
