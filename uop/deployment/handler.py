@@ -31,7 +31,8 @@ def format_resource_info(items):
             if i.get('p_code') is not None:
                 colunm[i.get('p_code')] = i.get('value')
         if item.get('item_id') == "docker":
-            logging.info("####items:{}".format(items))
+            if colunm.get('ip_address', '127.0.0.1') == "172.28.36.44":
+                logging.info("####items:{}".format(items))
             resource_info.setdefault('docker', [{
                 'ip_address': colunm.get('ip_address', '127.0.0.1')
             }]).append({'ip_address': colunm.get('ip_address', '127.0.0.1')})
@@ -79,7 +80,7 @@ def get_resource_by_id_mult(p_codes):
     err_msg = None
     try:
         result = requests.post(url, headers=headers, data=data_str)
-        logging.info("@@@@result:{}".format(result.json()))
+        # logging.info("@@@@result:{}".format(result.json()))
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message
     except Exception as e:

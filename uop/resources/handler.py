@@ -881,7 +881,7 @@ class GetMyResourcesInfo(Resource):
 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
-        logging.info("&&&resource info:{}".format(resource_info))
+        # logging.info("&&&resource info:{}".format(resource_info))
         if source_type == 'docker':
             docker_counts_ip_list = resource_info.get(source_type, [])
         for source in source_list:
@@ -889,6 +889,7 @@ class GetMyResourcesInfo(Resource):
                 continue
             result = copy.copy(result)
             if source_type == 'docker':
+                logging.info("&&&resource info:{}".format(resource_info))
                 type = source_type
                 if not docker_counts_ip_list:
                     continue
