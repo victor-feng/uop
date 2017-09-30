@@ -881,6 +881,7 @@ class GetMyResourcesInfo(Resource):
 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
+        logging.info("&&&resource info:{}".format(resource_info))
         if source_type == 'docker':
             docker_counts_ip_list = resource_info.get(source_type, [])
         for source in source_list:
