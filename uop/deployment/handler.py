@@ -24,9 +24,8 @@ deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
 def format_resource_info(items):
     resource_info = {}
-    colunm = {}
-
     for item in items.get('items'):
+        colunm = {}
         for i in item.get('column'):
             if i.get('p_code') is not None:
                 colunm[i.get('p_code')] = i.get('value')
