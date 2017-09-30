@@ -25,12 +25,13 @@ deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 def format_resource_info(items):
     resource_info = {}
     colunm = {}
-    logging.info("####items:{}".format(items))
+
     for item in items.get('items'):
         for i in item.get('column'):
             if i.get('p_code') is not None:
                 colunm[i.get('p_code')] = i.get('value')
         if item.get('item_id') == "docker":
+            logging.info("####items:{}".format(items))
             resource_info.setdefault('docker', [{
                 'ip_address': colunm.get('ip_address', '127.0.0.1')
             }]).append({'ip_address': colunm.get('ip_address', '127.0.0.1')})
