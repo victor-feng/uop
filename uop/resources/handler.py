@@ -371,7 +371,7 @@ class ResourceApplication(Resource):
                     crp_data['domain_list'] = domain_list
                     crp_data = json.dumps(crp_data)
                     requests.delete(crp_url, data=crp_data)
-                    deploy.delete()
+                    #deploy.delete()
                 # 调用CRP 删除资源
                 crp_data = {
                         "resources_id": resources.res_id,
