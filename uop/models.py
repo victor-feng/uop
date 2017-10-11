@@ -281,6 +281,7 @@ class StatusRecord(db.Document):
     created_time = db.DateTimeField(default=datetime.datetime.now())
     status = db.StringField(default='')  # 状态
     msg = db.StringField(default='')  # 状态信息
+    s_type = db.StringField(default='')
     docker = db.ListField(db.StringField())
     mongo = db.ListField(db.StringField())
     redis = db.ListField(db.StringField())

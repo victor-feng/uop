@@ -911,38 +911,63 @@ class ResourceStatusProviderCallBack(Resource):
         db_push = request_data.get('db_push', '')
         try:
             if instance:
-                resource_id = request_data.get('resource_id')
-                resource = ResourceModel.objects.filter(res_id=resource_id)
-                resource_name = resource.resource_name if resource else ''
-                os_inst_id = request_data.get('os_inst_id', '')
-                instance_type = request_data.get('instance_type')
-                quantity = int(request_data.get('quantity', '0'))
-                cur_instance_type = mapping_type_status.get('instance_type', '')
-                status_record = StatusRecord.objects.filter(res_id=resource_id)
+                resource_id = instance.get('resource_id')
+                os_inst_id = instance.get('os_inst_id', '')
+                instance_type = instance.get('instance_type')
+                quantity = int(instance.get('quantity', '0'))
+                cur_instance_type = mapping_type_status.get(instance_type, '')
+                status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type)
                 if status_record:
+                    status_record=status_record[0]
                     cur_instance_type_list = getattr(status_record, cur_instance_type)
-                    if len(cur_instance_type_list)==(quantity-1):
-                        status_record.status = '%s预留完成'%(cur_instance_type)
-                        status_record.msg='%s预留完成'%(cur_instance_type)
-                        # TODO 修改资源预留状态
-                        resource.reservation_status = ''
-                        resource.save()
+                    if quantity > 1:
+                        if len(cur_instance_type_list)==(quantity-1):
+                            status_record.s_type=cur_instance_type
+                            status_record.status = '%s_success'%(cur_instance_type)
+                            status_record.msg='%s预留完成'%(cur_instance_type)
+                            cur_instance_type_list.append(os_inst_id)
+                        else:
+                            cur_instance_type_list.append(os_inst_id)
+                            status_record.status = '%s_reserving'%(cur_instance_type)
+                            status_record.msg='%s预留中'%(cur_instance_type)
+                            status_record.s_type=cur_instance_type
                     else:
-                        cur_instance_type_list.append(os_inst_id)
+                        status_record.status = '%s_success'%(cur_instance_type)
+                        status_record.msg='%s预留完成'%(cur_instance_type)
+                        cur_instance_type_list = [os_inst_id]            
+                        status_record.s_type=cur_instance_type
+                    
                 else:
                     status_record = StatusRecord()
                     status_record.res_id = resource_id
-                    status_record.status = 'docker预留中'
-                    status_record.msg = 'docker预留中'
-                    cur_instance_type_list = [os_inst_id]
+                    if quantity > 1:
+                        status_record.status = '%s_reserving'%(cur_instance_type)
+                        status_record.msg='%s预留中'%(cur_instance_type)
+                        cur_instance_type_list = [os_inst_id]
+                        status_record.s_type=cur_instance_type
+                    else:
+                        status_record.status = '%s_success'%(cur_instance_type)
+                        status_record.msg='%s预留完成'%(cur_instance_type)
+                        cur_instance_type_list = [os_inst_id]        
+                        status_record.s_type=cur_instance_type
                 setattr(status_record, cur_instance_type, cur_instance_type_list)
                 status_record.save()
-                
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            resource.reservation_status = status
-            resource.os_ins_list = os_ids
-            resource.vid_list = vid_list
-            resource.save()
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.reservation_status = status_record.status
+                resource.save()
+            if db_push:
+                resource_id = db_push.get('resource_id')
+                cluster_type = db_push.get('cluster_type')
+                status_record = StatusRecord()
+                status_record.res_id = resource_id
+                status_record.s_type = cluster_type
+                status_record.status = '%s_success'%(cluster_type)
+                status_record.msg='%s配置推送完成'%(cluster_type)
+                status_record.save()
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.reservation_status = status_record.status
+                resource.save()
+                 
         except Exception as e:
             logging.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
             code = 500

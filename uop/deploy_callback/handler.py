@@ -8,7 +8,7 @@ import logging
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.deploy_callback.errors import deploy_cb_errors
-from uop.models import Deployment, ResourceModel
+from uop.models import Deployment, ResourceModel,StatusRecord
 import requests
 
 import sys
@@ -96,5 +96,57 @@ class DeployCallback(Resource):
         return ret
 
 
+class DeployStatusProviderCallBack(Resource):
+    @classmethod
+    def post(cls):
+        try:
+            code = 200
+            request_data=json.loads(request.data)
+            deploy_id=request_data.get('deploy_id')
+            deploy_type=request_data.get('deploy_type')
+            dep = Deployment.objects.get(deploy_id=deploy_id)
+            if dep:
+                resource_id=dep.resource_id
+                status_record = StatusRecord()
+                status_record.deploy_id = deploy_id
+                status_record.s_type=deploy_type
+                status_record.res_id = resource_id
+                status_record.status = '%s_success'%(deploy_type)
+                status_record.msg='%s部署完成'%(deploy_type)
+                status_record.save()
+                dep.apply_status=status_record.status
+                dep.save()
+            else:
+                ret = {
+                    "code": code,
+                    "result": {
+                        "res": 'success',
+                        "msg": "Deployment not find."
+                        }
+                    }
+                return ret,code 
+        except Exception as e:
+            logging.exception("[UOP] Deploy Status callback failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Deploy find error."
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "deploy info save success"
+            }
+        }
+        return res, 200
+        
+
 
 deploy_cb_api.add_resource(DeployCallback, '/<string:deploy_id>/')
+deploy_cb_api.add_resource(DeployStatusProviderCallBack, '/status')
