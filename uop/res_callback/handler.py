@@ -988,6 +988,40 @@ class ResourceStatusProviderCallBack(Resource):
             }
         }
         return res, 200
+    @classmethod
+    def get(cls):
+        code = 2002
+        request_data=json.loads(request.data)
+        try:
+            resource_id=request_data.get("resource_id")
+            status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
+            s_msg_list=[]
+            for sr in status_record:
+                s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                s_msg_list.append(s_msg)
+                print s_msg
+        except Exception as e:
+            ogging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error.",
+                    's_msg_list':s_msg_list,
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "get msg success",
+                's_msg_list':s_msg_list,
+            }
+        }
+        return res, 200
 
 res_callback_api.add_resource(ResourceProviderCallBack, '/res')
 res_callback_api.add_resource(ResourceStatusProviderCallBack, '/status')
