@@ -326,6 +326,12 @@ class ResourceApplication(Resource):
                 result['reservation_status'] = res.reservation_status
                 result['env'] = res.env
                 result['is_deleted'] = res.is_deleted
+                resource_id=res.resource_id
+                deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
+                if deploys:
+                    dep=deploys[-1]
+                    deploy_result=dep.deploy_result
+                    result['reservation_status'] = deploy_result
                 result_list.append(result)
         code = 200
         ret = {
