@@ -888,7 +888,6 @@ Post Request JSON Body：
             if status == 'ok':
                 status_record.status="set_success"
                 status_record.msg="预留成功"
-                status_record.save()
             else:
                 status_record.status="set_fail"
                 status_record.msg="预留失败,错误日志为: %s" % error_msg

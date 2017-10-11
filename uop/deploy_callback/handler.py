@@ -61,7 +61,7 @@ class DeployCallback(Resource):
         status_record.res_id = resource_id
         status_record.s_type="deploy"
         status_record.created_time=datetime.datetime.now()
-        if dep.deploy_result = "success":
+        if dep.deploy_result == "success":
            status_record.status="deploy_success"
            status_record.msg="部署成功"
         else:
