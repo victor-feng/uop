@@ -329,7 +329,7 @@ class ResourceApplication(Resource):
                 resource_id=res.res_id
                 deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
-                    dep=deploys[-1]
+                    dep=deploys[0]
                     deploy_result=dep.deploy_result
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
