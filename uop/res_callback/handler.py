@@ -822,7 +822,6 @@ Post Request JSON Body：
         error_msg=request_data.get('error_msg')
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
-            resource.reservation_status = status
 
             is_write_to_cmdb = False
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
@@ -879,7 +878,6 @@ Post Request JSON Body：
                     os_ids.append(os_ins_ids)
             resource.os_ins_list = os_ids
             resource.vid_list = vid_list
-            resource.save()
             #---------to statusrecord
             status_record = StatusRecord()
             status_record.res_id = resource_id
@@ -892,6 +890,8 @@ Post Request JSON Body：
                 status_record.status="set_fail"
                 status_record.msg="预留失败,错误日志为: %s" % error_msg
             status_record.save()
+            resource.reservation_status = status_record.status
+            resource.save()
 
             
         except Exception as e:
@@ -1019,7 +1019,26 @@ class ResourceStatusProviderCallBack(Resource):
             set_msg_list=[]
             dep_msg_list=[]
             data={}
+            status_record_list=[]
+            status_record_fail_list=[]
+            status_record_success_list=[]
+            status_records=[]
             for sr in status_record:
+                status_record_list.append(sr)
+                s_status=sr.status
+                if s_status in ["set_fail","deploy_fail"]:
+                    status_record_fail_list.append(sr)
+                else:
+                    status_record_success_list.append(sr)
+            if len(status_record_fail_list) > 0 and len(status_record_success_list) > 0:
+                for sr in status_record_list:
+                    if sr not in status_record_fail_list:
+                        status_records.append(sr)
+            elif len(status_record_fail_list) > 0 and len(status_record_success_list) == 0:
+                status_records=[status_record_fail_list[-1]]
+            elif len(status_record_fail_list) == 0 and len(status_record_success_list) > 0:
+                status_records=status_record_success_list
+            for sr in status_records:
                 s_type=sr.s_type
                 if s_type.strip().split('_')[0] == 'deploy':               
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
@@ -1027,6 +1046,7 @@ class ResourceStatusProviderCallBack(Resource):
                 else:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     set_msg_list.append(s_msg)
+                
             data["set"]=set_msg_list         
             data["deploy"]=dep_msg_list         
         except Exception as e:

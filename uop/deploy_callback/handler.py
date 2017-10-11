@@ -54,9 +54,7 @@ class DeployCallback(Resource):
             logging.error("###parser error:{}".format(e.args))
             return
 
-        dep.deploy_result = args.result
         resource_id = dep.resource_id
-        dep.save()
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.s_type="deploy"
@@ -68,6 +66,8 @@ class DeployCallback(Resource):
            status_record.status="deploy_fail"
            status_record.msg="部署失败"
         status_record.save()
+        dep.deploy_result = status_record.status
+        dep.save()
 
             
         try:
