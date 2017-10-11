@@ -994,9 +994,12 @@ class ResourceStatusProviderCallBack(Resource):
     @classmethod
     def get(cls):
         code = 2002
-        request_data=json.loads(request.data)
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id',location='args') 
+        args = parser.parse_args()
+        resource_id=args.resource_id
+        print resource_id
         try:
-            resource_id=request_data.get("resource_id")
             status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
             set_msg_list=[]
             dep_msg_list=[]
