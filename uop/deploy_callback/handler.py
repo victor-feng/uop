@@ -56,8 +56,21 @@ class DeployCallback(Resource):
 
         dep.deploy_result = args.result
         resource_id = dep.resource_id
+        dep.save()
+        status_record = StatusRecord()
+        status_record.res_id = resource_id
+        status_record.s_type="deploy"
+        status_record.created_time=datetime.datetime.now()
+        if dep.deploy_result = "success":
+           status_record.status="deploy_success"
+           status_record.msg="部署成功"
+        else:
+           status_record.status="deploy_fail"
+           status_record.msg="部署失败"
+        status_record.save()
+
+            
         try:
-            dep.save()
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
             CMDB_URL = current_app.config['CMDB_URL']

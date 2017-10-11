@@ -819,6 +819,7 @@ Post Request JSON Body：
         request_data = json.loads(request.data)
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
+        error_msg=request_data.get('error_msg')
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.reservation_status = status
@@ -879,6 +880,21 @@ Post Request JSON Body：
             resource.os_ins_list = os_ids
             resource.vid_list = vid_list
             resource.save()
+            #---------to statusrecord
+            status_record = StatusRecord()
+            status_record.res_id = resource_id
+            status_record.s_type="set"
+            status_record.created_time=datetime.datetime.now()
+            if status == 'ok':
+                status_record.status="set_success"
+                status_record.msg="预留成功"
+                status_record.save()
+            else:
+                status_record.status="set_fail"
+                status_record.msg="预留失败,错误日志为: %s" % error_msg
+            status_record.save()
+
+            
         except Exception as e:
             logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
             code = 500
@@ -1015,7 +1031,7 @@ class ResourceStatusProviderCallBack(Resource):
             data["set"]=set_msg_list         
             data["deploy"]=dep_msg_list         
         except Exception as e:
-            ogging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
+            logging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
