@@ -10,7 +10,7 @@ from uop.deploy_callback import deploy_cb_blueprint
 from uop.deploy_callback.errors import deploy_cb_errors
 from uop.models import Deployment, ResourceModel,StatusRecord
 import requests
-
+import datetime
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -113,6 +113,7 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.res_id = resource_id
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
+                status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 dep.apply_status=status_record.status
                 dep.save()

@@ -5,6 +5,7 @@ import uuid
 import copy
 import requests
 import logging
+import datetime
 
 from flask import request
 from flask_restful import reqparse, Api, Resource
@@ -951,6 +952,7 @@ class ResourceStatusProviderCallBack(Resource):
                         cur_instance_type_list = [os_inst_id]        
                         status_record.s_type=cur_instance_type
                 setattr(status_record, cur_instance_type, cur_instance_type_list)
+                status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
                 resource.reservation_status = status_record.status
@@ -963,6 +965,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.s_type = cluster_type
                 status_record.status = '%s_success'%(cluster_type)
                 status_record.msg='%s配置推送完成'%(cluster_type)
+                status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
                 resource.reservation_status = status_record.status
@@ -995,11 +998,19 @@ class ResourceStatusProviderCallBack(Resource):
         try:
             resource_id=request_data.get("resource_id")
             status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
-            s_msg_list=[]
+            set_msg_list=[]
+            dep_msg_list=[]
+            data={}
             for sr in status_record:
-                s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                s_msg_list.append(s_msg)
-                print s_msg
+                s_type=sr.s_type
+                if s_type.strip().split('_')[0] == 'deploy':               
+                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                    dep_msg_list.append(s_msg)
+                else:
+                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                    set_msg_list.append(s_msg)
+            data["set"]=set_msg_list         
+            data["deploy"]=dep_msg_list         
         except Exception as e:
             ogging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
             code = 500
@@ -1008,7 +1019,7 @@ class ResourceStatusProviderCallBack(Resource):
                 'result': {
                     'res': 'fail',
                     'msg': "Resource find error.",
-                    's_msg_list':s_msg_list,
+                    'data':data,
                 }
             }
             return ret, code
@@ -1018,7 +1029,7 @@ class ResourceStatusProviderCallBack(Resource):
             "result": {
                 "res": "success",
                 "msg": "get msg success",
-                's_msg_list':s_msg_list,
+                'data':data,
             }
         }
         return res, 200
