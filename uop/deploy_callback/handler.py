@@ -128,7 +128,7 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.msg='%s部署完成'%(deploy_type)
                 status_record.created_time=datetime.datetime.now()
                 status_record.save()
-                dep.apply_status=status_record.status
+                dep.deploy_result=status_record.status
                 dep.save()
             else:
                 ret = {
