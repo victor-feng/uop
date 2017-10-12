@@ -1018,7 +1018,7 @@ class ResourceStatusProviderCallBack(Resource):
             status_records=[]
             for sr in status_record:
                 s_status=sr.status
-                if s_status in ["set_fail","deploy_fail"]:
+                if s_status in ["set_fail"]:
                     status_record_fail_list.append(sr)
                 else:
                     status_record_success_list.append(sr)
