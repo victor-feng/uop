@@ -53,7 +53,7 @@ class DeployCallback(Resource):
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
             return
-
+        dep.deploy_result = args.result
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
