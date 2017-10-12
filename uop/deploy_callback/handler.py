@@ -63,7 +63,7 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
            status_record.status="deploy_success"
            status_record.msg="部署成功"
-        else:
+        elif dep.deploy_result == "fail":
            status_record.status="deploy_fail"
            status_record.msg="部署失败"
         status_record.save()
