@@ -947,11 +947,6 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.status = '%s_reserving'%(cur_instance_type)
                             status_record.msg='%s预留中'%(cur_instance_type)
                             status_record.s_type=cur_instance_type
-                    else:
-                        status_record.status = '%s_success'%(cur_instance_type)
-                        status_record.msg='%s预留完成'%(cur_instance_type)
-                        cur_instance_type_list = [os_inst_id]            
-                        status_record.s_type=cur_instance_type
                     
                 else:
                     status_record = StatusRecord()
@@ -1018,19 +1013,17 @@ class ResourceStatusProviderCallBack(Resource):
             set_msg_list=[]
             dep_msg_list=[]
             data={}
-            status_record_list=[]
             status_record_fail_list=[]
             status_record_success_list=[]
             status_records=[]
             for sr in status_record:
-                status_record_list.append(sr)
                 s_status=sr.status
                 if s_status in ["set_fail","deploy_fail"]:
                     status_record_fail_list.append(sr)
                 else:
                     status_record_success_list.append(sr)
             if len(status_record_fail_list) > 0 and len(status_record_success_list) > 0:
-                for sr in status_record_list:
+                for sr in status_record:
                     if sr not in status_record_fail_list:
                         status_records.append(sr)
             elif len(status_record_fail_list) > 0 and len(status_record_success_list) == 0:
@@ -1038,8 +1031,8 @@ class ResourceStatusProviderCallBack(Resource):
             elif len(status_record_fail_list) == 0 and len(status_record_success_list) > 0:
                 status_records=status_record_success_list
             for sr in status_records:
-                s_type=sr.s_type
-                if s_type.strip().split('_')[0] == 'deploy':               
+                dep_id=sr.deploy_id
+                if dep_id:               
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     dep_msg_list.append(s_msg)
                 else:
