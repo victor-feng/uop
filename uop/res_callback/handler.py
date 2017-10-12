@@ -1013,7 +1013,6 @@ class ResourceStatusProviderCallBack(Resource):
         parser.add_argument('resource_id',location='args') 
         args = parser.parse_args()
         resource_id=args.resource_id
-        print resource_id
         try:
             status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
             set_msg_list=[]

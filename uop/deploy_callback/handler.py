@@ -114,7 +114,7 @@ class DeployStatusProviderCallBack(Resource):
     @classmethod
     def post(cls):
         try:
-            code = 200
+            code = 2002
             request_data=json.loads(request.data)
             deploy_id=request_data.get('deploy_id')
             deploy_type=request_data.get('deploy_type')
@@ -160,6 +160,45 @@ class DeployStatusProviderCallBack(Resource):
             }
         }
         return res, 200
+    @classmethod
+    def get(cls):
+        code = 2002
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_id',location='args')
+        args = parser.parse_args()
+        deploy_id=args.deploy_id
+        try:
+            data={}
+            dep_msg_list=[]
+            status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
+            for sr in status_records:
+                s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                dep_msg_list.append(s_msg)
+            data["deploy"]=dep_msg_list
+        except Exception as e:
+            logging.exception("[UOP] Get deploy  callback msg failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Deploy find error.",
+                    'data':data,
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "get msg success",
+                'data':data,
+            }
+        }
+        return res, 200    
+             
+
         
 
 
