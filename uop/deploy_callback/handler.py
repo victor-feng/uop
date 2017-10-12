@@ -118,6 +118,7 @@ class DeployStatusProviderCallBack(Resource):
             request_data=json.loads(request.data)
             deploy_id=request_data.get('deploy_id')
             deploy_type=request_data.get('deploy_type')
+            ip=request_data.get('ip')
             dep = Deployment.objects.get(deploy_id=deploy_id)
             if dep:
                 resource_id=dep.resource_id
@@ -127,6 +128,8 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.res_id = resource_id
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
+                if deploy_type == "deploy_docker":
+                    status_record.msg='%s:%s 部署完成'%(deploy_type,ip)
                 status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 dep.deploy_result=status_record.status
