@@ -529,7 +529,7 @@ class DeploymentListAPI(Resource):
         if args.dep_id:
             dep_id = args.dep_id
 
-        deploy_result = 'deploying'
+        #deploy_result = 'deploying'
 
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         uid = str(uuid.uuid1())
@@ -548,6 +548,9 @@ class DeploymentListAPI(Resource):
         try:
             # 管理员审批通过 直接部署到CRP
             if action == 'admin_approve_allow':  # 管理员审批通过
+                #修改deploy_result状态为部署中
+                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+                deploy_obj.deploy_result='deploying'
             #disconf配置
                 #1、将disconf信息更新到数据库
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
@@ -640,6 +643,7 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
 
             elif action == 'save_to_db':  # 部署申请
+                deploy_result = 'deploy_to_approve'
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
