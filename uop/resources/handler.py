@@ -15,10 +15,11 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 
 from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
-from uop.models import ResourceModel, DBIns, ComputeIns, Deployment
+from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig
 from uop.resources.errors import resources_errors
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
+import IPy
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CRP_URL = configs[APP_ENV].CRP_URL
@@ -196,6 +197,24 @@ class ResourceApplication(Resource):
             return res, code
 
         try:
+            # TODO 调用network 表 匹配子网是否有余  插入 表中该子网
+            networks = NetWorkConfig.objects.filter(env=env)
+            headers = {'Content-Type': 'application/json'}
+            network_id = ''
+            for network in networks:
+                vlan_id = network.vlan_id
+                sub_network = network.sub_network
+                ip = IPy.IP(sub_network)
+                total_count = ip.len()
+                env_ = get_CRP_url(env)
+                crp_url = '%s%s'%(env_, 'api/openstack/port/count?network_id=%s'%(vlan_id))
+                cur_res = requests.get(crp_url,  headers=headers)
+                if cur_res.get('code') == 200:
+                    count = cur_res.result.res
+                    if total_count > int(count):
+                        network_id = vlan_id
+                        break
+            resource_application.network_id = network_id
             resource_application.save()
         except Exception as e:
             code = 200
