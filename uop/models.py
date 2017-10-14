@@ -184,6 +184,7 @@ class ResourceModel(db.DynamicDocument):
     vid_list = db.ListField(db.StringField(requeired=False))
     is_deleted = db.IntField(required=False, default=0)
     deleted_date = db.DateTimeField(required=False)
+    network_id = db.StringField(required=False)
 
 
     meta = {
@@ -333,6 +334,7 @@ class OperationLog(db.Document):
     }
 
 class NetWorkConfig(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     name = db.StringField()
     env = db.StringField()
     created_time = db.DateTimeField(default=datetime.datetime.now())
