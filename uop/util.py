@@ -3,6 +3,7 @@
 from flask import current_app
 import IPy
 import requests
+import json
 from uop.models import NetWorkConfig
 
 def get_CRP_url(env=None):
@@ -22,8 +23,10 @@ def check_network_use(env):
         ip = IPy.IP(sub_network)
         total_count = ip.len()
         env_ = get_CRP_url(env)
-        crp_url = '%s%s'%(env_, 'api/openstack/port/count?network_id=%s'%(vlan_id))
-        cur_res = requests.get(crp_url,  headers=headers)
+        crp_url = '%s%s'%(env_, 'api/openstack/port/count')
+        data = {'network_id': vlan_id}
+        data_str = json.dumps(data)
+        cur_res = requests.get(crp_url, data=data_str,  headers=headers)
         if cur_res.get('code') == 200:
             count = cur_res.result.res
             if total_count > int(count):
