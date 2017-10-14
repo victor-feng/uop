@@ -51,7 +51,7 @@ class Configure(Resource):
                 envs.append(dict(id=env.id, 
                                  name=env.name,
                                  ip=env.ip))
-        elif categpry == 'network':
+        elif category == 'network':
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
                 envs.append(dict(id=net.id,
