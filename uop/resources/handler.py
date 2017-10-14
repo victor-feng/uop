@@ -838,7 +838,7 @@ class GetMyResourcesInfo(Resource):
                 query['project'] = item_name
             if item_code:
                 query['project_id'] = item_code
-            resources = ResourceModel.objects.filter(**query).order_by('-create_date')
+            resources = ResourceModel.objects.filter(**query).order_by('-created_date')
 
         except Exception as e:
             print e
