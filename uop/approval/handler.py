@@ -298,19 +298,6 @@ class ReservationAPI(Resource):
         msg = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            # 调用network 表 匹配子网是否有余  插入 表中该子网
-            network_id = check_network_use(env)
-            if not network_id:
-                code = 200
-                res = {
-                    "code": code,
-                    "result": {
-                       'res': 'fail',
-                       'msg': 'Create resource application fail.  not network_id can use' 
-                    }
-                }
-                return res, code
-
         except Exception as e:
             code = 410
             res = "Failed to find the rsource"
