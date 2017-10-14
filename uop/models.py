@@ -332,3 +332,22 @@ class OperationLog(db.Document):
         'index_background': True
     }
 
+class NetWorkConfig(db.Document):
+    name = db.StringField()
+    env = db.StringField()
+    created_time = db.DateTimeField(default=datetime.datetime.now())
+    sub_network = db.StringField(default='') 
+    vlan_id = db.StringField(default='') 
+    is_deleted = db.IntField(required=False, default=0)
+
+    meta = {
+        'collection': 'network_config',
+        'index': [
+            {
+                'fields': ['env', 'name'],
+                'sparse': True,
+            }
+        ],
+        'index_background': True
+    }
+
