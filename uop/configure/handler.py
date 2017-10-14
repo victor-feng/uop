@@ -8,6 +8,7 @@ from uop.configure import configure_blueprint
 from uop.models import ConfigureEnvModel 
 from uop.models import ConfigureNginxModel 
 from uop.models import ConfigureDisconfModel 
+from uop.models import NetWorkConfig
 
 configure_api = Api(configure_blueprint)
 
@@ -43,12 +44,20 @@ class Configure(Resource):
         category = args.category if args.category else 'nginx'
         logging.info("[UOP] Get configs, env:%s, category: %s", env, category)
         envs = []
+        #nets = []
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret: 
                 envs.append(dict(id=env.id, 
                                  name=env.name,
                                  ip=env.ip))
+        elif categpry == 'network':
+            ret = NetWorkConfig.objects.filter(env=env)
+            for net in ret:
+                envs.append(dict(id=net.id,
+                                 name=env.name,
+                                 subnet=net.subnet,
+                                 vlan_id=net.vlan_id))
         else: # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret: 
@@ -77,6 +86,8 @@ class Configure(Resource):
         parser.add_argument('name', type=str)
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
+        parser.add_argument('sub_network', type=str)
+        parser.add_argument('vlan_id', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -85,6 +96,8 @@ class Configure(Resource):
         username = args.username if args.username else 'dev'
         password = args.password if args.password else 'dev'
         category = args.category if args.category else 'nginx'
+        sub_network = args.sub_network if args.sub_network else ''
+        vlan_id = args.vlan_id if args.vlan_id else ''
         logging.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
@@ -93,6 +106,12 @@ class Configure(Resource):
                                      ip=ip,
                                      name=name,
                                      id=id).save()
+        elif category == 'network':
+            ret = NetWorkConfig(env=env,
+                               name=name,
+                               sub_network=sub_network,
+                               vlan_id=vlan_id,
+                               id=id).save()
         else:
             ret = ConfigureDisconfModel(env=env,
                                      url=url,
@@ -121,6 +140,9 @@ class Configure(Resource):
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
         parser.add_argument('id', type=str)
+        parser.add_argument('sub_network', type=str)
+        parser.add_argument('vlan_id', type=str)
+
         args = parser.parse_args()
         category = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -131,11 +153,16 @@ class Configure(Resource):
         category = args.category if args.category else 'nginx'
         username = args.username if args.username else ''
         password = args.password if args.password else ''
+        sub_network = args.sub_network if args.sub_network else ''
+        vlan_id = args.vlan_id if args.vlan_id else ''
         logging.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
             ret.update(name=name,ip=ip)
+        elif category == 'network':
+            ret = NetWorkConfig.objects(id=id)
+            ret.update(name=name,sub_network=sub_network, vlan_id=vlan_id)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name,url=url,ip=ip,username=username,password=password)
@@ -164,6 +191,8 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(id=id)
+        elif category == 'network':
+            ret = NetWorkConfig.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
         if len(ret):
