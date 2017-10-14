@@ -27,7 +27,7 @@ def check_network_use(env):
         data = {'network_id': vlan_id}
         data_str = json.dumps(data)
         cur_res = requests.get(crp_url, data=data_str,  headers=headers)
-        cur_resjson.loads(cur_res.content)
+        cur_res = json.loads(cur_res.content)
         if cur_res.get('code') == 200:
             count = cur_res.get('result').get('res')
             if total_count > int(count):
