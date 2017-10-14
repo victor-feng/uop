@@ -208,7 +208,7 @@ class Reservation(Resource):
 
         data = dict()
         data['unit_id'] = resource.project_id
-        data['network_id'] = resource.network_id
+        data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
         data['unit_des'] = ''
         data['user_id'] = resource.user_id
@@ -325,6 +325,7 @@ class ReservationAPI(Resource):
 
         data = dict()
         data['unit_id'] = resource.project_id
+        data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
         data['unit_des'] = ''
         data['user_id'] = resource.user_id
