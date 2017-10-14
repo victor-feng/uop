@@ -55,7 +55,7 @@ class Configure(Resource):
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
                 envs.append(dict(id=net.id,
-                                 name=env.name,
+                                 name=net.name,
                                  subnet=net.subnet,
                                  vlan_id=net.vlan_id))
         else: # disconf
