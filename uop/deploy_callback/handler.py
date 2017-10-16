@@ -49,26 +49,32 @@ class DeployCallback(Resource):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('result', type=str)
+            parser.add_argument('ip', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
             return
         dep.deploy_result = args.result
+        ip=args.ip
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.deploy_id = deploy_id
-        status_record.s_type="deploy"
+        status_record.s_type="deploy_docker"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
-           status_record.status="deploy_success"
-           status_record.msg="部署成功"
+           status_record.status="deploy_docker_success"
+           status_record.msg="deploy_docker:%s部署成功" % ip
         elif dep.deploy_result == "fail":
-           status_record.status="deploy_fail"
-           status_record.msg="部署失败"
-        status_record.save()
-        dep.deploy_result = status_record.status
+           status_record.status="deploy_docker_fail"
+           status_record.msg="deploy_docker:%s部署失败" % ip
+        res_status = get_deploy_status(deploy_id)
+        if not res_status:
+            dep.deploy_result = "deploy_fail"
+        else:
+            dep.deploy_result = "deploy_success"
         dep.save()
+        status_record.save()
 
             
         try:
@@ -128,8 +134,8 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.res_id = resource_id
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
-                if deploy_type == "deploy_docker":
-                    status_record.msg='%s:%s 部署完成'%(deploy_type,ip)
+                #if deploy_type == "deploy_docker":
+                #status_record.msg='%s:%s 部署完成'%(deploy_type,ip)
                 status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 dep.deploy_result=status_record.status
@@ -199,8 +205,22 @@ class DeployStatusProviderCallBack(Resource):
                 'data':data,
             }
         }
-        return res, 200    
-             
+        return res, 200   
+
+def get_deploy_status(deploy_id): 
+    try:
+        docker_status_list=[]
+        status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
+        for sr in status_records:
+            if sr.s_type=="deploy_docker":
+                docker_status_list.append(sr.status)
+        if "deploy_docker_fail" in docker_status_list:
+            return False
+        else:
+            return True 
+    except Exception as e:
+        logging.exception("[UOP] Put deploy  callback msg failed, Excepton: %s", e.args)
+     
 
         
 
