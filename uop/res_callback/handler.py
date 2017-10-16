@@ -849,12 +849,17 @@ Post Request JSON Body：
             if is_write_to_cmdb is True:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
          
-            os_ids = [] 
+            os_ids = []
+            os_ins_ip_list=[]
+            os_ip_dic={}
             container = request_data.get('container')
             for _container in container:
                 instances = _container.get('instance')
                 for instance in instances:
                     os_ins_id = instance.get('os_inst_id')
+                    ip=instance.get('ip')
+                    os_ip_dic[ip]=[os_ins_id,"docker"]
+                    os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 
             db_info = request_data.get('db_info')
@@ -873,11 +878,15 @@ Post Request JSON Body：
 
                 for instance in value.get('instance'):
                     os_ins_id = instance.get('os_inst_id')
+                    ip=instance.get('ip')
+                    os_ip_dic[ip] = [os_ins_id, "db"]
+                    os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
                     os_ids.append(os_ins_ids)
             resource.os_ins_list = os_ids
             resource.vid_list = vid_list
+            resource.os_ins_ip_list=os_ins_ip_list
             #---------to statusrecord
             status_record = StatusRecord()
             status_record.res_id = resource_id
