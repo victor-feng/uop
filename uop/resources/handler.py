@@ -233,6 +233,7 @@ class ResourceApplication(Resource):
         parser.add_argument('formStatus', type=str, location='args')
         parser.add_argument('approval_status', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
+        parser.add_argument('env', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -255,6 +256,8 @@ class ResourceApplication(Resource):
             condition['approval_status'] = args.approval_status
         if args.name:
             condition['user_name'] = args.name
+        if args.env:
+            condition['env'] = args.env
 
         if agg_by:
             pipeline = []
@@ -879,15 +882,14 @@ class GetMyResourcesInfo(Resource):
         if page_num and page_count:
             page_num=int(page_num)
             page_count=int(page_count)
-            results=self.__get_vm_status(page_num,page_count,result_list,resource_status)
-        else:
-            results=result_list
+            if result_list:
+                result_list=self._get_vm_status(page_num,page_count,result_list,resource_status)
         code = 200
         ret = {
             'code': code,
             'result': {
                 "res": 'success',
-                "msg": results,
+                "msg": result_list,
                 "total_count":total_count,
             }
         }
@@ -996,6 +998,7 @@ class GetMyResourcesInfo(Resource):
             return res_list
         except Exception as e:
             logging.error('get vm status err: %s' % e.args)
+            return []
 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []

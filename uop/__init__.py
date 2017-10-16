@@ -28,6 +28,13 @@ class Config(object):
             #'args': (1, 2),
             'trigger': 'interval',
             'seconds': 60
+        },
+        {
+            'id': 'flush_crp_to_cmdb',
+            'func': 'uop.scheduler_util:flush_crp_to_cmdb',
+            # 'args': (1, 2),
+            'trigger': 'interval',
+            'seconds': 60 * 5
         }
     ]
 

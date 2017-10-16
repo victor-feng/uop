@@ -50,12 +50,18 @@ class DeployCallback(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('result', type=str)
             parser.add_argument('ip', type=str)
+            parser.add_argument('quantity', type=int)
+            parser.add_argument('err_msg', type=str)
+            parser.add_argument('vm_state', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
             return
         dep.deploy_result = args.result
         ip=args.ip
+        quantity=args.quantity
+        err_msg = args.err_msg
+        vm_state=args.vm_state
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -63,17 +69,21 @@ class DeployCallback(Resource):
         status_record.s_type="deploy_docker"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
-           status_record.status="deploy_docker_success"
-           status_record.msg="deploy_docker:%s部署成功" % ip
+            dep.deploy_result="deploy_docker_success"
+            status_record.status="deploy_docker_success"
+            status_record.msg="deploy_docker:%s部署成功，状态为%s" % (ip,vm_state)
         elif dep.deploy_result == "fail":
-           status_record.status="deploy_docker_fail"
-           status_record.msg="deploy_docker:%s部署失败" % ip
+            dep.deploy_result="deploy_docker_fail"
+            status_record.status="deploy_docker_fail"
+            status_record.msg="deploy_docker:%s部署失败，状态为%s，错误日志为：%s" % (ip,vm_state,err_msg)
         status_record.save()
-        res_status = get_deploy_status(deploy_id)
-        if not res_status:
+        res_status,count = get_deploy_status(deploy_id)
+        if not res_status and quantity == count:
             dep.deploy_result = "deploy_fail"
-        else:
+            create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
+        elif res_status and quantity == count:
             dep.deploy_result = "deploy_success"
+            create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success")
         dep.save()
 
 
@@ -216,13 +226,24 @@ def get_deploy_status(deploy_id):
             if sr.s_type=="deploy_docker":
                 docker_status_list.append(sr.status)
         if "deploy_docker_fail" in docker_status_list:
-            return False
+            return False,len(docker_status_list)
         else:
-            return True 
+            return True,len(docker_status_list) 
     except Exception as e:
-        logging.exception("[UOP] Put deploy  callback msg failed, Excepton: %s", e.args)
+        logging.exception("[UOP] get_deploy_status failed, Excepton: %s", e.args)
      
-
+def create_status_record(resource_id,deploy_id,s_type,msg,status):
+    try:
+        status_record = StatusRecord()
+        status_record.res_id = resource_id
+        status_record.deploy_id = deploy_id
+        status_record.s_type=s_type
+        status_record.created_time=datetime.datetime.now()
+        status_record.msg=msg
+        status_record.status=status
+        status_record.save()
+    except Exception as e:
+        logging.exception("[UOP] create_status_record failed, Excepton: %s", e.args)
         
 
 
