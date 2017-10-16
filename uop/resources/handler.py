@@ -876,8 +876,12 @@ class GetMyResourcesInfo(Resource):
                         source_list = res.resource_list
                     result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
         results=[]
-        page_num=int(page_num)
-        page_count=int(page_count)
+        if page_num and page_count:
+            page_num=int(page_num)
+            page_count=int(page_count)
+        else:
+            page_num=1
+            page_count=10
         result_list=result_list[(page_num-1)*page_count:page_num*page_count]
         for result in result_list:
             res_id=result["id"]
