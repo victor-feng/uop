@@ -905,7 +905,7 @@ class GetMyResourcesInfo(Resource):
                     result['resource_status'] = 'active'
             results.append(result)
         if resource_status:
-                status_results
+            status_results=[]
             for result in results:
                 res_status=result["resource_status"] 
                 if resource_status == res_status:
