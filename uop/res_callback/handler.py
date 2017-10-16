@@ -12,7 +12,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import current_app
 
 from uop.res_callback import res_callback_blueprint
-from uop.models import User, ResourceModel, StatusRecord
+from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic
 from uop.res_callback.errors import res_callback_errors
 from config import APP_ENV, configs
 from transitions import Machine
@@ -849,12 +849,16 @@ Post Request JSON Body：
             if is_write_to_cmdb is True:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
          
-            os_ids = [] 
+            os_ids = []
+            os_ins_ip_list=[]
             container = request_data.get('container')
             for _container in container:
                 instances = _container.get('instance')
                 for instance in instances:
                     os_ins_id = instance.get('os_inst_id')
+                    ip=instance.get('ip')
+                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker")
+                    os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 
             db_info = request_data.get('db_info')
@@ -873,11 +877,15 @@ Post Request JSON Body：
 
                 for instance in value.get('instance'):
                     os_ins_id = instance.get('os_inst_id')
+                    ip=instance.get('ip')
+                    os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= "db")
+                    os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
                     os_ids.append(os_ins_ids)
             resource.os_ins_list = os_ids
             resource.vid_list = vid_list
+            resource.os_ins_ip_list=os_ins_ip_list
             #---------to statusrecord
             status_record = StatusRecord()
             status_record.res_id = resource_id
@@ -1018,7 +1026,7 @@ class ResourceStatusProviderCallBack(Resource):
             status_records=[]
             for sr in status_record:
                 s_status=sr.status
-                if s_status in ["set_fail","deploy_fail"]:
+                if s_status in ["set_fail"]:
                     status_record_fail_list.append(sr)
                 else:
                     status_record_success_list.append(sr)

@@ -144,6 +144,21 @@ class DBIns(db.EmbeddedDocument):
         'index_background': True
         }
 
+class OS_ip_dic(db.EmbeddedDocument):
+    ip=db.StringField(required=True)
+    os_ins_id = db.StringField(required=True)
+    os_type = db.StringField(required=True)
+    meta = {
+        'collection': 'os_ip_dic',
+        'index': [
+            {
+                'fields': ['ip'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
+
 
 class ResourceModel(db.DynamicDocument):
     resource_name = db.StringField(required=True)
@@ -165,6 +180,7 @@ class ResourceModel(db.DynamicDocument):
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
     cmdb_p_code = db.StringField(requeired=False)
     os_ins_list = db.ListField(db.StringField(requeired=False))
+    os_ins_ip_list=db.ListField(db.EmbeddedDocumentField('OS_ip_dic'))
     vid_list = db.ListField(db.StringField(requeired=False))
     is_deleted = db.IntField(required=False, default=0)
     deleted_date = db.DateTimeField(required=False)
