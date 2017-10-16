@@ -165,7 +165,7 @@ class ResourceModel(db.DynamicDocument):
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
     cmdb_p_code = db.StringField(requeired=False)
     os_ins_list = db.ListField(db.StringField(requeired=False))
-    os_ins_ip_list=db.ListField(db.StringField(requeired=False))
+    os_ins_ip_list=db.ListField(db.EmbeddedDocumentField('os_ip_dic'))
     vid_list = db.ListField(db.StringField(requeired=False))
     is_deleted = db.IntField(required=False, default=0)
     deleted_date = db.DateTimeField(required=False)
