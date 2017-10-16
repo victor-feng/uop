@@ -876,6 +876,7 @@ class GetMyResourcesInfo(Resource):
                         source_list = res.resource_list
                     result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
         results=[]
+        total_count=len(result_list)
         if page_num and page_count:
             page_num=int(page_num)
             page_count=int(page_count)
@@ -915,8 +916,9 @@ class GetMyResourcesInfo(Resource):
         ret = {
             'code': code,
             'result': {
-                'res': 'success',
-                'msg': results,
+                "res": 'success',
+                "msg": results,
+                "total_count":total_count,
             }
         }
         return ret, code
