@@ -12,7 +12,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import current_app
 
 from uop.res_callback import res_callback_blueprint
-from uop.models import User, ResourceModel, StatusRecord
+from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic
 from uop.res_callback.errors import res_callback_errors
 from config import APP_ENV, configs
 from transitions import Machine
@@ -851,14 +851,13 @@ Post Request JSON Body：
          
             os_ids = []
             os_ins_ip_list=[]
-            os_ip_dic={}
             container = request_data.get('container')
             for _container in container:
                 instances = _container.get('instance')
                 for instance in instances:
                     os_ins_id = instance.get('os_inst_id')
                     ip=instance.get('ip')
-                    os_ip_dic[ip]=[os_ins_id,"docker"]
+                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker")
                     os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 
@@ -879,7 +878,7 @@ Post Request JSON Body：
                 for instance in value.get('instance'):
                     os_ins_id = instance.get('os_inst_id')
                     ip=instance.get('ip')
-                    os_ip_dic[ip] = [os_ins_id, "db"]
+                    os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= "db")
                     os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
