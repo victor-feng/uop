@@ -17,7 +17,7 @@ from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig
 from uop.resources.errors import resources_errors
-from uop.util import get_CRP_url, check_network_use
+from uop.util import get_CRP_url
 from config import APP_ENV, configs
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
@@ -196,19 +196,6 @@ class ResourceApplication(Resource):
             return res, code
 
         try:
-            # 调用network 表 匹配子网是否有余  插入 表中该子网
-            network_id = check_network_use(env)
-            if not network_id:
-                code = 200
-                res = {
-                    "code": code,
-                    "result": {
-                       'res': 'fail',
-                       'msg': 'Create resource application fail.  not network_id can use' 
-                    }
-                }
-                return res, code
-            resource_application.network_id = network_id
             resource_application.save()
         except Exception as e:
             code = 200

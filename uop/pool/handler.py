@@ -10,11 +10,44 @@ from flask import current_app
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
 from uop.models import ConfigureEnvModel 
-from uop.util import get_CRP_url
+from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from config import APP_ENV, configs
 
 pool_api = Api(pool_blueprint, errors=pool_errors)
+
+class NetworkListAPI(Resource):
+
+    @classmethod
+    def get(cls):
+        try:
+            res = []
+            CRP_URL = get_CRP_url(env_)
+            headers = {'Content-Type': 'application/json'}
+            res_list = []
+            CRP_URL = '%s%s'%(CRP_URL, 'api/openstack/network/list')
+            result = requests.get(url_, headers=headers)
+            if result.json().get('code') == 200:
+                cur_res = result.json().get('result').get('res')
+                for key, value in cur_res:
+                    res.append({'id': key, 'name': value})
+        except Exception as e:
+            err_msg = e.message
+            #NOTE: Wrong usage!!!!!!
+            logging.error('list az statistics err: %s' % err_msg)
+            logging.exception('list az statistics err: %s' , e.args)
+            #Log.logger.error('list az statistics err: %s' % err_msg)
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "failed",
+                    "msg": e.message
+                }
+            }
+            return res, 400
+        else:
+            return res, 200
+
 
 
 class StatisticAPI(Resource):

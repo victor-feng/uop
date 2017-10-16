@@ -13,7 +13,7 @@ from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
 # from config import APP_ENV
-from uop.util import get_CRP_url, check_network_use
+from uop.util import get_CRP_url, get_network_used
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -80,14 +80,16 @@ class ApprovalInfo(Resource):
             parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
+            parser.add_argument('network_id', type=str)
             args = parser.parse_args()
-
+            
             approval = models.Approval.objects.get(resource_id=res_id)
             resource = models.ResourceModel.objects.get(res_id=res_id)
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
+                network_id = args.network_id
                 if args.agree:
                     approval.approval_status = "success"
                     resource.approval_status = "success"
@@ -95,6 +97,7 @@ class ApprovalInfo(Resource):
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
                 approval.save()
+                resource.network_id = network_id
                 resource.save()
                 code = 200
             else:
