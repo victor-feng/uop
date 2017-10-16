@@ -21,6 +21,7 @@ from uop.util import get_CRP_url
 from config import APP_ENV, configs
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
+OPENSTACK_NOVA_URL=configs[APP_ENV].OPENSTACK_NOVA_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
@@ -805,6 +806,8 @@ class GetMyResourcesInfo(Resource):
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
         resource_status = request.args.get('resource_status')
+        page_num=request.args.get('page_num')
+        page_count=request.args.get('page_count')
         result_list = []
         query = {
             'approval_status': 'success',
@@ -872,19 +875,50 @@ class GetMyResourcesInfo(Resource):
                     else:
                         source_list = res.resource_list
                     result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
-
-
+        results=[]
+        page_num=int(page_num)
+        page_count=int(page_count)
+        result_list=result_list[(page_num-1)*page_count:page_num*page_count]
+        for result in result_list:
+            res_id=result["id"]
+            resource_ip=result["resource_ip"]
+            resource=ResourceModel.objects.get(res_id=res_id)
+            os_ins_ip_list=resource.os_ins_ip_list
+            os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
+            for os_ip_dic in os_ins_ip_list:
+                os_ins_id=os_ip_dic[resource_ip][0]
+                os_type=os_ip_dic[resource_ip][1]
+                if os_type == "docker":
+                    data={"os_ins_id":os_ins_id}
+                    data_str=json.dumps(data)
+                    headers = {'Content-Type': 'application/json'}
+                    res = requests.get(OPENSTACK_NOVA_URL, data=data_str, headers=headers)
+                    vm_state=res["result"]["vm_state"]
+                    result['resource_status'] = vm_state
+                else:
+                    result['resource_status'] = '运行中'
+            results.append(result)
         code = 200
         ret = {
             'code': code,
             'result': {
                 'res': 'success',
-                'msg': result_list
+                'msg': results,
             }
         }
         return ret, code
 
-
+    def _deal_os_ip_item(self,os_ins_ip_list):
+        res_list=[]
+        res_dic={}
+        for os_ip_dic in os_ins_ip_list:
+            os_ins_id=os_ip_dic["os_ins_id"]
+            os_type=os_ip_dic["os_type"]
+            ip=os_ip_dic["ip"]
+            res_dic[ip]=[os_ins_id,os_type] 
+            res_list.append(res_dic)
+        return res_list   
+    
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
         # logging.info("&&&resource info:{}".format(resource_info))
@@ -952,6 +986,7 @@ class GetMyResourcesInfo(Resource):
                 result['resource_status'] = '运行中'
                 result_list.append(result)
         return result_list
+            
 
 
 
