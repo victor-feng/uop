@@ -144,6 +144,19 @@ class DBIns(db.EmbeddedDocument):
         'index_background': True
         }
 
+class os_ip_dic(db.EmbeddedDocument):
+    ip=db.ListField(db.StringField(requeired=False))
+    meta = {
+        'collection': 'os_ip_dic',
+        'index': [
+            {
+                'fields': ['ip'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
+
 
 class ResourceModel(db.DynamicDocument):
     resource_name = db.StringField(required=True)
