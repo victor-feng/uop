@@ -21,7 +21,7 @@ from uop.util import get_CRP_url
 from config import APP_ENV, configs
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
-OPENSTACK_NOVA_URL=configs[APP_ENV].OPENSTACK_NOVA_URL
+CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
@@ -883,20 +883,22 @@ class GetMyResourcesInfo(Resource):
             res_id=result["id"]
             resource_ip=result["resource_ip"]
             resource=ResourceModel.objects.get(res_id=res_id)
+            env=resource.env
             os_ins_ip_list=resource.os_ins_ip_list
             os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
             for os_ip_dic in os_ins_ip_list:
                 os_ins_id=os_ip_dic[resource_ip][0]
                 os_type=os_ip_dic[resource_ip][1]
                 if os_type == "docker":
-                    data={"os_ins_id":os_ins_id}
+                    data={"os_inst_id":os_ins_id}
                     data_str=json.dumps(data)
                     headers = {'Content-Type': 'application/json'}
-                    res = requests.get(OPENSTACK_NOVA_URL, data=data_str, headers=headers)
+                    res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
+                    res=json.loads(res.content)
                     vm_state=res["result"]["vm_state"]
                     result['resource_status'] = vm_state
                 else:
-                    result['resource_status'] = '运行中'
+                    result['resource_status'] = 'active'
             results.append(result)
         code = 200
         ret = {
