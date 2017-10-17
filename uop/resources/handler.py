@@ -875,43 +875,13 @@ class GetMyResourcesInfo(Resource):
                     else:
                         source_list = res.resource_list
                     result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
-        results=[]
         total_count=len(result_list)
         if page_num and page_count:
             page_num=int(page_num)
             page_count=int(page_count)
+            results=self._get_vm_status(page_num,page_count,result_list,resource_status)
         else:
-            page_num=1
-            page_count=10
-        result_list=result_list[(page_num-1)*page_count:page_num*page_count]
-        for result in result_list:
-            res_id=result["id"]
-            resource_ip=result["resource_ip"]
-            resource=ResourceModel.objects.get(res_id=res_id)
-            env=resource.env
-            os_ins_ip_list=resource.os_ins_ip_list
-            os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
-            for os_ip_dic in os_ins_ip_list:
-                os_ins_id=os_ip_dic[resource_ip][0]
-                os_type=os_ip_dic[resource_ip][1]
-                if os_type == "docker":
-                    data={"os_inst_id":os_ins_id}
-                    data_str=json.dumps(data)
-                    headers = {'Content-Type': 'application/json'}
-                    res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
-                    res=json.loads(res.content)
-                    vm_state=res["result"]["vm_state"]
-                    result['resource_status'] = vm_state
-                else:
-                    result['resource_status'] = 'active'
-            results.append(result)
-        if resource_status:
-            status_results=[]
-            for result in results:
-                res_status=result["resource_status"] 
-                if resource_status == res_status:
-                      status_results.append(result)
-            results=status_results
+            results=result_list
         code = 200
         ret = {
             'code': code,
@@ -933,7 +903,44 @@ class GetMyResourcesInfo(Resource):
             res_dic[ip]=[os_ins_id,os_type] 
             res_list.append(res_dic)
         return res_list   
-    
+
+    def _get_vm_status(self,page_num,page_count,result_list,resource_status):
+        try:
+            results=[]
+            result_list=result_list[(page_num-1)*page_count:page_num*page_count]
+            for result in result_list:
+                res_id=result["id"]
+                resource_ip=result["resource_ip"]
+                resource=ResourceModel.objects.get(res_id=res_id)
+                env=resource.env
+                os_ins_ip_list=resource.os_ins_ip_list
+                os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
+                for os_ip_dic in os_ins_ip_list:
+                    os_ins_id=os_ip_dic[resource_ip][0]
+                    os_type=os_ip_dic[resource_ip][1]
+                    if os_type == "docker":
+                        data={"os_inst_id":os_ins_id}
+                        data_str=json.dumps(data)
+                        headers = {'Content-Type': 'application/json'}
+                        res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
+                        res=json.loads(res.content)
+                        vm_state=res["result"]["vm_state"]
+                        result['resource_status'] = vm_state
+                    else:
+                        result['resource_status'] = 'active'
+                results.append(result)
+            if resource_status:
+                status_results=[]
+                for result in results:
+                    res_status=result["resource_status"]
+                    if resource_status == res_status:
+                        status_results.append(result)
+                results=status_results
+            return results
+        except Exception as e:
+            logging.error('get vm status err: %s' % e.args)
+   
+ 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
         # logging.info("&&&resource info:{}".format(resource_info))
