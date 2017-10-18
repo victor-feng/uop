@@ -627,7 +627,7 @@ class DeploymentListAPI(Resource):
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo, disconf_server_info)
                     if err_msg:
-                        deploy_obj.deploy_result = 'fail'
+                        deploy_obj.deploy_result = 'deploy_fail'
                         print 'deploy_to_crp err: '+ err_msg
                     else:
                         print 'deploy_to_crp response: '+ result
