@@ -907,13 +907,14 @@ class GetMyResourcesInfo(Resource):
     def _get_vm_status(self,page_num,page_count,result_list,resource_status):
         try:
             results=[]
+            ed_ins_ids=[]
             result_list=result_list[(page_num-1)*page_count:page_num*page_count]
             for result in result_list:
                 res_id=result["id"]
                 resource_ip=result["resource_ip"]
                 resource=ResourceModel.objects.get(res_id=res_id)
-                env=resource.env
                 os_ins_ip_list=resource.os_ins_ip_list
+                env=resource.env
                 os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
                 for os_ip_dic in os_ins_ip_list:
                     os_ins_id=os_ip_dic[resource_ip][0]
@@ -922,10 +923,12 @@ class GetMyResourcesInfo(Resource):
                         data={"os_inst_id":os_ins_id}
                         data_str=json.dumps(data)
                         headers = {'Content-Type': 'application/json'}
-                        res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
-                        res=json.loads(res.content)
-                        vm_state=res["result"]["vm_state"]
-                        result['resource_status'] = vm_state
+                        if os_ins_id not in ed_ins_ids:
+                            res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
+                            ed_ins_ids.append(os_ins_id)
+                            res=json.loads(res.content)
+                            vm_state=res["result"]["vm_state"]
+                            result['resource_status'] = vm_state
                     else:
                         result['resource_status'] = 'active'
                 results.append(result)
