@@ -13,7 +13,7 @@ from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
 # from config import APP_ENV
-from uop.util import get_CRP_url
+from uop.util import get_CRP_url, check_network_use
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -298,6 +298,19 @@ class ReservationAPI(Resource):
         msg = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=res_id)
+            # 调用network 表 匹配子网是否有余  插入 表中该子网
+            network_id = check_network_use(env)
+            if not network_id:
+                code = 200
+                res = {
+                    "code": code,
+                    "result": {
+                       'res': 'fail',
+                       'msg': 'Create resource application fail.  not network_id can use' 
+                    }
+                }
+                return res, code
+
         except Exception as e:
             code = 410
             res = "Failed to find the rsource"
@@ -309,6 +322,19 @@ class ReservationAPI(Resource):
                 }
             }
             return ret, code
+        
+        # 调用network 表 匹配子网是否有余  插入 表中该子网
+        network_id = check_network_use(resource.env)
+        if not network_id:
+            code = 200
+            res = {
+                "code": code,
+                "result": {
+                    'res': 'fail',
+                    'msg': 'Create resource application fail.  not network_id can use' 
+                 }
+            }
+            return res, code
 
         data = dict()
         data['unit_id'] = resource.project_id
