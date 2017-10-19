@@ -892,7 +892,7 @@ class GetMyResourcesInfo(Resource):
         if page_num and page_count:
             page_num=int(page_num)
             page_count=int(page_count)
-            results=self._get_vm_status(page_num,page_count,result_list,resource_status)
+            results=self.__get_vm_status(page_num,page_count,result_list,resource_status)
         else:
             results=result_list
         code = 200
