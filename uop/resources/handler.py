@@ -959,8 +959,57 @@ class GetMyResourcesInfo(Resource):
             return results
         except Exception as e:
             logging.error('get vm status err: %s' % e.args)
-   
- 
+
+    def __get_vm_status(self, page_num, page_count, result_list, resource_status):
+        try:
+            results = []
+            ed_ins_ids = []
+            res_list = []
+            result_list = result_list[(page_num - 1) * page_count:page_num * page_count]
+            for result in result_list:
+                res_id = result["id"]
+                resource_ip = result["resource_ip"]
+                resource = ResourceModel.objects.get(res_id=res_id)
+                os_ins_ip_list = resource.os_ins_ip_list
+                env = resource.env
+                os_ins_ip_list = self._deal_os_ip_item(os_ins_ip_list)
+                for os_ip_dic in os_ins_ip_list:
+                    os_ip_list = os_ip_dic.get(resource_ip, [])
+                    if os_ip_list:
+                        os_ins_id = os_ip_list[0]
+                        os_type = os_ip_list[1]
+                        if os_type == "docker":
+                            if os_ins_id not in ed_ins_ids:
+                                result["os_ins_id"] = os_ins_id
+                                ed_ins_ids.append(os_ins_id)
+                        else:
+                            result["os_ins_id"] = os_ins_id
+                    else:
+                        result["os_ins_id"] = ''
+                result["resource_status"] = "active"
+                results.append(result)
+            data = {"os_inst_ids": ed_ins_ids}
+            data_str = json.dumps(data)
+            headers = {'Content-Type': 'application/json'}
+            res = requests.get(CRP_URL[env] + 'api/openstack/nova/state', data=data_str, headers=headers)
+            res = json.loads(res.content)
+            os_inst_status_dic = res["result"]["os_inst_status_dic"]
+            for result in results:
+                for os_id, os_status in os_inst_status_dic.items():
+                    if result["os_ins_id"] == os_id:
+                        result["resource_status"] = os_status
+                res_list.append(result)
+            if resource_status:
+                status_results=[]
+                for result in res_list:
+                    res_status=result["resource_status"]
+                    if resource_status == res_status:
+                        status_results.append(result)
+                res_list=status_results
+            return res_list
+        except Exception as e:
+            logging.error('get vm status err: %s' % e.args)
+
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
         # logging.info("&&&resource info:{}".format(resource_info))
