@@ -822,6 +822,7 @@ class GetMyResourcesInfo(Resource):
         page_num=request.args.get('page_num')
         page_count=request.args.get('page_count')
         result_list = []
+        results=[]
         query = {
             'approval_status': 'success',
         }
