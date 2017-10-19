@@ -1007,6 +1007,7 @@ class GetMyResourcesInfo(Resource):
             return res_list
         except Exception as e:
             logging.error('get vm status err: %s' % e.args)
+            return []
 
     def get_source_item(self, source_list, result, resource_info, source_type):
         result_list = []
