@@ -637,7 +637,7 @@ def filter_status_data(p_code):
     }
     for code in p_code:
         res = ResourceModel.objects.filter(cmdb_p_code=code)
-        for r in res:s
+        for r in res:
             osid_ip_list = r.os_ins_ip_list
             for oi in osid_ip_list:
                 meta = {}
