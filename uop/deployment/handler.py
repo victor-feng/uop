@@ -551,6 +551,7 @@ class DeploymentListAPI(Resource):
                 #修改deploy_result状态为部署中
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.deploy_result='deploying'
+                deploy_obj.save()
             #disconf配置
                 #1、将disconf信息更新到数据库
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
