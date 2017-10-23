@@ -119,18 +119,18 @@ def flush_crp_to_cmdb():
     with db.app.app_context():
         for resource in resources:
             env_list.add(resource.env)
-    try:
-        for env in env_list:
-            if not env:
-                continue
-            env_ = get_CRP_url(env)
-            crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
-            ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-            meta = {k: v[-1] for k,v in ret.items()}
-            osid_status.append(meta)
-            logging.info("####meta:{}".format(meta))
-        cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
-        ret = requests.put(cmdb_url, data={"osid_status": osid_status}).json()
-        logging.info("flush_crp_to_cmdb result is:{}".format(ret))
-    except Exception as exc:
-        logging.error("flush_crp_to_cmdb error:{}".format(exc))
+        try:
+            for env in env_list:
+                if not env:
+                    continue
+                env_ = get_CRP_url(env)
+                crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
+                ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                meta = {k: v[-1] for k,v in ret.items()}
+                osid_status.append(meta)
+                logging.info("####meta:{}".format(meta))
+            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+            ret = requests.put(cmdb_url, data={"osid_status": osid_status}).json()
+            logging.info("flush_crp_to_cmdb result is:{}".format(ret))
+        except Exception as exc:
+            logging.error("flush_crp_to_cmdb error:{}".format(exc))
