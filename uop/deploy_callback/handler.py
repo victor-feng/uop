@@ -51,6 +51,7 @@ class DeployCallback(Resource):
             parser.add_argument('result', type=str)
             parser.add_argument('ip', type=str)
             parser.add_argument('quantity', type=int)
+            parser.add_argument('err_msg', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
