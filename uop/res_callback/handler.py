@@ -647,6 +647,7 @@ def filter_status_data(p_code):
                 meta["create_time"] = r.create_time
                 meta["cpu"] = "2"
                 meta["mem"] = "4"
+                meta["env"] = r.env
                 meta["osid"] = oi.os_ins_id
                 meta["ip"] = oi.ip
                 meta["type"] = oi.os_type
@@ -664,7 +665,7 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
         ret = requests.post(url, data=data).json()
         logging.info("push CMDB vm and docker status result is:{}".format(ret))
     except Exception as exc:
-        logging.error("push_vm_docker_status_to_cmdb pcode is error")
+        logging.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
 
 class ResourceProviderCallBack(Resource):
     """
