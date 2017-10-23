@@ -662,7 +662,7 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
     logging.info("Start push vm and docker status to CMDB")
     data = filter_status_data(p_code)
     try:
-        ret = requests.post(url, data=data).json()
+        ret = requests.post(url, data=json.dumps(data)).json()
         logging.info("push CMDB vm and docker status result is:{}".format(ret))
     except Exception as exc:
         logging.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
