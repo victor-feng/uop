@@ -58,6 +58,7 @@ class DeployCallback(Resource):
         dep.deploy_result = args.result
         ip=args.ip
         quantity=args.quantity
+        err_msg = args.err_msg
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -71,7 +72,7 @@ class DeployCallback(Resource):
         elif dep.deploy_result == "fail":
             dep.deploy_result="deploy_docker_fail"
             status_record.status="deploy_docker_fail"
-            status_record.msg="deploy_docker:%s部署失败" % ip
+            status_record.msg="deploy_docker:%s部署失败，错误日志为：%s" % (ip,err_msg)
         status_record.save()
         res_status,count = get_deploy_status(deploy_id)
         if not res_status and quantity == count:
