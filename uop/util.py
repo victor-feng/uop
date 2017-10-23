@@ -5,6 +5,16 @@ import IPy
 import requests
 import json
 from uop.models import NetWorkConfig
+import threading
+
+def async(fun):
+    def wraps(*args, **kwargs):
+        thread = threading.Thread(target=fun, args=args, kwargs=kwargs)
+        thread.daemon = False
+        thread.start()
+        return thread
+    return wraps
+
 
 def get_CRP_url(env=None):
     if env:

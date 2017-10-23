@@ -16,6 +16,7 @@ from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic
 from uop.res_callback.errors import res_callback_errors
 from config import APP_ENV, configs
 from transitions import Machine
+from uop.util import async
 #from uop.log import Log
 
 
@@ -620,6 +621,49 @@ def do_transit_repo_items(items_sequence_list, property_json_mapper, request_dat
     property_mappers_list = transit_repo_items(property_json_mapper, request_items)
     return property_mappers_list
 
+def get_resources_all_pcode():
+    resources = ResourceModel.objects.all()
+    pcode_list = []
+    for res in resources:
+        code = res.cmdb_p_code
+        if code:
+            pcode_list.append(code)
+    return pcode_list
+
+
+def filter_status_data(p_code):
+    data = {
+        "vm_status":[]
+    }
+    for code in p_code:
+        res = ResourceModel.objects.filter(cmdb_p_code=code)
+        for r in res:
+            osid_ip_list = r.os_ins_ip_list
+            for oi in osid_ip_list:
+                meta = {}
+                meta["resource_id"] = r.res_id
+                meta["resource_name"] = r.resource_name
+                meta["item_name"] = r.project
+                meta["create_time"] = r.create_time
+                meta["cpu"] = "2"
+                meta["mem"] = "4"
+                meta["osid"] = oi.os_ins_id
+                meta["ip"] = oi.ip
+                meta["type"] = oi.os_type
+                meta["status"] = "querying"
+                data["vm_status"].append(meta)
+    return data
+
+@async
+def push_vm_docker_status_to_cmdb(url, p_code=None):
+    if not p_code:
+        logging.info("push_vm_docker_status_to_cmdb pcode is null")
+    logging.info("Start push vm and docker status to CMDB")
+    data = filter_status_data(p_code)
+    ret = requests.post(url, data=data)
+    logging.info("ret.dir:{}".format(ret))
+    # logging.info("ret:{}".format(ret))
+    # logging.info("push CMDB vm and docker status result is:{}".format(ret["result"].get("msg")))
 
 class ResourceProviderCallBack(Resource):
     """
@@ -901,7 +945,9 @@ Post Request JSON Body：
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
-
+            CMDB_URL = current_app.config['CMDB_URL']
+            CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, list(resource.cmdb_p_code))
             
         except Exception as e:
             logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
