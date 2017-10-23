@@ -659,8 +659,6 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
         logging.info("push_vm_docker_status_to_cmdb pcode is null")
     logging.info("Start push vm and docker status to CMDB")
-    CMDB_URL = current_app.config['CMDB_URL']
-    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
     data = filter_status_data(p_code)
     ret = requests.post(url, data=data)
     logging.info("push CMDB vm and docker status result is:{}".format(ret.get("msg")))
