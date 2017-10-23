@@ -622,7 +622,7 @@ def do_transit_repo_items(items_sequence_list, property_json_mapper, request_dat
     return property_mappers_list
 
 def get_resources_all_pcode():
-    resources = Resource.objects.all()
+    resources = ResourceModel.objects.all()
     pcode_list = []
     for res in resources:
         code = res.cmdb_p_code
@@ -636,8 +636,8 @@ def filter_status_data(p_code):
         "vm_status":[]
     }
     for code in p_code:
-        res = Resource.objects.filter(cmdb_p_code=code)
-        for r in res:
+        res = ResourceModel.objects.filter(cmdb_p_code=code)
+        for r in res:s
             osid_ip_list = r.os_ins_ip_list
             for oi in osid_ip_list:
                 meta = {}
