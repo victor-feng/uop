@@ -661,7 +661,7 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
     logging.info("Start push vm and docker status to CMDB")
     data = filter_status_data(p_code)
     ret = requests.post(url, data=data)
-    logging.info("push CMDB vm and docker status result is:{}".format(ret.get("msg")))
+    logging.info("push CMDB vm and docker status result is:{}".format(ret["result"].get("msg")))
 
 class ResourceProviderCallBack(Resource):
     """
