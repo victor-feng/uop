@@ -13,7 +13,7 @@ from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
 # from config import APP_ENV
-from uop.util import get_CRP_url, get_network_used
+from uop.util import get_CRP_url, get_network_used,check_network_use
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
