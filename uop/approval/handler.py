@@ -80,7 +80,10 @@ class ApprovalInfo(Resource):
             parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
-            parser.add_argument('network_id', type=str)
+            parser.add_argument('docker_network_id', type=str)
+            parser.add_argument('mysql_network_id', type=str)
+            parser.add_argument('redis_network_id', type=str)
+            parser.add_argument('mongodb_network_id', type=str)
             args = parser.parse_args()
             
             approval = models.Approval.objects.get(resource_id=res_id)
@@ -89,7 +92,10 @@ class ApprovalInfo(Resource):
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
-                network_id = args.network_id
+                docker_network_id = args.docker_network_id
+                mysql_network_id = args.mysql_network_id
+                redis_network_id = args.redis_network_id
+                mongodb_network_id = args.mongodb_network_id
                 if args.agree:
                     approval.approval_status = "success"
                     resource.approval_status = "success"
@@ -97,7 +103,14 @@ class ApprovalInfo(Resource):
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
                 approval.save()
-                resource.network_id = network_id
+                if docker_network_id:
+                    resource.docker_network_id = docker_network_id
+                if mysql_network_id:
+                    resource.mysql_network_id = mysql_network_id
+                if redis_network_id:
+                    resource.redis_network_id = redis_network_id
+                if mongodb_network_id:
+                    resource.mongodb_network_id = mongodb_network_id
                 resource.save()
                 code = 200
             else:
@@ -211,7 +224,7 @@ class Reservation(Resource):
 
         data = dict()
         data['unit_id'] = resource.project_id
-        data['network_id'] = resource.network_id.strip()
+        #data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
         data['unit_des'] = ''
         data['user_id'] = resource.user_id
@@ -222,6 +235,10 @@ class Reservation(Resource):
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
         data['env'] = resource.env
+        data['docker_network_id'] = resource.docker_network_id
+        data['mysql_network_id'] = resource.mysql_network_id
+        data['redis_network_id'] = resource.redis_network_id
+        data['mongodb_network_id'] = resource.mongodb_network_id
         data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list

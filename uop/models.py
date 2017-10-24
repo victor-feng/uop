@@ -184,7 +184,10 @@ class ResourceModel(db.DynamicDocument):
     vid_list = db.ListField(db.StringField(requeired=False))
     is_deleted = db.IntField(required=False, default=0)
     deleted_date = db.DateTimeField(required=False)
-    network_id = db.StringField(required=False)
+    docker_network_id = db.StringField(required=False)
+    mysql_network_id = db.StringField(required=False)
+    redis_network_id = db.StringField(required=False)
+    mongodb_network_id = db.StringField(required=False)
 
 
     meta = {
