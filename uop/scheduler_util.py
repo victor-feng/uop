@@ -110,4 +110,27 @@ def _delete_res(res_id):
     except Exception as e:
         logging.info('---- Scheduler_utuls  _delete_res  function Exception info is %s'%(e))
 
-    
+# 刷新 虚拟机 状态的 调用接口
+def flush_crp_to_cmdb():
+    logging.info('----------------flush_crp_to_cmdb job/5min----------------')
+    resources = ResourceModel.objects.all()
+    env_list = set([])
+    osid_status = []
+    with db.app.app_context():
+        for resource in resources:
+            env_list.add(resource.env)
+        try:
+            for env in env_list:
+                if not env:
+                    continue
+                env_ = get_CRP_url(env)
+                crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
+                ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                meta = {k: v[-1] for k,v in ret.items()}
+                osid_status.append(meta)
+                logging.info("####meta:{}".format(meta))
+            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+            ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
+            logging.info("flush_crp_to_cmdb result is:{}".format(ret))
+        except Exception as exc:
+            logging.error("flush_crp_to_cmdb error:{}".format(exc))
