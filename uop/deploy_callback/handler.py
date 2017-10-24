@@ -52,6 +52,7 @@ class DeployCallback(Resource):
             parser.add_argument('ip', type=str)
             parser.add_argument('quantity', type=int)
             parser.add_argument('err_msg', type=str)
+            parser.add_argument('vm_state', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
@@ -60,6 +61,7 @@ class DeployCallback(Resource):
         ip=args.ip
         quantity=args.quantity
         err_msg = args.err_msg
+        vm_state=args.vm_state
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -69,11 +71,11 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
             dep.deploy_result="deploy_docker_success"
             status_record.status="deploy_docker_success"
-            status_record.msg="deploy_docker:%s部署成功" % ip
+            status_record.msg="deploy_docker:%s部署成功，状态为%s" % (ip,vm_state)
         elif dep.deploy_result == "fail":
             dep.deploy_result="deploy_docker_fail"
             status_record.status="deploy_docker_fail"
-            status_record.msg="deploy_docker:%s部署失败，错误日志为：%s" % (ip,err_msg)
+            status_record.msg="deploy_docker:%s部署失败，状态为%s，错误日志为：%s" % (ip,vm_state,err_msg)
         status_record.save()
         res_status,count = get_deploy_status(deploy_id)
         if not res_status and quantity == count:
