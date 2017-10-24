@@ -9,7 +9,7 @@ from flask import current_app
 
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
-from uop.models import ConfigureEnvModel 
+from uop.models import ConfigureEnvModel,NetWorkConfig
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from config import APP_ENV, configs
@@ -21,11 +21,15 @@ class NetworkListAPI(Resource):
     @classmethod
     def get(cls):
         try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('env', type=str,location="args")
+            args = parser.parse_args()
+            env_=args.env
             res = []
             CRP_URL = get_CRP_url(env_)
             headers = {'Content-Type': 'application/json'}
             res_list = []
-            CRP_URL = '%s%s'%(CRP_URL, 'api/openstack/network/list')
+            url_ = '%s%s'%(CRP_URL, 'api/openstack/network/list')
             result = requests.get(url_, headers=headers)
             if result.json().get('code') == 200:
                 cur_res = result.json().get('result').get('res')
@@ -37,16 +41,63 @@ class NetworkListAPI(Resource):
             logging.error('list az statistics err: %s' % err_msg)
             logging.exception('list az statistics err: %s' , e.args)
             #Log.logger.error('list az statistics err: %s' % err_msg)
-            res = {
+            ret = {
                 "code": 400,
                 "result": {
-                    "res": "failed",
-                    "msg": e.message
+                    "msg": "failed",
+                    "res": e.message
                 }
             }
-            return res, 400
+            return ret, 400
         else:
-            return res, 200
+            ret = {
+                "code": 400,
+                "result": {
+                    "msg": "success",
+                    "res": res
+                }
+            }
+            return ret, 200
+
+
+class NetworksAPI(Resource):
+
+    @classmethod
+    def get(cls):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('env', type=str,location="args")
+            args = parser.parse_args()
+            env=args.env
+            network_info={}
+            res = []
+            Networks=NetWorkConfig.objects.filter(env=env)
+            for network in Networks:
+                name=network.name
+                vlan_id=network.vlan_id
+                network_info[name]=vlan_id
+                res.append(network_info)
+        except Exception as e:
+            err_msg = e.args
+            logging.error('list az statistics err: %s' % err_msg)
+            ret = {
+                "code": 400,
+                "result": {
+                    "msg": "failed",
+                    "res": err_msg
+                }
+            }
+            return ret, 400
+        else:
+            ret = {
+                "code": 400,
+                "result": {
+                    "msg": "success",
+                    "res": res
+                }
+            }
+            return ret, 200
+
 
 
 
@@ -90,3 +141,4 @@ class StatisticAPI(Resource):
 
 
 pool_api.add_resource(StatisticAPI, '/statistics')
+pool_api.add_resource(NetworksAPI, '/networks')
