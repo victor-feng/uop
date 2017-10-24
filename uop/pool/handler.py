@@ -90,7 +90,7 @@ class NetworksAPI(Resource):
             return ret, 400
         else:
             ret = {
-                "code": 400,
+                "code": 200,
                 "result": {
                     "msg": "success",
                     "res": res
