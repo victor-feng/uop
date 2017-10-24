@@ -652,7 +652,7 @@ def filter_status_data(p_code):
             meta["osid"] = oi.os_ins_id
             meta["ip"] = oi.ip
             meta["type"] = oi.os_type
-            meta["status"] = "querying"
+            meta["status"] = "active"
             data["vm_status"].append(meta)
     return data
 
