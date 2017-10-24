@@ -69,10 +69,10 @@ class NetworksAPI(Resource):
             parser.add_argument('env', type=str,location="args")
             args = parser.parse_args()
             env=args.env
-            network_info={}
             res = []
             Networks=NetWorkConfig.objects.filter(env=env)
             for network in Networks:
+                network_info={}
                 name=network.name
                 vlan_id=network.vlan_id
                 network_info[name]=vlan_id
