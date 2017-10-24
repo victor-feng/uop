@@ -510,6 +510,26 @@ class ResourceDetail(Resource):
                 result['application_status'] = resource.application_status
                 result['approval_status'] = resource.approval_status
                 result['database_password'] = database_password
+                docker_network_id=resource.docker_network_id
+                mysql_network_id = resource.mysql_network_id
+                redis_network_id = resource.redis_network_id
+                mongodb_network_id = resource.mongodb_network_id
+                if docker_network_id:
+                    network=NetWorkConfig.objects.filter(vlan_id=docker_network_id)
+                    docker_network_name=network.name
+                if mysql_network_id:
+                    network=NetWorkConfig.objects.filter(vlan_id=mysql_network_id)
+                    mysql_network_name=network.name
+                if redis_network_id:
+                    network=NetWorkConfig.objects.filter(vlan_id=redis_network_id)
+                    redis_network_name=network.name
+                if mongodb_network_id:
+                    network=NetWorkConfig.objects.filter(vlan_id=mongodb_network_id)
+                    mongodb_network_name=network.name
+                result['docker_network_name'] = docker_network_name
+                result['mysql_network_name'] = mysql_network_name
+                result['redis_network_name'] = redis_network_name
+                result['mongodb_network_name'] = mongodb_network_name
 
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list
