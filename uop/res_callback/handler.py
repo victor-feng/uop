@@ -635,24 +635,25 @@ def filter_status_data(p_code):
     data = {
         "vm_status":[]
     }
-    for code in p_code:
-        res = ResourceModel.objects.filter(cmdb_p_code=code)
-        for r in res:
-            osid_ip_list = r.os_ins_ip_list
-            for oi in osid_ip_list:
-                meta = {}
-                meta["resource_id"] = r.res_id
-                meta["resource_name"] = r.resource_name
-                meta["item_name"] = r.project
-                meta["create_time"] = r.create_time
-                meta["cpu"] = "2"
-                meta["mem"] = "4"
-                meta["env"] = r.env
-                meta["osid"] = oi.os_ins_id
-                meta["ip"] = oi.ip
-                meta["type"] = oi.os_type
-                meta["status"] = "querying"
-                data["vm_status"].append(meta)
+    logging.info("filter_status_data.p_code:{}".format(p_code))
+    res = ResourceModel.objects.filter(cmdb_p_code=p_code)
+    for r in res:
+        osid_ip_list = r.os_ins_ip_list
+        logging.info("filter_status_data.p_code:{}".format(osid_ip_list))
+        for oi in osid_ip_list:
+            meta = {}
+            meta["resource_id"] = r.res_id
+            meta["resource_name"] = r.resource_name
+            meta["item_name"] = r.project
+            meta["create_time"] = r.create_time
+            meta["cpu"] = "2"
+            meta["mem"] = "4"
+            meta["env"] = r.env
+            meta["osid"] = oi.os_ins_id
+            meta["ip"] = oi.ip
+            meta["type"] = oi.os_type
+            meta["status"] = "querying"
+            data["vm_status"].append(meta)
     return data
 
 @async
@@ -950,7 +951,7 @@ Post Request JSON Body：
             resource.save()
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, list(resource.cmdb_p_code))
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
             
         except Exception as e:
             logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
