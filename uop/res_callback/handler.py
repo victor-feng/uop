@@ -659,8 +659,9 @@ def filter_status_data(p_code):
 def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
         logging.info("push_vm_docker_status_to_cmdb pcode is null")
-    logging.info("Start push vm and docker status to CMDB")
+        return
     data = filter_status_data(p_code)
+    logging.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         ret = requests.post(url, data=json.dumps(data)).json()
         logging.info("push CMDB vm and docker status result is:{}".format(ret))

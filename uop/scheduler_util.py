@@ -130,7 +130,7 @@ def flush_crp_to_cmdb():
                 osid_status.append(meta)
                 logging.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
-            ret = requests.put(cmdb_url, data={"osid_status": osid_status}).json()
+            ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
             logging.info("flush_crp_to_cmdb result is:{}".format(ret))
         except Exception as exc:
             logging.error("flush_crp_to_cmdb error:{}".format(exc))
