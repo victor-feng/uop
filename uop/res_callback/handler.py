@@ -645,7 +645,7 @@ def filter_status_data(p_code):
             meta["resource_id"] = r.res_id
             meta["resource_name"] = r.resource_name
             meta["item_name"] = r.project
-            meta["create_time"] = r.create_time
+            meta["create_time"] = r.created_date
             meta["cpu"] = "2"
             meta["mem"] = "4"
             meta["env"] = r.env
