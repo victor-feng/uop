@@ -835,8 +835,8 @@ class GetMyResourcesInfo(Resource):
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}start_time={}&end_time={}&resource_status={}&page_num={}\
             &page_count={}&env={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env)
         ret = requests.get(url)
-        logging.info("ret:{}".format(ret))
-        return ret
+        logging.info("ret:{}".format(ret.json()))
+        return ret.json()
         # query = {
         #     'approval_status': 'success',
         # }
