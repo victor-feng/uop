@@ -517,20 +517,20 @@ class ResourceDetail(Resource):
                 if docker_network_id:
                     network=NetWorkConfig.objects.filter(vlan_id=docker_network_id)
                     docker_network_name=network.name
+                    result['docker_network_name'] = docker_network_name
                 if mysql_network_id:
                     network=NetWorkConfig.objects.filter(vlan_id=mysql_network_id)
                     mysql_network_name=network.name
+                    result['mysql_network_name'] = mysql_network_name
                 if redis_network_id:
                     network=NetWorkConfig.objects.filter(vlan_id=redis_network_id)
                     redis_network_name=network.name
+                    result['redis_network_name'] = redis_network_name
                 if mongodb_network_id:
                     network=NetWorkConfig.objects.filter(vlan_id=mongodb_network_id)
                     mongodb_network_name=network.name
-                result['docker_network_name'] = docker_network_name
-                result['mysql_network_name'] = mysql_network_name
-                result['redis_network_name'] = redis_network_name
-                result['mongodb_network_name'] = mongodb_network_name
-
+                    result['mongodb_network_name'] = mongodb_network_name
+                    
                 resource_list = resource.resource_list
                 compute_list = resource.compute_list
                 if resource_list:
