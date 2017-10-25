@@ -9,6 +9,7 @@ from flask import request, make_response
 from flask import redirect
 from flask import jsonify
 import uuid
+from urllib2 import unquote
 import datetime
 import hashlib
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
@@ -832,7 +833,7 @@ class GetMyResourcesInfo(Resource):
         env = request.args.get('env',"")
         page_count=request.args.get('page_count',"")
         result_list = []
-        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}start_time={}&end_time={}&resource_status={}&page_num={}\
+        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
             &page_count={}&env={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env)
         ret = requests.get(url)
         logging.info("ret:{}".format(ret.json()))
