@@ -828,7 +828,7 @@ class GetMyResourcesInfo(Resource):
         user_id = request.args.get('user_id')
         resource_type = request.args.get('resource_type',"")
         resource_database = request.args.get('mysqlandmongo',"")
-        resource_cache = request.args.get('redis', "")
+        resource_cache = request.args.get('cache', "")
         resource_type = resource_database or resource_cache or resource_type
         resource_name = request.args.get('resource_name',"")
         item_name = request.args.get('item_name',"")
