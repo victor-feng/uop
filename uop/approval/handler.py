@@ -104,13 +104,13 @@ class ApprovalInfo(Resource):
                     resource.approval_status = "failed"
                 approval.save()
                 if docker_network_id:
-                    resource.docker_network_id = docker_network_id
+                    resource.docker_network_id = docker_network_id.strip()
                 if mysql_network_id:
-                    resource.mysql_network_id = mysql_network_id
+                    resource.mysql_network_id = mysql_network_id.strip()
                 if redis_network_id:
-                    resource.redis_network_id = redis_network_id
+                    resource.redis_network_id = redis_network_id.strip()
                 if mongodb_network_id:
-                    resource.mongodb_network_id = mongodb_network_id
+                    resource.mongodb_network_id = mongodb_network_id.strip()
                 resource.save()
                 code = 200
             else:
