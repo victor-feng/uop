@@ -154,7 +154,7 @@ class Configure(Resource):
         username = args.username if args.username else ''
         password = args.password if args.password else ''
         sub_network = args.sub_network if args.sub_network else ''
-        vlan_id = args.vlan_id if args.vlan_id else ''
+        vlan_id = args.vlan_id.strip() if args.vlan_id else ''
         logging.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
