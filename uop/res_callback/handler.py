@@ -651,7 +651,7 @@ def filter_status_data(p_code):
             meta["env"] = r.env
             meta["osid"] = oi.os_ins_id
             meta["ip"] = oi.ip
-            meta["type"] = oi.os_type
+            meta["os_type"] = oi.os_type
             meta["status"] = "active"
             data["vm_status"].append(meta)
     return data
