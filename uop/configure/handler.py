@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
+import re
 from flask_restful import reqparse, Api, Resource, fields
-
+import requests
 from uop.configure import configure_blueprint
 from uop.models import ConfigureEnvModel 
 from uop.models import ConfigureNginxModel 
 from uop.models import ConfigureDisconfModel 
 from uop.models import NetWorkConfig
-
+from uop.util import get_CRP_url
 configure_api = Api(configure_blueprint)
 
 
@@ -208,6 +208,66 @@ class Configure(Resource):
                 }
         return res
 
+class ConfigureNetwork(Resource):
+    def fuzzyfinder(self,keywords, collection):
+        suggestions = []
+        pattern = '.*'.join(keywords)
+        regex = re.compile(pattern) 
+        for item in collection:
+            match = regex.search(item)
+            if match:
+                suggestions.append((match.start(), item))
+        return [x for _, x in suggestions]    
+
+    def get(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('keywords', type=str)
+            parser.add_argument('env', type=str)
+            args = parser.parse_args()
+            keywords=args.keywords
+            env_=args.env
+            network_list=[]
+            CRP_URL = get_CRP_url(env_)
+            headers = {'Content-Type': 'application/json'}
+            url_ = '%s%s'%(CRP_URL, 'api/openstack/network/list')
+            result = requests.get(url_, headers=headers)
+            networks=result.json().get('result').get('res')
+            if keywords:
+                fuzzy_res={}
+                network_names=self.fuzzyfinder(keywords, networks.keys())
+                for name in network_names:
+                    fuzzy_res[name]=networks[name]
+                networks=fuzzy_res
+            for name,info in networks.items():
+                network_info={}
+                network_info["vlan_name"]=name
+                network_info["vlan_id"]=info[0]
+                network_info["subnets"]=info[1]
+                network_list.append(network_info)
+        except Exception as e:
+            err_msg = e.args
+            logging.error('Uop get network list err: %s' % err_msg)
+            ret = {
+                "code": 400,
+                "result": {
+                    "msg": "failed",
+                    "res": err_msg
+                }
+            }
+            return ret, 400
+        else:
+            ret = {
+                "code": 200,
+                "result": {
+                    "msg": "success",
+                    "res": network_list
+                }
+            }
+            return ret, 200
+        
+
 
 configure_api.add_resource(ConfigureEnv, '/env')
 configure_api.add_resource(Configure, '/')
+configure_api.add_resource(ConfigureNetwork, '/network')
