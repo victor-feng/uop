@@ -22,8 +22,9 @@ class ProdConfig(BaseConfig):
     }
 
     CRP_URL = {
-        'dev': DEV_CRP_URL,
+        'dev': TEST_CRP_URL,
         'test': TEST_CRP_URL,
+        'prep': PROD_CRP_URL,
         'prod': PROD_CRP_URL,
     }
     CMDB_URL = "http://cmdb.syswin.com/"
