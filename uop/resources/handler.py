@@ -175,7 +175,7 @@ class ResourceApplication(Resource):
                 return res, code
         try:
             for insname in ins_name_list:
-                if ResourceModel.objects(compute_list__match={'ins_name': insname}).count() > 0:
+                if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(env=env).count() > 0:
                     code = 200
                     res = {
                         'code': code,
