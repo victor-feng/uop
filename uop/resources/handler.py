@@ -827,15 +827,18 @@ class GetMyResourcesInfo(Resource):
     def get(self):
         user_id = request.args.get('user_id')
         resource_type = request.args.get('resource_type',"")
+        resource_database = request.args.get('mysqlandmongo',"")
+        resource_cache = request.args.get('cache', "")
+        resource_type = resource_database or resource_cache or resource_type
         resource_name = request.args.get('resource_name',"")
         item_name = request.args.get('item_name',"")
         # item_code = request.args.get('item_code',"")
         start_time = request.args.get('start_time',"")
         end_time = request.args.get('end_time',"")
         resource_status = request.args.get('resource_status',"")
-        page_num=request.args.get('page_num',"")
+        page_num=request.args.get('page_num',1)
         env = request.args.get('env',"")
-        page_count=request.args.get('page_count',"")
+        page_count=request.args.get('page_count',10)
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
             &page_count={}&env={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env)
