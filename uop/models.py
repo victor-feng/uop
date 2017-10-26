@@ -97,7 +97,7 @@ class Deployment(db.Document):
 
 
 class ComputeIns(db.EmbeddedDocument):
-    ins_name = db.StringField(required=True, unique=True)
+    ins_name = db.StringField(required=True)
     ins_id = db.StringField(required=True, unique=True)
     # ins_type = db.StringField(required=False)
     cpu = db.IntField(required=False)
