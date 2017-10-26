@@ -329,20 +329,6 @@ class ReservationAPI(Resource):
                 }
             }
             return ret, code
-        
-        # 调用network 表 匹配子网是否有余  插入 表中该子网
-        network_id = check_network_use(resource.env)
-        if not network_id:
-            code = 200
-            res = {
-                "code": code,
-                "result": {
-                    'res': 'fail',
-                    'msg': 'Create resource application fail.  not network_id can use' 
-                 }
-            }
-            return res, code
-
         data = dict()
         data['unit_id'] = resource.project_id
         data['network_id'] = resource.network_id.strip()
@@ -356,6 +342,10 @@ class ReservationAPI(Resource):
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
         data['env'] = resource.env
+        data['docker_network_id'] = resource.docker_network_id
+        data['mysql_network_id'] = resource.mysql_network_id
+        data['redis_network_id'] = resource.redis_network_id
+        data['mongodb_network_id'] = resource.mongodb_network_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
