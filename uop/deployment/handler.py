@@ -196,6 +196,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
                 docker_list.append(
                     {
                         'url': obj.url,
+                        'ins_name': obj.ins_name,
                         'ip': obj.ips,
                     }
                 )
