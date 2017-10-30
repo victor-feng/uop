@@ -22,13 +22,13 @@ from uop.pool import pool_blueprint
 
 class Config(object):
     JOBS = [
-        {
-            'id': 'delete_res_handler',
-            'func': 'uop.scheduler_util:delete_res_handler',
-            #'args': (1, 2),
-            'trigger': 'interval',
-            'seconds': 60
-        },
+        # {
+        #     'id': 'delete_res_handler',
+        #     'func': 'uop.scheduler_util:delete_res_handler',
+        #     #'args': (1, 2),
+        #     'trigger': 'interval',
+        #     'seconds': 60
+        # },
         {
             'id': 'flush_crp_to_cmdb',
             'func': 'uop.scheduler_util:flush_crp_to_cmdb',
