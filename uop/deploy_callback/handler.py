@@ -53,6 +53,7 @@ class DeployCallback(Resource):
             parser.add_argument('quantity', type=int)
             parser.add_argument('err_msg', type=str)
             parser.add_argument('vm_state', type=str)
+            parser.add_argument('cluster_name', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
@@ -62,6 +63,7 @@ class DeployCallback(Resource):
         quantity=args.quantity
         err_msg = args.err_msg
         vm_state=args.vm_state
+        cluster_name = args.cluster_name
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -71,11 +73,11 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
             dep.deploy_result="deploy_docker_success"
             status_record.status="deploy_docker_success"
-            status_record.msg="deploy_docker:%s部署成功，状态为%s" % (ip,vm_state)
+            status_record.msg="deploy_docker:%s部署成功，状态为%s，所属集群为%s" % (ip,vm_state,cluster_name)
         elif dep.deploy_result == "fail":
             dep.deploy_result="deploy_docker_fail"
             status_record.status="deploy_docker_fail"
-            status_record.msg="deploy_docker:%s部署失败，状态为%s，错误日志为：%s" % (ip,vm_state,err_msg)
+            status_record.msg="deploy_docker:%s部署失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,vm_state,cluster_name,err_msg)
             dep.deploy_result = "deploy_fail"
             create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail")
         status_record.save()
