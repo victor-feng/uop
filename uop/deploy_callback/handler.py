@@ -54,7 +54,7 @@ class DeployCallback(Resource):
             parser.add_argument('err_msg', type=str)
             parser.add_argument('vm_state', type=str)
             parser.add_argument('cluster_name', type=str)
-            parser.add_argument('end_flag', type=str)
+            parser.add_argument('end_flag', type=bool)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
@@ -85,10 +85,10 @@ class DeployCallback(Resource):
         #if not res_status and quantity == count:
         #    dep.deploy_result = "deploy_fail"
         #    create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
-        if res_status and end_flag:
+        if res_status == True and end_flag == True:
             dep.deploy_result = "deploy_success"
             create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success")
-        elif not res_status and end_flag:
+        elif res_status == False and end_flag == True:
             dep.deploy_result = "deploy_fail"
             create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail")
         dep.save()
