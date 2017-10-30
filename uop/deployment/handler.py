@@ -747,10 +747,58 @@ class DeploymentListAPI(Resource):
     def delete(cls):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str)
+        parser.add_argument('user', type=str)
         args = parser.parse_args()
+        user = args.user
         deploy_id = args.deploy_id
         logging.info("delete deployment:{}".format(deploy_id))
         print "delete deployment:{}".format(deploy_id)
+        # if user == "admin":
+        #     logging.info("user is admin:will delete deployment immediately")
+        #     return cls.delete()
+        try:
+            deploy = Deployment.objects.get(deploy_id=deploy_id)
+            if len(deploy):
+                env_ = get_CRP_url(deploy.environment)
+                crp_url = '%s%s' % (env_, 'api/deploy/deploys')
+                disconf_list = deploy.disconf_list
+                disconfs = []
+                for dis in disconf_list:
+                    dis_ = dis.to_json()
+                    disconfs.append(eval(dis_))
+                crp_data = {
+                    "disconf_list": disconfs,
+                    "resources_id": '',
+                    "domain_list": [],
+                }
+                res = ResourceModel.objects.get(res_id=deploy.resource_id)
+                if res:
+                    crp_data['resources_id'] = res.res_id
+                    compute_list = res.compute_list
+                    domain_list = []
+                    for compute in compute_list:
+                        domain = compute.domain
+                        domain_ip = compute.domain_ip
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                        crp_data['domain_list'] = domain_list
+                    # 调用CRP 删除nginx资源
+                    crp_data = json.dumps(crp_data)
+                    requests.delete(crp_url, data=crp_data)
+                deploy.delete()
+
+                # 回写CMDB
+                # cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
+                # requests.delete(cmdb_url)
+        except Exception as e:
+            logging.info('----Scheduler_utuls _delete_deploy  function Exception info is %s' % (e))
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Delete deployment  application failed.'
+                }
+            }
+            return ret, 500
         # try:
         #     deploy = Deployment.objects.get(deploy_id=deploy_id)
         #     if len(deploy):
@@ -826,9 +874,7 @@ class DeploymentListAPI(Resource):
         deploy_id = args.deploy_id
         user = args.user
         action=args.action
-        if user == "admin":
-            cls.delete()
-            pass
+
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
