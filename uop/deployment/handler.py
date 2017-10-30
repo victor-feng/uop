@@ -771,19 +771,20 @@ class DeploymentListAPI(Resource):
                     "resources_id": '',
                     "domain_list": [],
                 }
-                res = ResourceModel.objects.get(res_id=deploy.resource_id)
-                if res:
-                    crp_data['resources_id'] = res.res_id
-                    compute_list = res.compute_list
-                    domain_list = []
-                    for compute in compute_list:
-                        domain = compute.domain
-                        domain_ip = compute.domain_ip
-                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
-                        crp_data['domain_list'] = domain_list
-                    # 调用CRP 删除nginx资源
-                    crp_data = json.dumps(crp_data)
-                    requests.delete(crp_url, data=crp_data)
+                resm = ResourceModel.objects.filter(res_id=deploy.resource_id)
+                if resm:
+                    for res in resm:
+                        crp_data['resources_id'] = res.res_id
+                        compute_list = res.compute_list
+                        domain_list = []
+                        for compute in compute_list:
+                            domain = compute.domain
+                            domain_ip = compute.domain_ip
+                            domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                            crp_data['domain_list'] = domain_list
+                        # 调用CRP 删除nginx资源
+                        crp_data = json.dumps(crp_data)
+                        requests.delete(crp_url, data=crp_data)
                 deploy.delete()
 
                 # 回写CMDB
