@@ -111,7 +111,6 @@ class DeployCallback(Resource):
                 ]
             }
             req = requests.put(deployment_url, data=json.dumps(data))
-            logging.info('----- {}'.format(req.text))
         except Exception as e:
             code = 500
             ret = {
