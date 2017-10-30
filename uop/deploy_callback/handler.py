@@ -78,8 +78,6 @@ class DeployCallback(Resource):
             dep.deploy_result="deploy_docker_fail"
             status_record.status="deploy_docker_fail"
             status_record.msg="deploy_docker:%s部署失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,vm_state,cluster_name,err_msg)
-            dep.deploy_result = "deploy_fail"
-            create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail")
         status_record.save()
         res_status,count = get_deploy_status(deploy_id)
         #if not res_status and quantity == count:
@@ -88,6 +86,9 @@ class DeployCallback(Resource):
         if res_status and quantity == count:
             dep.deploy_result = "deploy_success"
             create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success")
+        else:
+            dep.deploy_result = "deploy_fail"
+            create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail")
         dep.save()
 
 
