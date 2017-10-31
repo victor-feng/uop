@@ -344,9 +344,11 @@ def attach_domain_ip(compute_list, res):
         #     return False, appinfo #不需要上传nginx配置，直接返回，不做入库操作
         try:
             for i in old_compute_list:
-                tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id) and x.get("domain_ip", "")][0]
-                tmp["ips"] = i.ips
-                appinfo.append(tmp) # 将配置了nginx IP的 app传回，以便传回crp进行配置推送
+                tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id) and x.get("domain_ip", "")]
+                if len(tmp) > 0:
+                    tmp=tmp[0]
+                    tmp["ips"] = i.ips
+                    appinfo.append(tmp) # 将配置了nginx IP的 app传回，以便传回crp进行配置推送
             for i in xrange(0, len(old_compute_list)): # 更新resources表中的镜像url和可能配置nginx IP信息
                 match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
                 o = old_compute_list[i]
