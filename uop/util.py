@@ -24,8 +24,12 @@ def get_CRP_url(env=None):
     return CPR_URL
 
 def get_network_used(env, sub_network, vlan_id):
-    ip = IPy.IP(sub_network)
-    total_count = ip.len()
+    sub_networks = sub_network.split(',')
+    total_count = 0
+    for net in sub_networks:
+        ip = IPy.IP(net)
+        _count = ip.len()
+        total_count = total_count + _count
     headers = {'Content-Type': 'application/json'}
     env_ = get_CRP_url(env)
     crp_url = '%s%s'%(env_, 'api/openstack/port/count')
