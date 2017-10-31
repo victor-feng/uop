@@ -14,10 +14,6 @@ define('mode', default='debug')
 
 # dev, test, prod
 define('deploy', default='dev')
-os.system('rm -rf config.py')
-os.system('rm -rf conf')
-os.system('ln -s conf.d/%s  conf '%(options.deploy))
-os.system('ln -s conf/config.py  config.py')
 
 from config import APP_ENV
 from uop import create_app
