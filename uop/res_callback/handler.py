@@ -643,6 +643,7 @@ def filter_status_data(p_code):
         for oi in osid_ip_list:
             meta = {}
             meta["resource_id"] = r.res_id
+            meta["user_id"] = r.user_id
             meta["resource_name"] = r.resource_name
             meta["item_name"] = r.project
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')

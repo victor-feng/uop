@@ -26,6 +26,7 @@ def get_CRP_url(env=None):
 def get_network_used(env, sub_network, vlan_id):
     sub_networks = sub_network.split(',')
     total_count = 0
+    sub_networks = sub_networks[0:1]
     for net in sub_networks:
         ip = IPy.IP(net)
         _count = ip.len()
