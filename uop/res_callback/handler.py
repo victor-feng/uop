@@ -647,8 +647,12 @@ def filter_status_data(p_code):
             meta["resource_name"] = r.resource_name
             meta["item_name"] = r.project
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
-            meta["cpu"] = "2"
-            meta["mem"] = "4"
+            try:
+                meta["cpu"] = str(oi.cpu)
+                meta["mem"] = str(oi.mem)
+            except:
+                meta["cpu"] = "2"
+                meta["mem"] = "4"
             meta["env"] = r.env
             meta["osid"] = oi.os_ins_id
             meta["ip"] = oi.ip
