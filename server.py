@@ -7,7 +7,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.options import define, options
 import os
-from config import APP_ENV
+
 
 define('port', type=int, default=5000)
 # deploy or debug
@@ -21,6 +21,7 @@ os.system('rm -rf conf')
 os.system('ln -s conf.d/%s  conf '%(options.deploy))
 os.system('ln -s conf/config.py  config.py')
 
+from config import APP_ENV
 from uop import create_app
 
 def main():
