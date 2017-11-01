@@ -902,10 +902,12 @@ Post Request JSON Body：
             container = request_data.get('container')
             for _container in container:
                 instances = _container.get('instance')
+                cpu=_container.get('cpu','2')
+                mem = _container.get('mem', '2')
                 for instance in instances:
                     os_ins_id = instance.get('os_inst_id')
                     ip=instance.get('ip')
-                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker")
+                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker",cpu=cpu,mem=mem)
                     os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 
@@ -916,6 +918,8 @@ Post Request JSON Body：
                 wid = value.get("wvid", '')
                 rid = value.get("rvid", '')
                 vid = value.get("vid", '')
+                cpu=value.get("cpu", '2')
+                mem=value.get("mem", '2')
                 if wid:
                     vid_list.append(wid)
                 if rid:
@@ -927,7 +931,7 @@ Post Request JSON Body：
                     os_ins_id = instance.get('os_inst_id')
                     ip=instance.get('ip')
                     os_type = instance.get('instance_type')
-                    os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= os_type)
+                    os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= os_type,cpu=cpu,mem=mem)
                     os_ins_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
