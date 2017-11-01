@@ -841,7 +841,7 @@ class GetMyResourcesInfo(Resource):
         page_count=request.args.get('page_count',10)
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
-            &page_count={}&env={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env)
+            &page_count={}&env={}&user_id={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env, user_id)
         ret = requests.get(url)
         logging.info("ret:{}".format(ret.json()))
         return ret.json()
