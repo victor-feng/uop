@@ -175,6 +175,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
             "vip1": resource_info['mongodb_cluster']['vip1'],
             "vip2": resource_info['mongodb_cluster']['vip2'],
             "vip3": resource_info['mongodb_cluster']['vip3'],
+            "vip": resource_info['mongodb_instance']['vip'],
             "port": resource_info['mongodb_cluster']['port'],
             # TODO test data
             "db_username": resource_name,

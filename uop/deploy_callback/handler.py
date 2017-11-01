@@ -50,7 +50,7 @@ class DeployCallback(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('result', type=str)
             parser.add_argument('ip', type=str)
-            parser.add_argument('quantity', type=int)
+            parser.add_argument('res_type', type=str)
             parser.add_argument('err_msg', type=str)
             parser.add_argument('vm_state', type=str)
             parser.add_argument('cluster_name', type=str)
@@ -61,7 +61,7 @@ class DeployCallback(Resource):
             return
         dep.deploy_result = args.result
         ip=args.ip
-        quantity=args.quantity
+        res_type=args.res_type
         err_msg = args.err_msg
         vm_state=args.vm_state
         cluster_name = args.cluster_name
@@ -77,9 +77,18 @@ class DeployCallback(Resource):
             status_record.status="deploy_docker_success"
             status_record.msg="deploy_docker:%s部署成功，状态为%s，所属集群为%s" % (ip,vm_state,cluster_name)
         elif dep.deploy_result == "fail":
-            dep.deploy_result="deploy_docker_fail"
-            status_record.status="deploy_docker_fail"
-            status_record.msg="deploy_docker:%s部署失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,vm_state,cluster_name,err_msg)
+            if res_type == "docker":
+                dep.deploy_result="deploy_docker_fail"
+                status_record.status="deploy_docker_fail"
+                status_record.msg="deploy_docker:%s部署失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,vm_state,cluster_name,err_msg)
+            elif res_type == "mongodb":
+                dep.deploy_result = "deploy_mongodb_fail"
+                status_record.status = "deploy_mongodb_fail"
+                status_record.msg = "deploy_mongodb:部署失败，错误日志为：%s" % err_msg
+            elif res_type == "mysql":
+                dep.deploy_result = "deploy_mysql_fail"
+                status_record.status = "deploy_mysql_fail"
+                status_record.msg = "deploy_mysql:部署失败，错误日志为：%s" % err_msg
         status_record.save()
         res_status,count = get_deploy_status(deploy_id)
         #if not res_status and quantity == count:
@@ -231,7 +240,7 @@ def get_deploy_status(deploy_id):
         for sr in status_records:
             if sr.s_type=="deploy_docker":
                 docker_status_list.append(sr.status)
-        if "deploy_docker_fail" in docker_status_list:
+        if "deploy_docker_fail" in docker_status_list or "deploy_mongodb_fail" in docker_status_list or "deploy_mysql_fail" in docker_status_list:
             return False,len(docker_status_list)
         else:
             return True,len(docker_status_list) 
