@@ -7,6 +7,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.options import define, options
 import os
+from config import APP_ENV
 
 define('port', type=int, default=5000)
 # deploy or debug
@@ -14,12 +15,15 @@ define('mode', default='debug')
 
 # dev, test, prod
 define('deploy', default='dev')
+options.parse_command_line()
+os.system('rm -rf config.py')
+os.system('rm -rf conf')
+os.system('ln -s conf.d/%s  conf '%(options.deploy))
+os.system('ln -s conf/config.py  config.py')
 
-from config import APP_ENV
 from uop import create_app
 
 def main():
-    options.parse_command_line()
     if options.mode.lower() == "debug":
         from tornado import autoreload
         autoreload.start()
