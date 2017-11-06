@@ -330,7 +330,7 @@ class ResourceApplication(Resource):
                 result['id'] = res.res_id
                 result['reservation_status'] = res.reservation_status
                 result['env'] = res.env
-                result['is_deleted'] = res.is_deleted
+                result['is_rollback'] = res.is_rollback
                 resource_id=res.res_id
                 deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
@@ -478,7 +478,7 @@ class ResourceDetail(Resource):
     def get(cls, res_id):
         result = {}
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.filter(res_id=res_id, is_rollback=0)
         except Exception as e:
             print e
             code = 500
@@ -709,9 +709,25 @@ class ResourceDetail(Resource):
     @classmethod
     def delete(cls, res_id):
         try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('user_id', type=str, location='args')
+            parser.add_argument('options', type=str, location='args')
+            user_id = parser.parse_args()
+            options = parser.parse_args()
+            # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
-                resources.delete()
+                cur_id = resources.user_id
+                flag = resources.is_rollback
+                if user_id == cur_id: # 相同账户可以撤回或者删除自己的申请
+                    if options == "rollback":
+                        resources.is_rollback = 0 if flag == 1 else 1
+                        resources.save()
+                    elif options == "delete":
+                        resources.delete()
+                # elif user_id == "admin": # 不同账户(admin)只能删除
+                #     if options == "delete":
+                #         resources.delete()
             else:
                 ret = {
                     'code': 200,
