@@ -723,11 +723,17 @@ class ResourceDetail(Resource):
                     if options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
                         resources.save()
-                    elif options == "delete":
-                        resources.delete()
-                # elif user_id == "admin": # 不同账户(admin)只能删除
-                #     if options == "delete":
-                #         resources.delete()
+                        ret = {
+                            'code': 200,
+                            'result': {
+                                'res': 'success',
+                                'msg': 'Rollback success .'
+                            }
+                        }
+                        return ret, 200
+                    # elif options == "delete":
+                    #     resources.delete()
+                resources.delete()
             else:
                 ret = {
                     'code': 200,
