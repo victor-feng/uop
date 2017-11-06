@@ -713,6 +713,8 @@ class ResourceDetail(Resource):
             parser.add_argument('user_id', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
             args = parser.parse_args()
+            logging.info(args)
+            print args
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
