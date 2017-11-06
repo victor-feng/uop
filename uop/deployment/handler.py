@@ -1115,7 +1115,7 @@ class Download(Resource):
             return ret
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
-deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
+deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
 deployment_api.add_resource(Download, '/download/<file_name>')
