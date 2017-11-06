@@ -712,15 +712,14 @@ class ResourceDetail(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('user_id', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
-            user_id = parser.parse_args()
-            options = parser.parse_args()
+            args = parser.parse_args()
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
                 cur_id = resources.user_id
                 flag = resources.is_rollback
-                if user_id == cur_id: # 相同账户可以撤回或者删除自己的申请
-                    if options == "rollback":
+                if args.user_id == cur_id: # 相同账户可以撤回或者删除自己的申请
+                    if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
                         resources.save()
                         ret = {
