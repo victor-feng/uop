@@ -751,6 +751,7 @@ class DeploymentListAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str)
         parser.add_argument('user', type=str)
+        parser.add_argument('options', type=str)
         args = parser.parse_args()
         user = args.user
         deploy_id = args.deploy_id
@@ -762,6 +763,18 @@ class DeploymentListAPI(Resource):
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
+                if args.options == "rollback" and user == deploy.user_id:
+                    flag = deploy.is_rollback
+                    deploy.is_rollback = 1 if flag == 0 else 0
+                    deploy.save()
+                    ret = {
+                        'code': 200,
+                        'result': {
+                            'res': 'success',
+                            'msg': 'Rollback deployment success.'
+                        }
+                    }
+                    return ret, 200
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
                 disconf_list = deploy.disconf_list

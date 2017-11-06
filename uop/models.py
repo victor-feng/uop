@@ -82,6 +82,7 @@ class Deployment(db.Document):
     approve_suggestion = db.StringField()  # 审批意见
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     is_deleted = db.IntField(required=False, default=0)
+    is_rollback = db.IntField(required=False, default=0)
     deleted_time = db.DateTimeField(default=datetime.datetime.now())
 
     meta = {
