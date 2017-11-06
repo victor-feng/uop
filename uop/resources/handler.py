@@ -478,7 +478,7 @@ class ResourceDetail(Resource):
     def get(cls, res_id):
         result = {}
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id, is_rollback=0)
+            resources = ResourceModel.objects.filter(res_id=res_id)
         except Exception as e:
             print e
             code = 500
