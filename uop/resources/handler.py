@@ -335,8 +335,9 @@ class ResourceApplication(Resource):
                 deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
                     dep=deploys[0]
-                    deploy_result=dep.deploy_result
-                    result['reservation_status'] = deploy_result
+                    if int(dep.is_rollback) == 0:
+                        deploy_result=dep.deploy_result
+                        result['reservation_status'] = deploy_result
                 result_list.append(result)
         code = 200
         ret = {
