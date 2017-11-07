@@ -12,7 +12,7 @@ from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns, Deployment
+from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns, Deployment, Approval, Capacity
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
@@ -1130,8 +1130,159 @@ class Download(Resource):
                   }
             return ret
 
+class CapacityAPI(Resource):
+    '容量改变 扩容或者缩容 的提交申请'
+    @classmethod
+    def put(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('cluster_id', type=str)
+        parser.add_argument('number', type=str)
+        parser.add_argument('res_id', type=str)
+        parser.add_argument('deploy_id', type=str)
+        parser.add_argument('department_id', type=str)
+        parser.add_argument('creator_id', type=str)
+        parser.add_argument('project_id', type=str)
+        args = parser.parse_args()
+        project_id = args.project_id
+        department_id = args.department_id
+        creator_id = args.creator_id
+        cluster_id = args.cluster_id
+        number = args.number
+        res_id = args.res_id
+        deploy_id = args.deploy_id
+        try:
+            resources = Resource.objects.filter(res_id=res_id)
+            if len(resources):
+                resource = resources[0]
+                compute_list = resource.compute_list
+                for compute_ in compute_list:
+                    if compute_.ins_id == cluster_id:
+                        if int(number) > int(compute_.quantity):
+                            num = int(number) - int(compute_.quantity)
+                            capacity_status = 'increate'
+                        else:
+                            num = int(compute_.quantity) - int(number)
+                            capacity_status = 'reduce'
+                        capacity = Capacity()
+                        capacity.numbers = num
+                        capacity.created_date = datetime.datetime.now()
+                        capacity.capacity_status = capacity_status
+                        approval_id = str(uuid.uuid1())
+                        capacity.capacity_id = approval_id
+                        capacity_list = compute_.capacity_list
+                        capacity_list.append(capacity)
+                        compute_.capacity_list = capacity_list
+                        resource.save()
+
+                        create_date = datetime.datetime.now()
+                        approval_status = '%sing'%(capacity_status)
+                        Approval(approval_id=approval_id, resource_id=res_id,
+                            project_id=project_id,department_id=department_id,
+                            creator_id=creator_id,create_date=create_date,
+                            approval_status=approval_status, capacity_status=capacity_status).save()
+            else:
+                ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'resource not found.'
+                    }
+                }
+                return ret, 200
+        except Exception as e:
+            print e
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Put deployment  application failed.'
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Put deployment capacity application success.'
+            }
+        }
+        return ret, 200
+
+   # '资源实例的集群信息'
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str, location='args')
+        args = parser.parse_args()
+        res_id = args.res_id
+        rst = []
+        try:
+            resource = Resource.objects.get(res_id=res_id)
+            if len(resource):
+                compute_list = resource.compute_list
+                for compute_ in compute_list:
+                    quantity = compute_.quantity
+                    ins_name = compute_.ins_name
+                    rst.append({"quantity": quantity, "ins_name": ins_name})
+        except Exception as e:
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "failed",
+                    "msg": e.message
+                }
+            }
+            return res, 400
+        else:
+            return rst, 200
+
+class CapacityInfoAPI(Resource):
+
+   # '获取扩容详情'
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('app_id', type=str, location='args')
+        parser.add_argument('res_id', type=str, location='args')
+        args = parser.parse_args()
+        app_id = args.app_id
+        res_id = args.res_id
+        rst = []
+        cur_capacity_list = []
+        try:
+            resource = Resource.objects.get(res_id=res_id)
+            if len(resource):
+                compute_list = resource.compute_list
+                for compute_ in compute_list:
+                    capacity_list = compute_.capacity_list
+                    for capacity_ in capacity_list:
+                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
+                                   'port':compute_.port, 'env': resource.env }
+                        if capacity_.capacity_id == app_id:
+                            rst.append(tmp)
+                        if capacity_.application_status == 'success':
+                            cur_capacity_list.append(tmp)
+                if len(cur_capacity_list) > 1:
+                    cur_data = cur_capacity_list[-1]
+                else:
+                    cur_data = {'cluster_id': resource.ins_id, 'ins_name': resource.ins_name, 'cpu': resource.cpu, 'mem': resource.mem, 'domain': resource.domain,
+                                   'port':resource.port, 'env': resource.env }
+                rst.append(cur_data)
+        except Exception as e:
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "failed",
+                    "msg": e.message
+                }
+            }
+            return res, 400
+        else:
+            return rst, 200
+
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
 deployment_api.add_resource(Download, '/download/<file_name>')
+deployment_api.add_resource(CapacityAPI, '/capacity')
+deployment_api.add_resource(CapacityInfoAPI, '/capacity/info')
