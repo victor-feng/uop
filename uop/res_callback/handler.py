@@ -1198,8 +1198,9 @@ class ResourceDeleteCallBack(Resource):
         quantity=args.quantity
         try:
             os_inst_ip_dict={}
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            if resource:
+            resources = ResourceModel.objects.filter(res_id=resource_id)
+            if len(resources) > 0:
+                resource=resources[0]
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
