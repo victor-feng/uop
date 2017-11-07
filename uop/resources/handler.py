@@ -333,7 +333,7 @@ class ResourceApplication(Resource):
                 result['is_rollback'] = res.is_rollback
                 resource_id=res.res_id
                 deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
-                if deploys:
+                if deploys.is_rollback == 0:
                     dep=deploys[0]
                     deploy_result=dep.deploy_result
                     result['reservation_status'] = deploy_result
