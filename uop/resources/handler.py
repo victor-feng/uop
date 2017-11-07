@@ -330,7 +330,7 @@ class ResourceApplication(Resource):
                 result['id'] = res.res_id
                 result['reservation_status'] = res.reservation_status
                 result['env'] = res.env
-                result['is_deleted'] = res.is_deleted
+                result['is_rollback'] = res.is_rollback
                 resource_id=res.res_id
                 deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
@@ -709,8 +709,31 @@ class ResourceDetail(Resource):
     @classmethod
     def delete(cls, res_id):
         try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('user_id', type=str, location='args')
+            parser.add_argument('options', type=str, location='args')
+            args = parser.parse_args()
+            logging.info(args)
+            print args
+            # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
+                cur_id = resources.user_id
+                flag = resources.is_rollback
+                if args.user_id == cur_id: # 相同账户可以撤回或者删除自己的申请
+                    if args.options == "rollback":
+                        resources.is_rollback = 0 if flag == 1 else 1
+                        resources.save()
+                        ret = {
+                            'code': 200,
+                            'result': {
+                                'res': 'success',
+                                'msg': 'Rollback success .'
+                            }
+                        }
+                        return ret, 200
+                    # elif options == "delete":
+                    #     resources.delete()
                 resources.delete()
             else:
                 ret = {

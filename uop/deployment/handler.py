@@ -460,6 +460,7 @@ class DeploymentListAPI(Resource):
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
+                    'is_rollback':deployment.is_rollback
                 })
         except Exception as e:
             res = {
@@ -751,6 +752,7 @@ class DeploymentListAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str)
         parser.add_argument('user', type=str)
+
         args = parser.parse_args()
         user = args.user
         deploy_id = args.deploy_id
@@ -762,6 +764,7 @@ class DeploymentListAPI(Resource):
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
+
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
                 disconf_list = deploy.disconf_list
@@ -926,9 +929,26 @@ class DeploymentAPI(Resource):
 
     def delete(self, deploy_id):
         res_code = 204
-        deploys = Deployment.objects(deploy_id=deploy_id)
-        if deploys.count() > 0:
-            deploys.delete()
+        parser = reqparse.RequestParser()
+        parser.add_argument('options', type=str)
+        parser.add_argument('user_id', type=str)
+        args = parser.parse_args()
+        deploys = Deployment.objects.filter(deploy_id=deploy_id)
+        if deploys:
+            for deploy in deploys:
+                if args.options == "rollback" and args.user_id == deploy.user_id:
+                    flag = deploy.is_rollback
+                    deploy.is_rollback = 1 if flag == 0 else 0
+                    deploy.save()
+            ret = {
+                    'code': 200,
+                    'result': {
+                        'res': 'success',
+                        'msg': 'Rollback deployment success.'
+                    }
+            }
+            return ret, 200
+            # deploys.delete()
         else:
             res_code = 404
         return "", res_code
@@ -1096,7 +1116,7 @@ class Download(Resource):
             return ret
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
-deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>')
+deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
 deployment_api.add_resource(Upload, '/upload')
 deployment_api.add_resource(Download, '/download/<file_name>')

@@ -82,6 +82,7 @@ class Deployment(db.Document):
     approve_suggestion = db.StringField()  # 审批意见
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     is_deleted = db.IntField(required=False, default=0)
+    is_rollback = db.IntField(required=False, default=0)
     deleted_time = db.DateTimeField(default=datetime.datetime.now())
 
     meta = {
@@ -184,6 +185,7 @@ class ResourceModel(db.DynamicDocument):
     os_ins_list = db.ListField(db.StringField(requeired=False))
     os_ins_ip_list=db.ListField(db.EmbeddedDocumentField('OS_ip_dic'))
     vid_list = db.ListField(db.StringField(requeired=False))
+    is_rollback = db.IntField(required=False, default=0)
     is_deleted = db.IntField(required=False, default=0)
     deleted_date = db.DateTimeField(required=False)
     docker_network_id = db.StringField(required=False)
