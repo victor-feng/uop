@@ -938,7 +938,22 @@ class DeploymentAPI(Resource):
             for deploy in deploys:
                 if args.options == "rollback" and args.user_id == deploy.user_id:
                     flag = deploy.is_rollback
-                    deploy.is_rollback = 1 if flag == 0 else 0
+                    repo = ResourceModel.objects.filter(res_id=deploy.resource_id)
+                    if repo:
+                        for r in repo:
+                            r.reservation_status = "set_success"
+                            r.save()
+                        deploy.is_rollback = 1 if flag == 0 else 0
+                    else:
+                        deploy.is_rollback = 1 if flag == 0 else 0
+                        ret = {
+                            'code': 203,
+                            'result': {
+                                'res': 'success rollback, but resource not found',
+                                'msg': 'The deployment for its resource had been deleted.'
+                            }
+                        }
+                        return ret, 200
                     deploy.save()
             ret = {
                     'code': 200,
