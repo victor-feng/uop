@@ -372,6 +372,7 @@ class ResourceApplication(Resource):
                         "disconf_list" : disconfs,
                         "resources_id": res_id,
                         "domain_list":[],
+                        "set_flag": 'res'
                     }
                     compute_list = resources.compute_list
                     domain_list = []
@@ -388,6 +389,7 @@ class ResourceApplication(Resource):
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
                         "vid_list": resources.vid_list,
+                        "set_flag": 'res'
                 }
                 env_ = get_CRP_url(resources.env)
                 crp_url = '%s%s'%(env_, 'api/resource/deletes')

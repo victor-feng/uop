@@ -6,6 +6,7 @@ import datetime
 import logging
 
 import requests
+import random
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 
@@ -223,6 +224,7 @@ class Reservation(Resource):
             return ret, code
 
         data = dict()
+        data['set_flag'] = 'res'
         data['unit_id'] = resource.project_id
         #data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
@@ -330,6 +332,7 @@ class ReservationAPI(Resource):
             }
             return ret, code
         data = dict()
+        data['set_flag'] = 'res'
         data['unit_id'] = resource.project_id
         data['unit_name'] = resource.project
         data['unit_des'] = ''
@@ -449,6 +452,233 @@ class ReservationMock(Resource):
         }
         return ret, code
 
+class CapacityInfoAPI(Resource):
+
+    def put(self):
+        code = 0
+        res = ""
+        msg = {}
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('approve_uid', type=str)
+            parser.add_argument('agree', type=bool)
+            parser.add_argument('annotations', type=str)
+            parser.add_argument('docker_network_id', type=str)
+            parser.add_argument('res_id', type=str)
+            parser.add_argument('capacity_status', type=str)
+            args = parser.parse_args()
+            res_id = args.res_id
+            approve_uid = args.approve_uid
+            capacity_status = args.capacity_status
+
+            approval = models.Approval.objects.get(approval_id=approve_uid)
+            if approval:
+                approval.approve_uid = args.approve_uid
+                approval.approve_date = datetime.datetime.now()
+                approval.annotations = args.annotations
+                docker_network_id = args.docker_network_id
+                if args.agree:
+                    approval.approval_status = "%s_success"%(capacity_status)
+                    resource = Resource.objects.get(res_id=res_id)
+                    compute_list = resource.compute_list
+                    for compute_ in compute_list:
+                        capacity_list = compute_.capacity_list
+                        for capacity_ in capacity_list:
+                            if capacity_.capacity_id == approve_uid:
+                                capacity_.network_id = docker_network_id.strip()
+                                capacity_.application_status = 'success'
+                else:
+                    approval.approval_status = "%s_failed"%(capacity_status)
+                approval.save()
+                resource.save()
+                code = 200
+            else:
+                code = 410
+                res = "A resource with that ID no longer exists"
+        except Exception as e:
+            code = 500
+            res = "Failed to approve the resource."
+        finally:
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+
+        return ret, code
+
+    def get(self, res_id):
+        code = 0
+        res = ""
+        msg = {}
+        try:
+            approval = models.Approval.objects.get(resource_id=res_id)
+
+            if approval:
+                msg["creator_id"] = approval.creator_id
+                msg["create_date"] = str(approval.create_date)
+                status = approval.approval_status
+                msg["approval_status"] = status
+                if status == "success" or status == "failed":
+                    msg["approve_uid"] = approval.approve_uid
+                    msg["approve_date"] = str(approval.approve_date)
+                    msg["annotations"] = approval.annotations
+                code = 200
+            else:
+                code = 410
+                res = "A resource with that ID no longer exists"
+        except Exception as e:
+            code = 500
+        finally:
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+
+        return ret, code
+
+class CapacityReservation(Resource):
+
+
+    def post(self):
+        code = 0
+        res = ""
+        msg = {}
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str)
+        parser.add_argument('approve_uid', type=str)
+        parser.add_argument('compute_list', type=list, location='json')
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        approve_uid = args.approve_uid
+        try:
+            resource = models.ResourceModel.objects.get(res_id=resource_id)
+            item_info = models.ItemInformation.objects.get(item_name=resource.project)
+        except Exception as e:
+            print e
+            code = 410
+            res = "Failed to find the rsource"
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+            return ret, code
+
+        data = dict()
+        data['set_flag'] = 'res'
+        data['unit_id'] = resource.project_id
+        #data['network_id'] = resource.network_id.strip()
+        data['unit_name'] = resource.project
+        data['unit_des'] = ''
+        data['user_id'] = resource.user_id
+        data['username'] = resource.user_name
+        data['department'] = resource.department
+        data['created_time'] = str(resource.created_date)
+        data['resource_id'] = resource.res_id
+        data['resource_name'] = resource.resource_name
+        data['domain'] = resource.domain
+        data['env'] = resource.env
+        data['docker_network_id'] = resource.docker_network_id
+        data['mysql_network_id'] = resource.mysql_network_id
+        data['redis_network_id'] = resource.redis_network_id
+        data['mongodb_network_id'] = resource.mongodb_network_id
+        data['cmdb_repo_id'] = item_info.item_id
+        resource_list = resource.resource_list
+        compute_list = resource.compute_list
+        number = 0
+        if resource_list:
+            res = []
+            for db_res in resource_list:
+                res.append(
+                    {
+                        "instance_name": db_res.ins_name,
+                        "instance_id": db_res.ins_id,
+                        "instance_type": db_res.ins_type,
+                        "cpu": db_res.cpu,
+                        "mem": db_res.mem,
+                        "disk": db_res.disk,
+                        "quantity": 0,
+                        "version": db_res.version
+                    }
+                )
+            data['resource_list'] = res
+        if compute_list:
+            com = []
+            for db_com in compute_list:
+                # for i in range(0, db_com.quantity):
+                meta = json.dumps(db_com.docker_meta)
+                capacity_list = db_com.capacity_list
+                for capacity_ in capacity_list:
+                    if capacity_.capacity_id == approve_uid:
+                        number = capacity_.numbers
+                        com.append(
+                            {
+                                "instance_name": db_com.ins_name,
+                                "instance_id": db_com.ins_id,
+                                "cpu": db_com.cpu,
+                                "mem": db_com.mem,
+                                "image_url": db_com.url,
+                                 "quantity": number,
+                                 "domain": db_com.domain,
+                                 "port": db_com.port,
+                                 "domain_ip": db_com.domain_ip,
+                                 "meta": meta,
+                    }
+                )
+            data['compute_list'] = com
+
+        data_str = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
+        try:
+            approval = models.Approval.objects.get(approve_uid)
+            if approval.capacity_status=='increate':
+                CPR_URL = get_CRP_url(data['env'])
+                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+            elif approval.capacity_status == 'reduce':
+                reduce_list = random.sample(resource.os_ins_list, number)
+                crp_data = {
+                        "resources_id": resource.res_id,
+                        "os_inst_id_list": reduce_list,
+                        "vid_list": [],
+                        "set_flag": 'reduce'
+                }
+                env_ = get_CRP_url(resource.env)
+                crp_url = '%s%s'%(env_, 'api/resource/deletes')
+                crp_data = json.dumps(crp_data)
+                requests.delete(crp_url, data=crp_data)
+        except Exception as e:
+            res = "failed to connect CRP service."
+            code = 500
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
+            return ret, code
+        if msg.status_code != 202:
+            code = msg.status_code
+            res = "Failed to reserve resource."
+        else:
+            resource.reservation_status = "reserving"
+            resource.save()
+            code = 200
+            res = "Success in reserving resource."
+        ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
+        return ret, code
 
 
 approval_api.add_resource(ApprovalList, '/approvals')
@@ -456,3 +686,5 @@ approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
 approval_api.add_resource(Reservation, '/reservation')
 approval_api.add_resource(ReservationAPI, '/reservation/<string:res_id>')
 # approval_api.add_resource(ReservationMock, '/reservation')
+approval_api.add_resource(CapacityInfoAPI, '/capacity/approvals')
+approval_api.add_resource(CapacityReservation, '/capacity/reservation')
