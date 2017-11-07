@@ -1199,46 +1199,49 @@ class ResourceDeleteCallBack(Resource):
         try:
             os_inst_ip_dict={}
             resource = ResourceModel.objects.get(res_id=resource_id)
-            compute_list=resource.compute_list
-            os_ins_list=resource.os_ins_list
-            os_ins_ip_list=resource.os_ins_ip_list
-            new_compute_list = []
-            new_os_ins_list = []
-            new_os_ins_ip_list = []
-            for os_ins_ip in os_ins_ip_list:
-                if os_ins_ip["os_ins_id"]  == os_inst_id:
-                    ip=os_ins_ip["ip"]
-                    os_inst_ip_dict[os_inst_id]=ip
-                else:
-                    new_os_ins_ip_list.append(os_ins_ip)
-            for os_ins_id in os_ins_list:
-                if os_ins_id !=os_inst_id:
-                    new_os_ins_list.append(os_ins_id)
-            for compute in compute_list:
-                ips=compute.ips
-                ip=os_inst_ip_dict[os_inst_id]
-                if ip in ips:
-                    ips.remove(ip)
-                compute.ips=ips
-                new_compute_list.append(compute)
-            resource.compute_list=new_compute_list
-            resource.os_ins_list=new_os_ins_list
-            resource.os_ins_ip_list=new_os_ins_ip_list
-            resource.save()
-            status_record = StatusRecord()
-            status_record.created_time = datetime.datetime.now()
-            status_record.set_flag = "minus"
-            status_record.res_id=resource_id
-            status_record.status = "delete_success"
-            status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
-            status_record.s_type="docker"
-            status_record.unique_flag = unique_flag
-            status_record.save()
-            status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
-            if len(status_records) == quantity :
-                #要缩容的docker都删除完成,开始修改nginx的配置
-                deploy_type = "reduce"
-                deploy_nginx_to_crp(resource_id,deploy_type)
+            if resource:
+                compute_list=resource.compute_list
+                os_ins_list=resource.os_ins_list
+                os_ins_ip_list=resource.os_ins_ip_list
+                new_compute_list = []
+                new_os_ins_list = []
+                new_os_ins_ip_list = []
+                for os_ins_ip in os_ins_ip_list:
+                    if os_ins_ip["os_ins_id"]  == os_inst_id:
+                        ip=os_ins_ip["ip"]
+                        os_inst_ip_dict[os_inst_id]=ip
+                    else:
+                        new_os_ins_ip_list.append(os_ins_ip)
+                for os_ins_id in os_ins_list:
+                    if os_ins_id !=os_inst_id:
+                        new_os_ins_list.append(os_ins_id)
+                for compute in compute_list:
+                    ips=compute.ips
+                    ip=os_inst_ip_dict[os_inst_id]
+                    if ip in ips:
+                        ips.remove(ip)
+                    compute.ips=ips
+                    new_compute_list.append(compute)
+                resource.compute_list=new_compute_list
+                resource.os_ins_list=new_os_ins_list
+                resource.os_ins_ip_list=new_os_ins_ip_list
+                resource.save()
+                status_record = StatusRecord()
+                status_record.created_time = datetime.datetime.now()
+                status_record.set_flag = "minus"
+                status_record.res_id=resource_id
+                status_record.status = "delete_success"
+                status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
+                status_record.s_type="docker"
+                status_record.unique_flag = unique_flag
+                status_record.save()
+                status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
+                if len(status_records) == quantity :
+                    #要缩容的docker都删除完成,开始修改nginx的配置
+                    deploy_type = "reduce"
+                    deploy_nginx_to_crp(resource_id,deploy_type)
+            else:
+                logging.debug("UOP delete all instance and delete db record")
         except Exception as e:
             logging.exception("[UOP] Delete resource callback  failed, Excepton: %s", e.args)
             code = 500
