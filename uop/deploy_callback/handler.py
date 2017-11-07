@@ -147,10 +147,14 @@ class DeployStatusProviderCallBack(Resource):
     def post(cls):
         try:
             code = 2002
-            request_data=json.loads(request.data)
-            deploy_id=request_data.get('deploy_id')
-            deploy_type=request_data.get('deploy_type')
-            ip=request_data.get('ip')
+            parser = reqparse.RequestParser()
+            parser.add_argument('deploy_msg', type=bool, location='json')
+            parser.add_argument('deploy_id', type=str)
+            parser.add_argument('deploy_type', type=str)
+            args = parser.parse_args()
+            deploy_id = args.deploy_id
+            deploy_type = args.deploy_type
+            deploy_msg = args.deploy_msg
             dep = Deployment.objects.get(deploy_id=deploy_id)
             if dep:
                 resource_id=dep.resource_id
@@ -160,8 +164,8 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.res_id = resource_id
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
-                #if deploy_type == "deploy_docker":
-                #status_record.msg='%s:%s 部署完成'%(deploy_type,ip)
+                if deploy_msg:
+                    status_record.msg = '%s%s' % (deploy_type,deploy_msg)
                 status_record.created_time=datetime.datetime.now()
                 status_record.save()
                 dep.deploy_result=status_record.status
@@ -200,16 +204,33 @@ class DeployStatusProviderCallBack(Resource):
         code = 2002
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id',location='args')
+        parser.add_argument('res_id', location='args')
         args = parser.parse_args()
         deploy_id=args.deploy_id
+        resource_id = args.res_id
         try:
             data={}
             dep_msg_list=[]
-            status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
-            for sr in status_records:
-                s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                dep_msg_list.append(s_msg)
+            set_msg_list = []
+            del_msg_list = []
+            dep_status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
+            set_status_records = StatusRecord.objects.filter(res_id=resource_id,set_flag="increate").order_by('created_time')
+            del_status_records = StatusRecord.objects.filter(res_id=resource_id, set_flag="reduce").order_by('created_time')
+            if set_status_records:
+                for sr in set_status_records:
+                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                    set_msg_list.append(s_msg)
+            if del_status_records:
+                for sr in del_status_records:
+                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                    del_msg_list.append(s_msg)
+            if dep_status_records:
+                for sr in dep_status_records:
+                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
+                    dep_msg_list.append(s_msg)
             data["deploy"]=dep_msg_list
+            data["set"] = set_msg_list
+            data["del"] = del_msg_list
         except Exception as e:
             logging.exception("[UOP] Get deploy  callback msg failed, Excepton: %s", e.args)
             code = 500

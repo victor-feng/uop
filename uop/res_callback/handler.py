@@ -12,11 +12,13 @@ from flask_restful import reqparse, Api, Resource
 from flask import current_app
 
 from uop.res_callback import res_callback_blueprint
-from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic
+from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.res_callback.errors import res_callback_errors
+from uop.deployment.handler import attach_domain_ip
 from config import APP_ENV, configs
 from transitions import Machine
 from uop.util import async
+from uop.util import get_CRP_url
 #from uop.log import Log
 
 
@@ -873,6 +875,7 @@ Post Request JSON Body：
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
         error_msg=request_data.get('error_msg')
+        set_flag = request_data.get('set_flag')
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
 
@@ -948,6 +951,7 @@ Post Request JSON Body：
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type="set"
+            status_record.set_flag = set_flag
             status_record.created_time=datetime.datetime.now()
             if status == 'ok':
                 status_record.status="set_success"
@@ -958,6 +962,10 @@ Post Request JSON Body：
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
+            #判断是正常预留还是扩容set_flag=add 在nginx中添加扩容的docker
+            if set_flag == "increate":
+                deploy_type="increate"
+                deploy_nginx_to_crp(resource_id,deploy_type)
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
@@ -983,6 +991,47 @@ Post Request JSON Body：
         }
         return res, 200
 
+def deploy_nginx_to_crp(resource_id,deploy_type):
+    try:
+        app_image = []
+        resource = ResourceModel.objects.get(res_id=resource_id)
+        deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+        if len(deps) > 0:
+            dep = deps[0]
+            deploy_id = dep.deploy_id
+        compute_list = resource.compute_list
+        env = resource.env
+        for compute in compute_list:
+            app_dict = {}
+            cpu = str(compute.get("cpu", "2"))
+            mem = str(compute.get("cpu", "2"))
+            specifications = "%sC,%sG" % (cpu, mem)
+            app_dict["ins_id"] = compute.get("ins_id", "")
+            app_dict["port"] = compute.get("prot", "")
+            app_dict["ins_name"] = compute.get("ins_name", "")
+            app_dict["quantity"] = compute.get("quantity", 0)
+            app_dict["url"] = compute.get("url", "")
+            app_dict["domain"] = compute.get("domain", "")
+            app_dict["specifications"] = specifications
+            app_dict["meta"] = compute.get("meta", "")
+            app_image.append(app_dict)
+        appinfo = attach_domain_ip(app_image, resource)
+        data = {}
+        data["deploy_id"] = deploy_id
+        data["deploy_type"] = deploy_type
+        data["appinfo"] = appinfo
+        CPR_URL = get_CRP_url(env)
+        url = CPR_URL + "api/deploy/deploys"
+        headers = {'Content-Type': 'application/json',}
+        data_str = json.dumps(data)
+        logging.debug("Data args is " + str(data))
+        result = requests.put(url=url, headers=headers, data=data_str)
+        result = json.dumps(result.json())
+        logging.debug(result)
+    except Exception as e:
+        logging.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
+
+
 class ResourceStatusProviderCallBack(Resource):
     """
     资源预留状态记录回调
@@ -993,6 +1042,7 @@ class ResourceStatusProviderCallBack(Resource):
         request_data = json.loads(request.data)
         instance = request_data.get('instance', '')
         db_push = request_data.get('db_push', '')
+        set_flag = request_data.get('set_flag', '')
         try:
             if instance:
                 resource_id = instance.get('resource_id')
@@ -1031,6 +1081,7 @@ class ResourceStatusProviderCallBack(Resource):
                         status_record.s_type=cur_instance_type
                 setattr(status_record, cur_instance_type, cur_instance_type_list)
                 status_record.created_time=datetime.datetime.now()
+                status_record.set_flag = set_flag
                 status_record.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
                 resource.reservation_status = status_record.status
@@ -1044,6 +1095,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.status = '%s_success'%(cluster_type)
                 status_record.msg='%s配置推送完成'%(cluster_type)
                 status_record.created_time=datetime.datetime.now()
+                status_record.set_flag = set_flag
                 status_record.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
                 resource.reservation_status = status_record.status
@@ -1077,7 +1129,7 @@ class ResourceStatusProviderCallBack(Resource):
         args = parser.parse_args()
         resource_id=args.resource_id
         try:
-            status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
+            status_record = StatusRecord.objects.filter(res_id=resource_id,set_flag="res").order_by('created_time')
             set_msg_list=[]
             dep_msg_list=[]
             data={}
@@ -1106,8 +1158,7 @@ class ResourceStatusProviderCallBack(Resource):
                 else:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     set_msg_list.append(s_msg)
-                
-            data["set"]=set_msg_list         
+            data["set"]=set_msg_list
             data["deploy"]=dep_msg_list         
         except Exception as e:
             logging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
@@ -1132,5 +1183,87 @@ class ResourceStatusProviderCallBack(Resource):
         }
         return res, 200
 
+class ResourceDeleteCallBack(Resource):
+    def post(self):
+        code = 2002
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str)
+        parser.add_argument('os_inst_id', type=str)
+        parser.add_argument('unique_flag', type=str)
+        parser.add_argument('quantity', type=int)
+        args = parser.parse_args()
+        resource_id=args.resource_id
+        os_inst_id=args.os_inst_id
+        unique_flag=args.unique_flag
+        quantity=args.quantity
+        try:
+            os_inst_ip_dict={}
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            if resource:
+                compute_list=resource.compute_list
+                os_ins_list=resource.os_ins_list
+                os_ins_ip_list=resource.os_ins_ip_list
+                new_compute_list = []
+                new_os_ins_list = []
+                new_os_ins_ip_list = []
+                for os_ins_ip in os_ins_ip_list:
+                    if os_ins_ip["os_ins_id"]  == os_inst_id:
+                        ip=os_ins_ip["ip"]
+                        os_inst_ip_dict[os_inst_id]=ip
+                    else:
+                        new_os_ins_ip_list.append(os_ins_ip)
+                for os_ins_id in os_ins_list:
+                    if os_ins_id !=os_inst_id:
+                        new_os_ins_list.append(os_ins_id)
+                for compute in compute_list:
+                    ips=compute.ips
+                    ip=os_inst_ip_dict[os_inst_id]
+                    if ip in ips:
+                        ips.remove(ip)
+                    compute.ips=ips
+                    new_compute_list.append(compute)
+                resource.compute_list=new_compute_list
+                resource.os_ins_list=new_os_ins_list
+                resource.os_ins_ip_list=new_os_ins_ip_list
+                resource.save()
+                status_record = StatusRecord()
+                status_record.created_time = datetime.datetime.now()
+                status_record.set_flag = "minus"
+                status_record.res_id=resource_id
+                status_record.status = "delete_success"
+                status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
+                status_record.s_type="docker"
+                status_record.unique_flag = unique_flag
+                status_record.save()
+                status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
+                if len(status_records) == quantity :
+                    #要缩容的docker都删除完成,开始修改nginx的配置
+                    deploy_type = "reduce"
+                    deploy_nginx_to_crp(resource_id,deploy_type)
+            else:
+                logging.debug("UOP delete all instance and delete db record")
+        except Exception as e:
+            logging.exception("[UOP] Delete resource callback  failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource delete error.",
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "get msg success",
+            }
+        }
+        return res, 200
+
+
 res_callback_api.add_resource(ResourceProviderCallBack, '/res')
+res_callback_api.add_resource(ResourceDeleteCallBack, '/delete')
 res_callback_api.add_resource(ResourceStatusProviderCallBack, '/status')

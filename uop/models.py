@@ -325,6 +325,7 @@ class StatusRecord(db.Document):
     mysql = db.ListField(db.StringField())
     is_deleted = db.IntField(required=False, default=0)
     set_flag = db.StringField(default='')
+    unique_flag = db.StringField()
 
     meta = {
         'collection': 'status_record',
