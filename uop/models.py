@@ -309,6 +309,7 @@ class StatusRecord(db.Document):
     redis = db.ListField(db.StringField())
     mysql = db.ListField(db.StringField())
     is_deleted = db.IntField(required=False, default=0)
+    set_flag = db.StringField(default='')
 
     meta = {
         'collection': 'status_record',
