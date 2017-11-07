@@ -113,6 +113,8 @@ class ComputeIns(db.EmbeddedDocument):
     port = db.StringField(required=False)
     domain_ip = db.StringField(required=False)
     docker_meta = db.StringField(required=False)
+    capacity_list = db.ListField(db.EmbeddedDocumentField('Capacity'), default=[])
+
     meta = {
         'collection': 'compute_ins',
         'index': [
@@ -123,6 +125,16 @@ class ComputeIns(db.EmbeddedDocument):
             ],
         'index_background': True
         }
+
+class Capacity(db.EmbeddedDocument):
+    capacity_id = db.StringField(required=True, unique=True)
+    # 变更数 - 当前数
+    numbers = db.IntField(required=False)
+    created_date = db.DateTimeField(required=False)
+    network_id = db.StringField(required=False)
+    os_ins_ip_list = db.ListField(db.StringField(requeired=False))
+    capacity_status = db.ListField(db.StringField(default='res'))
+    application_status = db.ListField(db.StringField(default='increate'))
 
 
 class DBIns(db.EmbeddedDocument):
@@ -147,9 +159,7 @@ class DBIns(db.EmbeddedDocument):
 
 class OS_ip_dic(db.EmbeddedDocument):
     ip=db.StringField(required=True)
-    os_ins_id = db.StringField(required=True)
-    os_type = db.StringField(required=True)
-    cpu = db.StringField(required=False)
+    os_ins_id = db.StringField(requirquired=False)
     mem = db.StringField(required=False)
     meta = {
         'collection': 'os_ip_dic',
@@ -183,7 +193,7 @@ class ResourceModel(db.DynamicDocument):
     compute_list = db.ListField(db.EmbeddedDocumentField('ComputeIns'))
     cmdb_p_code = db.StringField(requeired=False)
     os_ins_list = db.ListField(db.StringField(requeired=False))
-    os_ins_ip_list=db.ListField(db.EmbeddedDocumentField('OS_ip_dic'))
+    os_ins_ip_list = db.ListField(db.EmbeddedDocumentField('OS_ip_dic'))
     vid_list = db.ListField(db.StringField(requeired=False))
     is_rollback = db.IntField(required=False, default=0)
     is_deleted = db.IntField(required=False, default=0)
@@ -192,6 +202,7 @@ class ResourceModel(db.DynamicDocument):
     mysql_network_id = db.StringField(required=False)
     redis_network_id = db.StringField(required=False)
     mongodb_network_id = db.StringField(required=False)
+
 
 
     meta = {
@@ -208,7 +219,7 @@ class ResourceModel(db.DynamicDocument):
 
 class Approval(db.DynamicDocument):
     approval_id = db.StringField(required=True, max_length=50, unique=True)
-    resource_id = db.StringField(required=True, unique=True)
+    resource_id = db.StringField(required=True)
     project_id = db.StringField(required=True)
     department_id = db.StringField(required=True)
     creator_id = db.StringField(required=True)
@@ -218,6 +229,8 @@ class Approval(db.DynamicDocument):
     # processing/success/failed
     approval_status = db.StringField(required=True)
     annotations = db.StringField(max_length=50, required=False)
+    capacity_status = db.StringField(required=False, default='res')
+
     meta = {
         'collection': 'approval',
         'index': [
