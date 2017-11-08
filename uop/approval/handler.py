@@ -508,39 +508,6 @@ class CapacityInfoAPI(Resource):
 
         return ret, code
 
-    def get(self, res_id):
-        code = 0
-        res = ""
-        msg = {}
-        try:
-            approval = models.Approval.objects.get(resource_id=res_id)
-
-            if approval:
-                msg["creator_id"] = approval.creator_id
-                msg["create_date"] = str(approval.create_date)
-                status = approval.approval_status
-                msg["approval_status"] = status
-                if status == "success" or status == "failed":
-                    msg["approve_uid"] = approval.approve_uid
-                    msg["approve_date"] = str(approval.approve_date)
-                    msg["annotations"] = approval.annotations
-                code = 200
-            else:
-                code = 410
-                res = "A resource with that ID no longer exists"
-        except Exception as e:
-            code = 500
-        finally:
-            ret = {
-                "code": code,
-                "result": {
-                    "res": res,
-                    "msg": msg
-                }
-            }
-
-        return ret, code
-
 class CapacityReservation(Resource):
     
     def post(self):
