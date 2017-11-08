@@ -979,8 +979,7 @@ Post Request JSON Body：
             resource.save()
             #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
             if set_flag == "increate":
-                deploy_type="increate"
-                deploy_nginx_to_crp(resource_id,deploy_type)
+                deploy_nginx_to_crp(resource_id,set_flag)
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
@@ -1006,7 +1005,7 @@ Post Request JSON Body：
         }
         return res, 200
 
-def deploy_nginx_to_crp(resource_id,deploy_type):
+def deploy_nginx_to_crp(resource_id,set_flag):
     try:
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
@@ -1034,7 +1033,7 @@ def deploy_nginx_to_crp(resource_id,deploy_type):
         appinfo = attach_domain_ip(app_image, resource)
         data = {}
         data["deploy_id"] = deploy_id
-        data["deploy_type"] = deploy_type
+        data["set_flag"] = set_flag
         data["appinfo"] = appinfo
         CPR_URL = get_CRP_url(env)
         url = CPR_URL + "api/deploy/deploys"
@@ -1305,12 +1304,12 @@ class ResourceDeleteCallBack(Resource):
                     deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                     dep = deps[0]
                     deploy_id=dep.deploy_id
-                    create_status_record(resource_id, deploy_id, "reduce", "缩容成功", "reduce_success")
+                    create_status_record(resource_id, deploy_id, "reduce", "缩容成功", "reduce_success","reduce")
                     dep.deploy_result = "reduce_success"
                     dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
-                    deploy_type = "reduce"
-                    deploy_nginx_to_crp(resource_id, deploy_type)
+                    set_flag = "reduce"
+                    deploy_nginx_to_crp(resource_id, set_flag)
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
                     data=[]
                     ip_list=[]
