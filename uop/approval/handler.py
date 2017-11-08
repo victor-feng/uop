@@ -461,6 +461,7 @@ class CapacityInfoAPI(Resource):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('approval_id', type=str)
+            parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
             parser.add_argument('docker_network_id', type=str)
