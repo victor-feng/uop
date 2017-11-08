@@ -87,7 +87,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('mongodb_network_id', type=str)
             args = parser.parse_args()
             
-            approval = models.Approval.objects.get(resource_id=res_id)
+            approval = models.Approval.objects.filter(capacity_status="res").get(resource_id=res_id)
             resource = models.ResourceModel.objects.get(res_id=res_id)
             if approval:
                 approval.approve_uid = args.approve_uid
@@ -136,7 +136,7 @@ class ApprovalInfo(Resource):
         res = ""
         msg = {}
         try:
-            approval = models.Approval.objects.get(resource_id=res_id)
+            approval = models.Approval.filter(capacity_status="res").objects.get(resource_id=res_id)
 
             if approval:
                 msg["creator_id"] = approval.creator_id
@@ -486,7 +486,6 @@ class CapacityInfoAPI(Resource):
                         for capacity_ in capacity_list:
                             if capacity_.capacity_id == approve_uid:
                                 capacity_.network_id = docker_network_id.strip()
-                                capacity_.application_status = 'success'
                 else:
                     approval.approval_status = "%s_failed"%(capacity_status)
                 approval.save()

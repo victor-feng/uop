@@ -127,14 +127,12 @@ class ComputeIns(db.EmbeddedDocument):
         }
 
 class Capacity(db.EmbeddedDocument):
-    capacity_id = db.StringField(required=True, unique=True)
+    capacity_id = db.StringField(required=False)
     # 变更数 - 当前数
     numbers = db.IntField(required=False)
     created_date = db.DateTimeField(required=False)
-    network_id = db.StringField(required=False)
+    network_id = db.StringField(required=False, default="")
     os_ins_ip_list = db.ListField(db.StringField(requeired=False))
-    capacity_status = db.ListField(db.StringField(default='res'))
-    application_status = db.ListField(db.StringField(default='increate'))
 
 
 class DBIns(db.EmbeddedDocument):

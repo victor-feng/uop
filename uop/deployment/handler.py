@@ -1166,7 +1166,6 @@ class CapacityAPI(Resource):
                         capacity = Capacity()
                         capacity.numbers = num
                         capacity.created_date = datetime.datetime.now()
-                        capacity.capacity_status = capacity_status
                         approval_id = str(uuid.uuid1())
                         capacity.capacity_id = approval_id
                         capacity_list = compute_.capacity_list
@@ -1255,11 +1254,10 @@ class CapacityInfoAPI(Resource):
                     capacity_list = compute_.capacity_list
                     for capacity_ in capacity_list:
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
-                                   'port':compute_.port, 'env': resource.env }
+                                   'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
                         if capacity_.capacity_id == app_id:
                             rst.append(tmp)
-                        if capacity_.application_status == 'success':
-                            cur_capacity_list.append(tmp)
+                        cur_capacity_list.append(tmp)
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
                 else:
