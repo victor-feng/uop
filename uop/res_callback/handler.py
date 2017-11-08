@@ -960,11 +960,19 @@ Post Request JSON Body：
             status_record.set_flag = set_flag
             status_record.created_time=datetime.datetime.now()
             if status == 'ok':
-                status_record.status="set_success"
-                status_record.msg="预留成功"
+                if set_flag == "res":
+                    status_record.status="set_success"
+                    status_record.msg="预留成功"
+                if set_flag == "increate":
+                    status_record.status="increate_success"
+                    status_record.msg="扩容成功"
             else:
-                status_record.status="set_fail"
-                status_record.msg="预留失败,错误日志为: %s" % error_msg
+                if set_flag == "res":
+                    status_record.status="set_fail"
+                    status_record.msg="预留失败,错误日志为: %s" % error_msg
+                elif set_flag == "increate":
+                    status_record.status = "increate_fail"
+                    status_record.msg = "扩容失败,错误日志为: %s" % error_msg
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
@@ -1057,6 +1065,9 @@ class ResourceStatusProviderCallBack(Resource):
                 instance_type = instance.get('instance_type')
                 quantity = int(instance.get('quantity', '0'))
                 cur_instance_type = mapping_type_status.get(instance_type, '')
+                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                dep = deps[0]
+                deploy_id = dep.deploy_id
                 status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type)
                 if status_record:
                     status_record=status_record[0]
@@ -1064,26 +1075,46 @@ class ResourceStatusProviderCallBack(Resource):
                     if quantity > 1:
                         if len(cur_instance_type_list)==(quantity-1):
                             status_record.s_type=cur_instance_type
-                            status_record.status = '%s_success'%(cur_instance_type)
-                            status_record.msg='%s预留完成'%(cur_instance_type)
+                            if set_flag == "res":
+                                status_record.status = '%s_success'%(cur_instance_type)
+                                status_record.msg='%s预留完成'%(cur_instance_type)
+                            elif set_flag == "increate":
+                                status_record.status = '%s_success' % "docker_increate"
+                                status_record.msg = '%s扩容完成' % "docker"
+                                status_record.deploy_id=deploy_id
                             cur_instance_type_list.append(os_inst_id)
                         else:
                             cur_instance_type_list.append(os_inst_id)
-                            status_record.status = '%s_reserving'%(cur_instance_type)
-                            status_record.msg='%s预留中'%(cur_instance_type)
+                            if set_flag == "res":
+                                status_record.status = '%s_reserving'%(cur_instance_type)
+                                status_record.msg='%s预留中'%(cur_instance_type)
+                            elif set_flag == "increate":
+                                status_record.status = '%s_reserving' % "docker_increate"
+                                status_record.msg = '%s扩容中' % "docker"
+                                status_record.deploy_id = deploy_id
                             status_record.s_type=cur_instance_type
                     
                 else:
                     status_record = StatusRecord()
                     status_record.res_id = resource_id
                     if quantity > 1:
-                        status_record.status = '%s_reserving'%(cur_instance_type)
-                        status_record.msg='%s预留中'%(cur_instance_type)
+                        if set_flag == "res":
+                            status_record.status = '%s_reserving'%(cur_instance_type)
+                            status_record.msg='%s预留中'%(cur_instance_type)
+                        elif set_flag == "increate":
+                            status_record.status = '%s_reserving' % "docker_increate"
+                            status_record.msg = '%s扩容中' % "docker"
+                            status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
                     else:
-                        status_record.status = '%s_success'%(cur_instance_type)
-                        status_record.msg='%s预留完成'%(cur_instance_type)
+                        if set_flag == "res":
+                            status_record.status = '%s_success'%(cur_instance_type)
+                            status_record.msg='%s预留完成'%(cur_instance_type)
+                        elif set_flag == "increate":
+                            status_record.status = '%s_success' % "docker_increate"
+                            status_record.msg = '%s扩容完成' % "docker"
+                            status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]        
                         status_record.s_type=cur_instance_type
                 setattr(status_record, cur_instance_type, cur_instance_type_list)
@@ -1136,21 +1167,23 @@ class ResourceStatusProviderCallBack(Resource):
         args = parser.parse_args()
         resource_id=args.resource_id
         try:
-            status_record = StatusRecord.objects.filter(res_id=resource_id,set_flag="res").order_by('created_time')
+            set_status_record = StatusRecord.objects.filter(res_id=resource_id,set_flag="res").order_by('created_time')
+            increate_status_record = StatusRecord.objects.filter(res_id=resource_id, set_flag="increate").order_by('created_time')
+            reduce_status_record = StatusRecord.objects.filter(res_id=resource_id, set_flag="reduce").order_by('created_time')
             set_msg_list=[]
             dep_msg_list=[]
             data={}
             status_record_fail_list=[]
             status_record_success_list=[]
             status_records=[]
-            for sr in status_record:
+            for sr in set_status_record:
                 s_status=sr.status
                 if s_status in ["set_fail"]:
                     status_record_fail_list.append(sr)
                 else:
                     status_record_success_list.append(sr)
             if len(status_record_fail_list) > 0 and len(status_record_success_list) > 0:
-                for sr in status_record:
+                for sr in set_status_record:
                     if sr not in status_record_fail_list:
                         status_records.append(sr)
             elif len(status_record_fail_list) > 0 and len(status_record_success_list) == 0:
@@ -1165,6 +1198,12 @@ class ResourceStatusProviderCallBack(Resource):
                 else:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     set_msg_list.append(s_msg)
+            for in_sr in increate_status_record:
+                in_s_msg = in_sr.created_time.strftime('%Y-%m-%d %H:%M:%S') + ':' + in_sr.msg
+                dep_msg_list.append(in_s_msg)
+            for re_sr in reduce_status_record:
+                re_s_msg = in_sr.created_time.strftime('%Y-%m-%d %H:%M:%S') + ':' + re_sr.msg
+                dep_msg_list.append(re_s_msg)
             data["set"]=set_msg_list
             data["deploy"]=dep_msg_list         
         except Exception as e:

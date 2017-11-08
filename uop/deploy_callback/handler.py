@@ -211,26 +211,22 @@ class DeployStatusProviderCallBack(Resource):
         try:
             data={}
             dep_msg_list=[]
-            set_msg_list = []
-            del_msg_list = []
             dep_status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
             set_status_records = StatusRecord.objects.filter(res_id=resource_id,set_flag="increate").order_by('created_time')
             del_status_records = StatusRecord.objects.filter(res_id=resource_id, set_flag="reduce").order_by('created_time')
             if set_status_records:
                 for sr in set_status_records:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                    set_msg_list.append(s_msg)
+                    dep_msg_list.append(s_msg)
             if del_status_records:
                 for sr in del_status_records:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                    del_msg_list.append(s_msg)
+                    dep_msg_list.append(s_msg)
             if dep_status_records:
                 for sr in dep_status_records:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     dep_msg_list.append(s_msg)
             data["deploy"]=dep_msg_list
-            data["set"] = set_msg_list
-            data["del"] = del_msg_list
         except Exception as e:
             logging.exception("[UOP] Get deploy  callback msg failed, Excepton: %s", e.args)
             code = 500
