@@ -1163,7 +1163,8 @@ class CapacityAPI(Resource):
                             capacity_status = 'reduce'
                         capacity = Capacity()
                         capacity.numbers = num
-                        capacity.created_date = datetime.datetime.now()
+                        create_date = datetime.datetime.now()
+                        capacity.created_date = create_date
                         approval_id = str(uuid.uuid1())
                         capacity.capacity_id = approval_id
                         capacity_list = compute_.capacity_list
@@ -1171,7 +1172,6 @@ class CapacityAPI(Resource):
                         compute_.capacity_list = capacity_list
                         resource.save()
 
-                        create_date = datetime.datetime.now()
                         approval_status = '%sing'%(capacity_status)
                         Approval(approval_id=approval_id, resource_id=res_id,
                             project_id=project_id,department_id=department_id,
