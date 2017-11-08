@@ -1273,6 +1273,7 @@ class CapacityInfoAPI(Resource):
         args = parser.parse_args()
         approval_id = args.approval_id
         res_id = args.res_id
+        rst_dict = {}
         rst = []
         cur_capacity_list = []
         try:
@@ -1282,18 +1283,21 @@ class CapacityInfoAPI(Resource):
                 for compute_ in compute_list:
                     capacity_list = compute_.capacity_list
                     for capacity_ in capacity_list:
-                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
-                                   'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
+                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
+                                   'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id, "quantity": compute_.quantity }
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
+                            tmp["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
                         if tmp_app:
                             cur_capacity_list.append(tmp)
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
-
                 rst.insert(0, cur_data)
+                rst_dict["resource_name"] = resource.resource_name
+                rst_dict["project"] = resource.project
+                rst_dict["compute_list"] = rst
         except Exception as e:
             res = {
                 "code": 400,
@@ -1304,7 +1308,7 @@ class CapacityInfoAPI(Resource):
             }
             return res, 400
         else:
-            return rst, 200
+            return rst_dict, 200
 
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
