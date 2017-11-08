@@ -8,6 +8,7 @@ import os
 import logging
 import random
 
+import copy
 from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
@@ -1287,17 +1288,20 @@ class CapacityInfoAPI(Resource):
                                    'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id, "quantity": compute_.quantity }
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
-                            tmp["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
-                            rst.append(tmp)
+                            tmp2= copy.deepcopy(tmp)
+                            tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
+                            rst.append(tmp2)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
                         if tmp_app:
-                            cur_capacity_list.append(tmp)
+                            cur_capacity_list.append(tmp2)
+
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
                 rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
                 rst_dict["project"] = resource.project
                 rst_dict["compute_list"] = rst
+                rst_dict["env"] = resource.env
         except Exception as e:
             res = {
                 "code": 400,
