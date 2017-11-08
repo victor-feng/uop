@@ -149,13 +149,15 @@ class DeployStatusProviderCallBack(Resource):
         try:
             code = 2002
             parser = reqparse.RequestParser()
-            parser.add_argument('deploy_msg', type=bool, location='json')
+            parser.add_argument('deploy_msg', type=str)
             parser.add_argument('deploy_id', type=str)
             parser.add_argument('deploy_type', type=str)
+            parser.add_argument('set_flag', type=str)
             args = parser.parse_args()
             deploy_id = args.deploy_id
             deploy_type = args.deploy_type
             deploy_msg = args.deploy_msg
+            set_flag = args.set_flag
             dep = Deployment.objects.get(deploy_id=deploy_id)
             if dep:
                 resource_id=dep.resource_id
@@ -163,7 +165,7 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.deploy_id = deploy_id
                 status_record.s_type=deploy_type
                 status_record.res_id = resource_id
-                status_record.set_flag = "res"
+                status_record.set_flag = set_flag
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
                 if deploy_msg:
