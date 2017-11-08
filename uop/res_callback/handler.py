@@ -1129,7 +1129,7 @@ class ResourceStatusProviderCallBack(Resource):
                 resource.save()
                 if set_flag == "increate":
                     dep.deploy_result=status_record.status
-                dep.save()
+                    dep.save()
             if db_push:
                 resource_id = db_push.get('resource_id')
                 cluster_type = db_push.get('cluster_type')
