@@ -895,7 +895,7 @@ Post Request JSON Body：
                                     ip=ins.get('ip')
                                     ips.append(ip)
                                 j.ips=ips
-                                j.quanity=len(ips)
+                                j.quantity=len(ips)
 
                 property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                               request_data)
