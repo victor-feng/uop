@@ -621,6 +621,7 @@ class CapacityReservation(Resource):
                         com.append(
                             {
                                 "instance_name": db_com.ins_name,
+                                "capacity_id": capacity_.capacity_id,
                                 "instance_id": db_com.ins_id,
                                 "cpu": db_com.cpu,
                                 "mem": db_com.mem,
