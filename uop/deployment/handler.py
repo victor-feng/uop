@@ -1221,7 +1221,7 @@ class CapacityAPI(Resource):
                 for compute_ in compute_list:
                     quantity = compute_.quantity
                     ins_name = compute_.ins_name
-                    rst.append({"quantity": quantity, "ins_name": ins_name, 'res_id': res_id, "ins_id": compute_.ins_id})
+                    rst.append({"quantity": quantity, "ins_name": ins_name, 'res_id': res_id, "ins_id": compute_.ins_id, "resource_name": resource.resource_name})
         except Exception as e:
             res = {
                 "code": 400,
