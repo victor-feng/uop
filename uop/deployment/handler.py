@@ -1282,8 +1282,8 @@ class CapacityInfoAPI(Resource):
                 for compute_ in compute_list:
                     capacity_list = compute_.capacity_list
                     for capacity_ in capacity_list:
-                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
-                                   'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
+                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
+                                   'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id, "quantity": compute_.quantity , "resource_name": resource.resource_name}
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
                             rst.append(tmp)
