@@ -472,6 +472,7 @@ class CapacityInfoAPI(Resource):
             capacity_status = args.capacity_status
 
             approval = models.Approval.objects.get(approval_id=approve_uid)
+            deployment = models.Deployment.objects.get(deploy_id=approve_uid)
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
@@ -479,17 +480,20 @@ class CapacityInfoAPI(Resource):
                 docker_network_id = args.docker_network_id
                 if args.agree:
                     approval.approval_status = "%s_success"%(capacity_status)
-                    resource = Resource.objects.get(res_id=res_id)
+                    resource = models.ResourceModel.objects.get(res_id=res_id)
                     compute_list = resource.compute_list
                     for compute_ in compute_list:
                         capacity_list = compute_.capacity_list
                         for capacity_ in capacity_list:
                             if capacity_.capacity_id == approve_uid:
                                 capacity_.network_id = docker_network_id.strip()
+                    deployment.approve_status = "%s_success"%(capacity_status)
                 else:
                     approval.approval_status = "%s_failed"%(capacity_status)
+                    deployment.approve_status = "%s_failed"%(capacity_status)
                 approval.save()
                 resource.save()
+                deployment.save()
                 code = 200
             else:
                 code = 410

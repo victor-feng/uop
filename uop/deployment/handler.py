@@ -1141,6 +1141,9 @@ class CapacityAPI(Resource):
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
         parser.add_argument('project_id', type=str)
+        parser.add_argument('initiator', type=str)
+        parser.add_argument('project_name', type=str)
+
         args = parser.parse_args()
         project_id = args.project_id
         department_id = args.department_id
@@ -1148,6 +1151,8 @@ class CapacityAPI(Resource):
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
+        initiator = args.initiator
+        project_name = args.project_name
         try:
             resources = ResourceModel.objects.filter(res_id=res_id)
             if len(resources):
@@ -1161,17 +1166,41 @@ class CapacityAPI(Resource):
                         else:
                             num = int(compute_.quantity) - int(number)
                             capacity_status = 'reduce'
-                        capacity = Capacity()
-                        capacity.numbers = num
-                        create_date = datetime.datetime.now()
                         approval_id = str(uuid.uuid1())
-                        capacity.capacity_id = approval_id
+                        capacity = Capacity(capacity_id=approval_id, numbers=num)
                         capacity_list = compute_.capacity_list
                         capacity_list.append(capacity)
-                        compute_.capacity_list = capacity_list
                         resource.save()
 
                         approval_status = '%sing'%(capacity_status)
+                        create_date = datetime.datetime.now()
+                        deploy_item = Deployment(
+                            deploy_id=approval_id,
+                            deploy_name=resource.resource_name,
+                            initiator=initiator,
+                            user_id=creator_id,
+                            project_id=project_id,
+                            project_name=project_name,
+                            resource_id=res_id,
+                            resource_name=resource.resource_name,
+                            created_time=create_date,
+                            environment=resource.env,
+                            release_notes='',
+                            mysql_tag='',
+                            mysql_context='',
+                            redis_tag='',
+                            redis_context='',
+                            mongodb_tag='',
+                            mongodb_context='',
+                            app_image=str(compute_.url),
+                            deploy_result="deploy_to_approve",
+                            apply_status="success",
+                            approve_status=approval_status,
+                            approve_suggestion='',
+                            database_password='',
+                            disconf_list=[]
+                        )
+                        deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
                             project_id=project_id,department_id=department_id,
                             creator_id=creator_id,create_date=create_date,
