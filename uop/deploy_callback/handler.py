@@ -71,6 +71,7 @@ class DeployCallback(Resource):
         status_record.res_id = resource_id
         status_record.deploy_id = deploy_id
         status_record.s_type="deploy_docker"
+        status_record.set_flag = "res"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
             dep.deploy_result="deploy_docker_success"
@@ -96,10 +97,10 @@ class DeployCallback(Resource):
         #    create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
         if res_status == True and end_flag == True:
             dep.deploy_result = "deploy_success"
-            create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success")
+            create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success","res")
         elif res_status == False and end_flag == True:
             dep.deploy_result = "deploy_fail"
-            create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail")
+            create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail","res")
         dep.save()
 
 
@@ -162,6 +163,7 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.deploy_id = deploy_id
                 status_record.s_type=deploy_type
                 status_record.res_id = resource_id
+                status_record.set_flag = "res"
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
                 if deploy_msg:
@@ -264,12 +266,13 @@ def get_deploy_status(deploy_id):
     except Exception as e:
         logging.exception("[UOP] get_deploy_status failed, Excepton: %s", e.args)
      
-def create_status_record(resource_id,deploy_id,s_type,msg,status):
+def create_status_record(resource_id,deploy_id,s_type,msg,status,set_flag):
     try:
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.deploy_id = deploy_id
         status_record.s_type=s_type
+        status_record.set_flag = set_flag
         status_record.created_time=datetime.datetime.now()
         status_record.msg=msg
         status_record.status=status
