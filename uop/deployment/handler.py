@@ -1164,7 +1164,6 @@ class CapacityAPI(Resource):
                         capacity = Capacity()
                         capacity.numbers = num
                         create_date = datetime.datetime.now()
-                        capacity.created_date = create_date
                         approval_id = str(uuid.uuid1())
                         capacity.capacity_id = approval_id
                         capacity_list = compute_.capacity_list

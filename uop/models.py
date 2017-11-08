@@ -130,9 +130,8 @@ class Capacity(db.EmbeddedDocument):
     capacity_id = db.StringField(required=False)
     # 变更数 - 当前数
     numbers = db.IntField(required=False)
-    created_date = db.DateTimeField(required=False)
+    created_date = db.DateTimeField(default=datetime.datetime.now())
     network_id = db.StringField(required=False, default="")
-    os_ins_ip_list = db.ListField(db.StringField(requeired=False))
 
 
 class DBIns(db.EmbeddedDocument):
