@@ -889,7 +889,13 @@ Post Request JSON Body：
                     for i in container:
                         for j in resource.compute_list:
                             if i.get('ins_id') == j.ins_id:
-                                j.ips = [ins.get('ip') for ins in i.get('instance')]
+                                #j.ips = [ins.get('ip') for ins in i.get('instance')]
+                                ips=j.ips
+                                for ins in i.get('instance'):
+                                    ip=ins.get('ip')
+                                    ips.append(ip)
+                                j.ips=ips
+                                j.quanity=len(ips)
 
                 property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                               request_data)
@@ -1223,10 +1229,13 @@ class ResourceDeleteCallBack(Resource):
                         new_os_ins_list.append(os_ins_id)
                 for compute in compute_list:
                     ips=compute.ips
+                    quantity=compute.quantity
                     ip=os_inst_ip_dict[os_inst_id]
                     if ip in ips:
                         ips.remove(ip)
+                        quantity = quantity - 1
                     compute.ips=ips
+                    compute.quantity=quantity
                     new_compute_list.append(compute)
                 resource.compute_list=new_compute_list
                 resource.os_ins_list=new_os_ins_list
