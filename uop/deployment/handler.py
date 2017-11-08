@@ -1255,7 +1255,9 @@ class CapacityInfoAPI(Resource):
                                    'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
                         if capacity_.capacity_id == app_id:
                             rst.append(tmp)
-                        cur_capacity_list.append(tmp)
+                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
+                        if tmp_app:
+                            cur_capacity_list.append(tmp)
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
                 else:
