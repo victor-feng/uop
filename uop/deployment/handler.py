@@ -1174,33 +1174,36 @@ class CapacityAPI(Resource):
 
                         approval_status = '%sing'%(capacity_status)
                         create_date = datetime.datetime.now()
-                        deploy_item = Deployment(
-                            deploy_id=approval_id,
-                            deploy_name=resource.resource_name,
-                            initiator=initiator,
-                            user_id=creator_id,
-                            project_id=project_id,
-                            project_name=project_name,
-                            resource_id=res_id,
-                            resource_name=resource.resource_name,
-                            created_time=create_date,
-                            environment=resource.env,
-                            release_notes='',
-                            mysql_tag='',
-                            mysql_context='',
-                            redis_tag='',
-                            redis_context='',
-                            mongodb_tag='',
-                            mongodb_context='',
-                            app_image=str(compute_.url),
-                            deploy_result="deploy_to_approve",
-                            apply_status="success",
-                            approve_status=approval_status,
-                            approve_suggestion='',
-                            database_password='',
-                            disconf_list=[]
-                        )
-                        deploy_item.save()
+                        deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
+                        if deployments:
+                            old_deployment = deployments[0]
+                            deploy_item = Deployment(
+                                deploy_id=approval_id,
+                                deploy_name=old_deployment.deploy_name,
+                                initiator=old_deployment.initiator,
+                                user_id=old_deployment.user_id,
+                                project_id=old_deployment.project_id,
+                                project_name=old_deployment.project_name,
+                                resource_id=old_deployment.resource_id,
+                                resource_name=old_deployment.resource_name,
+                                created_time=old_deployment.create_date,
+                                environment=old_deployment.environment,
+                                release_notes=old_deployment.release_notes,
+                                mysql_tag=old_deployment.mysql_tag,
+                                mysql_context=old_deployment.mysql_context,
+                                redis_tag=old_deployment.redis_tag,
+                                redis_context=old_deployment.redis_context,
+                                mongodb_tag=old_deployment.mongodb_tag,
+                                mongodb_context=old_deployment.mongodb_context,
+                                app_image=old_deployment.app_image,
+                                deploy_result="deploy_to_approve",
+                                apply_status="success",
+                                approve_status=approval_status,
+                                approve_suggestion=old_deployment.approve_suggestion,
+                                database_password=old_deployment.database_password,
+                                disconf_list=old_deployment.disconf_list
+                            )
+                            deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
                             project_id=project_id,department_id=department_id,
                             creator_id=creator_id,create_date=create_date,
