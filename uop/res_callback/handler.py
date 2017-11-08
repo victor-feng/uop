@@ -15,6 +15,7 @@ from uop.res_callback import res_callback_blueprint
 from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.res_callback.errors import res_callback_errors
 from uop.deployment.handler import attach_domain_ip
+from uop.deploy_callback.handler import create_status_record
 from config import APP_ENV, configs
 from transitions import Machine
 from uop.util import async
@@ -1122,8 +1123,12 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.set_flag = set_flag
                 status_record.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.reservation_status = status_record.status
+                if set_flag == "res":
+                    resource.reservation_status = status_record.status
                 resource.save()
+                if set_flag == "increate":
+                    dep.deploy_result=status_record.status
+                dep.save()
             if db_push:
                 resource_id = db_push.get('resource_id')
                 cluster_type = db_push.get('cluster_type')
@@ -1285,13 +1290,23 @@ class ResourceDeleteCallBack(Resource):
                 status_record.created_time = datetime.datetime.now()
                 status_record.set_flag = "reduce"
                 status_record.res_id=resource_id
-                status_record.status = "delete_success"
+                status_record.status = "docker_reduce_success"
                 status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
                 status_record.s_type="docker"
                 status_record.unique_flag = unique_flag
                 status_record.save()
+                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                dep = deps[0]
+                dep.deploy_result = "docker_reduce_success"
+                dep.save()
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 if len(status_records) == quantity :
+                    deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                    dep = deps[0]
+                    deploy_id=dep.deploy_id
+                    create_status_record(resource_id, deploy_id, "reduce", "缩容成功", "reduce_success")
+                    dep.deploy_result = "reduce_success"
+                    dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     deploy_type = "reduce"
                     deploy_nginx_to_crp(resource_id, deploy_type)
