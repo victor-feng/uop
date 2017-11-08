@@ -1285,6 +1285,8 @@ class CapacityInfoAPI(Resource):
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
                                    'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
                         if capacity_.capacity_id == approval_id:
+                            cluster_id = compute_.ins_id
+                            ins_name = compute_.ins_name
                             rst.append(tmp)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
                         if tmp_app:
@@ -1292,7 +1294,7 @@ class CapacityInfoAPI(Resource):
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
                 else:
-                    cur_data = {'cluster_id': resource.ins_id, 'ins_name': resource.ins_name, 'cpu': resource.cpu, 'mem': resource.mem, 'domain': resource.domain,
+                    cur_data = {'cluster_id': cluster_id, 'ins_name': ins_name, 'cpu': resource.cpu, 'mem': resource.mem, 'domain': resource.domain,
                                    'port':resource.port, 'env': resource.env }
                 rst.append(cur_data)
         except Exception as e:
