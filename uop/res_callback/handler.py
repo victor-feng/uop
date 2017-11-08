@@ -999,13 +999,11 @@ Post Request JSON Body：
 
 def deploy_nginx_to_crp(resource_id,deploy_type):
     try:
-        app_image = []
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-        if len(deps) > 0:
-            dep = deps[0]
-            deploy_id = dep.deploy_id
-            app_image=dep.app_image
+        dep = deps[0]
+        deploy_id = dep.deploy_id
+        app_image=dep.app_image
         #compute_list = resource.compute_list
         env = resource.env
         """
@@ -1200,13 +1198,13 @@ class ResourceDeleteCallBack(Resource):
         parser.add_argument('os_inst_id', type=str)
         parser.add_argument('unique_flag', type=str)
         parser.add_argument('quantity', type=int)
-        parser.add_argument('os_ins_ip_list', type=int,location=json)
+        parser.add_argument('del_os_ins_ip_list', type=int,location=json)
         args = parser.parse_args()
         resource_id=args.resource_id
         os_inst_id=args.os_inst_id
         unique_flag=args.unique_flag
         quantity=args.quantity
-        del_os_ins_ip_list=args.os_ins_ip_list
+        del_os_ins_ip_list=args.del_os_ins_ip_list
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
