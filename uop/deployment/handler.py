@@ -378,7 +378,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('environment', type=str, location='args')
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
-        parser.add_argument('approval_status', type=str, location='args')
+        parser.add_argument('approve_status', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -401,8 +401,8 @@ class DeploymentListAPI(Resource):
         if args.start_time and args.end_time:
             condition['created_time__gte'] = args.start_time
             condition['created_time__lte'] = args.end_time
-        if args.approval_status:
-            condition['approve_status'] = args.approval_status
+        if args.approve_status:
+            condition['approve_status'] = args.approve_status
 
         deployments = []
         try:
@@ -1141,6 +1141,9 @@ class CapacityAPI(Resource):
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
         parser.add_argument('project_id', type=str)
+        parser.add_argument('initiator', type=str)
+        parser.add_argument('project_name', type=str)
+
         args = parser.parse_args()
         project_id = args.project_id
         department_id = args.department_id
@@ -1148,6 +1151,8 @@ class CapacityAPI(Resource):
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
+        initiator = args.initiator
+        project_name = args.project_name
         try:
             resources = ResourceModel.objects.filter(res_id=res_id)
             if len(resources):
@@ -1161,17 +1166,44 @@ class CapacityAPI(Resource):
                         else:
                             num = int(compute_.quantity) - int(number)
                             capacity_status = 'reduce'
-                        capacity = Capacity()
-                        capacity.numbers = num
-                        create_date = datetime.datetime.now()
                         approval_id = str(uuid.uuid1())
-                        capacity.capacity_id = approval_id
+                        capacity = Capacity(capacity_id=approval_id, numbers=num)
                         capacity_list = compute_.capacity_list
                         capacity_list.append(capacity)
-                        compute_.capacity_list = capacity_list
                         resource.save()
 
                         approval_status = '%sing'%(capacity_status)
+                        create_date = datetime.datetime.now()
+                        deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
+                        if deployments:
+                            old_deployment = deployments[0]
+                            deploy_item = Deployment(
+                                deploy_id=approval_id,
+                                deploy_name=old_deployment.deploy_name,
+                                initiator=old_deployment.initiator,
+                                user_id=old_deployment.user_id,
+                                project_id=old_deployment.project_id,
+                                project_name=old_deployment.project_name,
+                                resource_id=old_deployment.resource_id,
+                                resource_name=old_deployment.resource_name,
+                                created_time=old_deployment.created_time,
+                                environment=old_deployment.environment,
+                                release_notes=old_deployment.release_notes,
+                                mysql_tag=old_deployment.mysql_tag,
+                                mysql_context=old_deployment.mysql_context,
+                                redis_tag=old_deployment.redis_tag,
+                                redis_context=old_deployment.redis_context,
+                                mongodb_tag=old_deployment.mongodb_tag,
+                                mongodb_context=old_deployment.mongodb_context,
+                                app_image=old_deployment.app_image,
+                                deploy_result="deploy_to_approve",
+                                apply_status="success",
+                                approve_status=approval_status,
+                                approve_suggestion=old_deployment.approve_suggestion,
+                                database_password=old_deployment.database_password,
+                                disconf_list=old_deployment.disconf_list
+                            )
+                            deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
                             project_id=project_id,department_id=department_id,
                             creator_id=creator_id,create_date=create_date,
@@ -1236,10 +1268,10 @@ class CapacityInfoAPI(Resource):
    # '获取扩容详情'
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('app_id', type=str, location='args')
+        parser.add_argument('approval_id', type=str, location='args')
         parser.add_argument('res_id', type=str, location='args')
         args = parser.parse_args()
-        app_id = args.app_id
+        approval_id = args.approval_id
         res_id = args.res_id
         rst = []
         cur_capacity_list = []
@@ -1252,17 +1284,16 @@ class CapacityInfoAPI(Resource):
                     for capacity_ in capacity_list:
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
                                    'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
-                        if capacity_.capacity_id == app_id:
+                        if capacity_.capacity_id == approval_id:
+                            cur_data = tmp
                             rst.append(tmp)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
                         if tmp_app:
                             cur_capacity_list.append(tmp)
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
-                else:
-                    cur_data = {'cluster_id': resource.ins_id, 'ins_name': resource.ins_name, 'cpu': resource.cpu, 'mem': resource.mem, 'domain': resource.domain,
-                                   'port':resource.port, 'env': resource.env }
-                rst.append(cur_data)
+
+                rst.insert(0, cur_data)
         except Exception as e:
             res = {
                 "code": 400,

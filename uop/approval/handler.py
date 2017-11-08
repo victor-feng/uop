@@ -460,36 +460,36 @@ class CapacityInfoAPI(Resource):
         msg = {}
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('approve_uid', type=str)
+            parser.add_argument('approval_id', type=str)
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
             parser.add_argument('docker_network_id', type=str)
-            parser.add_argument('res_id', type=str)
-            parser.add_argument('capacity_status', type=str)
             args = parser.parse_args()
-            res_id = args.res_id
-            approve_uid = args.approve_uid
-            capacity_status = args.capacity_status
+            approval_id = args.approval_id
 
-            approval = models.Approval.objects.get(approval_id=approve_uid)
+            approval = models.Approval.objects.get(approval_id=approval_id)
+            deployment = models.Deployment.objects.get(deploy_id=approval_id)
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
                 docker_network_id = args.docker_network_id
                 if args.agree:
-                    approval.approval_status = "%s_success"%(capacity_status)
-                    resource = Resource.objects.get(res_id=res_id)
+                    approval.approval_status = "%s_success"%(approval.capacity_status)
+                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                     compute_list = resource.compute_list
                     for compute_ in compute_list:
                         capacity_list = compute_.capacity_list
                         for capacity_ in capacity_list:
-                            if capacity_.capacity_id == approve_uid:
+                            if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
+                    deployment.approve_status = "%s_success"%(approval.capacity_status)
                 else:
-                    approval.approval_status = "%s_failed"%(capacity_status)
+                    approval.approval_status = "%s_failed"%(approval.capacity_status)
+                    deployment.approve_status = "%s_failed"%(approval.capacity_status)
                 approval.save()
                 resource.save()
+                deployment.save()
                 code = 200
             else:
                 code = 410
@@ -542,19 +542,18 @@ class CapacityInfoAPI(Resource):
         return ret, code
 
 class CapacityReservation(Resource):
-
-
+    
     def post(self):
         code = 0
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str)
-        parser.add_argument('approve_uid', type=str)
+        parser.add_argument('approval_id', type=str)
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         resource_id = args.resource_id
-        approve_uid = args.approve_uid
+        approval_id = args.approval_id
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
@@ -616,7 +615,7 @@ class CapacityReservation(Resource):
                 meta = json.dumps(db_com.docker_meta)
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
-                    if capacity_.capacity_id == approve_uid:
+                    if capacity_.capacity_id == approval_id:
                         number = capacity_.numbers
                         com.append(
                             {
@@ -637,7 +636,7 @@ class CapacityReservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            approval = models.Approval.objects.get(approve_uid)
+            approval = models.Approval.objects.get(approval_id)
             if approval.capacity_status=='increate':
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
