@@ -162,6 +162,7 @@ class DeployStatusProviderCallBack(Resource):
                 status_record.deploy_id = deploy_id
                 status_record.s_type=deploy_type
                 status_record.res_id = resource_id
+                status_record.set_flag = "res"
                 status_record.status = '%s_success'%(deploy_type)
                 status_record.msg='%s部署完成'%(deploy_type)
                 if deploy_msg:
