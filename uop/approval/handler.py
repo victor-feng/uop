@@ -546,19 +546,18 @@ class CapacityInfoAPI(Resource):
         return ret, code
 
 class CapacityReservation(Resource):
-
-
+    
     def post(self):
         code = 0
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str)
-        parser.add_argument('approve_uid', type=str)
+        parser.add_argument('approval_id', type=str)
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         resource_id = args.resource_id
-        approve_uid = args.approve_uid
+        approval_id = args.approval_id
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
@@ -620,7 +619,7 @@ class CapacityReservation(Resource):
                 meta = json.dumps(db_com.docker_meta)
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
-                    if capacity_.capacity_id == approve_uid:
+                    if capacity_.capacity_id == approval_id:
                         number = capacity_.numbers
                         com.append(
                             {
@@ -641,7 +640,7 @@ class CapacityReservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            approval = models.Approval.objects.get(approve_uid)
+            approval = models.Approval.objects.get(approval_id)
             if approval.capacity_status=='increate':
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)

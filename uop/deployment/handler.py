@@ -1268,10 +1268,10 @@ class CapacityInfoAPI(Resource):
    # '获取扩容详情'
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('app_id', type=str, location='args')
+        parser.add_argument('approval_id', type=str, location='args')
         parser.add_argument('res_id', type=str, location='args')
         args = parser.parse_args()
-        app_id = args.app_id
+        approval_id = args.approval_id
         res_id = args.res_id
         rst = []
         cur_capacity_list = []
@@ -1284,7 +1284,7 @@ class CapacityInfoAPI(Resource):
                     for capacity_ in capacity_list:
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'domain': compute_.domain,
                                    'port':compute_.port, 'env': resource.env, "capacity_id": capacity_.capacity_id }
-                        if capacity_.capacity_id == app_id:
+                        if capacity_.capacity_id == approval_id:
                             rst.append(tmp)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
                         if tmp_app:
