@@ -460,37 +460,33 @@ class CapacityInfoAPI(Resource):
         msg = {}
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('approve_uid', type=str)
+            parser.add_argument('approval_id', type=str)
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
             parser.add_argument('docker_network_id', type=str)
-            parser.add_argument('res_id', type=str)
-            parser.add_argument('capacity_status', type=str)
             args = parser.parse_args()
-            res_id = args.res_id
-            approve_uid = args.approve_uid
-            capacity_status = args.capacity_status
+            approval_id = args.approval_id
 
-            approval = models.Approval.objects.get(approval_id=approve_uid)
-            deployment = models.Deployment.objects.get(deploy_id=approve_uid)
+            approval = models.Approval.objects.get(approval_id=approval_id)
+            deployment = models.Deployment.objects.get(deploy_id=approval_id)
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
                 docker_network_id = args.docker_network_id
                 if args.agree:
-                    approval.approval_status = "%s_success"%(capacity_status)
-                    resource = models.ResourceModel.objects.get(res_id=res_id)
+                    approval.approval_status = "%s_success"%(approval.capacity_status)
+                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                     compute_list = resource.compute_list
                     for compute_ in compute_list:
                         capacity_list = compute_.capacity_list
                         for capacity_ in capacity_list:
-                            if capacity_.capacity_id == approve_uid:
+                            if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
-                    deployment.approve_status = "%s_success"%(capacity_status)
+                    deployment.approve_status = "%s_success"%(approval.capacity_status)
                 else:
-                    approval.approval_status = "%s_failed"%(capacity_status)
-                    deployment.approve_status = "%s_failed"%(capacity_status)
+                    approval.approval_status = "%s_failed"%(approval.capacity_status)
+                    deployment.approve_status = "%s_failed"%(approval.capacity_status)
                 approval.save()
                 resource.save()
                 deployment.save()
