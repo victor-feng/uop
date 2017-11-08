@@ -1301,6 +1301,7 @@ class CapacityInfoAPI(Resource):
                 rst_dict["resource_name"] = resource.resource_name
                 rst_dict["project"] = resource.project
                 rst_dict["compute_list"] = rst
+                rst_dict["env"] = resource.env
         except Exception as e:
             res = {
                 "code": 400,
