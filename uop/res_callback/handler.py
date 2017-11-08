@@ -1005,8 +1005,10 @@ def deploy_nginx_to_crp(resource_id,deploy_type):
         if len(deps) > 0:
             dep = deps[0]
             deploy_id = dep.deploy_id
-        compute_list = resource.compute_list
+            app_image=dep.app_image
+        #compute_list = resource.compute_list
         env = resource.env
+        """
         for compute in compute_list:
             app_dict = {}
             cpu = str(compute.get("cpu", "2"))
@@ -1021,6 +1023,7 @@ def deploy_nginx_to_crp(resource_id,deploy_type):
             app_dict["specifications"] = specifications
             app_dict["meta"] = compute.get("meta", "")
             app_image.append(app_dict)
+        """
         appinfo = attach_domain_ip(app_image, resource)
         data = {}
         data["deploy_id"] = deploy_id
@@ -1203,7 +1206,7 @@ class ResourceDeleteCallBack(Resource):
         os_inst_id=args.os_inst_id
         unique_flag=args.unique_flag
         quantity=args.quantity
-        os_ins_ip_list=args.os_ins_ip_list
+        del_os_ins_ip_list=args.os_ins_ip_list
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
@@ -1243,7 +1246,7 @@ class ResourceDeleteCallBack(Resource):
                 resource.save()
                 status_record = StatusRecord()
                 status_record.created_time = datetime.datetime.now()
-                status_record.set_flag = "minus"
+                status_record.set_flag = "reduce"
                 status_record.res_id=resource_id
                 status_record.status = "delete_success"
                 status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
@@ -1258,11 +1261,15 @@ class ResourceDeleteCallBack(Resource):
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
                     data=[]
                     ip_list=[]
-                    for ip_ins in os_ins_ip_list:
+                    osid_list=[]
+                    for ip_ins in del_os_ins_ip_list:
                         ip=ip_ins["ip"]
+                        os_id=ip_ins["os_ins_id"]
                         ip_list.append(ip)
+                        osid_list.append(os_id)
                     data["p_code"]=cmdb_p_code
                     data["ip_list"]=ip_list
+                    data["osid_list"] = osid_list
                     data_str=json.dumps(data)
                     CMDB_URL = current_app.config['CMDB_URL']
                     CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
