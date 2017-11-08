@@ -580,7 +580,7 @@ class CapacityReservation(Resource):
             com = []
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
-                meta = json.dumps(db_com.docker_meta)
+                meta = json.dumps(db_com.docker_meta) if db_com.docker_meta else ""
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
@@ -604,7 +604,7 @@ class CapacityReservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            approval = models.Approval.objects.get(approval_id)
+            approval = models.Approval.objects.get(approval_id=approval_id)
             if approval.capacity_status=='increate':
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
