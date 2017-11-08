@@ -1151,7 +1151,7 @@ class CapacityAPI(Resource):
         res_id = args.res_id
         deploy_id = args.deploy_id
         try:
-            resources = Resource.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.filter(res_id=res_id)
             if len(resources):
                 resource = resources[0]
                 compute_list = resource.compute_list
@@ -1215,7 +1215,7 @@ class CapacityAPI(Resource):
         res_id = args.res_id
         rst = []
         try:
-            resource = Resource.objects.get(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
                 compute_list = resource.compute_list
                 for compute_ in compute_list:
@@ -1247,7 +1247,7 @@ class CapacityInfoAPI(Resource):
         rst = []
         cur_capacity_list = []
         try:
-            resource = Resource.objects.get(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
                 compute_list = resource.compute_list
                 for compute_ in compute_list:
