@@ -132,6 +132,16 @@ class Capacity(db.EmbeddedDocument):
     numbers = db.IntField(required=False)
     created_date = db.DateTimeField(default=datetime.datetime.now())
     network_id = db.StringField(required=False, default="")
+    meta = {
+        'collection': 'capacity',
+        'index': [
+            {
+                'fields': ['capacity_id'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
 
 
 class DBIns(db.EmbeddedDocument):
