@@ -962,7 +962,7 @@ Post Request JSON Body：
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
-            #判断是正常预留还是扩容set_flag=add 在nginx中添加扩容的docker
+            #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
             if set_flag == "increate":
                 deploy_type="increate"
                 deploy_nginx_to_crp(resource_id,deploy_type)
@@ -1191,22 +1191,27 @@ class ResourceDeleteCallBack(Resource):
         parser.add_argument('os_inst_id', type=str)
         parser.add_argument('unique_flag', type=str)
         parser.add_argument('quantity', type=int)
+        parser.add_argument('os_ins_ip_list', type=int,location=json)
         args = parser.parse_args()
         resource_id=args.resource_id
         os_inst_id=args.os_inst_id
         unique_flag=args.unique_flag
         quantity=args.quantity
+        os_ins_ip_list=args.os_ins_ip_list
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
+            #resources 存在说明是扩容不是正常删除
             if len(resources) > 0:
                 resource=resources[0]
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
+                cmdb_p_code=resource.cmdb_p_code
                 new_compute_list = []
                 new_os_ins_list = []
                 new_os_ins_ip_list = []
+                #更新resource表中的数据，把要删除的数据删除
                 for os_ins_ip in os_ins_ip_list:
                     if os_ins_ip["os_ins_id"]  == os_inst_id:
                         ip=os_ins_ip["ip"]
@@ -1238,9 +1243,25 @@ class ResourceDeleteCallBack(Resource):
                 status_record.save()
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 if len(status_records) == quantity :
-                    #要缩容的docker都删除完成,开始修改nginx的配置
+                    # 要缩容的docker都删除完成,开始修改nginx的配置
                     deploy_type = "reduce"
-                    deploy_nginx_to_crp(resource_id,deploy_type)
+                    deploy_nginx_to_crp(resource_id, deploy_type)
+                    #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
+                    data=[]
+                    ip_list=[]
+                    for ip_ins in os_ins_ip_list:
+                        ip=ip_ins["ip"]
+                        ip_list.append(ip)
+                    data["p_code"]=cmdb_p_code
+                    data["ip_list"]=ip_list
+                    data_str=json.dumps(data)
+                    CMDB_URL = current_app.config['CMDB_URL']
+                    CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
+                    headers = {'Content-Type': 'application/json', }
+                    logging.debug("Data args is " + str(data))
+                    result = requests.delete(url=CMDB_DEL_URL, headers=headers, data=data_str)
+                    result = json.dumps(result.json())
+                    logging.debug(result)
             else:
                 logging.debug("UOP delete all instance and delete db record")
         except Exception as e:
