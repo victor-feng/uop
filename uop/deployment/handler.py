@@ -1138,7 +1138,6 @@ class CapacityAPI(Resource):
         parser.add_argument('cluster_id', type=str)
         parser.add_argument('number', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('deploy_id', type=str)
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
         parser.add_argument('project_id', type=str)
@@ -1149,7 +1148,6 @@ class CapacityAPI(Resource):
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
-        deploy_id = args.deploy_id
         try:
             resources = ResourceModel.objects.filter(res_id=res_id)
             if len(resources):
