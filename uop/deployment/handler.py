@@ -1138,7 +1138,6 @@ class CapacityAPI(Resource):
         parser.add_argument('cluster_id', type=str)
         parser.add_argument('number', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('deploy_id', type=str)
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
         parser.add_argument('project_id', type=str)
@@ -1149,9 +1148,8 @@ class CapacityAPI(Resource):
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
-        deploy_id = args.deploy_id
         try:
-            resources = Resource.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.filter(res_id=res_id)
             if len(resources):
                 resource = resources[0]
                 compute_list = resource.compute_list
@@ -1165,7 +1163,8 @@ class CapacityAPI(Resource):
                             capacity_status = 'reduce'
                         capacity = Capacity()
                         capacity.numbers = num
-                        capacity.created_date = datetime.datetime.now()
+                        create_date = datetime.datetime.now()
+                        capacity.created_date = create_date
                         approval_id = str(uuid.uuid1())
                         capacity.capacity_id = approval_id
                         capacity_list = compute_.capacity_list
@@ -1173,7 +1172,6 @@ class CapacityAPI(Resource):
                         compute_.capacity_list = capacity_list
                         resource.save()
 
-                        create_date = datetime.datetime.now()
                         approval_status = '%sing'%(capacity_status)
                         Approval(approval_id=approval_id, resource_id=res_id,
                             project_id=project_id,department_id=department_id,
@@ -1215,13 +1213,13 @@ class CapacityAPI(Resource):
         res_id = args.res_id
         rst = []
         try:
-            resource = Resource.objects.get(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
                 compute_list = resource.compute_list
                 for compute_ in compute_list:
                     quantity = compute_.quantity
                     ins_name = compute_.ins_name
-                    rst.append({"quantity": quantity, "ins_name": ins_name})
+                    rst.append({"quantity": quantity, "ins_name": ins_name, 'res_id': res_id, "ins_id": compute_.ins_id, "resource_name": resource.resource_name})
         except Exception as e:
             res = {
                 "code": 400,
@@ -1247,7 +1245,7 @@ class CapacityInfoAPI(Resource):
         rst = []
         cur_capacity_list = []
         try:
-            resource = Resource.objects.get(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
                 compute_list = resource.compute_list
                 for compute_ in compute_list:

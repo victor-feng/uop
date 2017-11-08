@@ -621,6 +621,7 @@ class CapacityReservation(Resource):
                         com.append(
                             {
                                 "instance_name": db_com.ins_name,
+                                "capacity_id": capacity_.capacity_id,
                                 "instance_id": db_com.ins_id,
                                 "cpu": db_com.cpu,
                                 "mem": db_com.mem,
@@ -642,10 +643,10 @@ class CapacityReservation(Resource):
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
             elif approval.capacity_status == 'reduce':
-                reduce_list = random.sample(resource.os_ins_list, number)
+                reduce_list = random.sample(resource.os_ins_ip_list, number)
                 crp_data = {
                         "resources_id": resource.res_id,
-                        "os_inst_id_list": reduce_list,
+                        "os_ins_ip_list": reduce_list,
                         "vid_list": [],
                         "set_flag": 'reduce'
                 }
