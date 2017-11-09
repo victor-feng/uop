@@ -1020,6 +1020,7 @@ def deploy_nginx_to_crp(resource_id,set_flag):
         dep = deps[0]
         deploy_id = dep.deploy_id
         app_image=dep.app_image
+        app_image=eval(app_image)
         #compute_list = resource.compute_list
         env = resource.env
         """
