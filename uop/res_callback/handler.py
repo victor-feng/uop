@@ -1039,6 +1039,8 @@ def deploy_nginx_to_crp(resource_id,set_flag):
             app_image.append(app_dict)
         """
         appinfo = attach_domain_ip(app_image, resource)
+        logging.debug("----------this is appinfo---------------")
+        logging.debug(appinfo)
         if appinfo:
             data = {}
             data["deploy_id"] = deploy_id
