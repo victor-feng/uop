@@ -962,6 +962,9 @@ Post Request JSON Body：
             resource.vid_list = vid_list
             resource.os_ins_ip_list=os_ip_list
             #---------to statusrecord
+            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            dep = deps[0]
+            deploy_id = dep.deploy_id
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type="set"
@@ -974,6 +977,7 @@ Post Request JSON Body：
                 if set_flag == "increate":
                     status_record.status="increate_success"
                     status_record.msg="docker扩容成功"
+                    status_record.deploy_id = deploy_id
             else:
                 if set_flag == "res":
                     status_record.status="set_fail"
@@ -981,6 +985,7 @@ Post Request JSON Body：
                 elif set_flag == "increate":
                     status_record.status = "increate_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
+                    status_record.deploy_id = deploy_id
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
@@ -1257,6 +1262,9 @@ class ResourceDeleteCallBack(Resource):
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
+            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            dep = deps[0]
+            deploy_id = dep.deploy_id
             #resources 存在说明是扩容不是正常删除
             if len(resources) > 0:
                 resource=resources[0]
@@ -1299,6 +1307,7 @@ class ResourceDeleteCallBack(Resource):
                 status_record.status = "docker_reduce_success"
                 status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
                 status_record.s_type="docker"
+                status_record.deploy_id = deploy_id
                 status_record.unique_flag = unique_flag
                 status_record.save()
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
@@ -1308,9 +1317,6 @@ class ResourceDeleteCallBack(Resource):
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
-                    deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-                    dep = deps[0]
-                    deploy_id=dep.deploy_id
                     create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success","reduce")
                     dep.deploy_result = "docker_reduce_success"
                     dep.save()
