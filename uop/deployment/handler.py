@@ -1284,15 +1284,18 @@ class CapacityInfoAPI(Resource):
                 for compute_ in compute_list:
                     capacity_list = compute_.capacity_list
                     for capacity_ in capacity_list:
-                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name, 'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
-                                   'port':compute_.port, "capacity_id": capacity_.capacity_id, "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip, 'domain': compute_.domain }
+                        tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name,
+                               'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
+                               'port':compute_.port, "capacity_id": capacity_.capacity_id,
+                               "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
+                               'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
+                        tmp2= copy.deepcopy(tmp)
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
-                            tmp2= copy.deepcopy(tmp)
                             tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp2)
-                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status='success')
+                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
                         if tmp_app:
                             cur_capacity_list.append(tmp2)
 
