@@ -1219,12 +1219,12 @@ class CapacityAPI(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            print e
+            logging.debug(e)
             ret = {
                 'code': 500,
                 'result': {
                     'res': 'fail',
-                    'msg': 'Put deployment  application failed.'
+                    'msg': 'Put deployment  application failed %s.' %e
                 }
             }
             return ret, 500
