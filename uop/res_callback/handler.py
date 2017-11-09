@@ -879,7 +879,7 @@ Post Request JSON Body：
         set_flag = request_data.get('set_flag')
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
-
+            env=resource.env
             is_write_to_cmdb = False
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
             if status == "ok":
@@ -973,7 +973,7 @@ Post Request JSON Body：
                     status_record.msg="预留成功"
                 if set_flag == "increate":
                     status_record.status="increate_success"
-                    status_record.msg="扩容成功"
+                    status_record.msg="docker扩容成功"
             else:
                 if set_flag == "res":
                     status_record.status="set_fail"
@@ -986,7 +986,9 @@ Post Request JSON Body：
             resource.save()
             #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
             if set_flag == "increate":
-                deploy_nginx_to_crp(resource_id,set_flag)
+                CPR_URL = get_CRP_url(env)
+                url = CPR_URL + "api/deploy/deploys"
+                deploy_nginx_to_crp(resource_id,url,set_flag)
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
@@ -1011,16 +1013,17 @@ Post Request JSON Body：
             }
         }
         return res, 200
-
-def deploy_nginx_to_crp(resource_id,set_flag):
+@async
+def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:
+        logging.debug("------Begin deploy nginx------")
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
         deploy_id = dep.deploy_id
         app_image=dep.app_image
+        app_image=eval(app_image)
         #compute_list = resource.compute_list
-        env = resource.env
         """
         for compute in compute_list:
             app_dict = {}
@@ -1038,18 +1041,20 @@ def deploy_nginx_to_crp(resource_id,set_flag):
             app_image.append(app_dict)
         """
         appinfo = attach_domain_ip(app_image, resource)
-        data = {}
-        data["deploy_id"] = deploy_id
-        data["set_flag"] = set_flag
-        data["appinfo"] = appinfo
-        CPR_URL = get_CRP_url(env)
-        url = CPR_URL + "api/deploy/deploys"
-        headers = {'Content-Type': 'application/json',}
-        data_str = json.dumps(data)
-        logging.debug("Data args is " + str(data))
-        result = requests.put(url=url, headers=headers, data=data_str)
-        result = json.dumps(result.json())
-        logging.debug(result)
+        logging.debug("----------this is appinfo---------------")
+        logging.debug(appinfo)
+        if appinfo:
+            data = {}
+            data["deploy_id"] = deploy_id
+            data["set_flag"] = set_flag
+            data["appinfo"] = appinfo
+            headers = {'Content-Type': 'application/json',}
+            data_str = json.dumps(data)
+            logging.debug("Data args is " + str(data))
+            logging.debug("URL args is " + url)
+            result = requests.put(url=url, headers=headers, data=data_str)
+            #result = json.dumps(result.json())
+            logging.debug(result)
     except Exception as e:
         logging.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
@@ -1244,24 +1249,19 @@ class ResourceStatusProviderCallBack(Resource):
 class ResourceDeleteCallBack(Resource):
     def post(self):
         code = 2002
-        parser = reqparse.RequestParser()
-        parser.add_argument('resource_id', type=str)
-        parser.add_argument('os_inst_id', type=str)
-        parser.add_argument('unique_flag', type=str)
-        parser.add_argument('quantity', type=int)
-        parser.add_argument('del_os_ins_ip_list', type=list,location=json)
-        args = parser.parse_args()
-        resource_id=args.resource_id
-        os_inst_id=args.os_inst_id
-        unique_flag=args.unique_flag
-        quantity=args.quantity
-        del_os_ins_ip_list=args.del_os_ins_ip_list
+        request_data = json.loads(request.data)
+        resource_id = request_data.get('resources_id')
+        os_inst_id = request_data.get('os_inst_id')
+        unique_flag = request_data.get('unique_flag')
+        quantity = request_data.get('quantity',0)
+        del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
             #resources 存在说明是扩容不是正常删除
             if len(resources) > 0:
                 resource=resources[0]
+                env = resource.env
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
@@ -1316,7 +1316,9 @@ class ResourceDeleteCallBack(Resource):
                     dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     set_flag = "reduce"
-                    deploy_nginx_to_crp(resource_id, set_flag)
+                    CPR_URL = get_CRP_url(env)
+                    url = CPR_URL + "api/deploy/deploys"
+                    deploy_nginx_to_crp(resource_id,url,set_flag)
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
                     data=[]
                     ip_list=[]
