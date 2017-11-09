@@ -1306,6 +1306,7 @@ class ResourceDeleteCallBack(Resource):
                 dep.deploy_result = "docker_reduce_success"
                 dep.save()
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
+                quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
                     deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                     dep = deps[0]
