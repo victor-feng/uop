@@ -1315,7 +1315,7 @@ class CapacityInfoAPI(Resource):
                 else:
                      net = NetWorkConfig.objects.get(vlan_id=resource.docker_network_id)
                      net_work_name = net.name
-                rst_dict["net_work_name"] = net_work_name
+                rst_dict["network_name"] = net_work_name
 
         except Exception as e:
             res = {
