@@ -475,9 +475,9 @@ class CapacityInfoAPI(Resource):
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
                 docker_network_id = args.docker_network_id
+                resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                 if args.agree:
                     approval.approval_status = "%s_success"%(approval.capacity_status)
-                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                     compute_list = resource.compute_list
                     for compute_ in compute_list:
                         capacity_list = compute_.capacity_list
