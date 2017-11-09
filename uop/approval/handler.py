@@ -610,9 +610,14 @@ class CapacityReservation(Resource):
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
             elif approval.capacity_status == 'reduce':
                 reduce_list = random.sample(resource.os_ins_ip_list, number)
+                os_inst_id_list=[]
+                for os_ip_dict in reduce_list:
+                    os_inst_id = os_ip_dict["os_ins_id"]
+                    os_inst_id_list.append(os_inst_id)
                 crp_data = {
                         "resources_id": resource.res_id,
                         "os_ins_ip_list": reduce_list,
+                        "os_inst_id_list": os_inst_id_list,
                         "vid_list": [],
                         "set_flag": 'reduce'
                 }
