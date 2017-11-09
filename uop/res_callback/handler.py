@@ -971,9 +971,9 @@ Post Request JSON Body：
                 if set_flag == "res":
                     status_record.status="set_success"
                     status_record.msg="预留成功"
-                #if set_flag == "increate":
-                #    status_record.status="increate_success"
-                #    status_record.msg="扩容成功"
+                if set_flag == "increate":
+                    status_record.status="increate_success"
+                    status_record.msg="docker扩容成功"
             else:
                 if set_flag == "res":
                     status_record.status="set_fail"
