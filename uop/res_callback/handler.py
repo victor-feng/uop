@@ -986,7 +986,15 @@ Post Request JSON Body：
             resource.save()
             #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
             if set_flag == "increate":
-                deploy_nginx_to_crp(resource_id,set_flag)
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                dep = deps[0]
+                deploy_id = dep.deploy_id
+                app_image = dep.app_image
+                app_image = eval(app_image)
+                appinfo = attach_domain_ip(app_image, resource)
+                env = resource.env
+                deploy_nginx_to_crp(deploy_id,appinfo,env,set_flag)
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
@@ -1012,34 +1020,9 @@ Post Request JSON Body：
         }
         return res, 200
 @async
-def deploy_nginx_to_crp(resource_id,set_flag):
+def deploy_nginx_to_crp(deploy_id,appinfo,env,set_flag):
     try:
         logging.debug("------Begin deploy nginx------")
-        resource = ResourceModel.objects.get(res_id=resource_id)
-        deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-        dep = deps[0]
-        deploy_id = dep.deploy_id
-        app_image=dep.app_image
-        app_image=eval(app_image)
-        #compute_list = resource.compute_list
-        env = resource.env
-        """
-        for compute in compute_list:
-            app_dict = {}
-            cpu = str(compute.get("cpu", "2"))
-            mem = str(compute.get("cpu", "2"))
-            specifications = "%sC,%sG" % (cpu, mem)
-            app_dict["ins_id"] = compute.get("ins_id", "")
-            app_dict["port"] = compute.get("prot", "")
-            app_dict["ins_name"] = compute.get("ins_name", "")
-            app_dict["quantity"] = compute.get("quantity", 0)
-            app_dict["url"] = compute.get("url", "")
-            app_dict["domain"] = compute.get("domain", "")
-            app_dict["specifications"] = specifications
-            app_dict["meta"] = compute.get("meta", "")
-            app_image.append(app_dict)
-        """
-        appinfo = attach_domain_ip(app_image, resource)
         logging.debug("----------this is appinfo---------------")
         logging.debug(appinfo)
         if appinfo:
@@ -1311,12 +1294,17 @@ class ResourceDeleteCallBack(Resource):
                     deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                     dep = deps[0]
                     deploy_id=dep.deploy_id
+                    deploy_id = dep.deploy_id
+                    app_image = dep.app_image
+                    app_image = eval(app_image)
+                    appinfo = attach_domain_ip(app_image, resource)
+                    env = resource.env
                     create_status_record(resource_id, deploy_id, "reduce", "缩容成功", "reduce_success","reduce")
                     dep.deploy_result = "reduce_success"
                     dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     set_flag = "reduce"
-                    deploy_nginx_to_crp(resource_id, set_flag)
+                    deploy_nginx_to_crp(deploy_id, appinfo, env, set_flag)
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
                     data=[]
                     ip_list=[]
