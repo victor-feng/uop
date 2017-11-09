@@ -13,7 +13,7 @@ from flask import request, send_from_directory
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns, Deployment, Approval, Capacity
+from uop.models import Deployment, ResourceModel, DisconfIns, ComputeIns, Deployment, Approval, Capacity, NetWorkConfig
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
@@ -1277,6 +1277,7 @@ class CapacityInfoAPI(Resource):
         rst_dict = {}
         rst = []
         cur_capacity_list = []
+        net = None
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
@@ -1295,6 +1296,9 @@ class CapacityInfoAPI(Resource):
                             cur_data = tmp
                             tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp2)
+                            if capacity_.network_id:
+                                net = NetWorkConfig.objects.filter(vlan_id=capacity_.network_id)
+
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
                         if tmp_app:
                             cur_capacity_list.append(tmp2)
@@ -1306,6 +1310,13 @@ class CapacityInfoAPI(Resource):
                 rst_dict["project"] = resource.project
                 rst_dict["compute_list"] = rst
                 rst_dict["env"] = resource.env
+                if net:
+                    net_work_name = net.name
+                else:
+                     net = NetWorkConfig.objects.filter(vlan_id=resource.docker_network_id)
+                     net_work_name = net.name
+                rst_dict["net_work_name"] = net_work_name
+
         except Exception as e:
             res = {
                 "code": 400,
