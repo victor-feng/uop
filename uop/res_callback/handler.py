@@ -1310,8 +1310,8 @@ class ResourceDeleteCallBack(Resource):
                     deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                     dep = deps[0]
                     deploy_id=dep.deploy_id
-                    create_status_record(resource_id, deploy_id, "reduce", "缩容成功", "reduce_success","reduce")
-                    dep.deploy_result = "reduce_success"
+                    create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success","reduce")
+                    dep.deploy_result = "docker_reduce_success"
                     dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     set_flag = "reduce"
