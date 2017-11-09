@@ -539,7 +539,7 @@ class CapacityReservation(Resource):
             return ret, code
 
         data = dict()
-        data['set_flag'] = 'res'
+        data['set_flag'] = 'increate'
         data['unit_id'] = resource.project_id
         #data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
