@@ -1047,8 +1047,9 @@ def deploy_nginx_to_crp(resource_id,set_flag):
         headers = {'Content-Type': 'application/json',}
         data_str = json.dumps(data)
         logging.debug("Data args is " + str(data))
+        logging.debug("URL args is " + url)
         result = requests.put(url=url, headers=headers, data=data_str)
-        result = json.dumps(result.json())
+        #result = json.dumps(result.json())
         logging.debug(result)
     except Exception as e:
         logging.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
