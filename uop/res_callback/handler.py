@@ -1319,7 +1319,7 @@ class ResourceDeleteCallBack(Resource):
                     url = CPR_URL + "api/deploy/deploys"
                     deploy_nginx_to_crp(resource_id,url,set_flag)
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
-                    data=[]
+                    data={}
                     ip_list=[]
                     osid_list=[]
                     for ip_ins in del_os_ins_ip_list:

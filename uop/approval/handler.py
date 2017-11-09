@@ -625,7 +625,7 @@ class CapacityReservation(Resource):
                 env_ = get_CRP_url(resource.env)
                 crp_url = '%s%s'%(env_, 'api/resource/deletes')
                 crp_data = json.dumps(crp_data)
-                requests.delete(crp_url, data=crp_data)
+                msg=requests.delete(crp_url, data=crp_data)
         except Exception as e:
             res = "failed to connect CRP service."
             code = 500
