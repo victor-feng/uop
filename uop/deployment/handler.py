@@ -1294,7 +1294,11 @@ class CapacityInfoAPI(Resource):
                         tmp2= copy.deepcopy(tmp)
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
-                            tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
+                            tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
+                            if tmp_app1.capacity_status=='reduce':
+                                tmp2["quantity"] = int(compute_.quantity) - int(capacity_.numbers)
+                            else:
+                                tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
