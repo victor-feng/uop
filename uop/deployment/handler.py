@@ -1290,9 +1290,9 @@ class CapacityInfoAPI(Resource):
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
+                        tmp2= copy.deepcopy(tmp)
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
-                            tmp2= copy.deepcopy(tmp)
                             tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp2)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
