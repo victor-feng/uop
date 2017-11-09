@@ -1297,7 +1297,7 @@ class CapacityInfoAPI(Resource):
                             tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
                             rst.append(tmp2)
                             if capacity_.network_id:
-                                net = NetWorkConfig.objects.filter(vlan_id=capacity_.network_id)
+                                net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
 
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
                         if tmp_app:
@@ -1313,7 +1313,7 @@ class CapacityInfoAPI(Resource):
                 if net:
                     net_work_name = net.name
                 else:
-                     net = NetWorkConfig.objects.filter(vlan_id=resource.docker_network_id)
+                     net = NetWorkConfig.objects.get(vlan_id=resource.docker_network_id)
                      net_work_name = net.name
                 rst_dict["net_work_name"] = net_work_name
 
