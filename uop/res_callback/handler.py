@@ -1249,7 +1249,7 @@ class ResourceDeleteCallBack(Resource):
         parser.add_argument('os_inst_id', type=str)
         parser.add_argument('unique_flag', type=str)
         parser.add_argument('quantity', type=int)
-        parser.add_argument('del_os_ins_ip_list', type=int,location=json)
+        parser.add_argument('del_os_ins_ip_list', type=list,location=json)
         args = parser.parse_args()
         resource_id=args.resource_id
         os_inst_id=args.os_inst_id
