@@ -1014,6 +1014,7 @@ Post Request JSON Body：
 @async
 def deploy_nginx_to_crp(resource_id,set_flag):
     try:
+        logging.debug("------Begin deploy nginx------")
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
