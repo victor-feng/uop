@@ -1245,18 +1245,12 @@ class ResourceStatusProviderCallBack(Resource):
 class ResourceDeleteCallBack(Resource):
     def post(self):
         code = 2002
-        parser = reqparse.RequestParser()
-        parser.add_argument('resource_id', type=str)
-        parser.add_argument('os_inst_id', type=str)
-        parser.add_argument('unique_flag', type=str)
-        parser.add_argument('quantity', type=int)
-        parser.add_argument('del_os_ins_ip_list', type=list,location=json)
-        args = parser.parse_args()
-        resource_id=args.resource_id
-        os_inst_id=args.os_inst_id
-        unique_flag=args.unique_flag
-        quantity=args.quantity
-        del_os_ins_ip_list=args.del_os_ins_ip_list
+        request_data = json.loads(request.data)
+        resource_id = request_data.get('resources_id')
+        os_inst_id = request_data.get('os_inst_id')
+        unique_flag = request_data.get('unique_flag')
+        quantity = request_data.get('quantity',0)
+        del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
