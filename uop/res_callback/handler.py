@@ -387,7 +387,8 @@ class ResourceProviderTransitions(object):
                             name_dict = p
                             break
                 app_name = name_dict["value"]
-                self.pcode_mapper[app_name] = p_code
+                self.pcode_mapper[app_name + u"应用集群"] = p_code
+
             else:
                 logging.info("else item_id:{}".format(item_id))
                 self.pcode_mapper[item_id] = p_code
@@ -922,15 +923,25 @@ Post Request JSON Body：
                     logging.debug(rpt.state)
 
             if is_write_to_cmdb is True:
-                #if set_flag =="increate"
-                #    CMDB_URL = current_app.config['CMDB_URL']
-                #    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                #    old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                #    cmdb_req = {"old_pcode":old_pcode, "new_pcode": rpt.pcode_mapper.get('deploy_instance') }
-                #    data = json.dumps(cmdb_req)
-                #    requests.post(CMDB_STATUS_URL, data=data)
-                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-                logging.debug("rpt.pcode_mapper的内容:%s"%(rpt.pcode_mapper))
+                logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+                if set_flag =="increate":
+                   CMDB_URL = current_app.config['CMDB_URL']
+                   CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                   old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                   app_cluster_name = ""
+                   new_pcode = ""
+                   for itemid, pcode in rpt.pcode_mapper.items():
+                       if u"应用集群" in itemid:
+                           app_cluster_name = itemid[:-4]
+                           new_pcode = pcode
+                           break
+                   cmdb_req = {"old_pcode":old_pcode, "new_pcode": new_pcode, "app_cluster_name":app_cluster_name}
+                   logging.info("increate to CMDB cmdb_req:{}".format(cmdb_req))
+                   data = json.dumps(cmdb_req)
+                   ret = requests.post(CMDB_STATUS_URL, data=data)
+                   logging.info("CMDB return:{}".format(ret))
+                else:
+                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
 
             os_ids = []
             os_ip_list=[]
@@ -1040,6 +1051,7 @@ Post Request JSON Body：
             }
         }
         return res, 200
+
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:
