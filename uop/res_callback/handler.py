@@ -1097,8 +1097,8 @@ class ResourceStatusProviderCallBack(Resource):
                                 status_record.status = '%s_success'%(cur_instance_type)
                                 status_record.msg='%s预留完成'%(cur_instance_type)
                             elif set_flag == "increate":
-                                status_record.status = '%s_success' % "docker_increate"
-                                status_record.msg = '%s扩容完成' % "docker"
+                                status_record.status = '%s_increate_success' % (cur_instance_type)
+                                status_record.msg = '%s扩容完成' % (cur_instance_type)
                                 status_record.deploy_id=deploy_id
                             cur_instance_type_list.append(os_inst_id)
                         else:
@@ -1107,8 +1107,8 @@ class ResourceStatusProviderCallBack(Resource):
                                 status_record.status = '%s_reserving'%(cur_instance_type)
                                 status_record.msg='%s预留中'%(cur_instance_type)
                             elif set_flag == "increate":
-                                status_record.status = '%s_reserving' % "docker_increate"
-                                status_record.msg = '%s扩容中' % "docker"
+                                status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                                status_record.msg = '%s扩容中' % (cur_instance_type)
                                 status_record.deploy_id = deploy_id
                             status_record.s_type=cur_instance_type
                     
@@ -1120,8 +1120,8 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.status = '%s_reserving'%(cur_instance_type)
                             status_record.msg='%s预留中'%(cur_instance_type)
                         elif set_flag == "increate":
-                            status_record.status = '%s_reserving' % "docker_increate"
-                            status_record.msg = '%s扩容中' % "docker"
+                            status_record.status = '%s_increate_reserving' %(cur_instance_type)
+                            status_record.msg = '%s扩容中' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
@@ -1130,8 +1130,8 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.status = '%s_success'%(cur_instance_type)
                             status_record.msg='%s预留完成'%(cur_instance_type)
                         elif set_flag == "increate":
-                            status_record.status = '%s_success' % "docker_increate"
-                            status_record.msg = '%s扩容完成' % "docker"
+                            status_record.status = '%s_increate_success' % (cur_instance_type)
+                            status_record.msg = '%s扩容完成' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]        
                         status_record.s_type=cur_instance_type
@@ -1258,17 +1258,16 @@ class ResourceDeleteCallBack(Resource):
         resource_id = request_data.get('resources_id')
         os_inst_id = request_data.get('os_inst_id')
         unique_flag = request_data.get('unique_flag')
-        quantity = request_data.get('quantity',0)
         del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
-            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-            dep = deps[0]
-            deploy_id = dep.deploy_id
             #resources 存在说明是扩容不是正常删除
             if len(resources) > 0:
                 resource=resources[0]
+                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                dep = deps[0]
+                deploy_id = dep.deploy_id
                 env = resource.env
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
@@ -1311,8 +1310,6 @@ class ResourceDeleteCallBack(Resource):
                 status_record.deploy_id = deploy_id
                 status_record.unique_flag = unique_flag
                 status_record.save()
-                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-                dep = deps[0]
                 dep.deploy_result = "docker_reduce_success"
                 dep.save()
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
