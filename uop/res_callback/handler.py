@@ -377,7 +377,18 @@ class ResourceProviderTransitions(object):
         logging.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
-            self.pcode_mapper[item_id] = p_code
+            if item_id == "app_cluster":
+                property_list = data.get("property_list")
+                name_dict = {}
+                for p in property_list:
+                    for k, v in p.items():
+                        if v == "name":
+                            name_dict = p
+                            break
+                app_name = name_dict["value"]
+                self.pcode_mapper[app_name] = p_code
+            else:
+                self.pcode_mapper[item_id] = p_code
             logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
@@ -884,7 +895,6 @@ Post Request JSON Body：
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
             if status == "ok":
                 is_write_to_cmdb = True
-
                 container = request_data.get('container')
                 if container is not None:
                     for i in container:
