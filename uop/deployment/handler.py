@@ -1278,6 +1278,7 @@ class CapacityInfoAPI(Resource):
         rst = []
         cur_capacity_list = []
         net = None
+        cur_data = None
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
@@ -1309,6 +1310,7 @@ class CapacityInfoAPI(Resource):
 
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
+                if cur_data:
                     rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
                 rst_dict["project"] = resource.project
