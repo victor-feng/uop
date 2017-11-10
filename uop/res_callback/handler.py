@@ -994,11 +994,13 @@ Post Request JSON Body：
                     status_record.status = "increate_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
                     status_record.deploy_id = deploy_id
+                    dep.deploy_result="deploy_fail"
+                    dep.save()
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
-            #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
-            if set_flag == "increate":
+            #判断是正常预留还是扩容set_flag=increate,扩容成功后 在nginx中添加扩容的docker
+            if set_flag == "increate" and status == 'ok':
                 CPR_URL = get_CRP_url(env)
                 url = CPR_URL + "api/deploy/deploys"
                 deploy_nginx_to_crp(resource_id,url,set_flag)
