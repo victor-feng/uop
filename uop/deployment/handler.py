@@ -1309,9 +1309,9 @@ class CapacityInfoAPI(Resource):
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
 
-                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
-                        if tmp_app:
-                            cur_capacity_list.append(tmp2)
+                        #tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
+                        #if tmp_app:
+                        #    cur_capacity_list.append(tmp2)
                 if cur_data:
                     rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
