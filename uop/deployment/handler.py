@@ -1293,13 +1293,18 @@ class CapacityInfoAPI(Resource):
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
                         tmp2= copy.deepcopy(tmp)
+                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
+                        if tmp_app:
+                            cur_capacity_list.append(tmp2)
                         if capacity_.capacity_id == approval_id:
                             cur_data = tmp
+                            if len(cur_capacity_list) > 1:
+                                cur_data = cur_capacity_list[-1]
                             tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
                             if tmp_app1.capacity_status=='reduce':
-                                tmp2["quantity"] = int(compute_.quantity) - int(capacity_.numbers)
+                                tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
                             else:
-                                tmp2["quantity"] = int(compute_.quantity) + int(capacity_.numbers)
+                                tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
                             rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
@@ -1307,9 +1312,6 @@ class CapacityInfoAPI(Resource):
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
                         if tmp_app:
                             cur_capacity_list.append(tmp2)
-
-                if len(cur_capacity_list) > 1:
-                    cur_data = cur_capacity_list[-1]
                 if cur_data:
                     rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
