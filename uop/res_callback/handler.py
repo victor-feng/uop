@@ -1085,7 +1085,7 @@ class ResourceStatusProviderCallBack(Resource):
                 if len(deps) >0:
                     dep = deps[0]
                     deploy_id = dep.deploy_id
-                status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type)
+                status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type,set_flag=set_flag)
                 if status_record:
                     status_record=status_record[0]
                     cur_instance_type_list = getattr(status_record, cur_instance_type)
