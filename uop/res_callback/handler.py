@@ -1097,8 +1097,8 @@ class ResourceStatusProviderCallBack(Resource):
                                 status_record.status = '%s_success'%(cur_instance_type)
                                 status_record.msg='%s预留完成'%(cur_instance_type)
                             elif set_flag == "increate":
-                                status_record.status = '%s_increate_success' % (cur_instance_type)
-                                status_record.msg = '%s扩容完成' % (cur_instance_type)
+                                status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                                status_record.msg = '%s扩容中' % (cur_instance_type)
                                 status_record.deploy_id=deploy_id
                             cur_instance_type_list.append(os_inst_id)
                         else:
@@ -1130,8 +1130,8 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.status = '%s_success'%(cur_instance_type)
                             status_record.msg='%s预留完成'%(cur_instance_type)
                         elif set_flag == "increate":
-                            status_record.status = '%s_increate_success' % (cur_instance_type)
-                            status_record.msg = '%s扩容完成' %(cur_instance_type)
+                            status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                            status_record.msg = '%s扩容中' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]        
                         status_record.s_type=cur_instance_type
