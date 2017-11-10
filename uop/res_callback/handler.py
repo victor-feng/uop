@@ -379,7 +379,7 @@ class ResourceProviderTransitions(object):
             p_code = item_property.get('result').get('id')
             if str(item_id) == "app_cluster":
                 logging.info("if item_id:{}".format(item_id))
-                property_list = data.get("property_list")
+                property_list = repo_item.get("property_list")
                 name_dict = {}
                 for p in property_list:
                     for k, v in p.items():
