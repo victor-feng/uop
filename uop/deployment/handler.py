@@ -1309,7 +1309,7 @@ class CapacityInfoAPI(Resource):
 
                 if len(cur_capacity_list) > 1:
                     cur_data = cur_capacity_list[-1]
-                rst.insert(0, cur_data)
+                    rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
                 rst_dict["project"] = resource.project
                 rst_dict["compute_list"] = rst

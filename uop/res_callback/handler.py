@@ -910,8 +910,15 @@ Post Request JSON Body：
                     logging.debug(rpt.state)
 
             if is_write_to_cmdb is True:
+                #if set_flag =="increate"
+                #    CMDB_URL = current_app.config['CMDB_URL']
+                #    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                #    old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                #    cmdb_req = {"old_pcode":old_pcode, "new_pcode": rpt.pcode_mapper.get('deploy_instance') }
+                #    data = json.dumps(cmdb_req)
+                #    requests.post(CMDB_STATUS_URL, data=data)
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-
+                logging.debug("rpt.pcode_mapper的内容:%s"%(rpt.pcode_mapper))
 
             os_ids = []
             os_ip_list=[]
