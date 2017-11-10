@@ -377,7 +377,21 @@ class ResourceProviderTransitions(object):
         logging.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
-            self.pcode_mapper[item_id] = p_code
+            if str(item_id) == "app_cluster":
+                logging.info("if item_id:{}".format(item_id))
+                property_list = repo_item.get("property_list")
+                name_dict = {}
+                for p in property_list:
+                    for k, v in p.items():
+                        if v == "name":
+                            name_dict = p
+                            break
+                app_name = name_dict["value"]
+                self.pcode_mapper[app_name + u"应用集群"] = p_code
+                self.pcode_mapper[item_id] = p_code
+            else:
+                logging.info("else item_id:{}".format(item_id))
+                self.pcode_mapper[item_id] = p_code
             logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
@@ -884,7 +898,6 @@ Post Request JSON Body：
             # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
             if status == "ok":
                 is_write_to_cmdb = True
-
                 container = request_data.get('container')
                 if container is not None:
                     for i in container:
@@ -910,15 +923,25 @@ Post Request JSON Body：
                     logging.debug(rpt.state)
 
             if is_write_to_cmdb is True:
-                #if set_flag =="increate"
-                #    CMDB_URL = current_app.config['CMDB_URL']
-                #    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                #    old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                #    cmdb_req = {"old_pcode":old_pcode, "new_pcode": rpt.pcode_mapper.get('deploy_instance') }
-                #    data = json.dumps(cmdb_req)
-                #    requests.post(CMDB_STATUS_URL, data=data)
-                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-                logging.debug("rpt.pcode_mapper的内容:%s"%(rpt.pcode_mapper))
+                logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+                if set_flag =="increate":
+                   CMDB_URL = current_app.config['CMDB_URL']
+                   CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                   old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                   app_cluster_name = ""
+                   new_pcode = ""
+                   for itemid, pcode in rpt.pcode_mapper.items():
+                       if u"应用集群" in itemid:
+                           app_cluster_name = itemid[:-4]
+                           new_pcode = pcode
+                           break
+                   cmdb_req = {"old_pcode":old_pcode, "new_pcode": new_pcode, "app_cluster_name":app_cluster_name}
+                   logging.info("increate to CMDB cmdb_req:{}".format(cmdb_req))
+                   data = json.dumps(cmdb_req)
+                   ret = requests.post(CMDB_STATUS_URL, data=data)
+                   logging.info("CMDB return:{}".format(ret))
+                else:
+                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
 
             os_ids = []
             os_ip_list=[]
@@ -994,11 +1017,13 @@ Post Request JSON Body：
                     status_record.status = "increate_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
                     status_record.deploy_id = deploy_id
+                    dep.deploy_result="deploy_fail"
+                    dep.save()
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
-            #判断是正常预留还是扩容set_flag=increate 在nginx中添加扩容的docker
-            if set_flag == "increate":
+            #判断是正常预留还是扩容set_flag=increate,扩容成功后 在nginx中添加扩容的docker
+            if set_flag == "increate" and status == 'ok':
                 CPR_URL = get_CRP_url(env)
                 url = CPR_URL + "api/deploy/deploys"
                 deploy_nginx_to_crp(resource_id,url,set_flag)
@@ -1026,6 +1051,7 @@ Post Request JSON Body：
             }
         }
         return res, 200
+
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:
