@@ -377,7 +377,8 @@ class ResourceProviderTransitions(object):
         logging.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
-            if item_id == "app_cluster":
+            if str(item_id) == "app_cluster":
+                logging.info("if item_id:{}".format(item_id))
                 property_list = data.get("property_list")
                 name_dict = {}
                 for p in property_list:
@@ -388,6 +389,7 @@ class ResourceProviderTransitions(object):
                 app_name = name_dict["value"]
                 self.pcode_mapper[app_name] = p_code
             else:
+                logging.info("else item_id:{}".format(item_id))
                 self.pcode_mapper[item_id] = p_code
             logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
