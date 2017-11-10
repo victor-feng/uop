@@ -1278,6 +1278,7 @@ class CapacityInfoAPI(Resource):
         rst = []
         cur_capacity_list = []
         net = None
+        cur_data = None
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if len(resource):
