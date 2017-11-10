@@ -1301,11 +1301,10 @@ class CapacityInfoAPI(Resource):
                             if len(cur_capacity_list) > 1:
                                 cur_data = cur_capacity_list[-1]
                             tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
-                            if not tmp_app:
-                                if tmp_app1.capacity_status=='reduce':
-                                    tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
-                                else:
-                                    tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
+                            if tmp_app1.capacity_status=='reduce':
+                                tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
+                            else:
+                                tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
                             rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
