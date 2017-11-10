@@ -994,7 +994,6 @@ Post Request JSON Body：
                     status_record.status = "increate_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
                     status_record.deploy_id = deploy_id
-                    create_status_record(resource_id, deploy_id, "increate", "扩容失败", "increate_fail", "increate")
                     dep.deploy_result="deploy_fail"
                     dep.save()
             status_record.save()
