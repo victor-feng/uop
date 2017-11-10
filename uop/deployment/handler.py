@@ -1319,7 +1319,8 @@ class CapacityInfoAPI(Resource):
                 if net:
                     net_work_name = net.name
                 else:
-                     net = NetWorkConfig.objects.get(vlan_id=resource.docker_network_id)
+                     nets = NetWorkConfig.objects.filter(vlan_id=resource.docker_network_id)
+                     net = nets[0]
                      net_work_name = net.name
                 rst_dict["network_name"] = net_work_name
 
