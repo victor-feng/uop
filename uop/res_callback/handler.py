@@ -388,7 +388,7 @@ class ResourceProviderTransitions(object):
                             break
                 app_name = name_dict["value"]
                 self.pcode_mapper[app_name + u"应用集群"] = p_code
-
+                self.pcode_mapper[item_id] = p_code
             else:
                 logging.info("else item_id:{}".format(item_id))
                 self.pcode_mapper[item_id] = p_code
