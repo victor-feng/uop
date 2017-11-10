@@ -485,6 +485,7 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success"%(approval.capacity_status)
+                    deployment.deploy_result="deploying"
                 else:
                     approval.approval_status = "%s_failed"%(approval.capacity_status)
                     deployment.approve_status = "%s_failed"%(approval.capacity_status)
