@@ -963,8 +963,9 @@ Post Request JSON Body：
             resource.os_ins_ip_list=os_ip_list
             #---------to statusrecord
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-            dep = deps[0]
-            deploy_id = dep.deploy_id
+            if len(deps) >0:
+                dep = deps[0]
+                deploy_id = dep.deploy_id
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type="set"
