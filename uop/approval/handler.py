@@ -577,6 +577,7 @@ class CapacityReservation(Resource):
                     }
                 )
             data['resource_list'] = res
+        ips = []
         if compute_list:
             com = []
             for db_com in compute_list:
@@ -598,8 +599,9 @@ class CapacityReservation(Resource):
                                  "port": db_com.port,
                                  "domain_ip": db_com.domain_ip,
                                  "meta": meta,
-                    }
-                )
+                        })
+                        ips.extend([ip for ip in db_com.ips])
+
             data['compute_list'] = com
 
         data_str = json.dumps(data)
@@ -610,7 +612,11 @@ class CapacityReservation(Resource):
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
             elif approval.capacity_status == 'reduce':
-                reduce_list = random.sample(resource.os_ins_ip_list, number)
+                reduce_list = []
+                for os_ins in resource.os_ins_ip_list:
+                    if os_ins.ip in ips:
+                        reduce_list.append(os_ins)
+                reduce_list = random.sample(reduce_list, number)
                 os_inst_id_list=[]
                 reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
                 for os_ip_dict in reduce_list:
