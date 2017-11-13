@@ -1322,7 +1322,7 @@ class CapacityInfoAPI(Resource):
         args = parser.parse_args()
         deploy_id = args.deploy_id
         try:
-            deployment = Deployment.objects.filter(deploy_id=deploy_id)
+            deployment = Deployment.objects.get(deploy_id=deploy_id)
             capacity_info=deployment.capacity_info
             if capacity_info:
                 capacity_info_dict=eval(capacity_info)
