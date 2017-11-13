@@ -1296,6 +1296,7 @@ class CapacityInfoAPI(Resource):
                         if capacity_.capacity_id == approval_id:
                             tmp2["quantity"]=capacity_.end_number
                             cur_data["quantity"] = capacity_.begin_number
+                            rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
 
