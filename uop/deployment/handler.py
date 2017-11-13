@@ -1324,7 +1324,10 @@ class CapacityInfoAPI(Resource):
         try:
             deployment = Deployment.objects.filter(deploy_id=deploy_id)
             capacity_info=deployment.capacity_info
-            capacity_info_dict=eval(capacity_info)
+            if capacity_info:
+                capacity_info_dict=eval(capacity_info)
+            else:
+                capacity_info_dict={}
         except Exception as e:
             res = {
                 "code": 400,
