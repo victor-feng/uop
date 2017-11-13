@@ -1291,9 +1291,9 @@ class CapacityInfoAPI(Resource):
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
-                        cur_data = tmp
-                        tmp2= copy.deepcopy(tmp)
                         if capacity_.capacity_id == approval_id:
+                            tmp2 = copy.deepcopy(tmp)
+                            cur_data = tmp
                             tmp2["quantity"]=capacity_.end_number
                             cur_data["quantity"] = capacity_.begin_number
                             rst.append(tmp2)
@@ -1326,24 +1326,6 @@ class CapacityInfoAPI(Resource):
         else:
             return rst_dict, 200
 
-    def deal_number(self,capacity_list,approval_id):
-        num=0
-        capacity_list=list(capacity_list)
-        capacity_list=capacity_list[::-1]
-        for capacity_ in capacity_list:
-            capacity_id=capacity_.capacity_id
-            numbers=capacity_.numbers
-            tmp_app1 = Approval.objects.filter(approval_id=capacity_id, approval_status__in=['increate_success','reduce_success'])
-            logging.debug(tmp_app1)
-            if len(tmp_app1) > 0:
-                tmp_app1=tmp_app1[0]
-                if tmp_app1.capacity_status == 'reduce':
-                    num=num - numbers
-                elif tmp_app1.capacity_status == 'increate':
-                    num = num +numbers
-                if capacity_id == approval_id:
-                    return num
-        return num
 
 
 
