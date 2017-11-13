@@ -129,7 +129,9 @@ class ComputeIns(db.EmbeddedDocument):
 class Capacity(db.EmbeddedDocument):
     capacity_id = db.StringField(required=True)
     # 变更数 - 当前数
-    numbers = db.IntField(required=False)
+    #numbers = db.IntField(required=False)
+    begin_number=db.IntField(required=False)
+    end_number = db.IntField(required=False)
     created_date = db.DateTimeField(default=datetime.datetime.now())
     network_id = db.StringField(required=False, default="")
     meta = {

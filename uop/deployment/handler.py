@@ -1162,13 +1162,13 @@ class CapacityAPI(Resource):
                 for compute_ in compute_list:
                     if compute_.ins_id == cluster_id:
                         if int(number) > int(compute_.quantity):
-                            num = int(number) - int(compute_.quantity)
                             capacity_status = 'increate'
                         else:
-                            num = int(compute_.quantity) - int(number)
                             capacity_status = 'reduce'
+                        begin_number=compute_.quantity
+                        end_number=number
                         approval_id = str(uuid.uuid1())
-                        capacity = Capacity(capacity_id=approval_id, numbers=num)
+                        capacity = Capacity(capacity_id=approval_id,begin_number=begin_number,end_number=end_number)
                         capacity_list = compute_.capacity_list
                         capacity_list.append(capacity)
                         resource.save()
@@ -1276,7 +1276,6 @@ class CapacityInfoAPI(Resource):
         res_id = args.res_id
         rst_dict = {}
         rst = []
-        cur_capacity_list = []
         net = None
         cur_data = None
         try:
@@ -1285,7 +1284,6 @@ class CapacityInfoAPI(Resource):
                 compute_list = resource.compute_list
                 for compute_ in compute_list:
                     capacity_list = compute_.capacity_list
-                    deal_num=self.deal_number(capacity_list,approval_id)
                     for capacity_ in capacity_list:
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name,
                                'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
@@ -1293,28 +1291,13 @@ class CapacityInfoAPI(Resource):
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
+                        cur_data = tmp
                         tmp2= copy.deepcopy(tmp)
-                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__in=['increate_success','reduce_success'])
-                        #判断审批是否通过，审批时展示的数据
-                        if not tmp_app and capacity_.capacity_id == approval_id:#审批时展示的数据
-                            cur_data = tmp
-                            tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
-                            if tmp_app1.capacity_status=='reduce':
-                                tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
-                            elif tmp_app1.capacity_status=='increate':
-                                tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
-                            rst.append(tmp2)
-                        if tmp_app and capacity_.capacity_id == approval_id: #审批通过时展示历史数据
-                            cur_data = tmp
-                            cur_data["quantity"]=cur_data["quantity"] -deal_num
-                            tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
-                            if tmp_app1.capacity_status=='reduce':
-                                tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
-                            elif tmp_app1.capacity_status=='increate':
-                                tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
-                            rst.append(tmp2)
-                        if capacity_.network_id:
-                            net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
+                        if capacity_.capacity_id == approval_id:
+                            tmp2["quantity"]=capacity_.end_number
+                            cur_data["quantity"] = capacity_.begin_number
+                            if capacity_.network_id:
+                                net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
 
                 if cur_data:
                     rst.insert(0, cur_data)

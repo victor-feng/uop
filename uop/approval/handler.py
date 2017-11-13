@@ -585,7 +585,7 @@ class CapacityReservation(Resource):
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
-                        number = capacity_.numbers
+                        number = abs(capacity_.begin_number - capacity_.end_number)
                         com.append(
                             {
                                 "instance_name": db_com.ins_name,
