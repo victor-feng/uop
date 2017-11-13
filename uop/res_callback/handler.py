@@ -962,7 +962,7 @@ Post Request JSON Body：
                     os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker",cpu=cpu,mem=mem)
                     os_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
-                
+
             db_info = request_data.get('db_info')
             vid_list = []
             for key, value in db_info.items():
@@ -984,7 +984,7 @@ Post Request JSON Body：
                     ip=instance.get('ip')
                     os_type = instance.get('instance_type')
                     os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= os_type,cpu=cpu,mem=mem)
-                    os_ins_ip_list.append(os_ip_dic)
+                    os_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
                 if os_ins_ids:
                     os_ids.append(os_ins_ids)
