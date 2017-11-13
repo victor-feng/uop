@@ -1162,13 +1162,13 @@ class CapacityAPI(Resource):
                 for compute_ in compute_list:
                     if compute_.ins_id == cluster_id:
                         if int(number) > int(compute_.quantity):
-                            num = int(number) - int(compute_.quantity)
                             capacity_status = 'increate'
                         else:
-                            num = int(compute_.quantity) - int(number)
                             capacity_status = 'reduce'
+                        begin_number=compute_.quantity
+                        end_number=number
                         approval_id = str(uuid.uuid1())
-                        capacity = Capacity(capacity_id=approval_id, numbers=num)
+                        capacity = Capacity(capacity_id=approval_id,begin_number=begin_number,end_number=end_number)
                         capacity_list = compute_.capacity_list
                         capacity_list.append(capacity)
                         resource.save()
@@ -1276,7 +1276,6 @@ class CapacityInfoAPI(Resource):
         res_id = args.res_id
         rst_dict = {}
         rst = []
-        cur_capacity_list = []
         net = None
         cur_data = None
         try:
@@ -1292,26 +1291,15 @@ class CapacityInfoAPI(Resource):
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
+                        cur_data = tmp
                         tmp2= copy.deepcopy(tmp)
-                        tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
-                        if tmp_app:
-                            cur_capacity_list.append(tmp2)
                         if capacity_.capacity_id == approval_id:
-                            cur_data = tmp
-                            if len(cur_capacity_list) > 1:
-                                cur_data = cur_capacity_list[-1]
-                            tmp_app1 = Approval.objects.get(approval_id=capacity_.capacity_id)
-                            if tmp_app1.capacity_status=='reduce':
-                                tmp2["quantity"] = int(cur_data.get('quantity')) - int(capacity_.numbers)
-                            else:
-                                tmp2["quantity"] = int(cur_data.get('quantity')) + int(capacity_.numbers)
+                            tmp2["quantity"]=capacity_.end_number
+                            cur_data["quantity"] = capacity_.begin_number
                             rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
 
-                        #tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__contains='success')
-                        #if tmp_app:
-                        #    cur_capacity_list.append(tmp2)
                 if cur_data:
                     rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
@@ -1331,12 +1319,34 @@ class CapacityInfoAPI(Resource):
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": e.message
+                    "msg": e.args
                 }
             }
             return res, 400
         else:
             return rst_dict, 200
+
+    def deal_number(self,capacity_list,approval_id):
+        num=0
+        capacity_list=list(capacity_list)
+        capacity_list=capacity_list[::-1]
+        for capacity_ in capacity_list:
+            capacity_id=capacity_.capacity_id
+            numbers=capacity_.numbers
+            tmp_app1 = Approval.objects.filter(approval_id=capacity_id, approval_status__in=['increate_success','reduce_success'])
+            logging.debug(tmp_app1)
+            if len(tmp_app1) > 0:
+                tmp_app1=tmp_app1[0]
+                if tmp_app1.capacity_status == 'reduce':
+                    num=num - numbers
+                elif tmp_app1.capacity_status == 'increate':
+                    num = num +numbers
+                if capacity_id == approval_id:
+                    return num
+        return num
+
+
+
 
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
