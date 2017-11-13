@@ -84,6 +84,7 @@ class Deployment(db.Document):
     is_deleted = db.IntField(required=False, default=0)
     is_rollback = db.IntField(required=False, default=0)
     deleted_time = db.DateTimeField(default=datetime.datetime.now())
+    capacity_info = db.StringField(required=False, default="{}")
 
     meta = {
         'collection': 'deployment',

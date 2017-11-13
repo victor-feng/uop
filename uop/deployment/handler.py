@@ -1133,8 +1133,7 @@ class Download(Resource):
 
 class CapacityAPI(Resource):
     '容量改变 扩容或者缩容 的提交申请'
-    @classmethod
-    def put(cls):
+    def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('cluster_id', type=str)
         parser.add_argument('number', type=str)
@@ -1178,6 +1177,8 @@ class CapacityAPI(Resource):
                         deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
                             old_deployment = deployments[0]
+                            capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
+                            capacity_info_str=json.dumps(capacity_info_dict)
                             deploy_item = Deployment(
                                 deploy_id=approval_id,
                                 deploy_name=old_deployment.deploy_name,
@@ -1202,7 +1203,8 @@ class CapacityAPI(Resource):
                                 approve_status=approval_status,
                                 approve_suggestion=old_deployment.approve_suggestion,
                                 database_password=old_deployment.database_password,
-                                disconf_list=old_deployment.disconf_list
+                                disconf_list=old_deployment.disconf_list,
+                                capacity_info=capacity_info_str
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
@@ -1264,16 +1266,8 @@ class CapacityAPI(Resource):
         else:
             return rst, 200
 
-class CapacityInfoAPI(Resource):
 
-   # '获取扩容详情'
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('approval_id', type=str, location='args')
-        parser.add_argument('res_id', type=str, location='args')
-        args = parser.parse_args()
-        approval_id = args.approval_id
-        res_id = args.res_id
+    def deal_capacity_info(self,approval_id,res_id):
         rst_dict = {}
         rst = []
         net = None
@@ -1287,19 +1281,18 @@ class CapacityInfoAPI(Resource):
                     for capacity_ in capacity_list:
                         tmp = {'cluster_id': compute_.ins_id, 'ins_name': compute_.ins_name,
                                'cpu': compute_.cpu, 'mem': compute_.mem, 'url': compute_.url,
-                               'port':compute_.port, "capacity_id": capacity_.capacity_id,
+                               'port': compute_.port, "capacity_id": capacity_.capacity_id,
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
-                               'domain': compute_.domain }
+                               'domain': compute_.domain}
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
                         if capacity_.capacity_id == approval_id:
                             tmp2 = copy.deepcopy(tmp)
                             cur_data = tmp
-                            tmp2["quantity"]=capacity_.end_number
+                            tmp2["quantity"] = capacity_.end_number
                             cur_data["quantity"] = capacity_.begin_number
                             rst.append(tmp2)
                             if capacity_.network_id:
                                 net = NetWorkConfig.objects.get(vlan_id=capacity_.network_id)
-
                 if cur_data:
                     rst.insert(0, cur_data)
                 rst_dict["resource_name"] = resource.resource_name
@@ -1309,11 +1302,29 @@ class CapacityInfoAPI(Resource):
                 if net:
                     net_work_name = net.name
                 else:
-                     nets = NetWorkConfig.objects.filter(vlan_id=resource.docker_network_id)
-                     net = nets[0]
-                     net_work_name = net.name
+                    nets = NetWorkConfig.objects.filter(vlan_id=resource.docker_network_id)
+                    net = nets[0]
+                    net_work_name = net.name
                 rst_dict["network_name"] = net_work_name
+                return rst_dict
+        except Exception as e:
+            err_msg=e.args
+            logging.error("UOP deal_capacity_info error: %s" % err_msg)
+            return rst_dict
 
+
+class CapacityInfoAPI(Resource):
+
+   # '获取扩容详情'
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_id', type=str, location='args')
+        args = parser.parse_args()
+        deploy_id = args.deploy_id
+        try:
+            deployment = Deployment.objects.filter(deploy_id=deploy_id)
+            capacity_info=deployment.capacity_info
+            capacity_info_dict=eval(capacity_info)
         except Exception as e:
             res = {
                 "code": 400,
@@ -1324,12 +1335,7 @@ class CapacityInfoAPI(Resource):
             }
             return res, 400
         else:
-            return rst_dict, 200
-
-
-
-
-
+            return capacity_info_dict, 200
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
