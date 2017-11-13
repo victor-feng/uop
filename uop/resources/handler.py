@@ -871,263 +871,37 @@ class GetMyResourcesInfo(Resource):
         ret = requests.get(url)
         logging.info("ret:{}".format(ret.json()))
         return ret.json()
-        # query = {
-        #     'approval_status': 'success',
-        # }
-        #
-        # def comparable_time(s):
-        #         return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.000Z")
-        #
-        # try:
-        #     if user_id:
-        #         query['user_id'] = user_id
-        #     if resource_name:
-        #         query['resource_name'] = resource_name
-        #     if item_name:
-        #         query['project'] = item_name
-        #     if item_code:
-        #         query['project_id'] = item_code
-        #     resources = ResourceModel.objects.filter(**query).order_by('-created_date')
-        #
-        # except Exception as e:
-        #     print e
-        #     code = 500
-        #     ret = {
-        #         'code': code,
-        #         'result': {
-        #             'res': 'fail',
-        #             'msg': "Resource find error."
-        #         }
-        #     }
-        #     return ret
-        # if len(resources):
-        #     flag, resources_dic= get_resource_by_id_mult([res.cmdb_p_code for res in resources])
-        #     if not flag:
-        #         code = 500
-        #         logging.error("@@@@result:{}".format(resources_dic))
-        #         ret = {
-        #             'code': code,
-        #             'result': {
-        #                 'res': 'fail',
-        #                 'msg': '批量查询CMDB接口失败！'
-        #             }
-        #         }
-        #         return ret, code
-        #     for res in resources:
-        #         rcd = res.created_date
-        #         if start_time:
-        #             if rcd < comparable_time(start_time):
-        #                 continue
-        #         if end_time:
-        #             if rcd > comparable_time(end_time):
-        #                 continue
-        #         resource_info = resources_dic.get(res.cmdb_p_code, {})
-        #         result = {}
-        #         result['create_date'] = datetime.datetime.strftime(res.created_date, '%Y-%m-%d %H:%M:%S')
-        #         result['resource_name'] = res.resource_name
-        #         result['item_name'] = res.project
-        #         result['item_code'] = res.project_id
-        #         result['id'] = res.res_id
-        #         if not resource_type:
-        #             result_list.extend(self.get_source_item(res.compute_list, result, resource_info, 'docker'))
-        #             result_list.extend(self.get_source_item(res.resource_list, result, resource_info, 'db'))
-        #         else :
-        #             if resource_type == 'docker':
-        #                 source_list = res.compute_list
-        #             else:
-        #                 source_list = res.resource_list
-        #             result_list.extend(self.get_source_item(source_list, result, resource_info, resource_type))
-        # total_count=len(result_list)
-        # if page_num and page_count:
-        #     page_num=int(page_num)
-        #     page_count=int(page_count)
-        #     if result_list:
-        #         result_list=self._get_vm_status(page_num,page_count,result_list,resource_status)
-        # code = 200
-        # ret = {
-        #     'code': code,
-        #     'result': {
-        #         "res": 'success',
-        #         "msg": result_list,
-        #         "total_count":total_count,
-        #     }
-        # }
-        # return ret, code
 
-    # def _deal_os_ip_item(self,os_ins_ip_list):
-    #     res_list=[]
-    #     res_dic={}
-    #     for os_ip_dic in os_ins_ip_list:
-    #         os_ins_id=os_ip_dic["os_ins_id"]
-    #         os_type=os_ip_dic["os_type"]
-    #         ip=os_ip_dic["ip"]
-    #         res_dic[ip]=[os_ins_id,os_type]
-    #         res_list.append(res_dic)
-    #     return res_list
-    #
-    # def _get_vm_status(self,page_num,page_count,result_list,resource_status):
-    #     try:
-    #         results=[]
-    #         ed_ins_ids=[]
-    #         result_list=result_list[(page_num-1)*page_count:page_num*page_count]
-    #         for result in result_list:
-    #             res_id=result["id"]
-    #             resource_ip=result["resource_ip"]
-    #             resource=ResourceModel.objects.get(res_id=res_id)
-    #             os_ins_ip_list=resource.os_ins_ip_list
-    #             env=resource.env
-    #             os_ins_ip_list=self._deal_os_ip_item(os_ins_ip_list)
-    #             for os_ip_dic in os_ins_ip_list:
-    #                 os_ip_list = os_ip_dic.get(resource_ip, [])
-    #                 if os_ip_list:
-    #                     os_ins_id=os_ip_list[0]
-    #                     os_type=os_ip_list[1]
-    #                     if os_type == "docker":
-    #                         data={"os_inst_id":os_ins_id}
-    #                         data_str=json.dumps(data)
-    #                         headers = {'Content-Type': 'application/json'}
-    #                         if os_ins_id not in ed_ins_ids:
-    #                             res = requests.get(CRP_URL[env]+'api/openstack/nova/state', data=data_str, headers=headers)
-    #                             ed_ins_ids.append(os_ins_id)
-    #                             res=json.loads(res.content)
-    #                             vm_state=res["result"]["vm_state"]
-    #                             result['resource_status'] = vm_state
-    #                     else:
-    #                         result['resource_status'] = 'active'
-    #                 else:
-    #                     result['resource_status'] = 'active'
-    #             results.append(result)
-    #         if resource_status:
-    #             status_results=[]
-    #             for result in results:
-    #                 res_status=result["resource_status"]
-    #                 if resource_status == res_status:
-    #                     status_results.append(result)
-    #             results=status_results
-    #         return results
-    #     except Exception as e:
-    #         logging.error('get vm status err: %s' % e.args)
-    #
-    # def __get_vm_status(self, page_num, page_count, result_list, resource_status):
-    #     try:
-    #         results = []
-    #         ed_ins_ids = []
-    #         res_list = []
-    #         result_list = result_list[(page_num - 1) * page_count:page_num * page_count]
-    #         for result in result_list:
-    #             res_id = result["id"]
-    #             resource_ip = result["resource_ip"]
-    #             resource = ResourceModel.objects.get(res_id=res_id)
-    #             os_ins_ip_list = resource.os_ins_ip_list
-    #             env = resource.env
-    #             os_ins_ip_list = self._deal_os_ip_item(os_ins_ip_list)
-    #             for os_ip_dic in os_ins_ip_list:
-    #                 os_ip_list = os_ip_dic.get(resource_ip, [])
-    #                 if os_ip_list:
-    #                     os_ins_id = os_ip_list[0]
-    #                     os_type = os_ip_list[1]
-    #                     if os_type == "docker":
-    #                         if os_ins_id not in ed_ins_ids:
-    #                             result["os_ins_id"] = os_ins_id
-    #                             ed_ins_ids.append(os_ins_id)
-    #                     else:
-    #                         result["os_ins_id"] = os_ins_id
-    #                 else:
-    #                     result["os_ins_id"] = ''
-    #             result["resource_status"] = "active"
-    #             results.append(result)
-    #         data = {"os_inst_ids": ed_ins_ids}
-    #         data_str = json.dumps(data)
-    #         headers = {'Content-Type': 'application/json'}
-    #         res = requests.get(CRP_URL[env] + 'api/openstack/nova/state', data=data_str, headers=headers)
-    #         res = json.loads(res.content)
-    #         os_inst_status_dic = res["result"]["os_inst_status_dic"]
-    #         for result in results:
-    #             for os_id, os_status in os_inst_status_dic.items():
-    #                 if result["os_ins_id"] == os_id:
-    #                     result["resource_status"] = os_status
-    #             res_list.append(result)
-    #         if resource_status:
-    #             status_results=[]
-    #             for result in res_list:
-    #                 res_status=result["resource_status"]
-    #                 if resource_status == res_status:
-    #                     status_results.append(result)
-    #             res_list=status_results
-    #         return res_list
-    #     except Exception as e:
-    #         logging.error('get vm status err: %s' % e.args)
-    #         return []
-    #
-    # def get_source_item(self, source_list, result, resource_info, source_type):
-    #     result_list = []
-    #     # logging.info("&&&resource info:{}".format(resource_info))
-    #     if source_type == 'docker':
-    #         docker_counts_ip_list = resource_info.get(source_type, [])
-    #     for source in source_list:
-    #         if source.quantity == 0:
-    #             continue
-    #         result = copy.copy(result)
-    #         if source_type == 'docker':
-    #             logging.info("&&&resource info:{}".format(resource_info))
-    #             type = source_type
-    #             if not docker_counts_ip_list:
-    #                 continue
-    #             try:
-    #                 for i in range(source.quantity):
-    #                     tmp_result = copy.copy(result)
-    #                     current_ip = docker_counts_ip_list.pop().get("ip_address")
-    #                     if current_ip == '127.0.0.1':
-    #                         continue
-    #                     tmp_result['resource_ip'] = current_ip
-    #                     tmp_result['resource_type'] = type
-    #                     tmp_result['resource_config'] = [
-    #                         {'name': 'CPU', 'value': str(source.cpu) + '核'},
-    #                         {'name': '内存', 'value': str(source.mem) + 'GB'},
-    #                     ]
-    #                     tmp_result['resource_status'] = '运行中'
-    #                     result_list.append(tmp_result)
-    #             except Exception as exc:
-    #                 logging.error("$$$get_source_item docker ip error:{}".format(exc))
-    #         else:
-    #             if source_type == 'db':
-    #                 type = source.ins_type
-    #             elif source_type == 'mysqlandmongo':
-    #                 if source.ins_type == 'redis':
-    #                     continue
-    #                 else:
-    #                     type = source.ins_type
-    #             else:
-    #                 if source.ins_type == source_type:
-    #                     type = source.ins_type
-    #                 else:
-    #                     continue
-    #             _ip = 'ip'
-    #             _ip_ = 'vip'
-    #             if type == 'redis':
-    #                 _ip = 'vip'
-    #             elif type == 'mysql':
-    #                 _ip = 'wvip'
-    #             elif type == 'mongodb':
-    #                 _ip = 'vip1'
-    #             ip = type + '_cluster'
-    #             ins = type + '_instance'
-    #             tempip = resource_info.get(ip, {}).get(_ip)
-    #             tempip_ = resource_info.get(ins, {}).get(_ip_)
-    #             relip = tempip_ if tempip == '127.0.0.1' else tempip
-    #             if not relip:
-    #                 continue
-    #             result['resource_ip'] = relip
-    #             result['resource_type'] = type
-    #             result['resource_config'] = [
-    #                 {'name': 'CPU', 'value': str(source.cpu) + '核'},
-    #                 {'name': '内存', 'value': str(source.mem) + 'GB'},
-    #             ]
-    #             result['resource_status'] = '运行中'
-    #             result_list.append(result)
-    #     return result_list
-            
-
+    def put(self):
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': ""
+            }
+        }
+        user_id = request.args.get('user_id')
+        osid = request.args.get('osid', "")
+        env = request.args.get('env',"")
+        operation = request.args.get('operation', "")
+        logging.info("get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env, operation))
+        if operation not in ["start","stop","restart"]:
+            ret["result"]["msg"] = "parameter error"
+            ret["result"]["res"] = "operation must be one of start|stop|restart"
+            return ret, 500
+        if not osid or not osid or not user_id:
+            ret["result"]["msg"] = "some parameters is null"
+            ret["result"]["res"] = "osid:{}, user_id:{}, env:{}".format(osid, user_id, env)
+            return ret, 500
+        url = get_CRP_url(env)
+        manager_url = url + "api/vm_operation/operations"
+        data = {
+            "vm_uuid": osid,
+            "operation": operation
+        }
+        ret = requests.post(manager_url, data=json.dumps(data))
+        return ret.json()
 
 
 resources_api.add_resource(ResourceApplication, '/')
