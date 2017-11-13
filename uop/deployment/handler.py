@@ -1293,7 +1293,6 @@ class CapacityInfoAPI(Resource):
                                "quantity": compute_.quantity, 'domain_ip': compute_.domain_ip,
                                'domain': compute_.domain }
                         tmp['meta'] = compute_.docker_meta if getattr(compute_, "docker_meta", "") else ""
-                        logging.debug(tmp)
                         tmp2= copy.deepcopy(tmp)
                         tmp_app = Approval.objects.filter(approval_id=capacity_.capacity_id, approval_status__in=['increate_success','reduce_success'])
                         #判断审批是否通过，审批时展示的数据
