@@ -900,7 +900,7 @@ class GetMyResourcesInfo(Resource):
             "vm_uuid": osid,
             "operation": operation
         }
-        ret = requests.post(manager_url, data=json.dumps(data))
+        ret = requests.post(manager_url, data=data)
         return ret.json()
 
 
