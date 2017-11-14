@@ -554,7 +554,8 @@ class ResourceDetail(Resource):
                                 "mem": db_res.mem,
                                 "disk": db_res.disk,
                                 "quantity": db_res.quantity,
-                                "version": db_res.version
+                                "version": db_res.version,
+                                "volume_size": db_res.volume_size
                             }
                         )
                 if compute_list:
@@ -669,8 +670,9 @@ class ResourceDetail(Resource):
             disk = resource.get('disk')
             quantity = resource.get('quantity')
             version = resource.get('version')
+            volume_size = resource.get('volume_size',0)
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version)
+                           quantity=quantity, version=version,volume_size=volume_size)
             resource_application.resource_list.append(db_ins)
 
         for compute in compute_list:
