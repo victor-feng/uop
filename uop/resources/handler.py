@@ -126,8 +126,9 @@ class ResourceApplication(Resource):
             disk = resource.get('disk')
             quantity = resource.get('quantity')
             version = resource.get('version')
+            volume_size = resource.get('volume_size',0)
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version)
+                           quantity=quantity, version=version,volume_size=volume_size)
             resource_application.resource_list.append(db_ins)
 
         ins_name_list = []

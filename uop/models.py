@@ -156,6 +156,7 @@ class DBIns(db.EmbeddedDocument):
     disk = db.IntField(required=False)
     quantity = db.IntField(required=False, default_value=0)
     version = db.StringField(required=False)
+    volume_size = db.IntField(required=False, default_value=0)
     meta = {
         'collection': 'db_ins',
         'index': [
