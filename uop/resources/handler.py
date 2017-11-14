@@ -881,10 +881,10 @@ class GetMyResourcesInfo(Resource):
                 'msg': ""
             }
         }
-        user_id = request.args.get('user_id')
-        osid = request.args.get('osid', "")
-        env = request.args.get('env',"")
-        operation = request.args.get('operation', "")
+        user_id = request.json.get('user_id')
+        osid = request.json.get('osid', "")
+        env = request.json.get('env',"")
+        operation = request.json.get('operation', "")
         logging.info("get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env, operation))
         if operation not in ["start","stop","restart"]:
             ret["result"]["msg"] = "parameter error"
