@@ -492,6 +492,8 @@ class CapacityInfoAPI(Resource):
                 else:
                     approval.approval_status = "%s_failed"%(approval.capacity_status)
                     deployment.approve_status = "%s_failed"%(approval.capacity_status)
+                    deployment.deploy_result = "not_deployed"
+
                 approval.save()
                 resource.save()
                 deployment.save()
