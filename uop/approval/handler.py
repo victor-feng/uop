@@ -362,7 +362,8 @@ class ReservationAPI(Resource):
                         "mem": db_res.mem,
                         "disk": db_res.disk,
                         "quantity": db_res.quantity,
-                        "version": db_res.version
+                        "version": db_res.version,
+                        "volume_size": db_res.volume_size
                     }
                 )
             data['resource_list'] = res
@@ -573,7 +574,8 @@ class CapacityReservation(Resource):
                         "mem": db_res.mem,
                         "disk": db_res.disk,
                         "quantity": 0,
-                        "version": db_res.version
+                        "version": db_res.version,
+                        "volume_size": db_res.volume_size
                     }
                 )
             data['resource_list'] = res
