@@ -1286,11 +1286,12 @@ class ResourceDeleteCallBack(Resource):
         os_inst_id = request_data.get('os_inst_id')
         unique_flag = request_data.get('unique_flag')
         del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
+        set_flag = request_data.get('set_flag', [])
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
-            #resources 存在说明是扩容不是正常删除
-            if len(resources) > 0:
+            #set_flag == "reduce" 存在说明是缩容不是正常删除
+            if set_flag == "reduce":
                 resource=resources[0]
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                 dep = deps[0]
@@ -1342,11 +1343,10 @@ class ResourceDeleteCallBack(Resource):
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
-                    create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success","reduce")
+                    create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success",set_flag)
                     dep.deploy_result = "docker_reduce_success"
                     dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
-                    set_flag = "reduce"
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
                     deploy_nginx_to_crp(resource_id,url,set_flag)
