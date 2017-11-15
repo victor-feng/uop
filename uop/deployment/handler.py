@@ -334,22 +334,20 @@ def disconf_write_to_file(file_name, file_content, instance_name, type):
 
 def attach_domain_ip(compute_list, res):
         old_compute_list = res.compute_list
+        os_ins_list = res.os_ins_ip_list
         appinfo = []
-        # flag = False
-        # for c in compute_list:
-        #     # if not c.get("domain_ip", ""):
-        #     #     return False, appinfo
-        #     if c.get("domain_ip", ""):
-        #         flag = True
-        #         break
-        # if not flag:
-        #     return False, appinfo #不需要上传nginx配置，直接返回，不做入库操作
+        cmdb_data = []
         try:
             for i in old_compute_list:
                 tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id) and x.get("domain_ip", "")]
                 if len(tmp) > 0:
                     tmp=tmp[0]
                     tmp["ips"] = i.ips
+                    tmp["osid"] = []
+                    for os_ins in os_ins_list:
+                        if os_ins.ip in tmp["ips"]:
+                            tmp["osid"].append(os_ins.os_ins_id) # 传给crp
+                    cmdb_data.append({"osid":tmp["osid"],"domain":tmp["domain"],"domain_ip":tmp["domain_ip"]})
                     appinfo.append(tmp) # 将配置了nginx IP的 app传回，以便传回crp进行配置推送
             for i in xrange(0, len(old_compute_list)): # 更新resources表中的镜像url和可能配置nginx IP信息
                 match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
@@ -359,6 +357,15 @@ def attach_domain_ip(compute_list, res):
                                              url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one.get("domain_ip", ""),capacity_list=o.capacity_list)
                 old_compute_list.insert(i, compute)
                 res.save()
+            logging.info("$$$$$$$$ Push domain info to cmdb stashvm")
+            data = {"osid_domain": cmdb_data}
+            CMDB_URL = current_app.config['CMDB_URL']
+            url = CMDB_URL + 'cmdb/api/vmdocker/status/'
+            ret = requests.put(url, data=json.dumps(data))
+            if ret.json()["code"] == 2002:
+                logging.info("$$$$$$$$ Push domain info to cmdb stashvm, success")
+            else:
+                logging.info("$$$$$$$$ Push domain info to cmdb stashvm: {}".format(ret.json()))
             return appinfo
         except Exception as e:
             logging.error( "attach domain_ip to appinfo error:{}".format(e.args))
