@@ -357,11 +357,10 @@ class ResourceApplication(Resource):
         parser.add_argument('res_id', type=str)
         args = parser.parse_args()
         res_id = args.res_id
-
         try:
+            os_inst_ip_list=[]
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
-                os_ins_list = resources.os_ins_list
                 deploys = Deployment.objects.filter(resource_id=res_id)
                 for deploy in deploys:
                     env_ = get_CRP_url(deploy.environment)
@@ -388,10 +387,17 @@ class ResourceApplication(Resource):
                     requests.delete(crp_url, data=crp_data)
                     #deploy.delete()
                 # 调用CRP 删除资源
+                os_ins_ip_list=resources.os_ins_ip_list
+                for os_ip in os_ins_ip_list:
+                    os_ip_dict={}
+                    os_ip_dict["os_ins_id"]=os_ip.get("os_ins_id")
+                    os_ip_dict["ip"] = os_ip.get("os_ins_id")
+                    os_ip_dict["os_vol_id"] = os_ip.get("os_vol_id")
+                    os_inst_ip_list.append(os_ip_dict)
                 crp_data = {
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
-                        "os_ins_ip_list":resources.os_ins_ip_list,
+                        "os_ins_ip_list":resources.os_inst_ip_list,
                         "vid_list": resources.vid_list,
                         "set_flag": 'res'
                 }
