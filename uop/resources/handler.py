@@ -390,14 +390,13 @@ class ResourceApplication(Resource):
                 os_ins_ip_list=resources.os_ins_ip_list
                 for os_ip in os_ins_ip_list:
                     os_ip_dict={}
-                    os_ip_dict["os_ins_id"]=os_ip.get("os_ins_id")
-                    os_ip_dict["ip"] = os_ip.get("os_ins_id")
-                    os_ip_dict["os_vol_id"] = os_ip.get("os_vol_id")
+                    os_ip_dict["os_inst_id"]=os_ip["os_ins_id"]
+                    os_ip_dict["os_vol_id"] = os_ip["os_vol_id"]
                     os_inst_ip_list.append(os_ip_dict)
                 crp_data = {
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
-                        "os_ins_ip_list":resources.os_inst_ip_list,
+                        "os_ins_ip_list":os_inst_ip_list,
                         "vid_list": resources.vid_list,
                         "set_flag": 'res'
                 }
