@@ -18,6 +18,7 @@ from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig
 from uop.resources.errors import resources_errors
+from uop.scheduler_util import flush_crp_to_cmdb
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
 
@@ -904,7 +905,11 @@ class GetMyResourcesInfo(Resource):
             "operation": operation
         }
         ret = requests.post(manager_url, data=data)
-        return ret.json()
+        # 操作成功 调用查询docker状态的接口
+        response = ret.json()
+        if response.get('code') == 200:
+            flush_crp_to_cmdb()
+        return response
 
 
 resources_api.add_resource(ResourceApplication, '/')
