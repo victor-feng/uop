@@ -907,15 +907,25 @@ class GetMyResourcesInfo(Resource):
             return ret, 500
         url = get_CRP_url(env)
         manager_url = url + "api/vm_operation/startorstop"
-        res = Resource.objects.get(res_id=resource_id)
-
+        res = ResourceModel.objects.get(res_id=resource_id)
+        app_list =  res.compute_list
+        appinfo = []
+        for app in app_list:
+            items = {}
+            items['domain_ip'] = app.domain_ip
+            items['ips'] = app.ips
+            items['port'] = app.port
+            items['domain'] = app.domain
+            appinfo.append(items)
         data = {
             "vm_uuid": osid,
             "operation": operation,
-            "appinfo": res.compute_list,
+            "appinfo": appinfo,
             "ip": resource_ip,
         }
-        ret = requests.post(manager_url, data=data)
+        headers = {'Content-Type': 'application/json'}
+        data_str = json.dumps(data)
+        ret = requests.post(manager_url, data=data_str, headers=headers)
         # 操作成功 调用查询docker状态的接口
         response = ret.json()
         if response.get('code') == 200:
