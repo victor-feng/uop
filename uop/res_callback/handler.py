@@ -1222,8 +1222,7 @@ class ResourceStatusProviderCallBack(Resource):
         args = parser.parse_args()
         resource_id=args.resource_id
         try:
-            set_status_record = StatusRecord.objects.filter(res_id=resource_id,set_flag="res").order_by('created_time')
-            cap_status_record = StatusRecord.objects.filter(res_id=resource_id, set_flag__in=["reduce","increate"]).order_by('created_time')
+            set_status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
             set_msg_list=[]
             dep_msg_list=[]
             data={}
@@ -1252,9 +1251,6 @@ class ResourceStatusProviderCallBack(Resource):
                 else:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     set_msg_list.append(s_msg)
-            for cap_sr in cap_status_record:
-                cap_s_msg = cap_sr.created_time.strftime('%Y-%m-%d %H:%M:%S') + ':' + cap_sr.msg
-                dep_msg_list.append(cap_s_msg)
             data["set"]=set_msg_list
             data["deploy"]=dep_msg_list         
         except Exception as e:
