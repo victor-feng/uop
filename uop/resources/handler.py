@@ -889,6 +889,8 @@ class GetMyResourcesInfo(Resource):
         osid = request.json.get('osid', "")
         env = request.json.get('env',"")
         operation = request.json.get('operation', "")
+        resource_id = request.json.get('resource_id', "")
+        resource_ip = request.json.get('resource_ip', "")
         logging.info("get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env, operation))
         if operation not in ["start","stop","restart"]:
             ret["result"]["msg"] = "parameter error"
@@ -899,10 +901,14 @@ class GetMyResourcesInfo(Resource):
             ret["result"]["res"] = "osid:{}, user_id:{}, env:{}".format(osid, user_id, env)
             return ret, 500
         url = get_CRP_url(env)
-        manager_url = url + "api/vm_operation/operations"
+        manager_url = url + "api/vm_operation/startorstop"
+        res = Resource.objects.get(res_id=resource_id)
+
         data = {
             "vm_uuid": osid,
-            "operation": operation
+            "operation": operation,
+            "appinfo": res.compute_list,
+            "ip": resource_ip,
         }
         ret = requests.post(manager_url, data=data)
         # 操作成功 调用查询docker状态的接口
