@@ -626,12 +626,11 @@ class CapacityReservation(Resource):
                 os_inst_id_list=[]
                 reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
                 for os_ip_dict in reduce_list:
-                    os_inst_id = os_ip_dict["os_inst_id"]
+                    os_inst_id = os_ip_dict["os_ins_id"]
                     os_inst_id_list.append(os_inst_id)
                 crp_data = {
                         "resources_id": resource.res_id,
                         "os_ins_ip_list": reduce_list,
-                        "os_inst_id_list": os_inst_id_list,
                         "vid_list": [],
                         "set_flag": 'reduce'
                 }
