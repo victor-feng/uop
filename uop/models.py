@@ -171,6 +171,7 @@ class DBIns(db.EmbeddedDocument):
 class OS_ip_dic(db.EmbeddedDocument):
     ip=db.StringField(required=True)
     os_ins_id = db.StringField(requirquired=False)
+    os_vol_id = db.StringField(requirquired=False)
     os_type = db.StringField(required=True)
     cpu = db.StringField(required=False)
     mem = db.StringField(required=False)

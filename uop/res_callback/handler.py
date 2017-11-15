@@ -959,7 +959,8 @@ Post Request JSON Body：
                 for instance in instances:
                     os_ins_id = instance.get('os_inst_id')
                     ip=instance.get('ip')
-                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker",cpu=cpu,mem=mem)
+                    os_vol_id=instance.get('os_vol_id')
+                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker",cpu=cpu,mem=mem,os_vol_id=os_vol_id)
                     os_ip_list.append(os_ip_dic)
                     os_ids.append(os_ins_id)
 
