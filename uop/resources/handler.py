@@ -391,6 +391,7 @@ class ResourceApplication(Resource):
                 crp_data = {
                         "resources_id": resources.res_id,
                         "os_inst_id_list": resources.os_ins_list,
+                        "os_ins_ip_list":resources.os_ins_ip_list,
                         "vid_list": resources.vid_list,
                         "set_flag": 'res'
                 }
