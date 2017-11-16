@@ -137,3 +137,15 @@ def flush_crp_to_cmdb():
                 logging.info("flush_crp_to_cmdb crp->openstack result is null")
         except Exception as exc:
             logging.error("flush_crp_to_cmdb error:{}".format(exc))
+
+
+def flush_crp_to_cmdb_by_osid(osid, env):
+    url = get_CRP_url(env)
+    crp_url = '%s%s' % (url, 'api/openstack/nova/state?os_inst_id='+ osid)
+    ret = requests.get(crp_url).json()
+    logging.info("flush_crp_to_cmdb_by_osid crp result is:{}".format(ret))
+    if ret.get('code') == 200:
+        status = ret["result"]["vm_state"]
+        cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+        ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
+        logging.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))
