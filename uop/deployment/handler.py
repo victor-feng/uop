@@ -369,7 +369,7 @@ def attach_domain_ip(compute_list, res):
             return appinfo
         except Exception as e:
             logging.error( "attach domain_ip to appinfo error:{}".format(e.args))
-            return []
+            return appinfo
 
 
 class DeploymentListAPI(Resource):
