@@ -906,22 +906,11 @@ class GetMyResourcesInfo(Resource):
             ret["result"]["res"] = "osid:{}, user_id:{}, env:{}".format(osid, user_id, env)
             return ret, 500
         url = get_CRP_url(env)
-        manager_url = url + "api/vm_operation/startorstop"
-        res = ResourceModel.objects.get(res_id=resource_id)
-        app_list =  res.compute_list
-        appinfo = []
-        for app in app_list:
-            items = {}
-            items['domain_ip'] = app.domain_ip
-            items['ips'] = app.ips
-            items['port'] = app.port
-            items['domain'] = app.domain
-            appinfo.append(items)
+        manager_url = url + "api/vm_operation/operations"
+
         data = {
             "vm_uuid": osid,
             "operation": operation,
-            "appinfo": appinfo,
-            "ip": resource_ip,
         }
         headers = {'Content-Type': 'application/json'}
         data_str = json.dumps(data)
