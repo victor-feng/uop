@@ -918,6 +918,7 @@ class GetMyResourcesInfo(Resource):
         # 操作成功 调用查询docker状态的接口
         response = ret.json()
         if response.get('code') == 200:
+            time.sleep(3)
             flush_crp_to_cmdb()
         return response
 
