@@ -1081,7 +1081,7 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
             app_dict["meta"] = compute.get("meta", "")
             app_image.append(app_dict)
         """
-        appinfo = attach_domain_ip(app_image, resource)
+        appinfo = attach_domain_ip(app_image, resource,None)
         logging.debug("----------this is appinfo---------------")
         logging.debug(appinfo)
         data = {}
