@@ -207,7 +207,7 @@ property_json_mapper_config = {
 mapping_type_status = {
            'mysql' : 'mysql',
            'mycat' : 'mysql',
-           'mongodb' : 'mongodb',
+           'mongodb' : 'mongo',
            'redis' : 'redis',
            'app_cluster' : 'docker',
 }
