@@ -104,7 +104,9 @@ def get_resource_by_id_mult(p_codes):
 def get_resource_by_id(resource_id):
     err_msg = None
     resource_info = {}
-    resource = ResourceModel.objects.get(res_id=resource_id)
+    resources = ResourceModel.objects.filter(res_id=resource_id)
+    if resources:
+        resource=resources[0]
     try:
         headers = {'Content-Type': 'application/json'}
         data = {
