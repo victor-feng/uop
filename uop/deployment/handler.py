@@ -392,7 +392,7 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         condition = {}
-        is_nginx=0
+        domain_info={}
         if args.deploy_id:
             condition['deploy_id'] = args.deploy_id
         if args.user_id:
@@ -421,10 +421,16 @@ class DeploymentListAPI(Resource):
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
             for dep in deps:
                 app_image=eval(dep.app_image)
-                domain_ip=app_image.get("domain_ip")
-                if domain_ip:
-                    is_nginx=1
-                    break
+                for app in app_image:
+                    domain = app.get("domain")
+                    domain_ip=app.get("domain_ip")
+                    if domain and domain_ip:
+                        is_nginx=1
+                        domain_info[domain]=is_nginx
+                        break
+                    elif domain and not domain_ip:
+                        is_nginx = 0
+                        domain_info[domain] = is_nginx
         deployments = []
         try:
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
@@ -454,6 +460,13 @@ class DeploymentListAPI(Resource):
                         else:
                             disconf.append(instance_info)
                 ###############
+                app_image=eval(deployment.app_image)
+                for app in app_image:
+                    domain=app.get("domain")
+                    if not domain:
+                        app["is_nginx"]=0
+                    else:
+                        app["is_nginx"]=domain_info[domain]
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -471,7 +484,7 @@ class DeploymentListAPI(Resource):
                     'redis_context': deployment.redis_context,
                     'mongodb_tag': deployment.mongodb_tag,
                     'mongodb_context': deployment.mongodb_context,
-                    'app_image': eval(str(deployment.app_image)),
+                    'app_image': app_image,
                     # 'app_image': type(deployment.app_image),
                     'created_time': str(deployment.created_time),
                     'deploy_result': deployment.deploy_result,
