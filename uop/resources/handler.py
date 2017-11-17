@@ -919,6 +919,13 @@ class GetMyResourcesInfo(Resource):
         response = ret.json()
         if response.get('code') == 200:
             flush_crp_to_cmdb_by_osid(osid, env)
+            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+            if operation == 'start':
+                status = 'startting'
+            elif operation == 'stop':
+                status = 'stopping'
+            ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
+
         return response
 
 
