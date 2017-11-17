@@ -388,9 +388,11 @@ class DeploymentListAPI(Resource):
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
         parser.add_argument('approve_status', type=str, location='args')
+        parser.add_argument('resource_id', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
+        is_nginx=0
         if args.deploy_id:
             condition['deploy_id'] = args.deploy_id
         if args.user_id:
@@ -412,10 +414,19 @@ class DeploymentListAPI(Resource):
             condition['created_time__lte'] = args.end_time
         if args.approve_status:
             condition['approve_status'] = args.approve_status
-
+        if args.resource_id:
+            resource_id=args.resource_id
+            condition['resource_id'] = resource_id
+            #判断是否必填nginx，如果之前的部署填过nginx，之后的部署必须填nginx
+            deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
+            for dep in deps:
+                app_image=eval(dep.app_image)
+                domain_ip=app_image.get("domain_ip")
+                if domain_ip:
+                    is_nginx=1
+                    break
         deployments = []
         try:
-
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
                 #返回disconf的json
                 disconf = []
@@ -442,7 +453,7 @@ class DeploymentListAPI(Resource):
                                 break
                         else:
                             disconf.append(instance_info)
-                ################
+                ###############
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
@@ -469,7 +480,8 @@ class DeploymentListAPI(Resource):
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
-                    'is_rollback':deployment.is_rollback
+                    'is_rollback':deployment.is_rollback,
+                    "is_nginx":is_nginx
                 })
         except Exception as e:
             res = {
