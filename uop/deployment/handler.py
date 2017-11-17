@@ -425,7 +425,7 @@ class DeploymentListAPI(Resource):
                 app_image=eval(dep.app_image)
                 for app in app_image:
                     domain_ip=app.get("domain_ip")
-                    ins_id=app.get("ins_id")
+                    ins_id=app.get("ins_id",'')
                     if  domain_ip:
                         is_nginx=1
                         domain_info[ins_id]=is_nginx
@@ -465,7 +465,7 @@ class DeploymentListAPI(Resource):
                 app_image=eval(deployment.app_image)
                 for app in app_image:
                     domain=app.get("domain")
-                    ins_id = app.ins_id
+                    ins_id = app.get("ins_id", '')
                     if not domain:
                         app["is_nginx"]=0
                     else:
