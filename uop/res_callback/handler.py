@@ -1286,7 +1286,7 @@ class ResourceDeleteCallBack(Resource):
         os_inst_id = request_data.get('os_inst_id')
         unique_flag = request_data.get('unique_flag')
         del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
-        set_flag = request_data.get('set_flag', [])
+        set_flag = request_data.get('set_flag', '')
         try:
             os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id)
