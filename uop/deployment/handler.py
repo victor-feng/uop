@@ -426,13 +426,15 @@ class DeploymentListAPI(Resource):
                 for app in app_image:
                     domain_ip=app.get("domain_ip")
                     ins_id=app.get("ins_id",'')
-                    if  domain_ip:
+                    if not domain_ip:
+                        is_nginx = 0
+                        domain_info[ins_id] = is_nginx
+                        continue
+                    elif  domain_ip:
                         is_nginx=1
                         domain_info[ins_id]=is_nginx
                         break
-                    elif not domain_ip:
-                        is_nginx = 0
-                        domain_info[ins_id] = is_nginx
+                    break
         deployments = []
         try:
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
