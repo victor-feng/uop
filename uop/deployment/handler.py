@@ -493,8 +493,7 @@ class DeploymentListAPI(Resource):
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
-                    'is_rollback':deployment.is_rollback,
-                    "is_nginx":is_nginx
+                    'is_rollback':deployment.is_rollback
                 })
         except Exception as e:
             res = {
