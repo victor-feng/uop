@@ -466,7 +466,7 @@ class DeploymentListAPI(Resource):
                     if not domain:
                         app["is_nginx"]=0
                     else:
-                        app["is_nginx"]=domain_info[domain]
+                        app["is_nginx"]=domain_info.get(domain,0)
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
