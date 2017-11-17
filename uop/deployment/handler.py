@@ -424,15 +424,15 @@ class DeploymentListAPI(Resource):
             for dep in deps:
                 app_image=eval(dep.app_image)
                 for app in app_image:
-                    domain = app.get("domain")
                     domain_ip=app.get("domain_ip")
-                    if domain and domain_ip:
+                    ins_id=app.ins_id
+                    if  domain_ip:
                         is_nginx=1
-                        domain_info[domain]=is_nginx
+                        domain_info[ins_id]=is_nginx
                         break
-                    elif domain and not domain_ip:
+                    elif not domain_ip:
                         is_nginx = 0
-                        domain_info[domain] = is_nginx
+                        domain_info[ins_id] = is_nginx
         deployments = []
         try:
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
@@ -465,10 +465,11 @@ class DeploymentListAPI(Resource):
                 app_image=eval(deployment.app_image)
                 for app in app_image:
                     domain=app.get("domain")
+                    ins_id = app.ins_id
                     if not domain:
                         app["is_nginx"]=0
                     else:
-                        app["is_nginx"]=domain_info.get(domain,0)
+                        app["is_nginx"]=domain_info.get(ins_id,0)
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
