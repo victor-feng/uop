@@ -332,7 +332,7 @@ def disconf_write_to_file(file_name, file_content, instance_name, type):
     return upload_file
 
 
-def attach_domain_ip(compute_list, res,CMDB_URL):
+def attach_domain_ip(compute_list, res,cmdb_url):
         old_compute_list = res.compute_list
         os_ins_list = res.os_ins_ip_list
         appinfo = []
@@ -357,11 +357,11 @@ def attach_domain_ip(compute_list, res,CMDB_URL):
                                              url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one.get("domain_ip", ""),capacity_list=o.capacity_list)
                 old_compute_list.insert(i, compute)
                 res.save()
-            if CMDB_URL:
+            if cmdb_url:
                 logging.info("$$$$$$$$ Push domain info to cmdb stashvm")
                 data = {"osid_domain": cmdb_data}
                 #CMDB_URL = current_app.config['CMDB_URL']
-                url = CMDB_URL + 'cmdb/api/vmdocker/status/'
+                url = cmdb_url + 'cmdb/api/vmdocker/status/'
                 ret = requests.put(url, data=json.dumps(data))
                 if ret.json()["code"] == 2002:
                     logging.info("$$$$$$$$ Push domain info to cmdb stashvm, success")
@@ -588,8 +588,8 @@ class DeploymentListAPI(Resource):
                 deploy_obj.app_image = str(app_image)
                 deploy_obj.save()
                 resource = ResourceModel.objects.get(res_id=resource_id)
-                CMDB_URL = current_app.config['CMDB_URL']
-                appinfo = attach_domain_ip(app_image, resource,CMDB_URL)
+                cmdb_url = current_app.config['CMDB_URL']
+                appinfo = attach_domain_ip(app_image, resource,cmdb_url)
 
                 #2、把配置推送到disconf
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
