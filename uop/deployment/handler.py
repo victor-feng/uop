@@ -421,6 +421,7 @@ class DeploymentListAPI(Resource):
             condition['resource_id'] = resource_id
             #判断是否必填nginx，如果之前的部署填过nginx，之后的部署必须填nginx
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
+            domain_ip_flag = 0
             for dep in deps:
                 app_image=eval(dep.app_image)
                 for app in app_image:
@@ -433,8 +434,9 @@ class DeploymentListAPI(Resource):
                     elif  domain_ip:
                         is_nginx=1
                         domain_info[ins_id]=is_nginx
+                        domain_ip_flag = 1
                         break
-                    break
+                if domain_ip_flag == 1: break
         deployments = []
         try:
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
