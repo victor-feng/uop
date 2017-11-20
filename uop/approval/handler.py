@@ -470,7 +470,6 @@ class CapacityInfoAPI(Resource):
             parser.add_argument('docker_network_id', type=str)
             args = parser.parse_args()
             approval_id = args.approval_id
-
             approval = models.Approval.objects.get(approval_id=approval_id)
             deployment = models.Deployment.objects.get(deploy_id=approval_id)
             if approval:
@@ -488,7 +487,10 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success"%(approval.capacity_status)
-                    deployment.deploy_result="deploying"
+                    if approval.capacity_status == "increate":
+                        deployment.deploy_result="increating"
+                    elif approval.capacity_status == "reduce":
+                        deployment.deploy_result = "reducing"
                 else:
                     approval.approval_status = "%s_failed"%(approval.capacity_status)
                     deployment.approve_status = "%s_failed"%(approval.capacity_status)

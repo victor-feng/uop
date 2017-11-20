@@ -1019,7 +1019,7 @@ Post Request JSON Body：
                     status_record.status = "increate_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result="deploy_fail"
+                    dep.deploy_result="increate_fail"
                     dep.save()
             status_record.save()
             resource.reservation_status = status_record.status
@@ -1174,13 +1174,13 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                if set_flag == "res":
-                    resource.reservation_status = status_record.status
-                resource.save()
-                if set_flag == "increate":
-                    dep.deploy_result=status_record.status
-                    dep.save()
+                #resource = ResourceModel.objects.get(res_id=resource_id)
+                #if set_flag == "res":
+                #    resource.reservation_status = status_record.status
+                #resource.save()
+                #if set_flag == "increate":
+                #    dep.deploy_result=status_record.status
+                #    dep.save()
             if db_push:
                 resource_id = db_push.get('resource_id')
                 cluster_type = db_push.get('cluster_type')
@@ -1192,9 +1192,9 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.reservation_status = status_record.status
-                resource.save()
+                #resource = ResourceModel.objects.get(res_id=resource_id)
+                #resource.reservation_status = status_record.status
+                #resource.save()
                  
         except Exception as e:
             logging.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
@@ -1338,14 +1338,14 @@ class ResourceDeleteCallBack(Resource):
                 status_record.deploy_id = deploy_id
                 status_record.unique_flag = unique_flag
                 status_record.save()
-                dep.deploy_result = "docker_reduce_success"
-                dep.save()
+                #dep.deploy_result = "docker_reduce_success"
+                #dep.save()
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
                     create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success",set_flag)
-                    dep.deploy_result = "docker_reduce_success"
-                    dep.save()
+                    #dep.deploy_result = "docker_reduce_success"
+                    #dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
