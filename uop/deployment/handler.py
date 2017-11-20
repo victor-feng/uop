@@ -394,7 +394,7 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         condition = {}
-        domain_info={}
+        domain_info=[]
         if args.deploy_id:
             condition['deploy_id'] = args.deploy_id
         if args.user_id:
@@ -421,22 +421,13 @@ class DeploymentListAPI(Resource):
             condition['resource_id'] = resource_id
             #判断是否必填nginx，如果之前的部署填过nginx，之后的部署必须填nginx
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
-            domain_ip_flag = 0
             for dep in deps:
                 app_image=eval(dep.app_image)
                 for app in app_image:
                     domain_ip=app.get("domain_ip")
                     ins_id=app.get("ins_id",'')
-                    if not domain_ip:
-                        is_nginx = 0
-                        domain_info[ins_id] = is_nginx
-                        continue
-                    elif  domain_ip:
-                        is_nginx=1
-                        domain_info[ins_id]=is_nginx
-                        domain_ip_flag = 1
-                        break
-                if domain_ip_flag == 1: break
+                    if  domain_ip:
+                        domain_info.append(ins_id)
         deployments = []
         try:
             for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
@@ -472,8 +463,8 @@ class DeploymentListAPI(Resource):
                     ins_id = app.get("ins_id", '')
                     if not domain:
                         app["is_nginx"]=0
-                    else:
-                        app["is_nginx"]=domain_info.get(ins_id,0)
+                    elif ins_id in domain_info:
+                        app["is_nginx"]=1
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
