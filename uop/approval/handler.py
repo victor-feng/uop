@@ -487,14 +487,17 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success"%(approval.capacity_status)
-                    if approval.capacity_status == "increate":
-                        deployment.deploy_result="increating"
+                    if approval.capacity_status == "increase":
+                        deployment.deploy_result="increasing"
                     elif approval.capacity_status == "reduce":
                         deployment.deploy_result = "reducing"
                 else:
                     approval.approval_status = "%s_failed"%(approval.capacity_status)
                     deployment.approve_status = "%s_failed"%(approval.capacity_status)
-                    deployment.deploy_result = "not_deployed"
+                    if approval.capacity_status == "increase":
+                        deployment.deploy_result="not_increased"
+                    elif approval.capacity_status == "reduce":
+                        deployment.deploy_result = "not_reduced"
 
                 approval.save()
                 resource.save()
@@ -547,7 +550,7 @@ class CapacityReservation(Resource):
             return ret, code
 
         data = dict()
-        data['set_flag'] = 'increate'
+        data['set_flag'] = 'increase'
         data['unit_id'] = resource.project_id
         #data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
@@ -616,7 +619,7 @@ class CapacityReservation(Resource):
         headers = {'Content-Type': 'application/json'}
         try:
             approval = models.Approval.objects.get(approval_id=approval_id)
-            if approval.capacity_status=='increate':
+            if approval.capacity_status=='increase':
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
             elif approval.capacity_status == 'reduce':

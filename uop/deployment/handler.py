@@ -1194,9 +1194,13 @@ class CapacityAPI(Resource):
                 for compute_ in compute_list:
                     if compute_.ins_id == cluster_id:
                         if int(number) > int(compute_.quantity):
-                            capacity_status = 'increate'
+                            capacity_status = 'increase'
+                            deploy_result="increase_to_approve"
+                            approval_status="increasing"
                         else:
                             capacity_status = 'reduce'
+                            deploy_result = "reduce_to_approve"
+                            approval_status = "reducing"
                         begin_number=compute_.quantity
                         end_number=number
                         approval_id = str(uuid.uuid1())
@@ -1205,7 +1209,7 @@ class CapacityAPI(Resource):
                         capacity_list.append(capacity)
                         resource.save()
 
-                        approval_status = '%sing'%(capacity_status)
+                        #approval_status = '%sing'%(capacity_status)
                         create_date = datetime.datetime.now()
                         deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
@@ -1231,7 +1235,7 @@ class CapacityAPI(Resource):
                                 mongodb_tag=old_deployment.mongodb_tag,
                                 mongodb_context=old_deployment.mongodb_context,
                                 app_image=old_deployment.app_image,
-                                deploy_result="deploy_to_approve",
+                                deploy_result=deploy_result,
                                 apply_status="success",
                                 approve_status=approval_status,
                                 approve_suggestion=old_deployment.approve_suggestion,

@@ -216,7 +216,7 @@ class DeployStatusProviderCallBack(Resource):
             data={}
             dep_msg_list=[]
             dep_status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
-            #set_status_records = StatusRecord.objects.filter(res_id=resource_id,set_flag="increate").order_by('created_time')
+            #set_status_records = StatusRecord.objects.filter(res_id=resource_id,set_flag="increase").order_by('created_time')
             #del_status_records = StatusRecord.objects.filter(res_id=resource_id, set_flag="reduce").order_by('created_time')
             """
             if set_status_records:

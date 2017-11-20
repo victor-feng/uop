@@ -924,7 +924,7 @@ Post Request JSON Body：
 
             if is_write_to_cmdb is True:
                 logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-                if set_flag =="increate":
+                if set_flag =="increase":
                    CMDB_URL = current_app.config['CMDB_URL']
                    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
                    old_pcode = copy.deepcopy(resource.cmdb_p_code)
@@ -936,7 +936,7 @@ Post Request JSON Body：
                            new_pcode = pcode
                            break
                    cmdb_req = {"old_pcode":old_pcode, "new_pcode": new_pcode, "app_cluster_name":app_cluster_name}
-                   logging.info("increate to CMDB cmdb_req:{}".format(cmdb_req))
+                   logging.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
                    data = json.dumps(cmdb_req)
                    ret = requests.post(CMDB_STATUS_URL, data=data)
                    logging.info("CMDB return:{}".format(ret))
@@ -1007,25 +1007,25 @@ Post Request JSON Body：
                 if set_flag == "res":
                     status_record.status="set_success"
                     status_record.msg="预留成功"
-                if set_flag == "increate":
-                    status_record.status="increate_success"
+                if set_flag == "increase":
+                    status_record.status="increase_success"
                     status_record.msg="docker扩容成功"
                     status_record.deploy_id = deploy_id
             else:
                 if set_flag == "res":
                     status_record.status="set_fail"
                     status_record.msg="预留失败,错误日志为: %s" % error_msg
-                elif set_flag == "increate":
-                    status_record.status = "increate_fail"
+                elif set_flag == "increase":
+                    status_record.status = "increase_fail"
                     status_record.msg = "扩容失败,错误日志为: %s" % error_msg
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result="increate_fail"
+                    dep.deploy_result="increase_fail"
                     dep.save()
             status_record.save()
             resource.reservation_status = status_record.status
             resource.save()
-            #判断是正常预留还是扩容set_flag=increate,扩容成功后 在nginx中添加扩容的docker
-            if set_flag == "increate" and status == 'ok':
+            #判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
+            if set_flag == "increase" and status == 'ok':
                 CPR_URL = get_CRP_url(env)
                 url = CPR_URL + "api/deploy/deploys"
                 deploy_nginx_to_crp(resource_id,url,set_flag)
@@ -1131,8 +1131,8 @@ class ResourceStatusProviderCallBack(Resource):
                             if set_flag == "res":
                                 status_record.status = '%s_success'%(cur_instance_type)
                                 status_record.msg='%s预留完成'%(cur_instance_type)
-                            elif set_flag == "increate":
-                                status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                            elif set_flag == "increase":
+                                status_record.status = '%s_increase_reserving' % (cur_instance_type)
                                 status_record.msg = '%s扩容中' % (cur_instance_type)
                                 status_record.deploy_id=deploy_id
                             cur_instance_type_list.append(os_inst_id)
@@ -1141,8 +1141,8 @@ class ResourceStatusProviderCallBack(Resource):
                             if set_flag == "res":
                                 status_record.status = '%s_reserving'%(cur_instance_type)
                                 status_record.msg='%s预留中'%(cur_instance_type)
-                            elif set_flag == "increate":
-                                status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                            elif set_flag == "increase":
+                                status_record.status = '%s_increase_reserving' % (cur_instance_type)
                                 status_record.msg = '%s扩容中' % (cur_instance_type)
                                 status_record.deploy_id = deploy_id
                             status_record.s_type=cur_instance_type
@@ -1154,8 +1154,8 @@ class ResourceStatusProviderCallBack(Resource):
                         if set_flag == "res":
                             status_record.status = '%s_reserving'%(cur_instance_type)
                             status_record.msg='%s预留中'%(cur_instance_type)
-                        elif set_flag == "increate":
-                            status_record.status = '%s_increate_reserving' %(cur_instance_type)
+                        elif set_flag == "increase":
+                            status_record.status = '%s_increase_reserving' %(cur_instance_type)
                             status_record.msg = '%s扩容中' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]
@@ -1164,8 +1164,8 @@ class ResourceStatusProviderCallBack(Resource):
                         if set_flag == "res":
                             status_record.status = '%s_success'%(cur_instance_type)
                             status_record.msg='%s预留完成'%(cur_instance_type)
-                        elif set_flag == "increate":
-                            status_record.status = '%s_increate_reserving' % (cur_instance_type)
+                        elif set_flag == "increase":
+                            status_record.status = '%s_increase_reserving' % (cur_instance_type)
                             status_record.msg = '%s扩容中' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]        
@@ -1178,7 +1178,7 @@ class ResourceStatusProviderCallBack(Resource):
                 #if set_flag == "res":
                 #    resource.reservation_status = status_record.status
                 #resource.save()
-                #if set_flag == "increate":
+                #if set_flag == "increase":
                 #    dep.deploy_result=status_record.status
                 #    dep.save()
             if db_push:
