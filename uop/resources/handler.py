@@ -960,5 +960,5 @@ resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
 resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
 resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
-resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
+
 resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
