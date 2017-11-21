@@ -939,7 +939,7 @@ class Dockerlogs(Resource):
             "osid":osid
         })
         try:
-            ret = requests.get(url, data=data, timeout=60)
+            ret = requests.post(url, data=data, timeout=60)
             logging.info("ret:{}".format(ret.json()))
         except Exception as exc:
             logging.error(str(exc))
