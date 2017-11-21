@@ -934,7 +934,7 @@ class Dockerlogs(Resource):
         osid = request.args.get('osid')
         user_id = request.args.get('user_id')
         crp_url = get_CRP_url(env)
-        url = crp_url + "api//docker/logs/"
+        url = crp_url + "api/docker/logs/"
         data = json.dumps({
             "osid":osid
         })
