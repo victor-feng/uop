@@ -928,9 +928,37 @@ class GetMyResourcesInfo(Resource):
 
         return response
 
+class Dockerlogs(Resource):
+    def get(self):
+        env = request.args.get('env')
+        osid = request.args.get('osid')
+        user_id = request.args.get('user_id')
+        crp_url = get_CRP_url(env)
+        url = crp_url + "api//docker/logs/"
+        data = json.dumps({
+            "osid":osid
+        })
+        try:
+            ret = requests.get(url, data=data, timeout=60)
+            logging.info("ret:{}".format(ret.json()))
+        except Exception as exc:
+            logging.error(str(exc))
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': str(exc)
+                }
+            }
+            return ret, 200
+        else:
+            return ret.json()
 
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
 resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
 resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
+resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
+resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
