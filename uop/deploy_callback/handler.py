@@ -172,8 +172,8 @@ class DeployStatusProviderCallBack(Resource):
                     status_record.msg = '%s' % (deploy_msg)
                 status_record.created_time=datetime.datetime.now()
                 status_record.save()
-                dep.deploy_result=status_record.status
-                dep.save()
+                #dep.deploy_result=status_record.status
+                #dep.save()
             else:
                 ret = {
                     "code": code,
