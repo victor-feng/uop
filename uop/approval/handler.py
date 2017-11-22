@@ -763,15 +763,51 @@ class RollBackReservation(Resource):
         msg = {}
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str)
+        parser.add_argument('deploy_id', type=str)
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         resource_id = args.resource_id
-        deploy_name=args.deploy_name
+        deploy_id = args.deploy_id
+        compute_list=args.compute_list
+        data={}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            env=resource.env
+            appinfo=[]
+            for compute in compute_list:
+                domain_ip=compute.get('domain_ip')
+                if domain_ip:
+                    appinfo.append(compute)
+            data["appinfo"]=appinfo
+            docker_list = []
+            for compute in compute_list:
+                docker_list.append(
+                    {
+                        'url': compute.url,
+                        'ins_name': compute.ins_name,
+                        'ip': compute.ips,
+                    }
+                )
+            data['docker'] = docker_list
+            data["mysql"]=[]
+            data["mongodb"]=[]
+            data["dns"]=[]
+            data["disconf_server_info"]=[]
+            data["deploy_id"]=deploy_id
+            CPR_URL = get_CRP_url(env)
+            url = CPR_URL + "api/deploy/deploys"
+            headers = {
+                'Content-Type': 'application/json',
+            }
+            data_str = json.dumps(data)
+            logging.debug("Data args is " + str(data))
+            logging.debug("Data args is " + str(data_str))
+            result = requests.post(url=url, headers=headers, data=data_str)
+            logging.debug("Result is " + str(result))
         except Exception as e:
-            code = 410
-            res = "Failed to find the rsource"
+            code = 500
+            res = "Failed the rollback post data to crp."
+        finally:
             ret = {
                 "code": code,
                 "result": {
@@ -779,10 +815,12 @@ class RollBackReservation(Resource):
                     "msg": msg
                 }
             }
-            return ret, code
-        deploys = models.Deployment.objects.filter(resource_id=resource_id, deploy_name=deploy_name).order_by("-created_time")
-        if deploys:
-            dep=deploys[0]
+        return ret, code
+
+
+
+
+
 
 
 
