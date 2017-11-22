@@ -669,6 +669,126 @@ class CapacityReservation(Resource):
             }
         return ret, code
 
+class RollBackInfoAPI(Resource):
+    #审批过后更新审批表的信息
+    def put(self):
+        code = 0
+        res = ""
+        msg = {}
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('approval_id', type=str)
+            parser.add_argument('approve_uid', type=str)
+            parser.add_argument('agree', type=bool)
+            parser.add_argument('annotations', type=str)
+            args = parser.parse_args()
+            approval_id = args.approval_id
+            approval = models.Approval.objects.get(approval_id=approval_id)
+            deployment = models.Deployment.objects.get(deploy_id=approval_id)
+            if approval:
+                approval.approve_uid = args.approve_uid
+                approval.approve_date = datetime.datetime.now()
+                approval.annotations = args.annotations
+                if args.agree:
+                    approval.approval_status = "rollback_success"
+                    deployment.approve_status = "rollback_success"
+                    #审批通过状态改为回滚中
+                    deployment.deploy_result="rollbacking"
+                else:
+                    approval.approval_status = "rollback_failed"
+                    deployment.approve_status = "rollback_failed"
+                    #审批不通过状态修改
+                    deployment.deploy_result="not_rollbacked"
+
+                approval.save()
+                deployment.save()
+                code = 200
+            else:
+                code = 410
+                res = "A resource with that ID no longer exists"
+        except Exception as e:
+            code = 500
+            res = "Failed to approve the rollback."
+        finally:
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+
+        return ret, code
+
+
+
+class RollBackReservation(Resource):
+    #获取回滚的详情
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_id', type=str, location='args')
+        args = parser.parse_args()
+        deploy_id = args.deploy_id
+        try:
+            results={}
+            roll_compute_list=[]
+            deployment = models.Deployment.objects.get(deploy_id=deploy_id)
+            resource_id=deployment.resource_id
+            resource = models.ResourceModel.objects.get(res_id=resource_id)
+            deploy_name=deployment.deploy_name
+            app_image=eval(deployment.app_image)
+            compute_list=resource.compute_list
+            for compute in compute_list:
+                for app in app_image:
+                    if app["ins_id"] == compute["ins_id"]:
+                        compute["url"] = app["url"]
+                        roll_compute_list.append(compute)
+            results["deploy_name"]=deploy_name
+            results["compute_list"]=roll_compute_list
+        except Exception as e:
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "failed",
+                    "msg": e.args
+                }
+            }
+            return res, 400
+        else:
+            return results, 200
+
+    #将回滚的数据发送到crp
+    def post(self):
+        code = 0
+        res = ""
+        msg = {}
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str)
+        parser.add_argument('compute_list', type=list, location='json')
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        deploy_name=args.deploy_name
+        try:
+            resource = models.ResourceModel.objects.get(res_id=resource_id)
+        except Exception as e:
+            code = 410
+            res = "Failed to find the rsource"
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+            return ret, code
+        deploys = models.Deployment.objects.filter(resource_id=resource_id, deploy_name=deploy_name).order_by("-created_time")
+        if deploys:
+            dep=deploys[0]
+
+
+
+
+
 
 approval_api.add_resource(ApprovalList, '/approvals')
 approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
@@ -677,3 +797,5 @@ approval_api.add_resource(ReservationAPI, '/reservation/<string:res_id>')
 # approval_api.add_resource(ReservationMock, '/reservation')
 approval_api.add_resource(CapacityInfoAPI, '/capacity/approvals')
 approval_api.add_resource(CapacityReservation, '/capacity/reservation')
+approval_api.add_resource(RollBackInfoAPI, '/rollback/approvals')
+approval_api.add_resource(RollBackReservation, '/rollback/reservation')

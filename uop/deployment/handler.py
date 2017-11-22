@@ -490,7 +490,7 @@ class DeploymentListAPI(Resource):
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
-                    'approval_type': deployment.approval_type,
+                    'deploy_type': deployment.deploy_type,
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
@@ -690,7 +690,7 @@ class DeploymentListAPI(Resource):
                 resource.save()
                 #------将部署信息更新到deployment表
                 deploy_result = 'deploy_to_approve'
-                approval_type='deploy'
+                deploy_type='deploy'
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -715,7 +715,7 @@ class DeploymentListAPI(Resource):
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
                     database_password=database_password,
-                    approval_type=approval_type,
+                    deploy_type=deploy_type,
                 )
 
                 for instance_info in disconf:
@@ -1206,12 +1206,12 @@ class CapacityAPI(Resource):
                             capacity_status = 'increase'
                             deploy_result="increase_to_approve"
                             approval_status="increasing"
-                            approval_type="increase"
+                            deploy_type="increase"
                         else:
                             capacity_status = 'reduce'
                             deploy_result = "reduce_to_approve"
                             approval_status = "reducing"
-                            approval_type = "reduce"
+                            deploy_type= "reduce"
                         begin_number=compute_.quantity
                         end_number=number
                         approval_id = str(uuid.uuid1())
@@ -1256,7 +1256,7 @@ class CapacityAPI(Resource):
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
                                 capacity_info=capacity_info_str,
-                                approval_type=approval_type
+                                deploy_type=deploy_type
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
