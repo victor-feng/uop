@@ -731,7 +731,6 @@ class RollBackReservation(Resource):
         deploy_id = args.deploy_id
         try:
             results={}
-            roll_compute_list=[]
             deployment = models.Deployment.objects.get(deploy_id=deploy_id)
             resource_id=deployment.resource_id
             resource = models.ResourceModel.objects.get(res_id=resource_id)
@@ -741,10 +740,10 @@ class RollBackReservation(Resource):
             for compute in compute_list:
                 for app in app_image:
                     if app["ins_id"] == compute["ins_id"]:
-                        compute["url"] = app["url"]
-                        roll_compute_list.append(compute)
+                        app["ips"]=compute["ips"]
+                        app["quantity"]=compute["quantity"]
             results["deploy_name"]=deploy_name
-            results["compute_list"]=roll_compute_list
+            results["compute_list"]=app_image
         except Exception as e:
             res = {
                 "code": 400,
