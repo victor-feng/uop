@@ -80,7 +80,7 @@ class Deployment(db.Document):
     apply_status = db.StringField()  # 部署申请状态
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
-    approval_type = db.StringField()  # 审批类型
+    deploy_type = db.StringField()  # 部署类型
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     is_deleted = db.IntField(required=False, default=0)
     is_rollback = db.IntField(required=False, default=0)
@@ -89,12 +89,12 @@ class Deployment(db.Document):
 
     meta = {
         'collection': 'deployment',
-        'index': [
+        'indexes': [
             {
-                'fields': ['initiator', 'project_name', 'deploy_name', 'created_time'],
+                'fields': ['deploy_id', 'deploy_name'],
                 'sparse': True,
-            }
-        ],
+                }
+            ],
         'index_background': True
     }
 
