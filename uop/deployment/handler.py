@@ -154,6 +154,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
         "deploy_id": deploy_item.deploy_id,
         "appinfo": appinfo,
         "disconf_server_info": disconf_server_info,
+        "deploy_type":"deploy",
         "dns":[],
     }
     if appinfo: # 判断nginx信息，没有则不推送dns配置

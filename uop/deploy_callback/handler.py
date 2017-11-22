@@ -55,6 +55,7 @@ class DeployCallback(Resource):
             parser.add_argument('vm_state', type=str)
             parser.add_argument('cluster_name', type=str)
             parser.add_argument('end_flag', type=bool)
+            parser.add_argument('deploy_type', type=str)
             args = parser.parse_args()
         except Exception as e:
             logging.error("###parser error:{}".format(e.args))
@@ -66,6 +67,7 @@ class DeployCallback(Resource):
         vm_state=args.vm_state
         cluster_name = args.cluster_name
         end_flag = args.end_flag
+        deploy_type = args.deploy_type
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -74,22 +76,18 @@ class DeployCallback(Resource):
         status_record.set_flag = "res"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
-            dep.deploy_result="deploy_docker_success"
-            status_record.status="deploy_docker_success"
-            status_record.msg="deploy_docker:%s部署成功，状态为%s，所属集群为%s,健康检查状态为UP" % (ip,vm_state,cluster_name)
+            dep.deploy_result="%s_docker_success" % deploy_type
+            status_record.status="%s_docker_success" % deploy_type
+            status_record.msg="%s_docker:%s %s成功，状态为%s，所属集群为%s,健康检查状态为UP" % (deploy_type,ip,deploy_type,vm_state,cluster_name)
         elif dep.deploy_result == "fail":
             if res_type == "docker":
-                dep.deploy_result="deploy_docker_fail"
-                status_record.status="deploy_docker_fail"
-                status_record.msg="deploy_docker:%s部署失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,vm_state,cluster_name,err_msg)
-            elif res_type == "mongodb":
-                dep.deploy_result = "deploy_mongodb_fail"
-                status_record.status = "deploy_mongodb_fail"
-                status_record.msg = "deploy_mongodb:部署失败，错误日志为：%s" % err_msg
-            elif res_type == "mysql":
-                dep.deploy_result = "deploy_mysql_fail"
-                status_record.status = "deploy_mysql_fail"
-                status_record.msg = "deploy_mysql:部署失败，错误日志为：%s" % err_msg
+                dep.deploy_result="%s_docker_fail" % deploy_type
+                status_record.status="%s_docker_fail" % deploy_type
+                status_record.msg="deploy_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,deploy_type,vm_state,cluster_name,err_msg)
+            else:
+                #dep.deploy_result = "deploy_%s_fail" % res_type
+                status_record.status = "deploy_%s_fail" % res_type
+                status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type,err_msg)
         status_record.save()
         res_status,count = get_deploy_status(deploy_id)
         #if not res_status and quantity == count:

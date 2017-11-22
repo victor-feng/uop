@@ -695,8 +695,8 @@ class RollBackInfoAPI(Resource):
                     #审批通过状态改为回滚中
                     deployment.deploy_result="rollbacking"
                 else:
-                    approval.approval_status = "rollback_failed"
-                    deployment.approve_status = "rollback_failed"
+                    approval.approval_status = "rollback_fail"
+                    deployment.approve_status = "rollback_fail"
                     #审批不通过状态修改
                     deployment.deploy_result="not_rollbacked"
 
@@ -812,6 +812,7 @@ class RollBackReservation(Resource):
             data["dns"]=[]
             data["disconf_server_info"]=[]
             data["deploy_id"]=deploy_id
+            data["deploy_type"]="rollback"
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             headers = {
