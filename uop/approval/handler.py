@@ -735,6 +735,12 @@ class RollBackReservation(Resource):
             resource_id=deployment.resource_id
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy_name=deployment.deploy_name
+            resource_id=deployment.resource_id
+            resource_name=deployment.resource_name
+            project_id=deployment.project_id
+            project_name=deployment.project_name
+            environment=deployment.environment
+            release_notes=deployment.release_notes
             app_image=eval(deployment.app_image)
             compute_list=resource.compute_list
             for compute in compute_list:
@@ -742,8 +748,14 @@ class RollBackReservation(Resource):
                     if app["ins_id"] == compute["ins_id"]:
                         app["ips"]=compute["ips"]
                         app["quantity"]=compute["quantity"]
-            results["deploy_name"]=deploy_name
-            results["compute_list"]=app_image
+            results["resource_id"] = resource_id
+            results["deploy_name"] = deploy_name
+            results["resource_name"] = resource_name
+            results["project_id"] = project_id
+            results["project_name"] = project_name
+            results["environment"] = environment
+            results["release_notes"] = release_notes
+            results["compute_list"] = app_image
         except Exception as e:
             res = {
                 "code": 400,
@@ -765,14 +777,20 @@ class RollBackReservation(Resource):
         parser.add_argument('resource_id', type=str)
         parser.add_argument('deploy_id', type=str)
         parser.add_argument('compute_list', type=list, location='json')
+        parser.add_argument('deploy_name', type=str)
         args = parser.parse_args()
         resource_id = args.resource_id
         deploy_id = args.deploy_id
+        deploy_name = args.deploy_name
         compute_list=args.compute_list
         data={}
         try:
+            # ------将当前部署的版本号更新到resource表
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             env=resource.env
+            resource.deploy_name = deploy_name
+            resource.save()
+            #----------
             appinfo=[]
             for compute in compute_list:
                 domain_ip=compute.get('domain_ip')

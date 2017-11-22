@@ -383,6 +383,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('deploy_id', type=str, location='args')
         parser.add_argument('initiator', type=str, location='args')
         parser.add_argument('deploy_name', type=str, location='args')
+        parser.add_argument('deploy_type', type=str, location='args')
         parser.add_argument('project_name', type=str, location='args')
         parser.add_argument('resource_name', type=str, location='args')
         parser.add_argument('deploy_result', type=str, location='args')
@@ -403,6 +404,8 @@ class DeploymentListAPI(Resource):
             condition['initiator'] = args.initiator
         if args.deploy_name:
             condition['deploy_name'] = args.deploy_name
+        if args.deploy_type:
+            condition['deploy_name'] = args.deploy_type
         if args.project_name:
             condition['project_name'] = args.project_name
         if args.resource_name:
@@ -1400,19 +1403,18 @@ class RollBackAPI(Resource):
         args = parser.parse_args()
         resource_id = args.resource_id
         try:
-            deployments=[]
+            deployments={}
+            history_version=[]
             resource = ResourceModel.objects.get(res_id=resource_id)
             now_deploy_name=resource.deploy_name
-            deployments.append({"now_deploy_name":now_deploy_name})
+            deployments["now_deploy_name"]=now_deploy_name
             deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
             for dep in deploys:
                 deploy_name=dep.deploy_name
                 release_notes=dep.release_notes
                 if deploy_name != now_deploy_name:
-                    deployments.append({
-                        "deploy_name":deploy_name,
-                        "release_notes":release_notes,
-                    })
+                    history_version.append({"deploy_name":deploy_name,"release_notes":release_notes})
+            deployments["history_version"]=history_version
 
         except Exception as e:
             res = {
@@ -1429,8 +1431,6 @@ class RollBackAPI(Resource):
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_name', type=str, location='args')
-
-        parser = reqparse.RequestParser()
         parser.add_argument('res_id', type=str)
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
