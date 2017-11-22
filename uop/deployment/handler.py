@@ -405,7 +405,7 @@ class DeploymentListAPI(Resource):
         if args.deploy_name:
             condition['deploy_name'] = args.deploy_name
         if args.deploy_type:
-            condition['deploy_name'] = args.deploy_type
+            condition['deploy_type'] = args.deploy_type
         if args.project_name:
             condition['project_name'] = args.project_name
         if args.resource_name:
@@ -1458,6 +1458,7 @@ class RollBackAPI(Resource):
             deployment.deploy_result=deploy_result
             deployment.initiator=initiator
             deployment.project_name=project_name
+            deployment.deploy_type = "rollback"
             deployment.save()
             #将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id,

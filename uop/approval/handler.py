@@ -754,7 +754,7 @@ class RollBackReservation(Resource):
             results["project_id"] = project_id
             results["project_name"] = project_name
             results["environment"] = environment
-            results["release_notes"] = release_notes
+            results[" release_notes"] = release_notes
             results["compute_list"] = app_image
         except Exception as e:
             res = {
@@ -785,7 +785,7 @@ class RollBackReservation(Resource):
         compute_list=args.compute_list
         data={}
         try:
-            # ------将当前部署的版本号更新到resource表
+            # ------将当前回滚的版本号更新到resource表
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             env=resource.env
             resource.deploy_name = deploy_name
