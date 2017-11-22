@@ -9,7 +9,7 @@ import logging
 import random
 
 import copy
-from flask import request, send_from_directory
+from flask import request, send_from_directory, jsonify
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
@@ -1486,6 +1486,29 @@ class RollBackAPI(Resource):
 
 
 
+
+@deployment_blueprint.route('/check_deploy_name', methods=['GET'])
+def check_deployment_by_id():
+    deploy_id = request.args.get('deploy_name', '')
+    try:
+        deploy = Deployment.objects.get(deploy_name=deploy_id)
+    except Deployment.DoesNotExist as e:
+        res = {
+            'code': 500,
+            'result': {
+                'res': 'failed',
+                'msg': 'deploy_name has existed'
+            }
+        }
+        return jsonify(res=res)
+    res = {
+        'code': 200,
+        'result': {
+            'res': 'success',
+            'msg': 'success',
+        }
+    }
+    return jsonify(res=res)
 
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
