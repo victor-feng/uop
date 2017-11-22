@@ -58,7 +58,7 @@ class DisconfIns(db.EmbeddedDocument):
 
 class Deployment(db.Document):
     deploy_id = db.StringField(unique=True)
-    deploy_name = db.StringField()
+    deploy_name = db.StringField(unique=True)
     initiator = db.StringField()
     project_id = db.StringField()
     project_name = db.StringField()
@@ -80,6 +80,7 @@ class Deployment(db.Document):
     apply_status = db.StringField()  # 部署申请状态
     approve_status = db.StringField()  # 部署审批状态
     approve_suggestion = db.StringField()  # 审批意见
+    approval_type = db.StringField()  # 审批类型
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     is_deleted = db.IntField(required=False, default=0)
     is_rollback = db.IntField(required=False, default=0)
@@ -193,6 +194,7 @@ class ResourceModel(db.DynamicDocument):
     project_id = db.StringField(required=False)
     department = db.StringField(required=True)
     department_id = db.StringField(required=True)
+    deploy_name = db.StringField()
     res_id = db.StringField(required=True, unique=True)
     user_name = db.StringField(required=False)
     user_id = db.StringField(required=False)
