@@ -490,6 +490,7 @@ class DeploymentListAPI(Resource):
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
+                    'approval_type': deployment.approval_type,
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
@@ -683,6 +684,11 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
 
             elif action == 'save_to_db':  # 部署申请
+                #------将当前部署的版本号更新到resource表
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.deploy_name=deploy_name
+                resource.save()
+                #------将部署信息更新到deployment表
                 deploy_result = 'deploy_to_approve'
                 approval_type='deploy'
                 deploy_item = Deployment(
@@ -1386,6 +1392,101 @@ class CapacityInfoAPI(Resource):
         else:
             return capacity_info_dict, 200
 
+class RollBackAPI(Resource):
+    #应用回滚
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str, location='args')
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        try:
+            deployments=[]
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            now_deploy_name=resource.deploy_name
+            deployments.append({"now_deploy_name":now_deploy_name})
+            deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            for dep in deploys:
+                deploy_name=dep.deploy_name
+                release_notes=dep.release_notes
+                if deploy_name != now_deploy_name:
+                    deployments.append({
+                        "deploy_name":deploy_name,
+                        "release_notes":release_notes,
+                    })
+
+        except Exception as e:
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "get rollback info failed",
+                    "msg": e.args
+                }
+            }
+            return res, 400
+        else:
+            return deployments, 200
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_name', type=str, location='args')
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str)
+        parser.add_argument('department_id', type=str)
+        parser.add_argument('creator_id', type=str)
+        parser.add_argument('project_id', type=str)
+        parser.add_argument('initiator', type=str)
+        parser.add_argument('project_name', type=str)
+        args = parser.parse_args()
+        project_id = args.project_id
+        department_id = args.department_id
+        creator_id = args.creator_id
+        res_id = args.res_id
+        initiator = args.initiator
+        project_name = args.project_name
+        deploy_name = args.deploy_name
+        try:
+            approval_id = str(uuid.uuid1())
+            approval_status="rollback"
+            #更新要回滚的deploy记录
+            deployment = Deployment.objects.get(deploy_name=deploy_name)
+            created_time=datetime.datetime.now()
+            create_date = datetime.datetime.now()
+            #状态为回滚未审批
+            deploy_result="rollback_to_approve"
+            deployment.created_time=created_time
+            deployment.deploy_result=deploy_result
+            deployment.initiator=initiator
+            deployment.project_name=project_name
+            deployment.save()
+            #将回滚信息记录到申请审批表
+            Approval(approval_id=approval_id, resource_id=res_id,
+                     project_id=project_id, department_id=department_id,
+                     creator_id=creator_id, create_date=create_date,
+                     approval_status=approval_status).save()
+
+        except Exception as e:
+            logging.debug(e)
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Put deployment rollback failed %s.' %e
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Put deployment rollback application success.'
+            }
+        }
+        return ret, 200
+
+
+
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
@@ -1393,3 +1494,4 @@ deployment_api.add_resource(Upload, '/upload')
 deployment_api.add_resource(Download, '/download/<file_name>')
 deployment_api.add_resource(CapacityAPI, '/capacity')
 deployment_api.add_resource(CapacityInfoAPI, '/capacity/info')
+deployment_api.add_resource(RollBackAPI, '/rollback')
