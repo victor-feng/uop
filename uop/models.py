@@ -89,7 +89,7 @@ class Deployment(db.Document):
 
     meta = {
         'collection': 'deployment',
-        'indexes': [
+        'index': [
             {
                 'fields': ['deploy_id', 'deploy_name'],
                 'sparse': True,
