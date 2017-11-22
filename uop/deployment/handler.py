@@ -684,6 +684,7 @@ class DeploymentListAPI(Resource):
 
             elif action == 'save_to_db':  # 部署申请
                 deploy_result = 'deploy_to_approve'
+                approval_type='deploy'
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -708,6 +709,7 @@ class DeploymentListAPI(Resource):
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
                     database_password=database_password,
+                    approval_type=approval_type,
                 )
 
                 for instance_info in disconf:
@@ -1191,16 +1193,19 @@ class CapacityAPI(Resource):
             if len(resources):
                 resource = resources[0]
                 compute_list = resource.compute_list
+                deploy_name=resource.deploy_name
                 for compute_ in compute_list:
                     if compute_.ins_id == cluster_id:
                         if int(number) > int(compute_.quantity):
                             capacity_status = 'increase'
                             deploy_result="increase_to_approve"
                             approval_status="increasing"
+                            approval_type="increase"
                         else:
                             capacity_status = 'reduce'
                             deploy_result = "reduce_to_approve"
                             approval_status = "reducing"
+                            approval_type = "reduce"
                         begin_number=compute_.quantity
                         end_number=number
                         approval_id = str(uuid.uuid1())
@@ -1211,7 +1216,10 @@ class CapacityAPI(Resource):
 
                         #approval_status = '%sing'%(capacity_status)
                         create_date = datetime.datetime.now()
-                        deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
+                        if deploy_name:
+                            deployments = Deployment.objects.filter(resource_id=res_id,deploy_name=deploy_name).order_by('-created_time')
+                        else:
+                            deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
                             old_deployment = deployments[0]
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
@@ -1241,7 +1249,8 @@ class CapacityAPI(Resource):
                                 approve_suggestion=old_deployment.approve_suggestion,
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
-                                capacity_info=capacity_info_str
+                                capacity_info=capacity_info_str,
+                                approval_type=approval_type
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
