@@ -1450,7 +1450,7 @@ class RollBackAPI(Resource):
         deploy_name = args.deploy_name
         try:
             approval_id = str(uuid.uuid1())
-            approval_status="rollback"
+            approval_status="rollbacking"
             #更新要回滚的deploy记录
             deployment = Deployment.objects.get(deploy_name=deploy_name)
             created_time=datetime.datetime.now()
