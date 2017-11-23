@@ -9,7 +9,7 @@ import logging
 import random
 
 import copy
-from flask import request, send_from_directory
+from flask import request, send_from_directory, jsonify
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
@@ -154,6 +154,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
         "deploy_id": deploy_item.deploy_id,
         "appinfo": appinfo,
         "disconf_server_info": disconf_server_info,
+        "deploy_type":"deploy",
         "dns":[],
     }
     if appinfo: # 判断nginx信息，没有则不推送dns配置
@@ -383,6 +384,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('deploy_id', type=str, location='args')
         parser.add_argument('initiator', type=str, location='args')
         parser.add_argument('deploy_name', type=str, location='args')
+        parser.add_argument('deploy_type', type=str, location='args')
         parser.add_argument('project_name', type=str, location='args')
         parser.add_argument('resource_name', type=str, location='args')
         parser.add_argument('deploy_result', type=str, location='args')
@@ -403,6 +405,8 @@ class DeploymentListAPI(Resource):
             condition['initiator'] = args.initiator
         if args.deploy_name:
             condition['deploy_name'] = args.deploy_name
+        if args.deploy_type:
+            condition['deploy_type'] = args.deploy_type
         if args.project_name:
             condition['project_name'] = args.project_name
         if args.resource_name:
@@ -490,6 +494,7 @@ class DeploymentListAPI(Resource):
                     'deploy_result': deployment.deploy_result,
                     'apply_status': deployment.apply_status,
                     'approve_status': deployment.approve_status,
+                    'deploy_type': deployment.deploy_type,
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted':deployment.is_deleted,
@@ -683,7 +688,13 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
 
             elif action == 'save_to_db':  # 部署申请
+                #------将当前部署的版本号更新到resource表
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.deploy_name=deploy_name
+                resource.save()
+                #------将部署信息更新到deployment表
                 deploy_result = 'deploy_to_approve'
+                deploy_type='deploy'
                 deploy_item = Deployment(
                     deploy_id=uid,
                     deploy_name=deploy_name,
@@ -708,6 +719,7 @@ class DeploymentListAPI(Resource):
                     approve_status=approve_status,
                     approve_suggestion=approve_suggestion,
                     database_password=database_password,
+                    deploy_type=deploy_type,
                 )
 
                 for instance_info in disconf:
@@ -1191,16 +1203,19 @@ class CapacityAPI(Resource):
             if len(resources):
                 resource = resources[0]
                 compute_list = resource.compute_list
+                deploy_name=resource.deploy_name
                 for compute_ in compute_list:
                     if compute_.ins_id == cluster_id:
                         if int(number) > int(compute_.quantity):
                             capacity_status = 'increase'
                             deploy_result="increase_to_approve"
                             approval_status="increasing"
+                            deploy_type="increase"
                         else:
                             capacity_status = 'reduce'
                             deploy_result = "reduce_to_approve"
                             approval_status = "reducing"
+                            deploy_type= "reduce"
                         begin_number=compute_.quantity
                         end_number=number
                         approval_id = str(uuid.uuid1())
@@ -1211,7 +1226,10 @@ class CapacityAPI(Resource):
 
                         #approval_status = '%sing'%(capacity_status)
                         create_date = datetime.datetime.now()
-                        deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
+                        if deploy_name:
+                            deployments = Deployment.objects.filter(resource_id=res_id,deploy_name=deploy_name).order_by('-created_time')
+                        else:
+                            deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
                             old_deployment = deployments[0]
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
@@ -1241,7 +1259,8 @@ class CapacityAPI(Resource):
                                 approve_suggestion=old_deployment.approve_suggestion,
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
-                                capacity_info=capacity_info_str
+                                capacity_info=capacity_info_str,
+                                deploy_type=deploy_type
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id,
@@ -1377,6 +1396,123 @@ class CapacityInfoAPI(Resource):
         else:
             return capacity_info_dict, 200
 
+class RollBackAPI(Resource):
+    #应用回滚
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str, location='args')
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        try:
+            deployments={}
+            history_version=[]
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            now_deploy_name=resource.deploy_name
+            deployments["now_deploy_name"]=now_deploy_name
+            deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            for dep in deploys:
+                deploy_name=dep.deploy_name
+                release_notes=dep.release_notes
+                if deploy_name != now_deploy_name:
+                    history_version.append({"deploy_name":deploy_name,"release_notes":release_notes})
+            deployments["history_version"]=history_version
+
+        except Exception as e:
+            res = {
+                "code": 400,
+                "result": {
+                    "res": "get rollback info failed",
+                    "msg": e.args
+                }
+            }
+            return res, 400
+        else:
+            return deployments, 200
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('deploy_name', type=str, location='args')
+        parser.add_argument('res_id', type=str)
+        parser.add_argument('department_id', type=str)
+        parser.add_argument('creator_id', type=str)
+        parser.add_argument('project_id', type=str)
+        parser.add_argument('initiator', type=str)
+        parser.add_argument('project_name', type=str)
+        args = parser.parse_args()
+        project_id = args.project_id
+        department_id = args.department_id
+        creator_id = args.creator_id
+        res_id = args.res_id
+        initiator = args.initiator
+        project_name = args.project_name
+        deploy_name = args.deploy_name
+        try:
+            approval_id = str(uuid.uuid1())
+            approval_status="rollback"
+            #更新要回滚的deploy记录
+            deployment = Deployment.objects.get(deploy_name=deploy_name)
+            created_time=datetime.datetime.now()
+            create_date = datetime.datetime.now()
+            #状态为回滚未审批
+            deploy_result="rollback_to_approve"
+            deployment.created_time=created_time
+            deployment.deploy_result=deploy_result
+            deployment.initiator=initiator
+            deployment.project_name=project_name
+            deployment.deploy_type = "rollback"
+            deployment.approve_status="rollbacking"
+            deployment.save()
+            #将回滚信息记录到申请审批表
+            Approval(approval_id=approval_id, resource_id=res_id,
+                     project_id=project_id, department_id=department_id,
+                     creator_id=creator_id, create_date=create_date,
+                     approval_status=approval_status).save()
+
+        except Exception as e:
+            logging.debug(e)
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'Put deployment rollback failed %s.' %e
+                }
+            }
+            return ret, 500
+        ret = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'Put deployment rollback application success.'
+            }
+        }
+        return ret, 200
+
+
+
+
+@deployment_blueprint.route('/check_deploy_name', methods=['GET'])
+def check_deployment_by_id():
+    deploy_id = request.args.get('deploy_name', '')
+    try:
+        deploy = Deployment.objects.get(deploy_name=deploy_id)
+    except Deployment.DoesNotExist as e:
+        res = {
+            'code': 200,
+            'result': {
+                'res': 'success',
+                'msg': 'success'
+            }
+        }
+        return jsonify(res=res)
+    res = {
+        'code': 500,
+        'result': {
+            'res': 'success',
+            'msg': 'deploy_name has existed',
+        }
+    }
+    return jsonify(res=res)
+
 deployment_api.add_resource(DeploymentListAPI, '/deployments')
 deployment_api.add_resource(DeploymentAPI, '/deployments/<deploy_id>/')
 deployment_api.add_resource(DeploymentListByByInitiatorAPI, '/getDeploymentsByInitiator')
@@ -1384,3 +1520,4 @@ deployment_api.add_resource(Upload, '/upload')
 deployment_api.add_resource(Download, '/download/<file_name>')
 deployment_api.add_resource(CapacityAPI, '/capacity')
 deployment_api.add_resource(CapacityInfoAPI, '/capacity/info')
+deployment_api.add_resource(RollBackAPI, '/rollback')
