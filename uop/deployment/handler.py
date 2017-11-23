@@ -1460,6 +1460,7 @@ class RollBackAPI(Resource):
             deployment.initiator=initiator
             deployment.project_name=project_name
             deployment.deploy_type = "rollback"
+            deployment.approve_status="rollbacking"
             deployment.save()
             #将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id,
