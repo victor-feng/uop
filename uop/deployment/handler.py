@@ -1453,6 +1453,7 @@ class RollBackAPI(Resource):
             approval_status="rollbacking"
             #更新要回滚的deploy记录
             deployment = Deployment.objects.get(deploy_name=deploy_name)
+            deploy_id=deployment.deploy_id
             created_time=datetime.datetime.now()
             create_date = datetime.datetime.now()
             #状态为回滚未审批
@@ -1465,7 +1466,7 @@ class RollBackAPI(Resource):
             deployment.approve_status="rollbacking"
             deployment.save()
             #将回滚信息记录到申请审批表
-            Approval(approval_id=approval_id, resource_id=res_id,
+            Approval(approval_id=approval_id, resource_id=res_id,deploy_id=deploy_id,
                      project_id=project_id, department_id=department_id,
                      creator_id=creator_id, create_date=create_date,
                      approval_status=approval_status).save()

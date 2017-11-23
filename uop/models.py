@@ -236,6 +236,7 @@ class ResourceModel(db.DynamicDocument):
 class Approval(db.DynamicDocument):
     approval_id = db.StringField(required=True, max_length=50, unique=True)
     resource_id = db.StringField(required=True)
+    deploy_id = db.StringField(required=False)
     project_id = db.StringField(required=True)
     department_id = db.StringField(required=True)
     creator_id = db.StringField(required=True)
