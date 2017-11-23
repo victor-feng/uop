@@ -1236,7 +1236,7 @@ class CapacityAPI(Resource):
                             new_deploy_name=old_deployment.deploy_name+'_'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
                             # ------将当前回滚的版本号更新到resource表
                             resource = ResourceModel.objects.get(res_id=res_id)
-                            resource.deploy_name = deploy_name
+                            resource.deploy_name = new_deploy_name
                             resource.save()
                             #------------------
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
