@@ -684,7 +684,7 @@ class RollBackInfoAPI(Resource):
             parser.add_argument('agree', type=bool)
             parser.add_argument('annotations', type=str)
             args = parser.parse_args()
-            deploy_id = args.deploy_id_id
+            deploy_id = args.deploy_id
             approvals = models.Approval.objects.filter(deploy_id=deploy_id).order_by('-create_date')
             deployment = models.Deployment.objects.get(deploy_id=deploy_id)
             if approvals:
