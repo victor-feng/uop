@@ -1433,7 +1433,7 @@ class RollBackAPI(Resource):
 
     def put(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('deploy_name', type=str, location='args')
+        parser.add_argument('deploy_name', type=str)
         parser.add_argument('res_id', type=str)
         parser.add_argument('department_id', type=str)
         parser.add_argument('creator_id', type=str)
