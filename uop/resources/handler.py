@@ -962,7 +962,7 @@ class Dockerlogs(Resource):
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if ret["code"] == 400:
                 try:
-                    ack = requests.delete(cmdb_url, data)
+                    ack = requests.delete(cmdb_url, data=data)
                     if ack.json()["code"] == 2002:
                         ret["result"]["msg"] = "Instance could not be found, and will delete from cmdb"
                     else:
