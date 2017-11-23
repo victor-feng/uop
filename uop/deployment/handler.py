@@ -1496,18 +1496,18 @@ def check_deployment_by_id():
         deploy = Deployment.objects.get(deploy_name=deploy_id)
     except Deployment.DoesNotExist as e:
         res = {
-            'code': 500,
+            'code': 200,
             'result': {
-                'res': 'failed',
-                'msg': 'deploy_name has existed'
+                'res': 'success',
+                'msg': 'success'
             }
         }
         return jsonify(res=res)
     res = {
-        'code': 200,
+        'code': 500,
         'result': {
             'res': 'success',
-            'msg': 'success',
+            'msg': 'deploy_name has existed',
         }
     }
     return jsonify(res=res)
