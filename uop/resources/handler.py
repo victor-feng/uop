@@ -954,7 +954,20 @@ class Dockerlogs(Resource):
             }
             return ret, 200
         else:
-            return ret.json()
+            ret = ret.json()
+            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+            if ret["code"] == 400:
+                try:
+                    ack = requests.delete(cmdb_url, data)
+                    if ack.json()["code"] == 2002:
+                        ret["result"]["msg"] = "Instance could not be found, and will delete from cmdb"
+                    else:
+                        logging.info("delete docker resource from cmdb error:{}".format(ack.json()))
+                except Exception as exc:
+                    logging.error("delete docker resource from cmdb error:{}".format(str(exc)))
+            return ret
+
+
 
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
