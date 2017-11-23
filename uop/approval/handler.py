@@ -747,6 +747,7 @@ class RollBackReservation(Resource):
                 for app in app_image:
                     if app["ins_id"] == compute["ins_id"]:
                         app["ips"]=compute["ips"]
+                        app["domain_ip"] = compute["domain_ip"]
                         app["quantity"]=compute["quantity"]
             results["resource_id"] = resource_id
             results["deploy_name"] = deploy_name
