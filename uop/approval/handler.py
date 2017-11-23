@@ -805,9 +805,9 @@ class RollBackReservation(Resource):
             for compute in compute_list:
                 docker_list.append(
                     {
-                        'url': compute.url,
-                        'ins_name': compute.ins_name,
-                        'ip': compute.ips,
+                        'url': compute.get("url"),
+                        'ins_name': compute.get("ins_name"),
+                        'ip': compute.get("ips"),
                     }
                 )
             data['docker'] = docker_list
