@@ -1233,7 +1233,8 @@ class CapacityAPI(Resource):
                             deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
                             old_deployment = deployments[0]
-                            new_deploy_name=old_deployment.deploy_name+'_'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+                            old_deploy_name=old_deployment.deploy_name.strip().split('@')[0]
+                            new_deploy_name=old_deploy_name+'@'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
                             # ------将当前回滚的版本号更新到resource表
                             resource = ResourceModel.objects.get(res_id=res_id)
                             resource.deploy_name = new_deploy_name
