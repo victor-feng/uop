@@ -711,7 +711,7 @@ class RollBackInfoAPI(Resource):
                 res = "A resource with that ID no longer exists"
         except Exception as e:
             code = 500
-            res = "Failed to approve the rollback."
+            res = "Failed to approve the rollback %s." %e
         finally:
             ret = {
                 "code": code,
