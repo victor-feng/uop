@@ -829,7 +829,7 @@ class RollBackReservation(Resource):
             logging.debug("Result is " + str(result))
         except Exception as e:
             code = 500
-            res = "Failed the rollback post data to crp."
+            res = "Failed the rollback post data to crp. %s" %e
         finally:
             ret = {
                 "code": code,
