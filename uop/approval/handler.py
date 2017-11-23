@@ -757,7 +757,7 @@ class RollBackReservation(Resource):
             results["project_id"] = project_id
             results["project_name"] = project_name
             results["environment"] = environment
-            results[" release_notes"] = release_notes
+            results["release_notes"] = release_notes
             results["compute_list"] = app_image
         except Exception as e:
             res = {
