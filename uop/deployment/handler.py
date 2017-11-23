@@ -1233,7 +1233,7 @@ class CapacityAPI(Resource):
                             deployments = Deployment.objects.filter(resource_id=res_id).order_by('-created_time')
                         if deployments:
                             old_deployment = deployments[0]
-                            new_deploy_name=old_deployment.deploy_name+'_'+deploy_type+ '_'+ time.time().__str__()[6:10]
+                            new_deploy_name=old_deployment.deploy_name+'_'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
                             capacity_info_str=json.dumps(capacity_info_dict)
                             deploy_item = Deployment(
