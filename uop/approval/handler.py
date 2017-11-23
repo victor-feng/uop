@@ -472,14 +472,14 @@ class CapacityInfoAPI(Resource):
             approval_id = args.approval_id
             approval = models.Approval.objects.get(approval_id=approval_id)
             deployment = models.Deployment.objects.get(deploy_id=approval_id)
-            deploy_name=deployment.deploy_name
+            #deploy_name=deployment.deploy_name
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
                 docker_network_id = args.docker_network_id
                 resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
-                resource.deploy_name = deploy_name
+                #resource.deploy_name = deploy_name
                 if args.agree:
                     approval.approval_status = "%s_success"%(approval.capacity_status)
                     compute_list = resource.compute_list
@@ -792,8 +792,8 @@ class RollBackReservation(Resource):
             # ------将当前回滚的版本号更新到resource表
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             env=resource.env
-            resource.deploy_name = deploy_name
-            resource.save()
+            #resource.deploy_name = deploy_name
+            #resource.save()
             #----------
             appinfo=[]
             for compute in compute_list:

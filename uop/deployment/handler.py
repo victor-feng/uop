@@ -1234,6 +1234,11 @@ class CapacityAPI(Resource):
                         if deployments:
                             old_deployment = deployments[0]
                             new_deploy_name=old_deployment.deploy_name+'_'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+                            # ------将当前回滚的版本号更新到resource表
+                            resource = ResourceModel.objects.get(res_id=res_id)
+                            resource.deploy_name = deploy_name
+                            resource.save()
+                            #------------------
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
                             capacity_info_str=json.dumps(capacity_info_dict)
                             deploy_item = Deployment(
@@ -1449,6 +1454,11 @@ class RollBackAPI(Resource):
         project_name = args.project_name
         deploy_name = args.deploy_name
         try:
+            # ------将当前回滚的版本号更新到resource表
+            resource = ResourceModel.objects.get(res_id=res_id)
+            resource.deploy_name = deploy_name
+            resource.save()
+            #-------
             approval_id = str(uuid.uuid1())
             approval_status="rollbacking"
             #更新要回滚的deploy记录
