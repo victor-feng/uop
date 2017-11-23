@@ -18,7 +18,10 @@ sys.setdefaultencoding('utf-8')
 
 deploy_cb_api = Api(deploy_cb_blueprint, errors=deploy_cb_errors)
 
-
+deploy_type_dict={
+    "deploy":"部署",
+    "rollback":"回滚",
+}
 
 class DeployCallback(Resource):
     @classmethod
@@ -78,12 +81,12 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
             dep.deploy_result="%s_docker_success" % deploy_type
             status_record.status="%s_docker_success" % deploy_type
-            status_record.msg="%s_docker:%s %s成功，状态为%s，所属集群为%s,健康检查状态为UP" % (deploy_type,ip,deploy_type,vm_state,cluster_name)
+            status_record.msg="%s_docker:%s %s成功，状态为%s，所属集群为%s,健康检查状态为UP" % (deploy_type,ip,deploy_type_dict[deploy_type],vm_state,cluster_name)
         elif dep.deploy_result == "fail":
             if res_type == "docker":
                 dep.deploy_result="%s_docker_fail" % deploy_type
                 status_record.status="%s_docker_fail" % deploy_type
-                status_record.msg="deploy_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (ip,deploy_type,vm_state,cluster_name,err_msg)
+                status_record.msg="%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (deploy_type,ip,deploy_type_dict[deploy_type],vm_state,cluster_name,err_msg)
             else:
                 #dep.deploy_result = "deploy_%s_fail" % res_type
                 status_record.status = "deploy_%s_fail" % res_type
@@ -94,11 +97,11 @@ class DeployCallback(Resource):
         #    dep.deploy_result = "deploy_fail"
         #    create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
         if res_status == True and end_flag == True:
-            dep.deploy_result = "deploy_success"
-            create_status_record(resource_id,deploy_id,"deploy","部署成功","deploy_success","res")
+            dep.deploy_result = "%s_success" % deploy_type
+            create_status_record(resource_id,deploy_id,deploy_type,"%s成功" % deploy_type_dict[deploy_type],"%s_success" % deploy_type,"res")
         elif res_status == False and end_flag == True:
-            dep.deploy_result = "deploy_fail"
-            create_status_record(resource_id, deploy_id, "deploy", "部署失败", "deploy_fail","res")
+            dep.deploy_result = "%s_fail" % deploy_type
+            create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type], "%s_fail" % deploy_type ,"res")
         dep.save()
 
 
