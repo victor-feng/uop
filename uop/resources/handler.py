@@ -94,21 +94,6 @@ class ResourceApplication(Resource):
         approval_status = "unsubmit"
         resource_list = args.resource_list
         compute_list = args.compute_list
-
-        try:
-            if ResourceModel.objects.filter(resource_name=resource_name, env=env).count():
-                res = {
-                    'code': 200,
-                    'result': {
-                        'res': 'fail',
-                        'msg': '该资源名称在所选环境已存在',
-                        'res_name': resource_name
-                    }
-                }
-                return res, 200
-        except Exception as e:
-            print e
-            return
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                              department_id=department_id, res_id=res_id, project_id=project_id,
                                              user_name=user_name, user_id=user_id, domain=domain, env=env,
