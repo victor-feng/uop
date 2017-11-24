@@ -774,7 +774,7 @@ class RollBackReservation(Resource):
 
     #将回滚的数据发送到crp
     def post(self):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
