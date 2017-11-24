@@ -588,20 +588,6 @@ class DeploymentListAPI(Resource):
             redis_context = write_file(uid, redis_context, 'redis')
         if mongodb_exe_mode == 'tag' and  mongodb_context:
             mongodb_context = write_file(uid, mongodb_context, 'mongodb')
-        try:
-            if Deployment.objects.filter(deploy_name=deploy_name,environment=environment).count():
-                res = {
-                    'code': 200,
-                    'result': {
-                        'res': 'fail',
-                        'msg': '该部署版本在所选环境已存在',
-                        'deploy_name': deploy_name
-                    }
-                }
-                return res, 200
-        except Exception as e:
-            print e
-            return
 
         try:
             # 管理员审批通过 直接部署到CRP
