@@ -824,7 +824,6 @@ class RollBackReservation(Resource):
             }
             data_str = json.dumps(data)
             logging.debug("Data args is " + str(data))
-            logging.debug("Data args is " + str(data_str))
             result = requests.post(url=url, headers=headers, data=data_str)
             logging.debug("Result is " + str(result))
         except Exception as e:
