@@ -93,8 +93,8 @@ class LdapConn(object):
                         }
                 print d
         print '共找到结果 %s 条' % (len(result))
-        for d in result:
-            print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
+        #for d in result:
+        #    print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
         try:
             if con.simple_bind_s(self.cn, password):
                 print 'verify successfully'
