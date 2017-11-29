@@ -148,7 +148,7 @@ class ItemInfo(Resource):
             items = ItemInformation.objects.filter(item_id=item_id)
             if items:
                 item = items[0]
-                res = ResourceModel.objects.filter(project_id=item_id)
+                res = ResourceModel.objects.filter(project_id=item_id,approval_status="success")
                 if not res:
                     item.delete()
                     code = 200
