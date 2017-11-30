@@ -50,7 +50,7 @@ items_sequence_list_config = [
                                             {
                                                 'app_instance'
                                             }
-                                     }
+                                    }
                                 ]
                         }
                     ],
@@ -205,11 +205,11 @@ property_json_mapper_config = {
 }
 
 mapping_type_status = {
-           'mysql' : 'mysql',
-           'mycat' : 'mysql',
-           'mongodb' : 'mongo',
-           'redis' : 'redis',
-           'app_cluster' : 'docker',
+    'mysql' : 'mysql',
+    'mycat' : 'mysql',
+    'mongodb' : 'mongo',
+    'redis' : 'redis',
+    'app_cluster' : 'docker',
 }
 
 # Transition state Log debug decorator
@@ -315,7 +315,7 @@ class ResourceProviderTransitions(object):
         repo_item = {}
         transited_property_list = []
         try:
-            CMDB_URL = current_app.config['CMDB_URL'] 
+            CMDB_URL = current_app.config['CMDB_URL']
             CMDB_ITEM_PROPERTY_LIST_URL = CMDB_URL+'cmdb/api/property_list/'
             resp_item_property = requests.get(CMDB_ITEM_PROPERTY_LIST_URL+item_id)
             item_property = json.loads(resp_item_property.text)
@@ -594,14 +594,14 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
                         item[items_sequence_key] = current_item_body
                         request_items.append(item)
                     if context is not None:
-                            if hasattr(current_items, items_sequence_key):
-                                sub_item = current_items.get(items_sequence_key)
-                                if sub_item is not None:
-                                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
-                            else:
-                                sub_item = current_items
-                                if sub_item is not None:
-                                    request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                        if hasattr(current_items, items_sequence_key):
+                            sub_item = current_items.get(items_sequence_key)
+                            if sub_item is not None:
+                                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
+                        else:
+                            sub_item = current_items
+                            if sub_item is not None:
+                                request_items.extend(transit_request_data(context, porerty_json_mapper, sub_item))
             if context is not None and request_data is not None:
                 sub_item = request_data.get(items_sequence_key)
                 if sub_item is not None:
@@ -695,6 +695,164 @@ class ResourceProviderCallBack(Resource):
     """
     资源预留回调
     """
+    @classmethod
+    def process_cmdb1(cls, request_data):
+        resource_id = request_data.get('resource_id')
+        status = request_data.get('status')
+        error_msg = request_data.get('error_msg')
+        set_flag = request_data.get('set_flag')
+        resource = ResourceModel.objects.get(res_id=resource_id)
+        env = resource.env
+        is_write_to_cmdb = False
+        # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
+        if status == "ok":
+            is_write_to_cmdb = True
+            container = request_data.get('container')
+            if container is not None:
+                for i in container:
+                    for j in resource.compute_list:
+                        if i.get('ins_id') == j.ins_id:
+                            # j.ips = [ins.get('ip') for ins in i.get('instance')]
+                            ips = j.ips
+                            for ins in i.get('instance'):
+                                ip = ins.get('ip')
+                                ips.append(ip)
+                            j.ips = ips
+                            j.quantity = len(ips)
+
+            property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                          request_data)
+            logging.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+
+            rpt = ResourceProviderTransitions(property_mappers_list)
+            rpt.start()
+            if rpt.state == "stop":
+                logging.debug("完成停止")
+            else:
+                logging.debug(rpt.state)
+
+        if is_write_to_cmdb is True:
+            logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+            if set_flag == "increase":
+                CMDB_URL = current_app.config['CMDB_URL']
+                CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                app_cluster_name = ""
+                new_pcode = ""
+                for itemid, pcode in rpt.pcode_mapper.items():
+                    if u"应用集群" in itemid:
+                        app_cluster_name = itemid[:-4]
+                        new_pcode = pcode
+                        break
+                cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode, "app_cluster_name": app_cluster_name}
+                logging.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
+                data = json.dumps(cmdb_req)
+                ret = requests.post(CMDB_STATUS_URL, data=data)
+                logging.info("CMDB return:{}".format(ret))
+            else:
+                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+
+        os_ids = []
+        os_ip_list = []
+        os_ins_list = resource.os_ins_list
+        os_ins_ip_list = resource.os_ins_ip_list
+        if os_ins_list:
+            os_ids = os_ins_list
+        if os_ins_ip_list:
+            os_ip_list = os_ins_ip_list
+        container = request_data.get('container')
+        for _container in container:
+            instances = _container.get('instance')
+            cpu = str(_container.get('cpu', '2'))
+            mem = str(_container.get('mem', '2'))
+            for instance in instances:
+                os_ins_id = instance.get('os_inst_id')
+                ip = instance.get('ip')
+                os_vol_id = instance.get('os_vol_id')
+                os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker", cpu=cpu, mem=mem,
+                                      os_vol_id=os_vol_id)
+                os_ip_list.append(os_ip_dic)
+                os_ids.append(os_ins_id)
+
+        db_info = request_data.get('db_info')
+        vid_list = []
+        for key, value in db_info.items():
+            os_ins_ids = []
+            wid = value.get("wvid", '')
+            rid = value.get("rvid", '')
+            vid = value.get("vid", '')
+            cpu = str(value.get("cpu", '2'))
+            mem = str(value.get("mem", '2'))
+            if wid:
+                vid_list.append(wid)
+            if rid:
+                vid_list.append(rid)
+            if vid:
+                vid_list.append(vid)
+
+            for instance in value.get('instance'):
+                os_ins_id = instance.get('os_inst_id')
+                ip = instance.get('ip')
+                os_type = instance.get('instance_type')
+                os_vol_id = instance.get('os_vol_id')
+                os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type=os_type, cpu=cpu, mem=mem,
+                                      os_vol_id=os_vol_id)
+                os_ip_list.append(os_ip_dic)
+                os_ids.append(os_ins_id)
+            if os_ins_ids:
+                os_ids.append(os_ins_ids)
+        resource.os_ins_list = os_ids
+        resource.vid_list = vid_list
+        resource.os_ins_ip_list = os_ip_list
+        # ---------to statusrecord
+        deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+        if len(deps) > 0:
+            dep = deps[0]
+            deploy_id = dep.deploy_id
+        status_record = StatusRecord()
+        status_record.res_id = resource_id
+        status_record.s_type = "set"
+        status_record.set_flag = set_flag
+        status_record.created_time = datetime.datetime.now()
+        if status == 'ok':
+            if set_flag == "res":
+                status_record.status = "set_success"
+                status_record.msg = "预留成功"
+            if set_flag == "increase":
+                status_record.status = "increase_success"
+                status_record.msg = "docker扩容成功"
+                status_record.deploy_id = deploy_id
+        else:
+            if set_flag == "res":
+                status_record.status = "set_fail"
+                status_record.msg = "预留失败,错误日志为: %s" % error_msg
+            elif set_flag == "increase":
+                status_record.status = "increase_fail"
+                status_record.msg = "扩容失败,错误日志为: %s" % error_msg
+                status_record.deploy_id = deploy_id
+                dep.deploy_result = "increase_fail"
+                dep.save()
+        status_record.save()
+        resource.reservation_status = status_record.status
+        resource.save()
+        # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
+        if set_flag == "increase" and status == 'ok':
+            CPR_URL = get_CRP_url(env)
+            url = CPR_URL + "api/deploy/deploys"
+            deploy_nginx_to_crp(resource_id, url, set_flag)
+        CMDB_URL = current_app.config['CMDB_URL']
+        CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
+        push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
+
+    @classmethod
+    def process_cmdb2(cls, request_data):
+        '''
+        CMDB2.0 相关接口位置
+        :param request_data:
+        :return:
+        '''
+        pass
+
     @classmethod
     def post(cls):
         """
@@ -887,154 +1045,10 @@ Post Request JSON Body：
         """
         code = 2002
         request_data = json.loads(request.data)
-        resource_id = request_data.get('resource_id')
-        status = request_data.get('status')
-        error_msg=request_data.get('error_msg')
-        set_flag = request_data.get('set_flag')
         try:
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            env=resource.env
-            is_write_to_cmdb = False
-            # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
-            if status == "ok":
-                is_write_to_cmdb = True
-                container = request_data.get('container')
-                if container is not None:
-                    for i in container:
-                        for j in resource.compute_list:
-                            if i.get('ins_id') == j.ins_id:
-                                #j.ips = [ins.get('ip') for ins in i.get('instance')]
-                                ips=j.ips
-                                for ins in i.get('instance'):
-                                    ip=ins.get('ip')
-                                    ips.append(ip)
-                                j.ips=ips
-                                j.quantity=len(ips)
-
-                property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                                                              request_data)
-                logging.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
-
-                rpt = ResourceProviderTransitions(property_mappers_list)
-                rpt.start()
-                if rpt.state == "stop":
-                    logging.debug("完成停止")
-                else:
-                    logging.debug(rpt.state)
-
-            if is_write_to_cmdb is True:
-                logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-                if set_flag =="increase":
-                   CMDB_URL = current_app.config['CMDB_URL']
-                   CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                   old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                   app_cluster_name = ""
-                   new_pcode = ""
-                   for itemid, pcode in rpt.pcode_mapper.items():
-                       if u"应用集群" in itemid:
-                           app_cluster_name = itemid[:-4]
-                           new_pcode = pcode
-                           break
-                   cmdb_req = {"old_pcode":old_pcode, "new_pcode": new_pcode, "app_cluster_name":app_cluster_name}
-                   logging.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
-                   data = json.dumps(cmdb_req)
-                   ret = requests.post(CMDB_STATUS_URL, data=data)
-                   logging.info("CMDB return:{}".format(ret))
-                else:
-                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-
-            os_ids = []
-            os_ip_list=[]
-            os_ins_list=resource.os_ins_list
-            os_ins_ip_list=resource.os_ins_ip_list
-            if os_ins_list:
-                os_ids=os_ins_list
-            if os_ins_ip_list:
-                os_ip_list=os_ins_ip_list
-            container = request_data.get('container')
-            for _container in container:
-                instances = _container.get('instance')
-                cpu=str(_container.get('cpu','2'))
-                mem = str(_container.get('mem', '2'))
-                for instance in instances:
-                    os_ins_id = instance.get('os_inst_id')
-                    ip=instance.get('ip')
-                    os_vol_id=instance.get('os_vol_id')
-                    os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker",cpu=cpu,mem=mem,os_vol_id=os_vol_id)
-                    os_ip_list.append(os_ip_dic)
-                    os_ids.append(os_ins_id)
-
-            db_info = request_data.get('db_info')
-            vid_list = []
-            for key, value in db_info.items():
-                os_ins_ids = []
-                wid = value.get("wvid", '')
-                rid = value.get("rvid", '')
-                vid = value.get("vid", '')
-                cpu=str(value.get("cpu", '2'))
-                mem=str(value.get("mem", '2'))
-                if wid:
-                    vid_list.append(wid)
-                if rid:
-                    vid_list.append(rid)
-                if vid:
-                    vid_list.append(vid)
-
-                for instance in value.get('instance'):
-                    os_ins_id = instance.get('os_inst_id')
-                    ip=instance.get('ip')
-                    os_type = instance.get('instance_type')
-                    os_vol_id = instance.get('os_vol_id')
-                    os_ip_dic = OS_ip_dic(ip=ip,os_ins_id=os_ins_id,os_type= os_type,cpu=cpu,mem=mem,os_vol_id=os_vol_id)
-                    os_ip_list.append(os_ip_dic)
-                    os_ids.append(os_ins_id)
-                if os_ins_ids:
-                    os_ids.append(os_ins_ids)
-            resource.os_ins_list = os_ids
-            resource.vid_list = vid_list
-            resource.os_ins_ip_list=os_ip_list
-            #---------to statusrecord
-            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-            if len(deps) >0:
-                dep = deps[0]
-                deploy_id = dep.deploy_id
-            status_record = StatusRecord()
-            status_record.res_id = resource_id
-            status_record.s_type="set"
-            status_record.set_flag = set_flag
-            status_record.created_time=datetime.datetime.now()
-            if status == 'ok':
-                if set_flag == "res":
-                    status_record.status="set_success"
-                    status_record.msg="预留成功"
-                if set_flag == "increase":
-                    status_record.status="increase_success"
-                    status_record.msg="docker扩容成功"
-                    status_record.deploy_id = deploy_id
-            else:
-                if set_flag == "res":
-                    status_record.status="set_fail"
-                    status_record.msg="预留失败,错误日志为: %s" % error_msg
-                elif set_flag == "increase":
-                    status_record.status = "increase_fail"
-                    status_record.msg = "扩容失败,错误日志为: %s" % error_msg
-                    status_record.deploy_id = deploy_id
-                    dep.deploy_result="increase_fail"
-                    dep.save()
-            status_record.save()
-            resource.reservation_status = status_record.status
-            resource.save()
-            #判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
-            if set_flag == "increase" and status == 'ok':
-                CPR_URL = get_CRP_url(env)
-                url = CPR_URL + "api/deploy/deploys"
-                deploy_nginx_to_crp(resource_id,url,set_flag)
-            CMDB_URL = current_app.config['CMDB_URL']
-            CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
-            
+            cls.process_cmdb1(request_data)
         except Exception as e:
-            logging.exception("[UOP] Resource callback failed, Excepton: %s", e.args)
+            logging.exception("[UOP to CMDB1] Resource callback failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
@@ -1044,7 +1058,20 @@ Post Request JSON Body：
                 }
             }
             return ret, code
-
+        else:
+            try:
+                cls.process_cmdb2(request_data)
+            except Exception as e:
+                logging.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
+                code = 500
+                ret = {
+                    'code': code,
+                    'result': {
+                        'res': 'fail',
+                        'msg': "Resource find error."
+                    }
+                }
+                return ret, code
         res = {
             "code": code,
             "result": {
@@ -1146,7 +1173,7 @@ class ResourceStatusProviderCallBack(Resource):
                                 status_record.msg = '%s扩容中' % (cur_instance_type)
                                 status_record.deploy_id = deploy_id
                             status_record.s_type=cur_instance_type
-                    
+
                 else:
                     status_record = StatusRecord()
                     status_record.res_id = resource_id
@@ -1168,7 +1195,7 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.status = '%s_increase_reserving' % (cur_instance_type)
                             status_record.msg = '%s扩容中' %(cur_instance_type)
                             status_record.deploy_id = deploy_id
-                        cur_instance_type_list = [os_inst_id]        
+                        cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
                 setattr(status_record, cur_instance_type, cur_instance_type_list)
                 status_record.created_time=datetime.datetime.now()
@@ -1195,7 +1222,7 @@ class ResourceStatusProviderCallBack(Resource):
                 #resource = ResourceModel.objects.get(res_id=resource_id)
                 #resource.reservation_status = status_record.status
                 #resource.save()
-                 
+
         except Exception as e:
             logging.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
             code = 500
@@ -1220,7 +1247,7 @@ class ResourceStatusProviderCallBack(Resource):
     def get(cls):
         code = 2002
         parser = reqparse.RequestParser()
-        parser.add_argument('resource_id',location='args') 
+        parser.add_argument('resource_id',location='args')
         args = parser.parse_args()
         resource_id=args.resource_id
         try:
@@ -1247,14 +1274,14 @@ class ResourceStatusProviderCallBack(Resource):
                 status_records=status_record_success_list
             for sr in status_records:
                 dep_id=sr.deploy_id
-                if dep_id:               
+                if dep_id:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     dep_msg_list.append(s_msg)
                 else:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     set_msg_list.append(s_msg)
             data["set"]=set_msg_list
-            data["deploy"]=dep_msg_list         
+            data["deploy"]=dep_msg_list
         except Exception as e:
             logging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
             code = 500
