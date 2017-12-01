@@ -765,8 +765,6 @@ class RollBackReservation(Resource):
                         app["ips"]=compute["ips"]
                         app["domain_ip"] = compute["domain_ip"]
                         app["quantity"]=compute["quantity"]
-                        compute["url"]=app["url"]
-            resource.save()
             results["resource_id"] = resource_id
             results["deploy_name"] = deploy_name
             results["resource_name"] = resource_name
@@ -804,20 +802,21 @@ class RollBackReservation(Resource):
         compute_list=args.compute_list
         data={}
         try:
-            # ------将当前回滚的版本号更新到resource表
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             env=resource.env
-            #resource.deploy_name = deploy_name
-            #resource.save()
+            res_compute_list = resource.compute_list
+            for res_compute in res_compute_list:
+                for compute in compute_list:
+                    if res_compute["ins_id"] == compute["ins_id"]:
+                        res_compute["url"]=compute["url"]
+            resource.save()
             #----------
             appinfo=[]
-            for compute in compute_list:
-                domain_ip=compute.get('domain_ip')
-                if domain_ip:
-                    appinfo.append(compute)
-            data["appinfo"]=appinfo
             docker_list = []
             for compute in compute_list:
+                domain_ip = compute.get('domain_ip')
+                if domain_ip:
+                    appinfo.append(compute)
                 docker_list.append(
                     {
                         'url': compute.get("url"),
@@ -825,6 +824,7 @@ class RollBackReservation(Resource):
                         'ip': compute.get("ips"),
                     }
                 )
+            data["appinfo"] = appinfo
             data['docker'] = docker_list
             data["mysql"]=[]
             data["mongodb"]=[]
