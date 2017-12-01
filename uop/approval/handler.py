@@ -500,11 +500,19 @@ class CapacityInfoAPI(Resource):
                         deployment.deploy_result="not_increased"
                     elif approval.capacity_status == "reduce":
                         deployment.deploy_result = "not_reduced"
-
-                approval.save()
-                resource.save()
-                deployment.save()
-                code = 200
+                    # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
+                    deps = models.Deployment.objects.filter(resource_id=approval.resource_id).order_by('-created_time')
+                    if len(deps) > 1:
+                        dep = deps[1]
+                    elif len(deps) == 1:
+                        dep = deps[0]
+                    deploy_name = dep.deploy_name
+                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
+                    resource.deploy_name = deploy_name
+                    approval.save()
+                    resource.save()
+                    deployment.save()
+                    code = 200
             else:
                 code = 410
                 res = "A resource with that ID no longer exists"
@@ -702,7 +710,16 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_fail"
                     #审批不通过状态修改
                     deployment.deploy_result="not_rollbacked"
-
+                    # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
+                    deps = models.Deployment.objects.filter(resource_id=approval.resource_id).order_by('-created_time')
+                    if len(deps) > 1:
+                        dep = deps[1]
+                    elif len(deps) == 1:
+                        dep = deps[0]
+                    deploy_name = dep.deploy_name
+                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
+                    resource.deploy_name = deploy_name
+                    resource.save()
                 approval.save()
                 deployment.save()
                 code = 200
