@@ -1479,10 +1479,12 @@ class RollBackAPI(Resource):
             deploy_result="rollback_to_approve"
             deploy_type = "rollback"
             approve_status="rollbacking"
+            #------------------------
+            new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
             #回滚新生成一条部署记录原来的部署记录保存
             deploy_item = Deployment(
                 deploy_id=approval_id,
-                deploy_name=deploy_name,
+                deploy_name=new_deploy_name,
                 initiator=initiator,
                 user_id=old_deployment.user_id,
                 project_id=project_id,
