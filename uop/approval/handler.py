@@ -509,10 +509,10 @@ class CapacityInfoAPI(Resource):
                     deploy_name = dep.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                     resource.deploy_name = deploy_name
-                    approval.save()
                     resource.save()
-                    deployment.save()
-                    code = 200
+                approval.save()
+                deployment.save()
+                code = 200
             else:
                 code = 410
                 res = "A resource with that ID no longer exists"
