@@ -765,6 +765,8 @@ class RollBackReservation(Resource):
                         app["ips"]=compute["ips"]
                         app["domain_ip"] = compute["domain_ip"]
                         app["quantity"]=compute["quantity"]
+                        compute["url"]=app["url"]
+            resource.save()
             results["resource_id"] = resource_id
             results["deploy_name"] = deploy_name
             results["resource_name"] = resource_name
