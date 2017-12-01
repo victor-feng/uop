@@ -320,10 +320,10 @@ class ResourceApplication(Resource):
                 result['is_rollback'] = res.is_rollback
                 resource_id=res.res_id
                 deploy_name=res.deploy_name
-                if deploy_name:
-                    deploys = Deployment.objects.filter(resource_id=resource_id,deploy_name=deploy_name).order_by("-created_time")
-                else:
-                    deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
+                #if deploy_name:
+                #deploys = Deployment.objects.filter(resource_id=resource_id,deploy_name=deploy_name).order_by("-created_time")
+                #else:
+                deploys=Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
                     dep=deploys[0]
                     if int(dep.is_rollback) == 0:

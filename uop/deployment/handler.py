@@ -688,7 +688,7 @@ class DeploymentListAPI(Resource):
                 deploy_obj.save()
                 message = 'approve_forbid success'
                 #管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
-                deps = Deployment.objects.filter(resource_id=resource_id,deploy_type="deploy").order_by('-created_time')
+                deps = Deployment.objects.filter(resource_id=resource_id,approve_status='success').order_by('-created_time')
                 if len(deps) > 1:
                     dep=deps[1]
                 elif len(deps) == 1:
@@ -1472,25 +1472,48 @@ class RollBackAPI(Resource):
             approval_id = str(uuid.uuid1())
             approval_status="rollbacking"
             #更新要回滚的deploy记录
-            deployment = Deployment.objects.get(deploy_name=deploy_name)
-            deploy_id=deployment.deploy_id
-            created_time=datetime.datetime.now()
+            old_deployment = Deployment.objects.get(deploy_name=deploy_name)
+            deploy_id=approval_id
             create_date = datetime.datetime.now()
             #状态为回滚未审批
             deploy_result="rollback_to_approve"
-            deployment.created_time=created_time
-            deployment.deploy_result=deploy_result
-            deployment.initiator=initiator
-            deployment.project_name=project_name
-            deployment.deploy_type = "rollback"
-            deployment.approve_status="rollbacking"
-            deployment.save()
+            deploy_type = "rollback"
+            approve_status="rollbacking"
+            #回滚新生成一条部署记录原来的部署记录保存
+            deploy_item = Deployment(
+                deploy_id=approval_id,
+                deploy_name=deploy_name,
+                initiator=initiator,
+                user_id=old_deployment.user_id,
+                project_id=project_id,
+                project_name=project_name,
+                resource_id=res_id,
+                resource_name=old_deployment.resource_name,
+                created_time=create_date,
+                environment=old_deployment.environment,
+                release_notes=old_deployment.release_notes,
+                mysql_tag=old_deployment.mysql_tag,
+                mysql_context=old_deployment.mysql_context,
+                redis_tag=old_deployment.redis_tag,
+                redis_context=old_deployment.redis_context,
+                mongodb_tag=old_deployment.mongodb_tag,
+                mongodb_context=old_deployment.mongodb_context,
+                app_image=old_deployment.app_image,
+                deploy_result=deploy_result,
+                apply_status="success",
+                approve_status=approve_status,
+                approve_suggestion=old_deployment.approve_suggestion,
+                database_password=old_deployment.database_password,
+                disconf_list=old_deployment.disconf_list,
+                deploy_type=deploy_type
+            )
+            deploy_item.save()
+
             #将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id,deploy_id=deploy_id,
                      project_id=project_id, department_id=department_id,
                      creator_id=creator_id, create_date=create_date,
                      approval_status=approval_status).save()
-
         except Exception as e:
             logging.debug(e)
             ret = {
