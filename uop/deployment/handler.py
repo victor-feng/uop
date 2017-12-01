@@ -689,11 +689,9 @@ class DeploymentListAPI(Resource):
                 message = 'approve_forbid success'
                 #管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
                 deps = Deployment.objects.filter(resource_id=resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
-                if len(deps) > 1:
-                    dep=deps[1]
-                elif len(deps) == 1:
-                    dep=deps[0]
-                deploy_name=dep.deploy_name
+                if deps:
+                    dep = deps[0]
+                    deploy_name=dep.deploy_name
                 resource = ResourceModel.objects.get(res_id=resource_id)
                 resource.deploy_name = deploy_name
                 resource.save()

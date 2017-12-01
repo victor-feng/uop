@@ -502,9 +502,7 @@ class CapacityInfoAPI(Resource):
                         deployment.deploy_result = "not_reduced"
                     # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
                     deps = models.Deployment.objects.filter(resource_id=approval.resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"] ).order_by('-created_time')
-                    if len(deps) > 1:
-                        dep = deps[1]
-                    elif len(deps) == 1:
+                    if deps:
                         dep = deps[0]
                     deploy_name = dep.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
@@ -712,9 +710,7 @@ class RollBackInfoAPI(Resource):
                     deployment.deploy_result="not_rollbacked"
                     # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
                     deps = models.Deployment.objects.filter(resource_id=approval.resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
-                    if len(deps) > 1:
-                        dep = deps[1]
-                    elif len(deps) == 1:
+                    if deps:
                         dep = deps[0]
                     deploy_name = dep.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
