@@ -1260,7 +1260,7 @@ class CapacityAPI(Resource):
                                 resource_name=old_deployment.resource_name,
                                 created_time=create_date,
                                 environment=old_deployment.environment,
-                                release_notes=old_deployment.release_notes,
+                                release_notes='',
                                 mysql_tag=old_deployment.mysql_tag,
                                 mysql_context=old_deployment.mysql_context,
                                 redis_tag=old_deployment.redis_tag,
