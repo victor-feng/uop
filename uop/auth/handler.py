@@ -388,7 +388,7 @@ class AllUserList(Resource):
     # @auth.login_required
     def get(self):
         all_user = []
-        users = UserInfo.objects.all()
+        users = UserInfo.objects.all().order_by('-created_time')
         for i in users:
             data = {
                     'id': i.id,
