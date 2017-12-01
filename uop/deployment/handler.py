@@ -1464,11 +1464,6 @@ class RollBackAPI(Resource):
         project_name = args.project_name
         deploy_name = args.deploy_name
         try:
-            # ------将当前回滚的版本号更新到resource表
-            resource = ResourceModel.objects.get(res_id=res_id)
-            resource.deploy_name = deploy_name
-            resource.save()
-            #-------
             approval_id = str(uuid.uuid1())
             approval_status="rollbacking"
             #更新要回滚的deploy记录
@@ -1481,6 +1476,11 @@ class RollBackAPI(Resource):
             approve_status="rollbacking"
             #------------------------
             new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+            # ------将当前回滚的版本号更新到resource表
+            resource = ResourceModel.objects.get(res_id=res_id)
+            resource.deploy_name = deploy_name
+            resource.save()
+            # -------
             #回滚新生成一条部署记录原来的部署记录保存
             deploy_item = Deployment(
                 deploy_id=approval_id,
