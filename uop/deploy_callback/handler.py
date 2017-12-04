@@ -265,7 +265,7 @@ def get_deploy_status(deploy_id):
         for sr in status_records:
             if sr.s_type=="deploy_docker":
                 docker_status_list.append(sr.status)
-        if "deploy_docker_fail" in docker_status_list or "deploy_mongodb_fail" in docker_status_list or "deploy_mysql_fail" in docker_status_list:
+        if "deploy_docker_fail" in docker_status_list or "deploy_mongodb_fail" in docker_status_list or "deploy_mysql_fail" in docker_status_list or "rollback_docker_fail" in docker_status_list:
             return False,len(docker_status_list)
         else:
             return True,len(docker_status_list) 
