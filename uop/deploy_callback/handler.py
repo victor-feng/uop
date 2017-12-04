@@ -75,7 +75,7 @@ class DeployCallback(Resource):
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.deploy_id = deploy_id
-        status_record.s_type="deploy_docker"
+        status_record.s_type="%s_docker" % deploy_type
         status_record.set_flag = "res"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
@@ -92,7 +92,7 @@ class DeployCallback(Resource):
                 status_record.status = "deploy_%s_fail" % res_type
                 status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type,err_msg)
         status_record.save()
-        res_status,count = get_deploy_status(deploy_id)
+        res_status,count = get_deploy_status(deploy_id,deploy_type)
         #if not res_status and quantity == count:
         #    dep.deploy_result = "deploy_fail"
         #    create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
@@ -258,12 +258,12 @@ class DeployStatusProviderCallBack(Resource):
         }
         return res, 200   
 
-def get_deploy_status(deploy_id): 
+def get_deploy_status(deploy_id,deploy_type):
     try:
         docker_status_list=[]
         status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
         for sr in status_records:
-            if sr.s_type=="deploy_docker":
+            if sr.s_type=="%s_docker" % deploy_type:
                 docker_status_list.append(sr.status)
         if "deploy_docker_fail" in docker_status_list or "deploy_mongodb_fail" in docker_status_list or "deploy_mysql_fail" in docker_status_list or "rollback_docker_fail" in docker_status_list:
             return False,len(docker_status_list)
