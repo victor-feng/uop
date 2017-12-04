@@ -596,7 +596,11 @@ class DeploymentListAPI(Resource):
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 deploy_obj.deploy_result='deploying'
                 deploy_obj.save()
-            #disconf配置
+                #管理员审批通过后修改resource表deploy_name,更新当前版本
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.deploy_name = deploy_name
+                resource.save()
+                #disconf配置
                 #1、将disconf信息更新到数据库
                 deploy_obj = Deployment.objects.get(deploy_id=dep_id)
                 for instance_info in disconf:
@@ -688,13 +692,13 @@ class DeploymentListAPI(Resource):
                 deploy_obj.save()
                 message = 'approve_forbid success'
                 #管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
-                deps = Deployment.objects.filter(resource_id=resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
-                if deps:
-                    dep = deps[0]
-                    deploy_name=dep.deploy_name
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.deploy_name = deploy_name
-                resource.save()
+                #deps = Deployment.objects.filter(resource_id=resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
+                #if deps:
+                #    dep = deps[0]
+                #    deploy_name=dep.deploy_name
+                #resource = ResourceModel.objects.get(res_id=resource_id)
+                #resource.deploy_name = deploy_name
+                #resource.save()
             elif action == 'save_to_db':  # 部署申请
                 #------将当前部署的版本号更新到resource表
                 resource = ResourceModel.objects.get(res_id=resource_id)
@@ -1243,9 +1247,9 @@ class CapacityAPI(Resource):
                             old_deploy_name=old_deployment.deploy_name.strip().split('@')[0]
                             new_deploy_name=old_deploy_name+'@'+deploy_type+ '_'+ datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
                             # ------将当前回滚的版本号更新到resource表
-                            resource = ResourceModel.objects.get(res_id=res_id)
-                            resource.deploy_name = new_deploy_name
-                            resource.save()
+                            #resource = ResourceModel.objects.get(res_id=res_id)
+                            #resource.deploy_name = new_deploy_name
+                            #resource.save()
                             #------------------
                             capacity_info_dict=self.deal_capacity_info(approval_id, res_id)
                             capacity_info_str=json.dumps(capacity_info_dict)
@@ -1278,7 +1282,7 @@ class CapacityAPI(Resource):
                                 deploy_type=deploy_type
                             )
                             deploy_item.save()
-                        Approval(approval_id=approval_id, resource_id=res_id,
+                        Approval(approval_id=approval_id, resource_id=res_id,deploy_id=approval_id,
                             project_id=project_id,department_id=department_id,
                             creator_id=creator_id,create_date=create_date,
                             approval_status=approval_status, capacity_status=capacity_status).save()
@@ -1475,9 +1479,9 @@ class RollBackAPI(Resource):
             #------------------------
             new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
             # ------将当前回滚的版本号更新到resource表
-            resource = ResourceModel.objects.get(res_id=res_id)
-            resource.deploy_name = deploy_name
-            resource.save()
+            #resource = ResourceModel.objects.get(res_id=res_id)
+            #resource.deploy_name = deploy_name
+            #resource.save()
             # -------
             #回滚新生成一条部署记录原来的部署记录保存
             deploy_item = Deployment(
