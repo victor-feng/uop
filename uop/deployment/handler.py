@@ -149,7 +149,7 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, appinfo, disconf_server_info):
+def deploy_to_crp(deploy_item,environment ,resource_info, resource_name, database_password, appinfo, disconf_server_info):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
@@ -157,6 +157,7 @@ def deploy_to_crp(deploy_item, resource_info, resource_name, database_password, 
         "disconf_server_info": disconf_server_info,
         "deploy_type":"deploy",
         "dns":[],
+        "environment":environment,
     }
     if appinfo: # 判断nginx信息，没有则不推送dns配置
         for app_info in res_obj.compute_list:
@@ -675,7 +676,7 @@ class DeploymentListAPI(Resource):
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
 
                 if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj, resource_info, resource_name, database_password, appinfo, disconf_server_info)
+                    err_msg, result = deploy_to_crp(deploy_obj,environment,resource_info, resource_name, database_password, appinfo, disconf_server_info)
                     if err_msg:
                         deploy_obj.deploy_result = 'deploy_fail'
                         print 'deploy_to_crp err: '+ err_msg
