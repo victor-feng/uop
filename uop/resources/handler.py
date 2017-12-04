@@ -328,7 +328,12 @@ class ResourceApplication(Resource):
                     dep=deploys[0]
                     if int(dep.is_rollback) == 0:
                         deploy_result=dep.deploy_result
-                        result['reservation_status'] = deploy_result
+                    elif int(dep.is_rollback) == 1:
+                        if len(deploys) > 1:
+                            deploy_result=deploys[1].deploy_result
+                        elif len(deploys) == 1:
+                            deploy_result='set_success'
+                    result['reservation_status'] = deploy_result
                 result_list.append(result)
         code = 200
         ret = {
