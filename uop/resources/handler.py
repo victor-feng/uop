@@ -5,7 +5,7 @@ import copy
 import time
 import random
 import logging
-from flask import request, make_response
+from flask import request, make_response, current_app
 from flask import redirect
 from flask import jsonify
 import uuid
@@ -27,7 +27,7 @@ CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
-
+Logger = current_app.logger
 
 def make_random_database_password():
     return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
@@ -933,9 +933,9 @@ class Dockerlogs(Resource):
             "osid":osid
         })
         try:
-            logging.info("osid:{}".format(data))
+            Logger.info("osid:{}".format(data))
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
-            logging.info("ret:{}".format(ret.json()))
+            Logger.error("ret:{}".format(ret.json()))
         except Exception as exc:
             logging.error(str(exc))
             code = 500

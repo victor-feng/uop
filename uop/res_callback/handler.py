@@ -1081,6 +1081,7 @@ Post Request JSON Body：
         }
         return res, 200
 
+
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:

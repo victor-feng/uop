@@ -208,7 +208,7 @@ def deploy_to_crp(deploy_item,environment ,resource_info, resource_name, databas
                     }
                 )
             except AttributeError as e:
-                print e
+                logging.error(str(e))
         data['docker'] = docker_list
 
     err_msg = None
