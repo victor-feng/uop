@@ -21,7 +21,7 @@ from uop.resources.errors import resources_errors
 from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
-
+from uop.log import Log
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
@@ -933,9 +933,9 @@ class Dockerlogs(Resource):
             "osid":osid
         })
         try:
-            current_app.logger.info("osid:{}".format(data))
+            Log.logger.info("osid:{}".format(data))
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
-            current_app.logger.info("ret:{}".format(ret.json()))
+            Log.logger.error("ret:{}".format(ret.json()))
         except Exception as exc:
             current_app.logger.error(str(exc))
             code = 500

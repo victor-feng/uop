@@ -14,8 +14,8 @@ class BaseConfig:
     DEBUG = False
 
 class DevelopmentConfig(BaseConfig):
-    TESTING = True
-    DEBUG = True
+    # TESTING = True
+    # DEBUG = True
     MONGODB_SETTINGS = {
             'db': 'uop',
             'host': '172.28.20.124',
