@@ -27,13 +27,7 @@ CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
-app = current_app._get_current_object()
-try:
-    with app.app_context():
-        Logger = app.logger
-except Exception as e:
-    print str(e)
-    Logger = logging
+
 
 def make_random_database_password():
     return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
@@ -939,9 +933,9 @@ class Dockerlogs(Resource):
             "osid":osid
         })
         try:
-            Logger.info("osid:{}".format(data))
+            current_app.logger.info("osid:{}".format(data))
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
-            Logger.error("ret:{}".format(ret.json()))
+            current_app.logger.error("ret:{}".format(ret.json()))
         except Exception as exc:
             logging.error(str(exc))
             code = 500
