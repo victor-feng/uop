@@ -935,7 +935,7 @@ class Dockerlogs(Resource):
         try:
             Log.logger.info("osid:{}".format(data))
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
-            Log.logger.error("ret:{}".format(ret.json()))
+            Log.logger.info("ret:{}".format(ret.json()))
         except Exception as exc:
             Log.logger.error(str(exc))
             code = 500
