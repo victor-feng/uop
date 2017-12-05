@@ -222,7 +222,6 @@ class ResourceApplication(Resource):
         parser.add_argument('approval_status', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
         parser.add_argument('env', type=str, location='args')
-        parser.add_argument('approval_status', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -247,8 +246,6 @@ class ResourceApplication(Resource):
             condition['user_name'] = args.name
         if args.env:
             condition['env'] = args.env
-        if args.reservation_status:
-            condition['approval_status'] = args.approval_status
 
         if agg_by:
             pipeline = []
