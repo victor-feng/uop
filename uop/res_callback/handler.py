@@ -4,7 +4,6 @@ import json
 import uuid
 import copy
 import requests
-import Log.logger
 import datetime
 
 from flask import request
