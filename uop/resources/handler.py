@@ -222,7 +222,6 @@ class ResourceApplication(Resource):
         parser.add_argument('approval_status', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
         parser.add_argument('env', type=str, location='args')
-        parser.add_argument('approval_status', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -247,8 +246,6 @@ class ResourceApplication(Resource):
             condition['user_name'] = args.name
         if args.env:
             condition['env'] = args.env
-        if args.reservation_status:
-            condition['approval_status'] = args.approval_status
 
         if agg_by:
             pipeline = []
@@ -297,7 +294,8 @@ class ResourceApplication(Resource):
         try:
             resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
         except Exception as e:
-            print e
+            Log.logger.error(str(e))
+            # print e
             code = 500
             ret = {
                 'code': code,
@@ -415,7 +413,8 @@ class ResourceApplication(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             ret = {
                 'code': 500,
                 'result': {
@@ -461,7 +460,8 @@ class ResourceApplication(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             ret = {
                 'code': 500,
                 'result': {
@@ -487,7 +487,8 @@ class ResourceDetail(Resource):
         try:
             resources = ResourceModel.objects.filter(res_id=res_id)
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             code = 500
             ret = {
                 'code': code,
@@ -604,7 +605,8 @@ class ResourceDetail(Resource):
         try:
             resource_application = ResourceModel.objects.get(res_id=res_id)
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             code = 500
             ret = {
                 'code': code,
@@ -694,7 +696,8 @@ class ResourceDetail(Resource):
         try:
             resource_application.save()
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             code = 500
             res = {"code": code,
                    "result": {
@@ -722,8 +725,8 @@ class ResourceDetail(Resource):
             parser.add_argument('user_id', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
             args = parser.parse_args()
-            Log.logger.info(args)
-            print args
+            # print args
+            Log.logger.debug("delete args:{}".format(args))
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
@@ -754,7 +757,8 @@ class ResourceDetail(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             ret = {
                 'code': 500,
                 'result': {
@@ -780,7 +784,8 @@ class ResourceRecord(Resource):
         try:
             resources = ResourceModel.objects.filter(user_id=user_id)
         except Exception as e:
-            print e
+            # print e
+            Log.logger.error(str(e))
             code = 500
             ret = {
                 'code': code,
@@ -937,7 +942,6 @@ class Dockerlogs(Resource):
         })
         try:
             Log.logger.info("osid:{}".format(data))
-            Log.logger.info("Log.level:{}".format(Log.logger.level))
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
             Log.logger.info("ret:{}".format(ret.json()))
         except Exception as exc:

@@ -19,6 +19,7 @@ from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from config import APP_ENV, configs
 from uop.util import get_CRP_url
+from uop.log import Log
 
 
 
@@ -238,7 +239,7 @@ def deploy_to_crp(deploy_item,environment ,resource_info, resource_name, databas
                     data[type]['path_filename'] = path_filename
             elif cont.get('code') == 500:
                 return 'upload sql file failed', result
-        print url + ' ' + json.dumps(headers)
+        Log.logger.info("{}  {}".format(url, json.dumps(headers)))
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("Data args is " + str(data_str))
@@ -679,9 +680,9 @@ class DeploymentListAPI(Resource):
                     err_msg, result = deploy_to_crp(deploy_obj,environment,resource_info, resource_name, database_password, appinfo, disconf_server_info)
                     if err_msg:
                         deploy_obj.deploy_result = 'deploy_fail'
-                        print 'deploy_to_crp err: '+ err_msg
+                        Log.logger.info('deploy_to_crp err: {}'.format(err_msg))
                     else:
-                        print 'deploy_to_crp response: '+ result
+                        Log.logger.info('deploy_to_crp response: {}'.format(result))
                 else:
                     raise Exception(err_msg)
                 deploy_obj.save()
@@ -816,10 +817,6 @@ class DeploymentListAPI(Resource):
         user = args.user
         deploy_id = args.deploy_id
         Log.logger.info("delete deployment:{}".format(deploy_id))
-        print "delete deployment:{}".format(deploy_id)
-        # if user == "admin":
-        #     Log.logger.info("user is admin:will delete deployment immediately")
-        #     return cls.delete()
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
@@ -962,7 +959,7 @@ class DeploymentListAPI(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            print e
+            Log.logger.error(str(e))
             ret = {
                 'code': 500,
                 'result': {

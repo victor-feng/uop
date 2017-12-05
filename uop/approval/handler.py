@@ -177,7 +177,7 @@ class Reservation(Resource):
                 old_compute_list.insert(i, compute)
             res.save()
         except Exception as e:
-            print "attach domain_ip to compute error:{}".format(e)
+            Log.logger.error("attach domain_ip to compute error:{}".format(e))
         return True
 
     def post(self):
@@ -207,7 +207,7 @@ class Reservation(Resource):
             #resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
-            print e
+            Log.logger.error(str(e))
             code = 410
             res = "Failed to find the rsource"
             ret = {
@@ -546,7 +546,7 @@ class CapacityReservation(Resource):
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
-            print e
+            Log.logger.error(str(e))
             code = 410
             res = "Failed to find the rsource"
             ret = {

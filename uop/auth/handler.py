@@ -19,6 +19,7 @@ from uop.auth import auth_blueprint
 from uop.models import UserInfo, User
 from uop.auth.errors import user_errors
 from config import APP_ENV, configs
+from uop.log import Log
 from wtforms import ValidationError
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -77,7 +78,7 @@ class LdapConn(object):
                     d['givenName'] = ''
                 result.append(d)
                 self.cn = d.get('distinguishedName', '')
-                print self.cn
+                Log.logger.error(self.cn)
                 id = d.get('sAMAccountName', '')
                 mail = d.get('mail', '')
                 name = d.get('cn', '')
@@ -90,19 +91,20 @@ class LdapConn(object):
                         'mobile': mobile,
                         'department': department
                         }
-                print d
-        print '共找到结果 %s 条' % (len(result))
+                Log.logger.info(d)
+        Log.logger.debug('共找到结果 %s 条' % (len(result)))
+        # print '共找到结果 %s 条' % (len(result))
         #for d in result:
         #    print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
         try:
             if con.simple_bind_s(self.cn, password):
-                print 'verify successfully'
+                Log.logger.debug('verify successfully')
                 self.flag = 1
             else:
-                print 'verify fail'
+                Log.logger.debug('verify fail')
                 self.flag = 0
         except ldap.INVALID_CREDENTIALS, e:
-            print e
+            Log.logger.error(str(e))
             self.flag = 0
         return self.flag, field_value
 
