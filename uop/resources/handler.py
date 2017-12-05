@@ -27,7 +27,7 @@ CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
-Logger = current_app.logger
+Logger = current_app._get_current_object().logger
 
 def make_random_database_password():
     return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
