@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import Log.logger
+# import Log.logger
 import json
 import requests
 from models import db
