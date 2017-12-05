@@ -3,18 +3,14 @@
 import json
 import uuid
 import datetime
-import logging
-
 import requests
 import random
 from flask_restful import reqparse, Api, Resource
-from flask import current_app
-
+from uop.log import Log
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-# from config import APP_ENV
-from uop.util import get_CRP_url, get_network_used,check_network_use
+from uop.util import get_CRP_url
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -55,7 +51,7 @@ class ApprovalList(Resource):
             resource.save()
             code = 200
         except Exception as e:
-            logging.exception("[UOP] ApprovalList failed, Exception: %s", e.args)
+            Log.logger.exception("[UOP] ApprovalList failed, Exception: %s", e.args)
             code = 500
             res = "Failed to add a approval"
 
@@ -848,9 +844,9 @@ class RollBackReservation(Resource):
                 'Content-Type': 'application/json',
             }
             data_str = json.dumps(data)
-            logging.debug("Data args is " + str(data))
+            Log.logger.debug("Data args is " + str(data))
             result = requests.post(url=url, headers=headers, data=data_str)
-            logging.debug("Result is " + str(result))
+            Log.logger.debug("Result is " + str(result))
         except Exception as e:
             code = 500
             res = "Failed the rollback post data to crp. %s" %e

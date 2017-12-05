@@ -14,7 +14,7 @@ from uop import models
 from uop.disconf import disconf_blueprint
 from uop.disconf.errors import disconf_errors
 from uop.disconf.disconf_api import *
-
+from uop.log import Log
 
 disconf_api = Api(disconf_blueprint, errors=disconf_errors)
 

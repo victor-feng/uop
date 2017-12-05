@@ -4,7 +4,7 @@ import json
 import uuid
 import copy
 import requests
-import logging
+import Log.logger
 import datetime
 
 from flask import request
@@ -20,7 +20,7 @@ from config import APP_ENV, configs
 from transitions import Machine
 from uop.util import async
 from uop.util import get_CRP_url
-#from uop.log import Log
+from uop.log import Log
 
 
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
@@ -215,9 +215,9 @@ mapping_type_status = {
 # Transition state Log debug decorator
 def transition_state_logger(func):
     def wrapper(self, *args, **kwargs):
-        logging.debug("Transition state is turned in " + self.state)
+        Log.logger.debug("Transition state is turned in " + self.state)
         ret = func(self, *args, **kwargs)
-        logging.debug("Transition state is turned out " + self.state)
+        Log.logger.debug("Transition state is turned out " + self.state)
         return ret
     return wrapper
 
@@ -306,7 +306,7 @@ class ResourceProviderTransitions(object):
             func = getattr(self, item_id, None)
             if not func:
                 raise NotImplementedError("Unexpected item_id=%s" % item_id)
-            logging.debug('Trigger is %s', item_id)
+            Log.logger.debug('Trigger is %s', item_id)
             func()
         else:
             self.stop()
@@ -359,26 +359,26 @@ class ResourceProviderTransitions(object):
                 repo_item['name'] = item.get('result').get('res').get('item_name')
                 repo_item['property_list'] = transited_property_list
         except Exception as e:
-            logging.debug(e.message)
+            Log.logger.debug(e.message)
         return repo_item
 
     def _do_one_item_post(self, item_id):
         repo_item = self.transit_item_property_list(item_id)
         data = json.dumps(repo_item)
-        logging.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
-        logging.debug(data)
+        Log.logger.debug("Resource Provider CallBack to CMDB RESTFUL API Post data is:")
+        Log.logger.debug(data)
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_REPO_URL = CMDB_URL+'cmdb/api/repo/'
         resp_repo_item = requests.post(CMDB_REPO_URL, data=data)
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
-        logging.debug("The CMDB RESTFUL API Post Response is:")
-        logging.debug(item_property)
-        logging.debug("The Response code is :"+code.__str__())
+        Log.logger.debug("The CMDB RESTFUL API Post Response is:")
+        Log.logger.debug(item_property)
+        Log.logger.debug("The Response code is :"+code.__str__())
         if 2002 == code:
             p_code = item_property.get('result').get('id')
             if str(item_id) == "app_cluster":
-                logging.info("if item_id:{}".format(item_id))
+                Log.logger.info("if item_id:{}".format(item_id))
                 property_list = repo_item.get("property_list")
                 name_dict = {}
                 for p in property_list:
@@ -390,9 +390,9 @@ class ResourceProviderTransitions(object):
                 self.pcode_mapper[app_name + u"应用集群"] = p_code
                 self.pcode_mapper[item_id] = p_code
             else:
-                logging.info("else item_id:{}".format(item_id))
+                Log.logger.info("else item_id:{}".format(item_id))
                 self.pcode_mapper[item_id] = p_code
-            logging.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
+            Log.logger.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
         condition = 'item_id=physical_server&p_code=hostname&value=' + physical_server
@@ -405,7 +405,7 @@ class ResourceProviderTransitions(object):
         if 2002 == code:
             p_code = item_property.get('result').get('res')[0].get('p_code')
             self.pcode_mapper['physical_server'] = p_code
-            logging.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
+            Log.logger.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
                           % (physical_server, p_code))
 
     def start(self):
@@ -652,11 +652,11 @@ def filter_status_data(p_code):
     data = {
         "vm_status":[]
     }
-    logging.info("filter_status_data.p_code:{}".format(p_code))
+    Log.logger.info("filter_status_data.p_code:{}".format(p_code))
     res = ResourceModel.objects.filter(cmdb_p_code=p_code)
     for r in res:
         osid_ip_list = r.os_ins_ip_list
-        logging.info("filter_status_data.p_code:{}".format(osid_ip_list))
+        Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
         for oi in osid_ip_list:
             meta = {}
             meta["resource_id"] = r.res_id
@@ -681,15 +681,15 @@ def filter_status_data(p_code):
 @async
 def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
-        logging.info("push_vm_docker_status_to_cmdb pcode is null")
+        Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
     data = filter_status_data(p_code)
-    logging.info("Start push vm and docker status to CMDB, data:{}".format(data))
+    Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         ret = requests.post(url, data=json.dumps(data)).json()
-        logging.info("push CMDB vm and docker status result is:{}".format(ret))
+        Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
     except Exception as exc:
-        logging.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
+        Log.logger.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
 
 class ResourceProviderCallBack(Resource):
     """
@@ -722,17 +722,17 @@ class ResourceProviderCallBack(Resource):
 
             property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                           request_data)
-            logging.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+            Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
 
             rpt = ResourceProviderTransitions(property_mappers_list)
             rpt.start()
             if rpt.state == "stop":
-                logging.debug("完成停止")
+                Log.logger.debug("完成停止")
             else:
-                logging.debug(rpt.state)
+                Log.logger.debug(rpt.state)
 
         if is_write_to_cmdb is True:
-            logging.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+            Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
             if set_flag == "increase":
                 CMDB_URL = current_app.config['CMDB_URL']
                 CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
@@ -745,10 +745,10 @@ class ResourceProviderCallBack(Resource):
                         new_pcode = pcode
                         break
                 cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode, "app_cluster_name": app_cluster_name}
-                logging.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
+                Log.logger.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
                 data = json.dumps(cmdb_req)
                 ret = requests.post(CMDB_STATUS_URL, data=data)
-                logging.info("CMDB return:{}".format(ret))
+                Log.logger.info("CMDB return:{}".format(ret))
             else:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
 
@@ -1048,7 +1048,7 @@ Post Request JSON Body：
         try:
             cls.process_cmdb1(request_data)
         except Exception as e:
-            logging.exception("[UOP to CMDB1] Resource callback failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP to CMDB1] Resource callback failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
@@ -1062,7 +1062,7 @@ Post Request JSON Body：
             try:
                 cls.process_cmdb2(request_data)
             except Exception as e:
-                logging.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
+                Log.logger.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
                 code = 500
                 ret = {
                     'code': code,
@@ -1085,7 +1085,7 @@ Post Request JSON Body：
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:
-        logging.debug("------Begin deploy nginx------")
+        Log.logger.debug("------Begin deploy nginx------")
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
@@ -1110,21 +1110,21 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
             app_image.append(app_dict)
         """
         appinfo = attach_domain_ip(app_image, resource,None)
-        logging.debug("----------this is appinfo---------------")
-        logging.debug(appinfo)
+        Log.logger.debug("----------this is appinfo---------------")
+        Log.logger.debug(appinfo)
         data = {}
         data["deploy_id"] = deploy_id
         data["set_flag"] = set_flag
         data["appinfo"] = appinfo
         headers = {'Content-Type': 'application/json',}
         data_str = json.dumps(data)
-        logging.debug("Data args is " + str(data))
-        logging.debug("URL args is " + url)
+        Log.logger.debug("Data args is " + str(data))
+        Log.logger.debug("URL args is " + url)
         result = requests.put(url=url, headers=headers, data=data_str)
         #result = json.dumps(result.json())
-        logging.debug(result)
+        Log.logger.debug(result)
     except Exception as e:
-        logging.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
+        Log.logger.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
 
 class ResourceStatusProviderCallBack(Resource):
@@ -1225,7 +1225,7 @@ class ResourceStatusProviderCallBack(Resource):
                 #resource.save()
 
         except Exception as e:
-            logging.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
@@ -1284,7 +1284,7 @@ class ResourceStatusProviderCallBack(Resource):
             data["set"]=set_msg_list
             data["deploy"]=dep_msg_list
         except Exception as e:
-            logging.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,
@@ -1394,14 +1394,14 @@ class ResourceDeleteCallBack(Resource):
                     CMDB_URL = current_app.config['CMDB_URL']
                     CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
                     headers = {'Content-Type': 'application/json', }
-                    logging.debug("Data args is " + str(data))
+                    Log.logger.debug("Data args is " + str(data))
                     result = requests.delete(url=CMDB_DEL_URL, headers=headers, data=data_str)
                     result = json.dumps(result.json())
-                    logging.debug(result)
+                    Log.logger.debug(result)
             else:
-                logging.debug("UOP delete all instance and delete db record")
+                Log.logger.debug("UOP delete all instance and delete db record")
         except Exception as e:
-            logging.exception("[UOP] Delete resource callback  failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Delete resource callback  failed, Excepton: %s", e.args)
             code = 500
             ret = {
                 'code': code,

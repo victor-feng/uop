@@ -5,7 +5,7 @@ import requests
 import json
 import datetime
 import os
-import logging
+from uop.log import Log
 import random
 import time
 
@@ -33,7 +33,7 @@ def format_resource_info(items):
                 colunm[i.get('p_code')] = i.get('value')
         if item.get('item_id') == "docker":
             if colunm.get('ip_address', '127.0.0.1') == "172.28.36.44":
-                logging.info("####items:{}".format(items))
+                Log.logger.info("####items:{}".format(items))
             resource_info.setdefault('docker', []).append({'ip_address': colunm.get('ip_address', '127.0.0.1')})
         else:
             resource_info[item.get('item_id')] = {
@@ -52,7 +52,7 @@ def format_resource_info(items):
                 resource_info[item.get('item_id')]['vip'] = colunm.get('redis_cluster_vip', '127.0.0.1')
             elif item.get('item_id') == 'mongodb_instance':
                 resource_info[item.get('item_id')]['vip'] = colunm.get('ip_address', '127.0.0.1')
-    # logging.info("####resource_info:{}".format(resource_info))
+    # Log.logger.info("####resource_info:{}".format(resource_info))
     return resource_info
 
 
@@ -79,7 +79,7 @@ def get_resource_by_id_mult(p_codes):
     err_msg = None
     try:
         result = requests.post(url, headers=headers, data=data_str)
-        # logging.info("@@@@result:{}".format(result.json()))
+        # Log.logger.info("@@@@result:{}".format(result.json()))
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message
     except Exception as e:
@@ -128,13 +128,13 @@ def get_resource_by_id(resource_id):
         data_str = json.dumps(data)
         CMDB_URL = current_app.config['CMDB_URL']
         url = CMDB_URL + 'cmdb/api/repo_relation/' + resource.cmdb_p_code + '/'
-        logging.debug('UOP get_db_info: url is %(url)s, data is %(data)s', {'url': url, 'data': data})
+        Log.logger.debug('UOP get_db_info: url is %(url)s, data is %(data)s', {'url': url, 'data': data})
 
         result = requests.get(url, headers=headers, data=data_str)
         result = result.json()
         data = result.get('result', {}).get('res', {})
         code = result.get('code', -1)
-        logging.info('data: '+json.dumps(result))
+        Log.logger.info('data: '+json.dumps(result))
     except requests.exceptions.ConnectionError as rq:
         err_msg = rq.message.message
     except BaseException as e:
@@ -145,7 +145,7 @@ def get_resource_by_id(resource_id):
         else:
             err_msg = 'resource('+resource_id+') not found.'
 
-    logging.debug('UOP get_db_info: resource_info is %(ri)s', {'ri': resource_info})
+    Log.logger.debug('UOP get_db_info: resource_info is %(ri)s', {'ri': resource_info})
     return err_msg, resource_info
 
 
@@ -208,7 +208,7 @@ def deploy_to_crp(deploy_item,environment ,resource_info, resource_name, databas
                     }
                 )
             except AttributeError as e:
-                logging.error(str(e))
+                Log.logger.error(str(e))
         data['docker'] = docker_list
 
     err_msg = None
@@ -240,8 +240,8 @@ def deploy_to_crp(deploy_item,environment ,resource_info, resource_name, databas
                 return 'upload sql file failed', result
         print url + ' ' + json.dumps(headers)
         data_str = json.dumps(data)
-        logging.debug("Data args is " + str(data))
-        logging.debug("Data args is " + str(data_str))
+        Log.logger.debug("Data args is " + str(data))
+        Log.logger.debug("Data args is " + str(data_str))
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
@@ -363,18 +363,18 @@ def attach_domain_ip(compute_list, res,cmdb_url):
                 old_compute_list.insert(i, compute)
                 res.save()
             if cmdb_url:
-                logging.info("$$$$$$$$ Push domain info to cmdb stashvm")
+                Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm")
                 data = {"osid_domain": cmdb_data}
                 #CMDB_URL = current_app.config['CMDB_URL']
                 url = cmdb_url + 'cmdb/api/vmdocker/status/'
                 ret = requests.put(url, data=json.dumps(data))
                 if ret.json()["code"] == 2002:
-                    logging.info("$$$$$$$$ Push domain info to cmdb stashvm, success")
+                    Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm, success")
                 else:
-                    logging.info("$$$$$$$$ Push domain info to cmdb stashvm: {}".format(ret.json()))
+                    Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm: {}".format(ret.json()))
             return appinfo
         except Exception as e:
-            logging.error( "attach domain_ip to appinfo error:{}".format(e.args))
+            Log.logger.error( "attach domain_ip to appinfo error:{}".format(e.args))
             return appinfo
 
 
@@ -815,10 +815,10 @@ class DeploymentListAPI(Resource):
         args = parser.parse_args()
         user = args.user
         deploy_id = args.deploy_id
-        logging.info("delete deployment:{}".format(deploy_id))
+        Log.logger.info("delete deployment:{}".format(deploy_id))
         print "delete deployment:{}".format(deploy_id)
         # if user == "admin":
-        #     logging.info("user is admin:will delete deployment immediately")
+        #     Log.logger.info("user is admin:will delete deployment immediately")
         #     return cls.delete()
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
@@ -856,7 +856,7 @@ class DeploymentListAPI(Resource):
                 # cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
                 # requests.delete(cmdb_url)
         except Exception as e:
-            logging.info('----Scheduler_utuls _delete_deploy  function Exception info is %s' % (e))
+            Log.logger.info('----Scheduler_utuls _delete_deploy  function Exception info is %s' % (e))
             ret = {
                 'code': 500,
                 'result': {
@@ -1034,7 +1034,7 @@ class DeploymentListByByInitiatorAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('initiator', type=str, location='args')
         args = parser.parse_args()
-        logging.info("[UOP] come into uop/deployment/handler.py, args: %s", args)
+        Log.logger.info("[UOP] come into uop/deployment/handler.py, args: %s", args)
 
         condition = {}
         if args.initiator:
@@ -1297,7 +1297,7 @@ class CapacityAPI(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            logging.debug(e)
+            Log.logger.debug(e)
             ret = {
                 'code': 500,
                 'result': {
@@ -1385,7 +1385,7 @@ class CapacityAPI(Resource):
                 return rst_dict
         except Exception as e:
             err_msg=e.args
-            logging.error("UOP deal_capacity_info error: %s" % err_msg)
+            Log.logger.error("UOP deal_capacity_info error: %s" % err_msg)
             return rst_dict
 
 
@@ -1520,7 +1520,7 @@ class RollBackAPI(Resource):
                      creator_id=creator_id, create_date=create_date,
                      approval_status=approval_status).save()
         except Exception as e:
-            logging.debug(e)
+            Log.logger.debug(e)
             ret = {
                 'code': 500,
                 'result': {

@@ -2,7 +2,6 @@
 
 import requests
 import json
-import logging
 
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
@@ -38,8 +37,8 @@ class NetworkListAPI(Resource):
         except Exception as e:
             err_msg = e.message
             #NOTE: Wrong usage!!!!!!
-            logging.error('list az statistics err: %s' % err_msg)
-            logging.exception('list az statistics err: %s' , e.args)
+            Log.logger.error('list az statistics err: %s' % err_msg)
+            Log.logger.exception('list az statistics err: %s' , e.args)
             #Log.logger.error('list az statistics err: %s' % err_msg)
             ret = {
                 "code": 400,
@@ -87,7 +86,7 @@ class NetworksAPI(Resource):
                     res.append(network_info)
         except Exception as e:
             err_msg = e.args
-            logging.error('list az statistics err: %s' % err_msg)
+            Log.logger.error('list az statistics err: %s' % err_msg)
             ret = {
                 "code": 400,
                 "result": {
@@ -120,12 +119,12 @@ class StatisticAPI(Resource):
             headers = {'Content-Type': 'application/json'}
             res_list = []
             for url in urls:
-                logging.info('[UOP] Get url: %s', url)
+                Log.logger.info('[UOP] Get url: %s', url)
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
-                logging.info('[UOP] Get the whole url: %s', url_)
+                Log.logger.info('[UOP] Get the whole url: %s', url_)
                 result = requests.get(url_, headers=headers)
                 if result.json().get('code') == 200:
-                    logging.debug(url_ + ' '+json.dumps(headers))
+                    Log.logger.debug(url_ + ' '+json.dumps(headers))
                     cur_res = result.json().get('result').get('res')
                     res_list.append({url.get('id'): cur_res})
             res = {'result': {'res': []}, 'code' : 200}
@@ -133,8 +132,8 @@ class StatisticAPI(Resource):
         except Exception as e:
             err_msg = e.message
             #NOTE: Wrong usage!!!!!!
-            logging.error('list az statistics err: %s' % err_msg)
-            logging.exception('list az statistics err: %s' , e.args)
+            Log.logger.error('list az statistics err: %s' % err_msg)
+            Log.logger.exception('list az statistics err: %s' , e.args)
             #Log.logger.error('list az statistics err: %s' % err_msg)
             res = {
                 "code": 400,

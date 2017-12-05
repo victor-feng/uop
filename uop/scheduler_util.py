@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import logging
+import Log.logger
 import json
 import requests
 from models import db
 from uop.util import get_CRP_url
 from uop.models import ResourceModel, Deployment
 from config import APP_ENV, configs
-
+from uop.log import Log
 CMDB_URL = configs[APP_ENV].CMDB_URL
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
-    logging.info('----------------delete_res_handler----------------')
+    Log.logger.info('----------------delete_res_handler----------------')
     yestoday = datetime.datetime.now() - datetime.timedelta(days = 1)
     resources = ResourceModel.objects.filter(is_deleted=1).filter(deleted_date__lte=yestoday)
     #deploies = Deployment.objects.filter(is_deleted=1).filter(deleted_time__lte=yestoday)
-    #logging.info('-----------deploies---------------:%s'%(deploies))
-    #logging.info('-----------resources---------------:%s'%(resources))
+    #Log.logger.info('-----------deploies---------------:%s'%(deploies))
+    #Log.logger.info('-----------resources---------------:%s'%(resources))
     with db.app.app_context():
         for resource in resources:
             _delete_res(resource.res_id)
@@ -61,7 +61,7 @@ def _delete_deploy(deploy_id):
             #cmdb_url = '%s%s%s'%(CMDB_URL, 'api/repores_delete/', resources.res_id)
             #requests.delete(cmdb_url)
     except Exception as e:
-        logging.info('----Scheduler_utuls _delete_deploy  function Exception info is %s'%(e))
+        Log.logger.info('----Scheduler_utuls _delete_deploy  function Exception info is %s'%(e))
 
 def _delete_res(res_id):
     try:
@@ -108,11 +108,11 @@ def _delete_res(res_id):
             cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
             requests.delete(cmdb_url)   
     except Exception as e:
-        logging.info('---- Scheduler_utuls  _delete_res  function Exception info is %s'%(e))
+        Log.logger.info('---- Scheduler_utuls  _delete_res  function Exception info is %s'%(e))
 
 # 刷新 虚拟机 状态的 调用接口
 def flush_crp_to_cmdb():
-    logging.info('----------------flush_crp_to_cmdb job/5min----------------')
+    Log.logger.info('----------------flush_crp_to_cmdb job/5min----------------')
     resources = ResourceModel.objects.all()
     env_list = set([])
     osid_status = []
@@ -128,24 +128,24 @@ def flush_crp_to_cmdb():
                 ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
                 meta = {k: v[-1] for k,v in ret.items()}
                 osid_status.append(meta)
-                logging.info("####meta:{}".format(meta))
+                Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if osid_status:
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
-                logging.info("flush_crp_to_cmdb result is:{}".format(ret))
+                Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
-                logging.info("flush_crp_to_cmdb crp->openstack result is null")
+                Log.logger.info("flush_crp_to_cmdb crp->openstack result is null")
         except Exception as exc:
-            logging.error("flush_crp_to_cmdb error:{}".format(exc))
+            Log.logger.error("flush_crp_to_cmdb error:{}".format(exc))
 
 
 def flush_crp_to_cmdb_by_osid(osid, env):
     url = get_CRP_url(env)
     crp_url = '%s%s' % (url, 'api/openstack/nova/state?os_inst_id='+ osid)
     ret = requests.get(crp_url).json()
-    logging.info("flush_crp_to_cmdb_by_osid crp result is:{}".format(ret))
+    Log.logger.info("flush_crp_to_cmdb_by_osid crp result is:{}".format(ret))
     if ret.get('code') == 200:
         status = ret["result"]["vm_state"]
         cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
         ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
-        logging.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))
+        Log.logger.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))

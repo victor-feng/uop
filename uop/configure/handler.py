@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import logging
 import re
 from flask_restful import reqparse, Api, Resource, fields
 import requests
@@ -10,6 +8,7 @@ from uop.models import ConfigureNginxModel
 from uop.models import ConfigureDisconfModel 
 from uop.models import NetWorkConfig
 from uop.util import get_CRP_url
+from uop.log import Log
 configure_api = Api(configure_blueprint)
 
 
@@ -42,7 +41,7 @@ class Configure(Resource):
         category = parser.parse_args()
         env = args.env if args.env else 'dev'
         category = args.category if args.category else 'nginx'
-        logging.info("[UOP] Get configs, env:%s, category: %s", env, category)
+        Log.logger.info("[UOP] Get configs, env:%s, category: %s", env, category)
         envs = []
         #nets = []
         if category == 'nginx':
@@ -98,7 +97,7 @@ class Configure(Resource):
         category = args.category if args.category else 'nginx'
         sub_network = args.sub_network if args.sub_network else ''
         vlan_id = args.vlan_id if args.vlan_id else ''
-        logging.info("[UOP] Create configs, env:%s, category: %s", env, category)
+        Log.logger.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
         if category == 'nginx':
@@ -155,7 +154,7 @@ class Configure(Resource):
         password = args.password if args.password else ''
         sub_network = args.sub_network if args.sub_network else ''
         vlan_id = args.vlan_id.strip() if args.vlan_id else ''
-        logging.info("[UOP] Modify configs, env:%s, category: %s", env, category)
+        Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
@@ -186,7 +185,7 @@ class Configure(Resource):
         env = args.env if args.env else 'dev'
         category = args.category if args.category else 'nginx'
         id = args.id if args.id else -1 
-        logging.info("[UOP] Delete configs, env:%s, category: %s, id: %s", env, category, id)
+        Log.logger.info("[UOP] Delete configs, env:%s, category: %s, id: %s", env, category, id)
 
 
         if category == 'nginx':
@@ -198,7 +197,7 @@ class Configure(Resource):
         if len(ret):
             ret.delete()
         else:
-            logging.info("[UOP] Do not found the item, id:%s", id)
+            Log.logger.info("[UOP] Do not found the item, id:%s", id)
 
         res = {
                 'code': 200,
@@ -247,7 +246,7 @@ class ConfigureNetwork(Resource):
                 network_list.append(network_info)
         except Exception as e:
             err_msg = e.args
-            logging.error('Uop get network list err: %s' % err_msg)
+            Log.logger.error('Uop get network list err: %s' % err_msg)
             ret = {
                 "code": 400,
                 "result": {

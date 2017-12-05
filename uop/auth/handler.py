@@ -6,7 +6,6 @@ import ldap
 import datetime
 import os
 import hashlib
-import logging
 
 import requests
 from flask import request

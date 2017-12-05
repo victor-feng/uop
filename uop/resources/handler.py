@@ -4,7 +4,7 @@ import requests
 import copy
 import time
 import random
-import logging
+from uop.log import Log
 from flask import request, make_response, current_app
 from flask import redirect
 from flask import jsonify
@@ -719,7 +719,7 @@ class ResourceDetail(Resource):
             parser.add_argument('user_id', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
             args = parser.parse_args()
-            current_app.logger.info(args)
+            Log.logger.info(args)
             print args
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
@@ -872,7 +872,7 @@ class GetMyResourcesInfo(Resource):
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
             &page_count={}&env={}&user_id={}".format(resource_type, resource_name, item_name, start_time, end_time, resource_status, page_num, page_count, env, user_id)
         ret = requests.get(url)
-        current_app.logger.info("ret:{}".format(ret.json()))
+        Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
 
     def put(self):
@@ -890,7 +890,7 @@ class GetMyResourcesInfo(Resource):
         operation = request.json.get('operation', "")
         resource_id = request.json.get('resource_id', "")
         resource_ip = request.json.get('resource_ip', "")
-        current_app.logger.info("get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env, operation))
+        Log.logger.info("get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env, operation))
         if operation not in ["start","stop","restart"]:
             ret["result"]["msg"] = "parameter error"
             ret["result"]["res"] = "operation must be one of start|stop|restart"
@@ -937,7 +937,7 @@ class Dockerlogs(Resource):
             ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
             Log.logger.error("ret:{}".format(ret.json()))
         except Exception as exc:
-            current_app.logger.error(str(exc))
+            Log.logger.error(str(exc))
             code = 500
             ret = {
                 'code': code,
@@ -956,9 +956,9 @@ class Dockerlogs(Resource):
                     if ack.json()["code"] == 2002:
                         ret["result"]["msg"] = "Instance could not be found, and will delete from cmdb"
                     else:
-                        current_app.logger.info("delete docker resource from cmdb error:{}".format(ack.json()))
+                        Log.logger.info("delete docker resource from cmdb error:{}".format(ack.json()))
                 except Exception as exc:
-                    current_app.logger.error("delete docker resource from cmdb error:{}".format(str(exc)))
+                    Log.logger.error("delete docker resource from cmdb error:{}".format(str(exc)))
             return ret
 
 
