@@ -1112,7 +1112,7 @@ class ResourceStatusProviderCallBack(Resource):
     """
     @classmethod
     def post(cls):
-        code = 2002
+        code = 200
         request_data = json.loads(request.data)
         instance = request_data.get('instance', '')
         db_push = request_data.get('db_push', '')
