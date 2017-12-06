@@ -200,7 +200,7 @@ class DeployStatusProviderCallBack(Resource):
         return res, 200
     @classmethod
     def get(cls):
-        code = 2002
+        code = 200
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id',location='args')
         parser.add_argument('res_id', location='args')
@@ -237,7 +237,7 @@ class DeployStatusProviderCallBack(Resource):
                 'data':data,
             }
         }
-        return res, 200   
+        return res, code
 
 def get_deploy_status(deploy_id,deploy_type,res_type):
     try:
