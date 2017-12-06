@@ -134,7 +134,7 @@ class DeployCallback(Resource):
                 'msg': "Deployment update success."
             }
         }
-        return ret.code
+        return ret,code
 
 
 class DeployStatusProviderCallBack(Resource):
