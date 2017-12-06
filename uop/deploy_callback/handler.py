@@ -134,14 +134,14 @@ class DeployCallback(Resource):
                 'msg': "Deployment update success."
             }
         }
-        return ret
+        return ret.code
 
 
 class DeployStatusProviderCallBack(Resource):
     @classmethod
     def post(cls):
         try:
-            code = 2002
+            code = 200
             parser = reqparse.RequestParser()
             parser.add_argument('deploy_msg', type=str)
             parser.add_argument('deploy_id', type=str)
@@ -197,7 +197,7 @@ class DeployStatusProviderCallBack(Resource):
                 "msg": "deploy info save success"
             }
         }
-        return res, 200
+        return res,code
     @classmethod
     def get(cls):
         code = 200

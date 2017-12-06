@@ -1211,7 +1211,7 @@ class ResourceStatusProviderCallBack(Resource):
                 "msg": "test info"
             }
         }
-        return res, 200
+        return res, code
     @classmethod
     def get(cls):
         code = 200
@@ -1272,7 +1272,7 @@ class ResourceStatusProviderCallBack(Resource):
                 'data':data,
             }
         }
-        return res, 200
+        return res, code
 
 class ResourceDeleteCallBack(Resource):
     def post(self):
@@ -1377,7 +1377,7 @@ class ResourceDeleteCallBack(Resource):
                 "msg": "get msg success",
             }
         }
-        return res, 200
+        return res, code
 
 
 res_callback_api.add_resource(ResourceProviderCallBack, '/res')
