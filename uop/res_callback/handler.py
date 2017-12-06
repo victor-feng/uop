@@ -1103,7 +1103,7 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
         result = requests.put(url=url, headers=headers, data=data_str)
         Log.logger.debug(result)
     except Exception as e:
-        Log.logger.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
+        Log.logger.error("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
 
 class ResourceStatusProviderCallBack(Resource):
@@ -1193,7 +1193,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.set_flag = set_flag
                 status_record.save()
         except Exception as e:
-            Log.logger.exception("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
+            Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -1252,7 +1252,7 @@ class ResourceStatusProviderCallBack(Resource):
             data["set"]=set_msg_list
             data["deploy"]=dep_msg_list
         except Exception as e:
-            Log.logger.exception("[UOP] Get resource  callback msg failed, Excepton: %s" % str(e.args))
+            Log.logger.error("[UOP] Get resource  callback msg failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -1359,7 +1359,7 @@ class ResourceDeleteCallBack(Resource):
             else:
                 Log.logger.debug("UOP delete all instance and delete db record")
         except Exception as e:
-            Log.logger.exception("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
+            Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
