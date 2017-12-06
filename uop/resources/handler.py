@@ -331,9 +331,9 @@ class ResourceApplication(Resource):
                         deploy_result=dep.deploy_result
                     elif int(dep.is_rollback) == 1:
                         deps = Deployment.objects.filter(resource_id=resource_id,is_rollback=0).order_by("-created_time")
-                        if len(deploys) > 1:
+                        if len(deploys) > 1 and len(deps) >0:
                             deploy_result=deps[0].deploy_result
-                        elif len(deploys) == 1:
+                        else :
                             deploy_result='set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
