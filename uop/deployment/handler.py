@@ -1541,8 +1541,9 @@ class RollBackAPI(Resource):
 @deployment_blueprint.route('/check_deploy_name', methods=['GET'])
 def check_deployment_by_id():
     deploy_name = request.args.get('deploy_name', '')
+    resource_id = request.args.get('resource_id', '')
     try:
-        deploy = Deployment.objects.get(deploy_name=deploy_name)
+        deploy = Deployment.objects.get(deploy_name=deploy_name,resource_id=resource_id)
     except Deployment.DoesNotExist as e:
         res = {
             'code': 200,
