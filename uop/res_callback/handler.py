@@ -1084,32 +1084,13 @@ Post Request JSON Body：
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
     try:
-        Log.logger.debug("------Begin deploy nginx------")
         resource = ResourceModel.objects.get(res_id=resource_id)
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
         deploy_id = dep.deploy_id
         app_image=dep.app_image
         app_image=eval(app_image)
-        #compute_list = resource.compute_list
-        """
-        for compute in compute_list:
-            app_dict = {}
-            cpu = str(compute.get("cpu", "2"))
-            mem = str(compute.get("cpu", "2"))
-            specifications = "%sC,%sG" % (cpu, mem)
-            app_dict["ins_id"] = compute.get("ins_id", "")
-            app_dict["port"] = compute.get("prot", "")
-            app_dict["ins_name"] = compute.get("ins_name", "")
-            app_dict["quantity"] = compute.get("quantity", 0)
-            app_dict["url"] = compute.get("url", "")
-            app_dict["domain"] = compute.get("domain", "")
-            app_dict["specifications"] = specifications
-            app_dict["meta"] = compute.get("meta", "")
-            app_image.append(app_dict)
-        """
         appinfo = attach_domain_ip(app_image, resource,None)
-        Log.logger.debug("----------this is appinfo---------------")
         Log.logger.debug(appinfo)
         data = {}
         data["deploy_id"] = deploy_id
@@ -1120,7 +1101,6 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("URL args is " + url)
         result = requests.put(url=url, headers=headers, data=data_str)
-        #result = json.dumps(result.json())
         Log.logger.debug(result)
     except Exception as e:
         Log.logger.exception("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
@@ -1201,13 +1181,6 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
-                #resource = ResourceModel.objects.get(res_id=resource_id)
-                #if set_flag == "res":
-                #    resource.reservation_status = status_record.status
-                #resource.save()
-                #if set_flag == "increase":
-                #    dep.deploy_result=status_record.status
-                #    dep.save()
             if db_push:
                 resource_id = db_push.get('resource_id')
                 cluster_type = db_push.get('cluster_type')
@@ -1219,12 +1192,8 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
-                #resource = ResourceModel.objects.get(res_id=resource_id)
-                #resource.reservation_status = status_record.status
-                #resource.save()
-
         except Exception as e:
-            Log.logger.exception("[UOP] Resource Status callback failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -1245,7 +1214,7 @@ class ResourceStatusProviderCallBack(Resource):
         return res, 200
     @classmethod
     def get(cls):
-        code = 2002
+        code = 200
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id',location='args')
         args = parser.parse_args()
@@ -1283,7 +1252,7 @@ class ResourceStatusProviderCallBack(Resource):
             data["set"]=set_msg_list
             data["deploy"]=dep_msg_list
         except Exception as e:
-            Log.logger.exception("[UOP] Get resource  callback msg failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Get resource  callback msg failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -1307,7 +1276,7 @@ class ResourceStatusProviderCallBack(Resource):
 
 class ResourceDeleteCallBack(Resource):
     def post(self):
-        code = 2002
+        code = 200
         request_data = json.loads(request.data)
         resource_id = request_data.get('resources_id')
         os_inst_id = request_data.get('os_inst_id')
@@ -1355,24 +1324,14 @@ class ResourceDeleteCallBack(Resource):
                 resource.os_ins_list=new_os_ins_list
                 resource.os_ins_ip_list=new_os_ins_ip_list
                 resource.save()
-                status_record = StatusRecord()
-                status_record.created_time = datetime.datetime.now()
-                status_record.set_flag = "reduce"
-                status_record.res_id=resource_id
-                status_record.status = "docker_reduce_success"
-                status_record.msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
-                status_record.s_type="docker"
-                status_record.deploy_id = deploy_id
-                status_record.unique_flag = unique_flag
-                status_record.save()
-                #dep.deploy_result = "docker_reduce_success"
-                #dep.save()
+                msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
+                s_type = "docker"
+                status = "docker_reduce_success"
+                create_status_record(resource_id, deploy_id, s_type,msg,status, set_flag, unique_flag)
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
                     create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success",set_flag)
-                    #dep.deploy_result = "docker_reduce_success"
-                    #dep.save()
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
@@ -1400,7 +1359,7 @@ class ResourceDeleteCallBack(Resource):
             else:
                 Log.logger.debug("UOP delete all instance and delete db record")
         except Exception as e:
-            Log.logger.exception("[UOP] Delete resource callback  failed, Excepton: %s", e.args)
+            Log.logger.exception("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,

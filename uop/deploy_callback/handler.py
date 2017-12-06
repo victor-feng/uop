@@ -75,7 +75,7 @@ class DeployCallback(Resource):
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.deploy_id = deploy_id
-        status_record.s_type="%s_docker" % deploy_type
+        status_record.s_type="%s_%s" % (deploy_type,res_type)
         status_record.set_flag = "res"
         status_record.created_time=datetime.datetime.now()
         if dep.deploy_result == "success":
@@ -88,14 +88,10 @@ class DeployCallback(Resource):
                 status_record.status="%s_docker_fail" % deploy_type
                 status_record.msg="%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (deploy_type,ip,deploy_type_dict[deploy_type],vm_state,cluster_name,err_msg)
             else:
-                #dep.deploy_result = "deploy_%s_fail" % res_type
                 status_record.status = "deploy_%s_fail" % res_type
                 status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type,err_msg)
         status_record.save()
-        res_status,count = get_deploy_status(deploy_id,deploy_type)
-        #if not res_status and quantity == count:
-        #    dep.deploy_result = "deploy_fail"
-        #    create_status_record(resource_id,deploy_id,"deploy","部署失败","deploy_fail")
+        res_status,count = get_deploy_status(deploy_id,deploy_type,res_type)
         if res_status == True and end_flag == True:
             dep.deploy_result = "%s_success" % deploy_type
             create_status_record(resource_id,deploy_id,deploy_type,"%s成功" % deploy_type_dict[deploy_type],"%s_success" % deploy_type,"res")
@@ -103,9 +99,6 @@ class DeployCallback(Resource):
             dep.deploy_result = "%s_fail" % deploy_type
             create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type], "%s_fail" % deploy_type ,"res")
         dep.save()
-
-
-            
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
@@ -186,7 +179,7 @@ class DeployStatusProviderCallBack(Resource):
                     }
                 return ret,code 
         except Exception as e:
-            Log.logger.exception("[UOP] Deploy Status callback failed, Excepton: %s", e.args)
+            Log.logger.error("[UOP] Deploy Status callback failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -218,25 +211,13 @@ class DeployStatusProviderCallBack(Resource):
             data={}
             dep_msg_list=[]
             dep_status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
-            #set_status_records = StatusRecord.objects.filter(res_id=resource_id,set_flag="increase").order_by('created_time')
-            #del_status_records = StatusRecord.objects.filter(res_id=resource_id, set_flag="reduce").order_by('created_time')
-            """
-            if set_status_records:
-                for sr in set_status_records:
-                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                    dep_msg_list.append(s_msg)       
-            if del_status_records:
-                for sr in del_status_records:
-                    s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
-                    dep_msg_list.append(s_msg)
-           """
             if dep_status_records:
                 for sr in dep_status_records:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
                     dep_msg_list.append(s_msg)
             data["deploy"]=dep_msg_list
         except Exception as e:
-            Log.logger.exception("[UOP] Get deploy  callback msg failed, Excepton: %s", e.args)
+            Log.logger.error("[UOP] Get deploy  callback msg failed, Excepton: %s" % str(e.args))
             code = 500
             ret = {
                 'code': code,
@@ -258,21 +239,22 @@ class DeployStatusProviderCallBack(Resource):
         }
         return res, 200   
 
-def get_deploy_status(deploy_id,deploy_type):
+def get_deploy_status(deploy_id,deploy_type,res_type):
     try:
         docker_status_list=[]
-        status_records = StatusRecord.objects.filter(deploy_id=deploy_id).order_by('created_time')
+        s_type='%s_%s' % (deploy_type,res_type)
+        status_records = StatusRecord.objects.filter(deploy_id=deploy_id,s_type=s_type).order_by('created_time')
         for sr in status_records:
-            if sr.s_type=="%s_docker" % deploy_type:
-                docker_status_list.append(sr.status)
-        if "deploy_docker_fail" in docker_status_list or "deploy_mongodb_fail" in docker_status_list or "deploy_mysql_fail" in docker_status_list or "rollback_docker_fail" in docker_status_list:
-            return False,len(docker_status_list)
+            docker_status_list.append(sr.status)
+        for s_status in docker_status_list:
+            if 'fail' in s_status:
+                return False,len(docker_status_list)
         else:
             return True,len(docker_status_list) 
     except Exception as e:
-        Log.logger.exception("[UOP] get_deploy_status failed, Excepton: %s", e.args)
+        Log.logger.error("[UOP] get_deploy_status failed, Excepton: %s" % str(e.args))
      
-def create_status_record(resource_id,deploy_id,s_type,msg,status,set_flag):
+def create_status_record(resource_id,deploy_id,s_type,msg,status,set_flag,unique_flag=None):
     try:
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -282,9 +264,10 @@ def create_status_record(resource_id,deploy_id,s_type,msg,status,set_flag):
         status_record.created_time=datetime.datetime.now()
         status_record.msg=msg
         status_record.status=status
+        status_record.unique_flag = unique_flag
         status_record.save()
     except Exception as e:
-        Log.logger.exception("[UOP] create_status_record failed, Excepton: %s", e.args)
+        Log.logger.error("[UOP] create_status_record failed, Excepton: %s" %  str(e.args))
         
 
 
