@@ -569,8 +569,8 @@ class DeploymentListAPI(Resource):
             deploy_obj.deploy_result = 'deploying'
             deploy_obj.save()
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            resource.deploy_name = deploy_name
+            resource = ResourceModel.objects.get(res_id=args.resource_id)
+            resource.deploy_name = args.deploy_name
             resource.save()
             # disconf配置
             # 1、将disconf信息更新到数据库
