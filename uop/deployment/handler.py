@@ -688,7 +688,7 @@ class DeploymentListAPI(Resource):
                 project_name=args.project_name,
                 resource_id=args.resource_id,
                 resource_name=args.resource_name,
-                created_time=args.datetime.datetime.now(),
+                created_time=datetime.datetime.now(),
                 environment=args.environment,
                 release_notes=args.release_notes,
                 mysql_tag=args.mysql_exe_mode,
