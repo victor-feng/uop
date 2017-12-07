@@ -644,6 +644,7 @@ class DeploymentListAPI(Resource):
             message = 'approve_allow success'
             if not err_msg:
                 err_msg, result = deploy_to_crp(deploy_obj,
+                                                args.environment,
                                                 resource_info,
                                                 args.resource_name,
                                                 args.database_password,
