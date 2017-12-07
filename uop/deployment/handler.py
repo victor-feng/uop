@@ -8,6 +8,7 @@ import os
 from uop.log import Log
 import random
 import time
+import sys
 
 import copy
 from flask import request, send_from_directory, jsonify
@@ -517,8 +518,11 @@ class DeploymentListAPI(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('action', type=str, choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid'), required=True,
-                            help='No action(save_to_db/admin_approve_allow/admin_approve_forbid) provided', location='json')
+        parser.add_argument('action', type=str,
+                            choices=('save_to_db', 'admin_approve_allow', 'admin_approve_forbid', 'not_need_approve'),
+                            required=True,
+                            help='No action(save_to_db/admin_approve_allow/admin_approve_forbid/not_need_approve) provided',
+                            location='json')
         parser.add_argument('deploy_name', type=str, required=True,
                             help='No deploy name provided', location='json')
         parser.add_argument('initiator', type=str, location='json')
@@ -546,249 +550,234 @@ class DeploymentListAPI(Resource):
         parser.add_argument('disconf',type=list, location='json')
         parser.add_argument('database_password',type=str, location='json')
 
-
         args = parser.parse_args()
-
         action = args.action
-        deploy_name = args.deploy_name
-        initiator = args.initiator
-        user_id = args.user_id
-        project_id = args.project_id
-        project_name = args.project_name
-        resource_id = args.resource_id
-        resource_name = args.resource_name
-        environment = args.environment
-        release_notes = args.release_notes
-        mysql_exe_mode = args.mysql_exe_mode
-        mysql_context = args.mysql_context
-        redis_exe_mode = args.redis_exe_mode
-        redis_context = args.redis_context
-        mongodb_exe_mode = args.mongodb_exe_mode
-        mongodb_context = args.mongodb_context
-        app_image = args.app_image
-        disconf = args.disconf
-        database_password = args.database_password
-
-        approve_suggestion = args.approve_suggestion
-        apply_status = args.apply_status
-        approve_status = args.approve_status
-        if args.dep_id:
-            dep_id = args.dep_id
-
-        #deploy_result = 'deploying'
 
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
-        uid = str(uuid.uuid1())
+
         def write_file(uid, context, type):
             path = os.path.join(UPLOAD_FOLDER, type, 'script_' + uid)
             with open(path, 'wb') as f:
                 f.write(context)
             return path
-        if mysql_exe_mode == 'tag' and  mysql_context:
-            mysql_context = write_file(uid, mysql_context, 'mysql')
-        if redis_exe_mode == 'tag' and  redis_context:
-            redis_context = write_file(uid, redis_context, 'redis')
-        if mongodb_exe_mode == 'tag' and  mongodb_context:
-            mongodb_context = write_file(uid, mongodb_context, 'mongodb')
 
-        try:
-            # 管理员审批通过 直接部署到CRP
-            if action == 'admin_approve_allow':  # 管理员审批通过
-                #修改deploy_result状态为部署中
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.deploy_result='deploying'
-                deploy_obj.save()
-                #管理员审批通过后修改resource表deploy_name,更新当前版本
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.deploy_name = deploy_name
-                resource.save()
-                #disconf配置
-                #1、将disconf信息更新到数据库
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                for instance_info in disconf:
-                    for disconf_info_front in instance_info.get('dislist'):
-                        disconf_id = disconf_info_front.get('disconf_id')
-                        for disconf_info in deploy_obj.disconf_list:
-                            if disconf_info.disconf_id == disconf_id:
-                                disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
-                                disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
-                                disconf_info.disconf_server_url = disconf_info_front.get('disconf_server_url')
-                                disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
-                                disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
-                                disconf_info.disconf_env = disconf_info_front.get('disconf_env')
-                                disconf_info.disconf_app_name = disconf_info_front.get('disconf_app_name')
-                deploy_obj.save()
 
-                #将computer信息如IP，更新到数据库
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.app_image = str(app_image)
-                deploy_obj.save()
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                cmdb_url = current_app.config['CMDB_URL']
-                appinfo = attach_domain_ip(app_image, resource,cmdb_url)
+        def admin_approve_allow(args):
+            dep_id = args.dep_id
+            # 修改deploy_result状态为部署中
+            deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+            deploy_obj.deploy_result = 'deploying'
+            deploy_obj.save()
+            # 管理员审批通过后修改resource表deploy_name,更新当前版本
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.deploy_name = deploy_name
+            resource.save()
+            # disconf配置
+            # 1、将disconf信息更新到数据库
+            deploy_obj = Deployment.objects.get(deploy_id=dep_id)
+            for instance_info in args.disconf:
+                for disconf_info_front in instance_info.get('dislist'):
+                    disconf_id = disconf_info_front.get('disconf_id')
+                    for disconf_info in deploy_obj.disconf_list:
+                        if disconf_info.disconf_id == disconf_id:
+                            disconf_info.disconf_admin_content = disconf_info_front.get('disconf_admin_content')
+                            disconf_info.disconf_server_name = disconf_info_front.get('disconf_server_name')
+                            disconf_info.disconf_server_url = disconf_info_front.get('disconf_server_url')
+                            disconf_info.disconf_server_user = disconf_info_front.get('disconf_server_user')
+                            disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
+                            disconf_info.disconf_env = disconf_info_front.get('disconf_env')
+                            disconf_info.disconf_app_name = disconf_info_front.get('disconf_app_name')
+            deploy_obj.save()
 
-                #2、把配置推送到disconf
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                disconf_server_info = []
-                for disconf_info in deploy_obj.disconf_list:
-                    if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
-                        continue
+            # 将computer信息如IP，更新到数据库
+            deploy_obj.app_image = str(args.app_image)
+            deploy_obj.save()
+            resource = ResourceModel.objects.get(res_id=args.resource_id)
+            cmdb_url = current_app.config['CMDB_URL']
+            appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+
+            # 2、把配置推送到disconf
+            disconf_server_info = []
+            for disconf_info in deploy_obj.disconf_list:
+                if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
+                    continue
+                else:
+                    server_info = {'disconf_server_name': disconf_info.disconf_server_name,
+                                   'disconf_server_url': disconf_info.disconf_server_url,
+                                   'disconf_server_user': disconf_info.disconf_server_user,
+                                   'disconf_server_password': disconf_info.disconf_server_password,
+                                   'disconf_admin_content': disconf_info.disconf_admin_content,
+                                   'disconf_content': disconf_info.disconf_content,
+                                   'disconf_env': disconf_info.disconf_env,
+                                   'disconf_version': disconf_info.disconf_version,
+                                   'ins_name': disconf_info.ins_name,
+                                   'disconf_app_name': disconf_info.disconf_app_name,
+                                   }
+                    disconf_server_info.append(server_info)
+                    '''
+                    server_info = {'disconf_server_name':'172.28.11.111',
+                                   'disconf_server_url':'http://172.28.11.111:8081',
+                                   'disconf_server_user':'admin',
+                                   'disconf_server_password':'admin',
+                                   }
+
+                    disconf_api_connect = DisconfServerApi(server_info)
+                    if disconf_info.disconf_env.isdigit():
+                        env_id = disconf_info.disconf_env
                     else:
-                        server_info = {'disconf_server_name':disconf_info.disconf_server_name,
-                                       'disconf_server_url':disconf_info.disconf_server_url,
-                                       'disconf_server_user':disconf_info.disconf_server_user,
-                                       'disconf_server_password':disconf_info.disconf_server_password,
-                                       'disconf_admin_content':disconf_info.disconf_admin_content,
-                                       'disconf_content':disconf_info.disconf_content,
-                                       'disconf_env':disconf_info.disconf_env,
-                                       'disconf_version':disconf_info.disconf_version,
-                                       'ins_name':disconf_info.ins_name,
-                                       'disconf_app_name': disconf_info.disconf_app_name,
-                                       }
-                        disconf_server_info.append(server_info)
-                        '''
-                        server_info = {'disconf_server_name':'172.28.11.111',
-                                       'disconf_server_url':'http://172.28.11.111:8081',
-                                       'disconf_server_user':'admin',
-                                       'disconf_server_password':'admin',
-                                       }
+                        env_id = disconf_api_connect.disconf_env_id(env_name=disconf_info.disconf_env)
+                    result,message = disconf_api_connect.disconf_add_app_config_api_file(
+                                                    app_name=disconf_info.ins_name,
+                                                    myfilerar=disconf_admin_name,
+                                                    version=disconf_info.disconf_version,
+                                                    env_id=env_id
+                                                    )
 
-                        disconf_api_connect = DisconfServerApi(server_info)
-                        if disconf_info.disconf_env.isdigit():
-                            env_id = disconf_info.disconf_env
-                        else:
-                            env_id = disconf_api_connect.disconf_env_id(env_name=disconf_info.disconf_env)
-                        result,message = disconf_api_connect.disconf_add_app_config_api_file(
-                                                        app_name=disconf_info.ins_name,
-                                                        myfilerar=disconf_admin_name,
-                                                        version=disconf_info.disconf_version,
-                                                        env_id=env_id
-                                                        )
-
-                    disconf_result.append(dict(result=result,message=message))
-                        '''
-                deploy_obj.save()
-                #message = disconf_result
-                message = disconf_server_info
+                disconf_result.append(dict(result=result,message=message))
+                    '''
+            # message = disconf_result
+            # message = disconf_server_info
 
             ##推送到crp
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.approve_status = 'success'
-                err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+            deploy_obj.approve_status = 'success'
+            err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+            message = 'approve_allow success'
+            if not err_msg:
+                err_msg, result = deploy_to_crp(deploy_obj,
+                                                resource_info,
+                                                args.resource_name,
+                                                args.database_password,
+                                                appinfo,disconf_server_info)
+                if err_msg:
+                    deploy_obj.deploy_result = 'deploy_fail'
+                    message = 'deploy_fail'
+            else:
+                raise Exception(err_msg)
+            deploy_obj.save()
+            return message
 
-                if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy_obj,environment,resource_info, resource_name, database_password, appinfo, disconf_server_info)
-                    if err_msg:
-                        deploy_obj.deploy_result = 'deploy_fail'
-                        Log.logger.info('deploy_to_crp err: {}'.format(err_msg))
-                    else:
-                        Log.logger.info('deploy_to_crp response: {}'.format(result))
-                else:
-                    raise Exception(err_msg)
-                deploy_obj.save()
+        def admin_approve_forbid(args):
+            deploy_obj = Deployment.objects.get(deploy_id=args.dep_id)
+            deploy_obj.approve_status = 'fail'
+            deploy_obj.deploy_result = 'not_deployed'
+            deploy_obj.save()
+            message = 'approve_forbid success'
+            return message
 
-            elif action == 'admin_approve_forbid':  # 管理员审批不通过
-                deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-                deploy_obj.approve_status = 'fail'
-                deploy_obj.deploy_result = 'not_deployed'
-                deploy_obj.save()
-                message = 'approve_forbid success'
-                #管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
-                #deps = Deployment.objects.filter(resource_id=resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
-                #if deps:
-                #    dep = deps[0]
-                #    deploy_name=dep.deploy_name
-                #resource = ResourceModel.objects.get(res_id=resource_id)
-                #resource.deploy_name = deploy_name
-                #resource.save()
-            elif action == 'save_to_db':  # 部署申请
-                #------将当前部署的版本号更新到resource表
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.deploy_name=deploy_name
-                resource.save()
-                #------将部署信息更新到deployment表
-                deploy_result = 'deploy_to_approve'
-                deploy_type='deploy'
-                deploy_item = Deployment(
-                    deploy_id=uid,
-                    deploy_name=deploy_name,
-                    initiator=initiator,
-                    user_id=user_id,
-                    project_id=project_id,
-                    project_name=project_name,
-                    resource_id=resource_id,
-                    resource_name=resource_name,
-                    created_time=datetime.datetime.now(),
-                    environment=environment,
-                    release_notes=release_notes,
-                    mysql_tag=mysql_exe_mode,
-                    mysql_context=mysql_context,
-                    redis_tag=redis_exe_mode,
-                    redis_context=redis_context,
-                    mongodb_tag=mongodb_exe_mode,
-                    mongodb_context=mongodb_context,
-                    app_image=str(app_image),
-                    deploy_result=deploy_result,
-                    apply_status=apply_status,
-                    approve_status=approve_status,
-                    approve_suggestion=approve_suggestion,
-                    database_password=database_password,
-                    deploy_type=deploy_type,
-                )
+        def save_to_db(args):
+            uid = args.uid
+            if args.mysql_exe_mode == 'tag' and args.mysql_context:
+                mysql_context = write_file(uid, args.mysql_context, 'mysql')
+            if args.redis_exe_mode == 'tag' and args.redis_context:
+                redis_context = write_file(uid, args.redis_context, 'redis')
+            if args.mongodb_exe_mode == 'tag' and args.mongodb_context:
+                mongodb_context = write_file(uid, args.mongodb_context, 'mongodb')
+            # ------将当前部署的版本号更新到resource表
+            resource = ResourceModel.objects.get(res_id=args.resource_id)
+            resource.deploy_name = args.deploy_name
+            resource.save()
+            # ------将部署信息更新到deployment表
+            deploy_result = 'deploy_to_approve'
+            deploy_type = 'deploy'
+            deploy_item = Deployment(
+                deploy_id=uid,
+                deploy_name=args.deploy_name,
+                initiator=args.initiator,
+                user_id=args.user_id,
+                project_id=args.project_id,
+                project_name=args.project_name,
+                resource_id=args.resource_id,
+                resource_name=args.resource_name,
+                created_time=args.datetime.datetime.now(),
+                environment=args.environment,
+                release_notes=args.release_notes,
+                mysql_tag=args.mysql_exe_mode,
+                mysql_context=mysql_context,
+                redis_tag=args.redis_exe_mode,
+                redis_context=redis_context,
+                mongodb_tag=args.mongodb_exe_mode,
+                mongodb_context=mongodb_context,
+                app_image=str(args.app_image),
+                deploy_result=deploy_result,
+                apply_status=args.apply_status,
+                approve_status=args.approve_status,
+                approve_suggestion=args.approve_suggestion,
+                database_password=args.database_password,
+                deploy_type=deploy_type,
+            )
 
-                for instance_info in disconf:
-                    for disconf_info in instance_info.get('dislist'):
-                        #以内容形式上传，需要将内容转化为文本
-                        if disconf_info.get('disconf_tag') == 'tag':
-                            file_name = disconf_info.get('disconf_name')
-                            file_content = disconf_info.get('disconf_content')
-                            ins_name = instance_info.get('ins_name')
-                            upload_file = disconf_write_to_file(file_name=file_name,
-                                                                file_content=file_content,
-                                                                instance_name=ins_name,
-                                                                type='disconf')
-                            disconf_info['disconf_content'] = upload_file
-                            disconf_info['disconf_admin_content'] = ''
-                        #以文本形式上传，只需获取文件名
-                        else:
-                            file_name = disconf_info.get('disconf_name')
-                            if len(file_name.strip()) == 0:
-                                upload_file = ''
-                                disconf_info['disconf_content'] = upload_file
-                                disconf_info['disconf_admin_content'] = upload_file
-
+            for instance_info in args.disconf:
+                for disconf_info in instance_info.get('dislist'):
+                    # 以内容形式上传，需要将内容转化为文本
+                    if disconf_info.get('disconf_tag') == 'tag':
+                        file_name = disconf_info.get('disconf_name')
+                        file_content = disconf_info.get('disconf_content')
                         ins_name = instance_info.get('ins_name')
-                        ins_id = instance_info.get('ins_id')
-                        disconf_tag=disconf_info.get('disconf_tag')
-                        disconf_name = disconf_info.get('disconf_name')
-                        disconf_content = disconf_info.get('disconf_content')
-                        disconf_admin_content = disconf_info.get('disconf_admin_content')
-                        disconf_server_name = disconf_info.get('disconf_server_name')
-                        disconf_server_url = disconf_info.get('disconf_server_url')
-                        disconf_server_user = disconf_info.get('disconf_server_user')
-                        disconf_server_password = disconf_info.get('disconf_server_password')
-                        disconf_version = disconf_info.get('disconf_version')
-                        disconf_env = disconf_info.get('disconf_env')
-                        disconf_app_name = disconf_info.get('disconf_app_name')
-                        disconf_id = str(uuid.uuid1())
-                        disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
-                                                 disconf_tag=disconf_tag,
-                                                 disconf_name = disconf_name,
-                                                 disconf_content = disconf_content,
-                                                 disconf_admin_content = disconf_admin_content,
-                                                 disconf_server_name = disconf_server_name,
-                                                 disconf_server_url = disconf_server_url,
-                                                 disconf_server_user = disconf_server_user,
-                                                 disconf_server_password = disconf_server_password,
-                                                 disconf_version = disconf_version,
-                                                 disconf_env = disconf_env,
-                                                 disconf_id = disconf_id,
-                                                 disconf_app_name=disconf_app_name,
-                                                 )
-                        deploy_item.disconf_list.append(disconf_ins)
+                        upload_file = disconf_write_to_file(file_name=file_name,
+                                                            file_content=file_content,
+                                                            instance_name=ins_name,
+                                                            type='disconf')
+                        disconf_info['disconf_content'] = upload_file
+                        disconf_info['disconf_admin_content'] = ''
+                    # 以文本形式上传，只需获取文件名
+                    else:
+                        file_name = disconf_info.get('disconf_name')
+                        if len(file_name.strip()) == 0:
+                            upload_file = ''
+                            disconf_info['disconf_content'] = upload_file
+                            disconf_info['disconf_admin_content'] = upload_file
 
-                deploy_item.save()
-                message = 'save_to_db success'
+                    ins_name = instance_info.get('ins_name')
+                    ins_id = instance_info.get('ins_id')
+                    disconf_tag = disconf_info.get('disconf_tag')
+                    disconf_name = disconf_info.get('disconf_name')
+                    disconf_content = disconf_info.get('disconf_content')
+                    disconf_admin_content = disconf_info.get('disconf_admin_content')
+                    disconf_server_name = disconf_info.get('disconf_server_name')
+                    disconf_server_url = disconf_info.get('disconf_server_url')
+                    disconf_server_user = disconf_info.get('disconf_server_user')
+                    disconf_server_password = disconf_info.get('disconf_server_password')
+                    disconf_version = disconf_info.get('disconf_version')
+                    disconf_env = disconf_info.get('disconf_env')
+                    disconf_app_name = disconf_info.get('disconf_app_name')
+                    disconf_id = str(uuid.uuid1())
+                    disconf_ins = DisconfIns(ins_name=ins_name, ins_id=ins_id,
+                                             disconf_tag=disconf_tag,
+                                             disconf_name=disconf_name,
+                                             disconf_content=disconf_content,
+                                             disconf_admin_content=disconf_admin_content,
+                                             disconf_server_name=disconf_server_name,
+                                             disconf_server_url=disconf_server_url,
+                                             disconf_server_user=disconf_server_user,
+                                             disconf_server_password=disconf_server_password,
+                                             disconf_version=disconf_version,
+                                             disconf_env=disconf_env,
+                                             disconf_id=disconf_id,
+                                             disconf_app_name=disconf_app_name,
+                                             )
+                    deploy_item.disconf_list.append(disconf_ins)
+
+            deploy_item.save()
+            message = 'save_to_db success'
+            return message
+
+        def not_need_approve(args):
+            message = save_to_db(args)
+            if message == 'save_to_db success':
+                setattr(args, 'dep_id', args.uid)
+                # domain_ip 使用上次部署时用的
+                resource = ResourceModel.objects.get(res_id=args.resource_id)
+                domain_ip = resource.compute_list[0].domain_ip
+                for _app in args.app_image:
+                    _app['domain_ip'] = domain_ip
+                return admin_approve_allow(args)
+
+        try:
+            uid = str(uuid.uuid1())
+            setattr(args, 'uid', uid)
+            this_module = sys.modules[__name__]
+            func = getattr(this_module, action)
+            message = func(args)
         except Exception as e:
             res = {
                 "code": 400,
