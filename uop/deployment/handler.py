@@ -773,10 +773,15 @@ class DeploymentListAPI(Resource):
                 return admin_approve_allow(args)
 
         try:
+            func_map = {
+                'admin_approve_allow': admin_approve_allow,
+                'admin_approve_forbid': admin_approve_forbid,
+                'save_to_db': save_to_db,
+                'not_need_approve': not_need_approve,
+            }
             uid = str(uuid.uuid1())
             setattr(args, 'uid', uid)
-            this_module = sys.modules[__name__]
-            func = getattr(this_module, action)
+            func = func_map[action]
             message = func(args)
         except Exception as e:
             res = {
