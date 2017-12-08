@@ -361,7 +361,9 @@ def attach_domain_ip(compute_list, res,cmdb_url):
                 o = old_compute_list[i]
                 old_compute_list.remove(old_compute_list[i])
                 compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
-                                             url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port, domain_ip=match_one.get("domain_ip", ""),capacity_list=o.capacity_list)
+                                     url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port,
+                                     docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
+                                     capacity_list=o.capacity_list)
                 old_compute_list.insert(i, compute)
                 res.save()
             if cmdb_url:
@@ -1443,7 +1445,7 @@ class RollBackAPI(Resource):
             #------------------------
             new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
             # ------将当前回滚的版本号更新到resource表
-            #resource = ResourceModel.objects.get(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             #resource.deploy_name = deploy_name
             #resource.save()
             # -------
