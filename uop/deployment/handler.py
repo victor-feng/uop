@@ -1089,47 +1089,6 @@ class DeploymentListByByInitiatorAPI(Resource):
         else:
             return rst, 200
 
-        # try:
-        #     deploy_list = {}
-        #     for deployment in Deployment.objects.filter(**condition):
-        #
-        #         def _get_deployment_dict(_deployment):
-        #             return {
-        #                 "resource_id": _deployment.resource_id,
-        #                 "resource_name": _deployment.resource_name,
-        #                 "deploy_id": _deployment.deploy_id,
-        #                 "deploy_name": _deployment.deploy_name,
-        #                 "deploy_result": _deployment.deploy_result,
-        #                 "project_id": _deployment.project_id,
-        #                 "project_name": _deployment.project_name,
-        #                 "created_time": str(_deployment.created_time),
-        #                 "initiator": _deployment.initiator,
-        #                 "environment": _deployment.environment,
-        #                 "app_image": _deployment.app_image
-        #             }
-        #
-        #         if not deploy_list.get(deployment.resource_id, None):
-        #             deploy_list[deployment.resource_id] = [_get_deployment_dict(deployment)]
-        #         else:
-        #             deploy_list[deployment.resource_id].append(_get_deployment_dict(deployment))
-        #
-        #     rst = []
-        #     for _, d_value in deploy_list.items():
-        #         d_lst = sorted(d_value, reverse=True, key=lambda x: x['created_time'])
-        #         rst.append(d_lst[0])
-        # except Exception as e:
-        #     res = {
-        #         "code": 400,
-        #         "result": {
-        #             "res": "failed",
-        #             "msg": e.message
-        #         }
-        #     }
-        #     return res, 400
-        # else:
-        #     return rst, 200
-
-
 class Upload(Resource):
     def post(self):
         try:
