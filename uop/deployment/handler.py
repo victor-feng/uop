@@ -775,7 +775,7 @@ class DeploymentListAPI(Resource):
                 resource = ResourceModel.objects.get(res_id=args.resource_id)
                 domain_ip = resource.compute_list[0].domain_ip
                 # docker_meta =
-                deploy_last = Deployment.objects.filter(resource_id=args.resource_id).order_by('-created_time')[0]
+                deploy_last = Deployment.objects.filter(resource_id=args.resource_id).order_by('created_time')[0]
                 disconf_list=deploy_last.disconf_list
                 if disconf_list:
                     disconf_list=eval(disconf_list[0].to_json())
