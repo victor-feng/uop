@@ -778,8 +778,9 @@ class DeploymentListAPI(Resource):
                 deploy_last = Deployment.objects.filter(resource_id=args.resource_id).order_by('-created_time')[0]
                 disconf_list=deploy_last.disconf_list
                 if disconf_list:
-                    disconf_server_url = deploy_last.disconf_list[0].get('disconf_server_url')
-                    disconf_server_name = deploy_last.disconf_list[0].get('disconf_server_name')
+                    disconf_list=eval(disconf_list[0].to_json())
+                    disconf_server_url = disconf_list.get('disconf_server_url')
+                    disconf_server_name = disconf_list.get('disconf_server_name')
                     for instance_info in args.disconf:
                         for disconf_info_front in instance_info.get('dislist'):
                             disconf_info_front['disconf_server_url'] = disconf_server_url
