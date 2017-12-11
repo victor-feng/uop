@@ -58,11 +58,11 @@ class DisconfIns(db.EmbeddedDocument):
 
 class Deployment(db.Document):
     deploy_id = db.StringField(required=True, unique=True)
-    deploy_name = db.StringField(required=True, unique=True)
     initiator = db.StringField()
     project_id = db.StringField()
     project_name = db.StringField()
     resource_id = db.StringField()
+    deploy_name = db.StringField(required=True, unique_with='resource_id')
     resource_name = db.StringField()
     created_time = db.DateTimeField(default=datetime.datetime.now())
     environment = db.StringField()
