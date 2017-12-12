@@ -115,12 +115,12 @@ class StatisticAPI(Resource):
         try:
             ret = ConfigureEnvModel.objects.all()
             envs = [{'id': env.id, 'name': env.name } for env in ret]
-            urls = [{'url': get_CRP_url(e.get('id')), 'id': e.get('id'),'env':e,} for e in envs ]
+            urls = [{'url': get_CRP_url(e.get('id')), 'id': e.get('id')} for e in envs ]
             headers = {'Content-Type': 'application/json'}
             res_list = []
             for url in urls:
                 data = {}
-                _env=url.get('env')
+                _env=url.get('id')
                 data['env']=_env
                 Log.logger.info('[UOP] Get url: %s', url)
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
@@ -133,11 +133,8 @@ class StatisticAPI(Resource):
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
-            err_msg = e.message
-            #NOTE: Wrong usage!!!!!!
+            err_msg = e.args
             Log.logger.error('list az statistics err: %s' % err_msg)
-            Log.logger.exception('list az statistics err: %s' , e.args)
-            #Log.logger.error('list az statistics err: %s' % err_msg)
             res = {
                 "code": 400,
                 "result": {
