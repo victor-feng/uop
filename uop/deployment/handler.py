@@ -774,17 +774,16 @@ class DeploymentListAPI(Resource):
                 # domain_ip 使用上次部署时用的
                 resource = ResourceModel.objects.get(res_id=args.resource_id)
                 domain_ip = resource.compute_list[0].domain_ip
-                # docker_meta =
                 deploy_last = Deployment.objects.filter(resource_id=args.resource_id).order_by('created_time')[0]
                 disconf_list=deploy_last.disconf_list
-                if disconf_list:
-                    disconf_list=eval(disconf_list[0].to_json())
-                    disconf_server_url = disconf_list.get('disconf_server_url')
-                    disconf_server_name = disconf_list.get('disconf_server_name')
+                if len(disconf_list) != 0:
+                    disconf_info = disconf_list[0]
                     for instance_info in args.disconf:
                         for disconf_info_front in instance_info.get('dislist'):
-                            disconf_info_front['disconf_server_url'] = disconf_server_url
-                            disconf_info_front['disconf_server_name'] = disconf_server_name
+                            disconf_info_front['disconf_server_url'] = disconf_info.disconf_server_url
+                            disconf_info_front['disconf_server_name'] = disconf_info.disconf_server_name
+                            disconf_info_front['disconf_server_user'] = disconf_info.disconf_server_user
+                            disconf_info_front['disconf_server_password'] = disconf_info.disconf_server_password
 
                 for _app in args.app_image:
                     _app['domain_ip'] = domain_ip
@@ -1434,54 +1433,39 @@ class RollBackAPI(Resource):
         initiator = args.initiator
         project_name = args.project_name
         deploy_name = args.deploy_name
+        approval_id = str(uuid.uuid1())
+        approval_status="rollbacking"
         try:
-            approval_id = str(uuid.uuid1())
-            approval_status="rollbacking"
             #更新要回滚的deploy记录
-            old_deployment = Deployment.objects.get(deploy_name=deploy_name)
-            deploy_id=approval_id
-            create_date = datetime.datetime.now()
-            #状态为回滚未审批
-            deploy_result="rollback_to_approve"
-            deploy_type = "rollback"
-            approve_status="rollbacking"
+            old_deployment = Deployment.objects.get(deploy_name=deploy_name, resource=res_id)
+        except Deployment.DoesNotExist as e:
+            ret = {
+                'code': 500,
+                'result': {
+                    'res': 'fail',
+                    'msg': 'deploy_name has existed'
+                }
+            }
+            return ret, 500
+
+
+
+        deploy_id = approval_id
+        create_date = datetime.datetime.now()
+        #状态为回滚未审批
+        deploy_result="rollback_to_approve"
+        approve_status="rollbacking"
             #------------------------
-            new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+            # new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+        try:
             # ------将当前回滚的版本号更新到resource表
             resource = ResourceModel.objects.get(res_id=res_id)
-            #resource.deploy_name = deploy_name
-            #resource.save()
-            # -------
-            #回滚新生成一条部署记录原来的部署记录保存
-            deploy_item = Deployment(
-                deploy_id=approval_id,
-                deploy_name=new_deploy_name,
-                initiator=initiator,
-                user_id=old_deployment.user_id,
-                project_id=project_id,
-                project_name=project_name,
-                resource_id=res_id,
-                resource_name=old_deployment.resource_name,
-                created_time=create_date,
-                environment=old_deployment.environment,
-                release_notes=old_deployment.release_notes,
-                mysql_tag=old_deployment.mysql_tag,
-                mysql_context=old_deployment.mysql_context,
-                redis_tag=old_deployment.redis_tag,
-                redis_context=old_deployment.redis_context,
-                mongodb_tag=old_deployment.mongodb_tag,
-                mongodb_context=old_deployment.mongodb_context,
-                app_image=old_deployment.app_image,
-                deploy_result=deploy_result,
-                apply_status="success",
-                approve_status=approve_status,
-                approve_suggestion=old_deployment.approve_suggestion,
-                database_password=old_deployment.database_password,
-                disconf_list=old_deployment.disconf_list,
-                deploy_type=deploy_type
-            )
-            deploy_item.save()
+            resource.deploy_name = deploy_name
+            resource.save()
 
+            old_deployment.deploy_result = deploy_result
+            old_deployment.approve_status = approve_status
+            old_deployment.save()
             #将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id,deploy_id=deploy_id,
                      project_id=project_id, department_id=department_id,
@@ -1512,8 +1496,9 @@ class RollBackAPI(Resource):
 @deployment_blueprint.route('/check_deploy_name', methods=['GET'])
 def check_deployment_by_id():
     deploy_name = request.args.get('deploy_name', '')
+    resource_id = request.args.get('resource_id', '')
     try:
-        deploy = Deployment.objects.get(deploy_name=deploy_name)
+        deploy = Deployment.objects.get(deploy_name=deploy_name, resource_id=resource_id)
     except Deployment.DoesNotExist as e:
         res = {
             'code': 200,
