@@ -122,10 +122,11 @@ class StatisticAPI(Resource):
                 data = {}
                 _env=url.get('id')
                 data['env']=_env
+                data_str=json.dumps(data)
                 Log.logger.info('[UOP] Get url: %s', url)
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
                 Log.logger.info('[UOP] Get the whole url: %s', url_)
-                result = requests.get(url_,data=data,headers=headers)
+                result = requests.get(url_,data=data_str,headers=headers)
                 if result.json().get('code') == 200:
                     Log.logger.debug(url_ + ' '+json.dumps(headers))
                     cur_res = result.json().get('result').get('res')
