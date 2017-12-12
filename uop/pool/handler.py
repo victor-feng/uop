@@ -118,8 +118,8 @@ class StatisticAPI(Resource):
             urls = [{'url': get_CRP_url(e.get('id')), 'id': e.get('id'),'env':e,} for e in envs ]
             headers = {'Content-Type': 'application/json'}
             res_list = []
-            data={}
             for url in urls:
+                data = {}
                 _env=url.get('env')
                 data['env']=_env
                 Log.logger.info('[UOP] Get url: %s', url)
