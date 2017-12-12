@@ -86,7 +86,7 @@ class NetworksAPI(Resource):
                     res.append(network_info)
         except Exception as e:
             err_msg = e.args
-            Log.logger.error('list az statistics err: %s' % err_msg)
+            Log.logger.error('get network info err: %s' % err_msg)
             ret = {
                 "code": 400,
                 "result": {
