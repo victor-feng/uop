@@ -3,4 +3,4 @@ from flask import Blueprint
 
 pool_blueprint = Blueprint('pool_blueprint', __name__)
 
-from . import handler, forms, errors
+from . import handler, forms, errors, view
