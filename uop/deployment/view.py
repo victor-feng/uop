@@ -405,19 +405,24 @@ class DeploymentListAPI(Resource):
             if message == 'save_to_db success':
                 setattr(args, 'dep_id', args.uid)
                 # domain_ip 使用上次部署时用的
-                resource = ResourceModel.objects.get(res_id=args.resource_id)
-                domain_ip = resource.compute_list[0].domain_ip
-                # docker_meta =
-                deploy_last = Deployment.objects.get(resource_id=args.resource_id).order_by('created_time')[0]
-                disconf_server_url = deploy_last.disconf_list[0].get('disconf_server_url')
-                disconf_server_name = deploy_last.disconf_list[0].get('disconf_server_name')
-                for instance_info in args.disconf:
-                    for disconf_info_front in instance_info.get('dislist'):
-                        disconf_info_front['disconf_server_url'] = disconf_server_url
-                        disconf_info_front['disconf_server_name'] = disconf_server_name
-
-                for _app in args.app_image:
-                    _app['domain_ip'] = domain_ip
+                # resource = ResourceModel.objects.get(res_id=args.resource_id)
+                # domain_ip_list = []
+                # for docker in resource.compute_list:
+                #     domain_ip_list.append(docker.domain_ip)
+                # deploy_last = Deployment.objects.get(resource_id=args.resource_id).order_by('created_time')[0]
+                # disconf_list = deploy_last.disconf_list
+                # if len(disconf_list) != 0:
+                #     disconf_info = disconf_list[0]
+                #     for instance_info in args.disconf:
+                #         for disconf_info_front in instance_info.get('dislist'):
+                #             disconf_info_front['disconf_server_url'] = disconf_info.disconf_server_url
+                #             disconf_info_front['disconf_server_name'] = disconf_info.disconf_server_name
+                #             disconf_info_front['disconf_server_user'] = disconf_info.disconf_server_user
+                #             disconf_info_front['disconf_server_password'] = disconf_info.disconf_server_password
+                #
+                #
+                # for idx, _app in enumerate(args.app_image):
+                #     _app['domain_ip'] = domain_ip_list[idx]
                 return admin_approve_allow(args)
 
         try:
@@ -1085,7 +1090,7 @@ class RollBackAPI(Resource):
             new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime(
                 '%Y-%m-%d_%H:%M:%S')
             # ------将当前回滚的版本号更新到resource表
-            resource = ResourceModel.objects.get(res_id=res_id)
+            # resource = ResourceModel.objects.get(res_id=res_id)
             # resource.deploy_name = deploy_name
             # resource.save()
             # -------

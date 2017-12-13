@@ -791,6 +791,7 @@ class RollBackReservation(Resource):
         data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            resource.deploy_name = deploy_name
             env = resource.env
             res_compute_list = resource.compute_list
             for res_compute in res_compute_list:
