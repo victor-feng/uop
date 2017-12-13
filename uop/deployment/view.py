@@ -1142,7 +1142,7 @@ class RollBackAPI(Resource):
         ret = {
             'code': 200,
             'result': {
-                'res': 'success',
+                'res': approval_id,
                 'msg': 'Put deployment rollback application success.'
             }
         }
