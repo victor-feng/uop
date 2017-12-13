@@ -452,9 +452,8 @@ class ResourceDetail(Resource):
     def get(cls, res_id):
         result = {}
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
         except Exception as e:
-            # print e
             Log.logger.error(str(e))
             code = 500
             ret = {
@@ -465,106 +464,97 @@ class ResourceDetail(Resource):
                 }
             }
             return ret
-        if len(resources):
-            deploies = Deployment.objects.filter(resource_id=res_id).order_by('+created_date')
-            if len(deploies):
-                deploy = deploies.first()
-                database_password = deploy.database_password
-            else:
-                database_password = make_random_database_password()
-            for resource in resources:
-                result['resource_name'] = resource.resource_name
-                result['project'] = resource.project
-                result['project_id'] = resource.project_id
-                result['department'] = resource.department
-                result['department_id'] = resource.department_id
-                result['res_id'] = res_id
-                result['user_name'] = resource.user_name
-                result['user_id'] = resource.user_id
-                result['domain'] = resource.domain
-                result['env'] = resource.env
-                result['application_status'] = resource.application_status
-                result['approval_status'] = resource.approval_status
-                result['database_password'] = database_password
-                result['docker_network_name'] = ""
-                result['mysql_network_name'] = ""
-                result['redis_network_name'] = ""
-                result['mongodb_network_name'] = ""
-                docker_network_id = resource.docker_network_id
-                mysql_network_id = resource.mysql_network_id
-                redis_network_id = resource.redis_network_id
-                mongodb_network_id = resource.mongodb_network_id
-                if docker_network_id:
-                    network = NetWorkConfig.objects.filter(vlan_id=docker_network_id).first()
-                    docker_network_name = network.name
-                    result['docker_network_name'] = docker_network_name
-                if mysql_network_id:
-                    network = NetWorkConfig.objects.filter(vlan_id=mysql_network_id).first()
-                    mysql_network_name = network.name
-                    result['mysql_network_name'] = mysql_network_name
-                if redis_network_id:
-                    network = NetWorkConfig.objects.filter(vlan_id=redis_network_id).first()
-                    redis_network_name = network.name
-                    result['redis_network_name'] = redis_network_name
-                if mongodb_network_id:
-                    network = NetWorkConfig.objects.filter(vlan_id=mongodb_network_id).first()
-                    mongodb_network_name = network.name
-                    result['mongodb_network_name'] = mongodb_network_name
-
-                resource_list = resource.resource_list
-                compute_list = resource.compute_list
-                if resource_list:
-                    res = []
-                    for db_res in resource_list:
-                        res.append(
-                            {
-                                "res_name": db_res.ins_name,
-                                "res_id": db_res.ins_id,
-                                "res_type": db_res.ins_type,
-                                "cpu": db_res.cpu,
-                                "mem": db_res.mem,
-                                "disk": db_res.disk,
-                                "quantity": db_res.quantity,
-                                "version": db_res.version,
-                                "volume_size": db_res.volume_size
-                            }
-                        )
-                if compute_list:
-                    com = []
-                    for db_com in compute_list:
-                        com.append(
-                            {
-                                "ins_name": db_com.ins_name,
-                                "ins_id": db_com.ins_id,
-                                "cpu": db_com.cpu,
-                                "mem": db_com.mem,
-                                "url": db_com.url,
-                                "domain": db_com.domain,
-                                "quantity": db_com.quantity,
-                                "port": db_com.port,
-                                "meta": db_com.docker_meta,
-                            }
-                        )
-                result['resource_list'] = res
-                result['compute_list'] = com
-                code = 200
-                ret = {
-                    'code': code,
-                    'result': {
-                        'res': 'success',
-                        'msg': result
-                    }
-                }
+        deploies = Deployment.objects.filter(resource_id=res_id).order_by('+created_date')
+        first_deploy = True
+        if len(deploies):
+            deploy = deploies.first()
+            database_password = deploy.database_password
+            first_deploy = False
         else:
-            code = 200
-            result = []
-            ret = {
-                'code': code,
-                'result': {
-                    'res': 'success',
-                    'msg': result
-                }
+            database_password = make_random_database_password()
+        result['first_deploy'] = first_deploy
+        result['resource_name'] = resource.resource_name
+        result['project'] = resource.project
+        result['project_id'] = resource.project_id
+        result['department'] = resource.department
+        result['department_id'] = resource.department_id
+        result['res_id'] = res_id
+        result['user_name'] = resource.user_name
+        result['user_id'] = resource.user_id
+        result['domain'] = resource.domain
+        result['env'] = resource.env
+        result['application_status'] = resource.application_status
+        result['approval_status'] = resource.approval_status
+        result['database_password'] = database_password
+        result['docker_network_name'] = ""
+        result['mysql_network_name'] = ""
+        result['redis_network_name'] = ""
+        result['mongodb_network_name'] = ""
+        docker_network_id = resource.docker_network_id
+        mysql_network_id = resource.mysql_network_id
+        redis_network_id = resource.redis_network_id
+        mongodb_network_id = resource.mongodb_network_id
+        if docker_network_id:
+            network = NetWorkConfig.objects.filter(vlan_id=docker_network_id).first()
+            docker_network_name = network.name
+            result['docker_network_name'] = docker_network_name
+        if mysql_network_id:
+            network = NetWorkConfig.objects.filter(vlan_id=mysql_network_id).first()
+            mysql_network_name = network.name
+            result['mysql_network_name'] = mysql_network_name
+        if redis_network_id:
+            network = NetWorkConfig.objects.filter(vlan_id=redis_network_id).first()
+            redis_network_name = network.name
+            result['redis_network_name'] = redis_network_name
+        if mongodb_network_id:
+            network = NetWorkConfig.objects.filter(vlan_id=mongodb_network_id).first()
+            mongodb_network_name = network.name
+            result['mongodb_network_name'] = mongodb_network_name
+
+        resource_list = resource.resource_list
+        compute_list = resource.compute_list
+        if resource_list:
+            res = []
+            for db_res in resource_list:
+                res.append(
+                    {
+                        "res_name": db_res.ins_name,
+                        "res_id": db_res.ins_id,
+                        "res_type": db_res.ins_type,
+                        "cpu": db_res.cpu,
+                        "mem": db_res.mem,
+                        "disk": db_res.disk,
+                        "quantity": db_res.quantity,
+                        "version": db_res.version,
+                        "volume_size": db_res.volume_size
+                    }
+                )
+        if compute_list:
+            com = []
+            for db_com in compute_list:
+                com.append(
+                    {
+                        "ins_name": db_com.ins_name,
+                        "ins_id": db_com.ins_id,
+                        "cpu": db_com.cpu,
+                        "mem": db_com.mem,
+                        "url": db_com.url,
+                        "domain": db_com.domain,
+                        "quantity": db_com.quantity,
+                        "port": db_com.port,
+                        "meta": db_com.docker_meta,
+                    }
+                )
+        result['resource_list'] = res
+        result['compute_list'] = com
+        code = 200
+        ret = {
+            'code': code,
+            'result': {
+                'res': 'success',
+                'msg': result
             }
+        }
         return ret, code
 
     @classmethod
