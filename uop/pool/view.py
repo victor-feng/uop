@@ -111,14 +111,15 @@ class StatisticAPI(Resource):
         try:
             ret = ConfigureEnvModel.objects.all()
             envs = [{'id': env.id, 'name': env.name } for env in ret]
-            urls = [{'url': get_CRP_url(e.get('id')), 'id': e.get('id') } for e in envs ]
+            urls = [{'url': get_CRP_url(e.get('id')), 'env': e.get('id') } for e in envs ]
             headers = {'Content-Type': 'application/json'}
             res_list = []
             for url in urls:
                 Log.logger.info('[UOP] Get url: %s', url)
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
                 Log.logger.info('[UOP] Get the whole url: %s', url_)
-                result = requests.get(url_, headers=headers)
+                data_str = json.dumps({"env": url.get("env")})
+                result = requests.get(url_, headers=headers, data=data_str)
                 if result.json().get('code') == 200:
                     Log.logger.debug(url_ + ' '+json.dumps(headers))
                     cur_res = result.json().get('result').get('res')

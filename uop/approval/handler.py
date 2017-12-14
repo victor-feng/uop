@@ -21,4 +21,5 @@ def attach_domain_ip(compute_list, res):
         res.save()
     except Exception as e:
         Log.logger.error("attach domain_ip to compute error:{}".format(e))
+
     return True
