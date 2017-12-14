@@ -188,7 +188,6 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         action = args.action
-
         UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
         def write_file(uid, context, type):
@@ -449,6 +448,7 @@ class DeploymentListAPI(Resource):
             res = {
                 "code": 200,
                 "result": {
+                    'deploy_id': uid,
                     "res": message,
                 }
             }
