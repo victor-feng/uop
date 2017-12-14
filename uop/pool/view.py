@@ -123,7 +123,7 @@ class StatisticAPI(Resource):
                 if result.json().get('code') == 200:
                     Log.logger.debug(url_ + ' '+json.dumps(headers))
                     cur_res = result.json().get('result').get('res')
-                    res_list.append({url.get('id'): cur_res})
+                    res_list.append({url.get('env'): cur_res})
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
