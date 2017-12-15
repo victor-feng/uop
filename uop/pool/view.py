@@ -13,50 +13,6 @@ from uop.log import Log
 pool_api = Api(pool_blueprint, errors=pool_errors)
 
 
-class NetworkListAPI(Resource):
-
-    @classmethod
-    def get(cls):
-        try:
-            parser = reqparse.RequestParser()
-            parser.add_argument('env', type=str,location="args")
-            args = parser.parse_args()
-            env_=args.env
-            res = []
-            CRP_URL = get_CRP_url(env_)
-            headers = {'Content-Type': 'application/json'}
-            res_list = []
-            url_ = '%s%s'%(CRP_URL, 'api/openstack/network/list')
-            result = requests.get(url_, headers=headers)
-            if result.json().get('code') == 200:
-                cur_res = result.json().get('result').get('res')
-                for key, value in cur_res:
-                    res.append({'id': key, 'name': value})
-        except Exception as e:
-            err_msg = e.message
-            #NOTE: Wrong usage!!!!!!
-            Log.logger.error('list az statistics err: %s' % err_msg)
-            Log.logger.exception('list az statistics err: %s' , e.args)
-            #Log.logger.error('list az statistics err: %s' % err_msg)
-            ret = {
-                "code": 400,
-                "result": {
-                    "msg": "failed",
-                    "res": e.message
-                }
-            }
-            return ret, 400
-        else:
-            ret = {
-                "code": 400,
-                "result": {
-                    "msg": "success",
-                    "res": res
-                }
-            }
-            return ret, 200
-
-
 class NetworksAPI(Resource):
 
     @classmethod
@@ -127,16 +83,13 @@ class StatisticAPI(Resource):
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
-            err_msg = e.message
-            #NOTE: Wrong usage!!!!!!
+            err_msg = str(e.args)
             Log.logger.error('list az statistics err: %s' % err_msg)
-            Log.logger.exception('list az statistics err: %s' , e.args)
-            #Log.logger.error('list az statistics err: %s' % err_msg)
             res = {
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": e.message
+                    "msg": err_msg
                 }
             }
             return res, 400
