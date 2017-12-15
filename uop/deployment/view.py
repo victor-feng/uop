@@ -300,9 +300,9 @@ class DeploymentListAPI(Resource):
             return message
 
         def save_to_db(args):
-            mysql_context = ''
-            redis_context = ''
-            mongodb_context = ''
+            mysql_context = args.mysql_context
+            redis_context = args.redis_context
+            mongodb_context = args.mongodb_context
             uid = args.uid
             if args.mysql_exe_mode == 'tag' and args.mysql_context:
                 mysql_context = write_file(uid, args.mysql_context, 'mysql')
