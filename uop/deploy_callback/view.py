@@ -80,7 +80,7 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
             dep.deploy_result = "%s_docker_success" % deploy_type
             status_record.status = "%s_docker_success" % deploy_type
-            status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,健康检查状态为UP" % (
+            status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,检查正常" % (
             deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name)
         elif dep.deploy_result == "fail":
             if res_type == "docker":
