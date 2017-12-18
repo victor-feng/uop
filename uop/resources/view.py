@@ -101,6 +101,7 @@ class ResourceApplication(Resource):
                 quantity = compute.get('quantity')
                 port = compute.get('port')
                 meta_str = compute.get('meta')
+                health_check=compute.get('health_check',0)
                 try:
                     meta = json.dumps(meta_str)
                 except Exception as e:
@@ -543,6 +544,7 @@ class ResourceDetail(Resource):
                         "quantity": db_com.quantity,
                         "port": db_com.port,
                         "meta": db_com.docker_meta,
+                        "health_check": db_com.health_check,
                     }
                 )
         result['resource_list'] = res

@@ -347,7 +347,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
                                  url=match_one["url"], domain=o.domain, quantity=o.quantity, port=o.port,
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
-                                 capacity_list=o.capacity_list)
+                                 health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list)
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:

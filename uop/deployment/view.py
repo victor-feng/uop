@@ -178,7 +178,6 @@ class DeploymentListAPI(Resource):
         parser.add_argument('mongodb_exe_mode', type=str, location='json')
         parser.add_argument('mongodb_context', type=str, location='json')
         parser.add_argument('app_image', type=list, location='json')
-
         parser.add_argument('approve_suggestion', type=str, location='json')
         parser.add_argument('apply_status', type=str, location='json')
         parser.add_argument('approve_status', type=str, location='json')
