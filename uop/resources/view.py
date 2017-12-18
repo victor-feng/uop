@@ -115,7 +115,7 @@ class ResourceApplication(Resource):
                     }
                     return res, code
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
-                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str)
+                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check)
                 resource_application.compute_list.append(compute_ins)
 
         if ins_name_list:
