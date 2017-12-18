@@ -116,7 +116,7 @@ class ComputeIns(db.EmbeddedDocument):
     domain_ip = db.StringField(required=False)
     docker_meta = db.StringField(required=False)
     capacity_list = db.ListField(db.EmbeddedDocumentField('Capacity'), default=[])
-    health_check = db.IntField(required=False,default=0)
+    health_check = db.IntField(required=False)
 
     meta = {
         'collection': 'compute_ins',
