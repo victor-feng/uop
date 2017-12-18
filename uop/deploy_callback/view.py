@@ -53,7 +53,7 @@ class DeployCallback(Resource):
             parser.add_argument('result', type=str)
             parser.add_argument('ip', type=str)
             parser.add_argument('res_type', type=str)
-            parser.add_argument('err_msg', type=str)
+            parser.add_argument('msg', type=str)
             parser.add_argument('vm_state', type=str)
             parser.add_argument('cluster_name', type=str)
             parser.add_argument('end_flag', type=bool)
@@ -65,7 +65,7 @@ class DeployCallback(Resource):
         dep.deploy_result = args.result
         ip = args.ip
         res_type = args.res_type
-        err_msg = args.err_msg
+        msg = args.msg
         vm_state = args.vm_state
         cluster_name = args.cluster_name
         end_flag = args.end_flag
@@ -80,17 +80,17 @@ class DeployCallback(Resource):
         if dep.deploy_result == "success":
             dep.deploy_result = "%s_docker_success" % deploy_type
             status_record.status = "%s_docker_success" % deploy_type
-            status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,检查正常" % (
-            deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name)
+            status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
+            deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
         elif dep.deploy_result == "fail":
             if res_type == "docker":
                 dep.deploy_result = "%s_docker_fail" % deploy_type
                 status_record.status = "%s_docker_fail" % deploy_type
                 status_record.msg = "%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (
-                deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name, err_msg)
+                deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name, msg)
             else:
                 status_record.status = "deploy_%s_fail" % res_type
-                status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type, err_msg)
+                status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type, msg)
         status_record.save()
         res_status, count = get_deploy_status(deploy_id, deploy_type, res_type)
         if res_status == True and end_flag == True:
