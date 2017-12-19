@@ -798,6 +798,8 @@ class RollBackReservation(Resource):
                 for compute in compute_list:
                     if res_compute["ins_id"] == compute["ins_id"]:
                         res_compute["url"] = compute["url"]
+                        res_compute["prot"] = compute["port"]
+                        res_compute["domain"] = compute["domain"]
             resource.save()
             # ----------
             appinfo = []
