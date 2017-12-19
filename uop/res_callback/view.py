@@ -809,30 +809,11 @@ class ResourceStatusProviderCallBack(Resource):
         args = parser.parse_args()
         resource_id=args.resource_id
         try:
-            set_status_record = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
+            status_records = StatusRecord.objects.filter(res_id=resource_id).order_by('created_time')
             set_msg_list=[]
             dep_msg_list=[]
             data={}
-            """
-            status_record_fail_list=[]
-            status_record_success_list=[]
-            status_records=[]
-            for sr in set_status_record:
-                s_status=sr.status
-                if s_status  == "set_fail":
-                    status_record_fail_list.append(sr)
-                else:
-                    status_record_success_list.append(sr)
-            if len(status_record_fail_list) > 0 and len(status_record_success_list) > 0:
-                for sr in set_status_record:
-                    if sr not in status_record_fail_list:
-                        status_records.append(sr)
-            elif len(status_record_fail_list) > 0 and len(status_record_success_list) == 0:
-                status_records=[status_record_fail_list[-1]]
-            elif len(status_record_fail_list) == 0 and len(status_record_success_list) > 0:
-                status_records=status_record_success_list
-            """
-            for sr in set_status_record:
+            for sr in status_records:
                 dep_id=sr.deploy_id
                 if dep_id:
                     s_msg=sr.created_time.strftime('%Y-%m-%d %H:%M:%S') +':'+ sr.msg
