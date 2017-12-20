@@ -1033,7 +1033,7 @@ class RollBackAPI(Resource):
             deployments = {}
             history_version = []
             resource = ResourceModel.objects.get(res_id=resource_id)
-            now_deploy_name = resource.deploy_name
+            now_deploy_name = resource.deploy_name.strip().split('@')[0]
             deployments["now_deploy_name"] = now_deploy_name
             deploys = Deployment.objects.filter(resource_id=resource_id,
                                                 approve_status="success",deploy_type="deploy").order_by('-created_time')

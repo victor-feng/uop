@@ -739,6 +739,7 @@ class RollBackReservation(Resource):
             resource_id = deployment.resource_id
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy_name = deployment.deploy_name
+            deploy_name=deploy_name.strip().split('@')[0]
             resource_id = deployment.resource_id
             resource_name = deployment.resource_name
             project_id = deployment.project_id
