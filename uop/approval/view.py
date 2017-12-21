@@ -446,7 +446,7 @@ class CapacityInfoAPI(Resource):
             parser.add_argument('approval_id', type=str)
             parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
-            parser.add_argument('annotations', type=str)
+            parser.add_argument('approve_suggestion', type=str)
             parser.add_argument('docker_network_id', type=str)
             args = parser.parse_args()
             approval_id = args.approval_id
@@ -469,7 +469,7 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success" % (approval.capacity_status)
-                    deployment.approve_suggestion = args.annotations
+                    deployment.approve_suggestion = args.approve_suggestion
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "increasing"
                     elif approval.capacity_status == "reduce":
@@ -482,7 +482,7 @@ class CapacityInfoAPI(Resource):
                 else:
                     approval.approval_status = "%s_failed" % (approval.capacity_status)
                     deployment.approve_status = "%s_failed" % (approval.capacity_status)
-                    deployment.approve_suggestion = args.annotations
+                    deployment.approve_suggestion = args.approve_suggestion
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "not_increased"
                     elif approval.capacity_status == "reduce":
@@ -668,7 +668,7 @@ class RollBackInfoAPI(Resource):
             parser.add_argument('deploy_id', type=str)
             parser.add_argument('approve_uid', type=str)
             parser.add_argument('agree', type=bool)
-            parser.add_argument('annotations', type=str)
+            parser.add_argument('approve_suggestion', type=str)
             args = parser.parse_args()
             deploy_id = args.deploy_id
             approvals = models.Approval.objects.filter(approval_id=deploy_id).order_by('-create_date')
@@ -683,7 +683,7 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_success"
                     # 审批通过状态改为回滚中
                     deployment.deploy_result = "rollbacking"
-                    deployment.approve_suggestion = args.annotations
+                    deployment.approve_suggestion = args.approve_suggestion
                     # 管理员审批通过后修改resource表deploy_name,更新当前版本
                     deploy_name = deployment.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
