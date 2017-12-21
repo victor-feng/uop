@@ -880,7 +880,7 @@ class CapacityAPI(Resource):
                                 deploy_result=deploy_result,
                                 apply_status="success",
                                 approve_status=approval_status,
-                                approve_suggestion=old_deployment.approve_suggestion,
+                                approve_suggestion="",
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
                                 capacity_info=capacity_info_str,
@@ -1111,7 +1111,7 @@ class RollBackAPI(Resource):
                 deploy_result=deploy_result,
                 apply_status="success",
                 approve_status=approve_status,
-                approve_suggestion=old_deployment.approve_suggestion,
+                approve_suggestion="",
                 database_password=old_deployment.database_password,
                 disconf_list=old_deployment.disconf_list,
                 deploy_type=deploy_type
