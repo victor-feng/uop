@@ -695,14 +695,6 @@ class RollBackInfoAPI(Resource):
                     # 审批不通过状态修改
                     deployment.deploy_result = "not_rollbacked"
                     deployment.approve_suggestion = args.annotations
-                    # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
-                    # deps = models.Deployment.objects.filter(resource_id=approval.resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
-                    # if deps:
-                    #    dep = deps[0]
-                    # deploy_name = dep.deploy_name
-                    # resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
-                    # resource.deploy_name = deploy_name
-                    # resource.save()
                 approval.save()
                 deployment.save()
                 code = 200
