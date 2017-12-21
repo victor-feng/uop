@@ -553,7 +553,7 @@ class ResourceDetail(Resource):
         result['compute_list'] = com
         result['annotations'] = ""
         try:
-            approvals=Approval.objects.filter(resource_id=res_id,approval_status__in=["success","failed"]).ordey_by('-created_date')
+            approvals=Approval.objects.filter(resource_id=res_id,approval_status__in=["success","failed"]).order_by('-created_date')
         except Exception as e:
             Log.logger.error(str(e))
             code = 500
