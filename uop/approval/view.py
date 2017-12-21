@@ -99,11 +99,9 @@ class ApprovalInfo(Resource):
                 if args.agree:
                     approval.approval_status = "success"
                     resource.approval_status = "success"
-                    approval.annotations=args.annotations
                 else:
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
-                    approval.annotations = args.annotations
                 approval.save()
                 if docker_network_id:
                     resource.docker_network_id = docker_network_id.strip()
@@ -452,11 +450,12 @@ class CapacityInfoAPI(Resource):
             approval_id = args.approval_id
             approval = models.Approval.objects.get(approval_id=approval_id)
             deployment = models.Deployment.objects.get(deploy_id=approval_id)
+            deployment.approve_suggestion = args.approve_suggestion
             # deploy_name=deployment.deploy_name
             if approval:
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
-                approval.annotations = args.annotations
+                approval.annotations = args.approve_suggestion
                 docker_network_id = args.docker_network_id
                 resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                 # resource.deploy_name = deploy_name
@@ -469,7 +468,6 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success" % (approval.capacity_status)
-                    deployment.approve_suggestion = args.approve_suggestion
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "increasing"
                     elif approval.capacity_status == "reduce":
@@ -482,7 +480,6 @@ class CapacityInfoAPI(Resource):
                 else:
                     approval.approval_status = "%s_failed" % (approval.capacity_status)
                     deployment.approve_status = "%s_failed" % (approval.capacity_status)
-                    deployment.approve_suggestion = args.approve_suggestion
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "not_increased"
                     elif approval.capacity_status == "reduce":
@@ -673,17 +670,17 @@ class RollBackInfoAPI(Resource):
             deploy_id = args.deploy_id
             approvals = models.Approval.objects.filter(approval_id=deploy_id).order_by('-create_date')
             deployment = models.Deployment.objects.get(deploy_id=deploy_id)
+            deployment.approve_suggestion = args.approve_suggestion
             if approvals:
                 approval = approvals[0]
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
-                approval.annotations = args.annotations
+                approval.annotations = args.approve_suggestion
                 if args.agree:
                     approval.approval_status = "rollback_success"
                     deployment.approve_status = "rollback_success"
                     # 审批通过状态改为回滚中
                     deployment.deploy_result = "rollbacking"
-                    deployment.approve_suggestion = args.approve_suggestion
                     # 管理员审批通过后修改resource表deploy_name,更新当前版本
                     deploy_name = deployment.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
@@ -694,7 +691,6 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_fail"
                     # 审批不通过状态修改
                     deployment.deploy_result = "not_rollbacked"
-                    deployment.approve_suggestion = args.annotations
                 approval.save()
                 deployment.save()
                 code = 200
