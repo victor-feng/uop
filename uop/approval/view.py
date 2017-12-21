@@ -99,9 +99,11 @@ class ApprovalInfo(Resource):
                 if args.agree:
                     approval.approval_status = "success"
                     resource.approval_status = "success"
+                    approval.annotations=args.annotations
                 else:
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
+                    approval.annotations = args.annotations
                 approval.save()
                 if docker_network_id:
                     resource.docker_network_id = docker_network_id.strip()
@@ -467,6 +469,7 @@ class CapacityInfoAPI(Resource):
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success" % (approval.capacity_status)
+                    deployment.approve_suggestion = args.annotations
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "increasing"
                     elif approval.capacity_status == "reduce":
@@ -479,18 +482,11 @@ class CapacityInfoAPI(Resource):
                 else:
                     approval.approval_status = "%s_failed" % (approval.capacity_status)
                     deployment.approve_status = "%s_failed" % (approval.capacity_status)
+                    deployment.approve_suggestion = args.annotations
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "not_increased"
                     elif approval.capacity_status == "reduce":
                         deployment.deploy_result = "not_reduced"
-                        # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
-                        # deps = models.Deployment.objects.filter(resource_id=approval.resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"] ).order_by('-created_time')
-                        # if deps:
-                        #    dep = deps[0]
-                        # deploy_name = dep.deploy_name
-                        # resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
-                        # resource.deploy_name = deploy_name
-                        # resource.save()
                 approval.save()
                 deployment.save()
                 code = 200
@@ -687,6 +683,7 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_success"
                     # 审批通过状态改为回滚中
                     deployment.deploy_result = "rollbacking"
+                    deployment.approve_suggestion = args.annotations
                     # 管理员审批通过后修改resource表deploy_name,更新当前版本
                     deploy_name = deployment.deploy_name
                     resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
@@ -697,6 +694,7 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_fail"
                     # 审批不通过状态修改
                     deployment.deploy_result = "not_rollbacked"
+                    deployment.approve_suggestion = args.annotations
                     # 管理员审批不通过时修改回滚时的当前版本为审批不通过的版本
                     # deps = models.Deployment.objects.filter(resource_id=approval.resource_id,approve_status__in=["success","rollback_success","reduce_success","increase_success"]).order_by('-created_time')
                     # if deps:
@@ -747,6 +745,7 @@ class RollBackReservation(Resource):
             environment = deployment.environment
             release_notes = deployment.release_notes
             app_image = eval(deployment.app_image)
+            approve_suggestion = deployment.approve_suggestion
             compute_list = resource.compute_list
             for compute in compute_list:
                 for app in app_image:
@@ -762,6 +761,7 @@ class RollBackReservation(Resource):
             results["environment"] = environment
             results["release_notes"] = release_notes
             results["compute_list"] = app_image
+            results["approve_suggestion"] = approve_suggestion
         except Exception as e:
             res = {
                 "code": 400,

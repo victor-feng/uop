@@ -16,7 +16,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.resources.handler import *
 from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
-from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig
+from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig,Approval
 from uop.resources.errors import resources_errors
 from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url
@@ -31,6 +31,7 @@ resources_api = Api(resources_blueprint, errors=resources_errors)
 
 
 class ResourceApplication(Resource):
+
     @classmethod
     def post(cls):
         parser = reqparse.RequestParser()
@@ -449,6 +450,7 @@ class ResourceApplication(Resource):
 
 
 class ResourceDetail(Resource):
+
     @classmethod
     def get(cls, res_id):
         result = {}
@@ -549,6 +551,25 @@ class ResourceDetail(Resource):
                 )
         result['resource_list'] = res
         result['compute_list'] = com
+        result['annotations'] = ""
+        try:
+            approvals=Approval.objects.filter(resource_id=res_id,approval_status__in=["success","approval_status"]).ordey_by('-created_date')
+        except Exception as e:
+            Log.logger.error(str(e))
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Approval find error."
+                }
+            }
+            return ret
+        if approvals:
+            approval=approvals[0]
+            annotations=approval.annotations
+            result['annotations'] = annotations
+
         code = 200
         ret = {
             'code': code,

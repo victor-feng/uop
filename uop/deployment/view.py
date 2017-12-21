@@ -18,6 +18,7 @@ from uop.log import Log
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
 class DeploymentListAPI(Resource):
+
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, location='args')
@@ -138,7 +139,8 @@ class DeploymentListAPI(Resource):
                     'disconf': disconf,
                     'database_password': deployment.database_password,
                     'is_deleted': deployment.is_deleted,
-                    'is_rollback': deployment.is_rollback
+                    'is_rollback': deployment.is_rollback,
+                    'approve_suggestion': deployment.approve_suggestion
                 })
         except Exception as e:
             res = {
@@ -200,6 +202,7 @@ class DeploymentListAPI(Resource):
             # 修改deploy_result状态为部署中
             deploy_obj = Deployment.objects.get(deploy_id=dep_id)
             deploy_obj.deploy_result = 'deploying'
+            deploy_obj.approve_suggestion = args.approve_suggestion
             deploy_obj.save()
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
             resource = ResourceModel.objects.get(res_id=args.resource_id)
@@ -294,6 +297,7 @@ class DeploymentListAPI(Resource):
             deploy_obj = Deployment.objects.get(deploy_id=args.dep_id)
             deploy_obj.approve_status = 'fail'
             deploy_obj.deploy_result = 'not_deployed'
+            deploy_obj.approve_suggestion = args.approve_suggestion
             deploy_obj.save()
             message = 'approve_forbid success'
             return message
@@ -1004,11 +1008,13 @@ class CapacityInfoAPI(Resource):
         deploy_id = args.deploy_id
         try:
             deployment = Deployment.objects.get(deploy_id=deploy_id)
+            approve_suggestion = deployment.approve_suggestion
             capacity_info = deployment.capacity_info
             if capacity_info:
                 capacity_info_dict = eval(capacity_info)
             else:
                 capacity_info_dict = {}
+            capacity_info_dict["approve_suggestion"]=approve_suggestion
         except Exception as e:
             res = {
                 "code": 400,
@@ -1087,11 +1093,6 @@ class RollBackAPI(Resource):
             # ------------------------
             new_deploy_name = deploy_name + '@' + deploy_type + '_' + datetime.datetime.now().strftime(
                 '%Y-%m-%d_%H:%M:%S')
-            # ------将当前回滚的版本号更新到resource表
-            # resource = ResourceModel.objects.get(res_id=res_id)
-            # resource.deploy_name = deploy_name
-            # resource.save()
-            # -------
             # 回滚新生成一条部署记录原来的部署记录保存
             deploy_item = Deployment(
                 deploy_id=approval_id,
