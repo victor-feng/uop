@@ -313,10 +313,6 @@ class DeploymentListAPI(Resource):
                 redis_context = write_file(uid, args.redis_context, 'redis')
             if args.mongodb_exe_mode == 'tag' and args.mongodb_context:
                 mongodb_context = write_file(uid, args.mongodb_context, 'mongodb')
-            # ------将当前部署的版本号更新到resource表
-            resource = ResourceModel.objects.get(res_id=args.resource_id)
-            resource.deploy_name = args.deploy_name
-            resource.save()
             # ------将部署信息更新到deployment表
             deploy_result = 'deploy_to_approve'
             deploy_type = 'deploy'
