@@ -403,22 +403,21 @@ class ResourceApplication(Resource):
 
     @classmethod
     def put(cls):
+        """
+        预留失败或者撤销时，重新申请时更新数据库
+        :return:
+        """
         parser = reqparse.RequestParser()
-        parser.add_argument('res_id', type=str)
-        parser.add_argument('action', type=str)
+        parser.add_argument('resource_list', type=list, location='json')
+        parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
-        res_id = args.res_id
-        action = args.action
         try:
-            resources = ResourceModel.objects.get(res_id=res_id)
-            if len(resources):
-                if action == 'delete':
-                    delete_time = datetime.datetime.now()
-                    resources.is_deleted = 1
-                    resources.deleted_date = delete_time
-                elif action == 'revoke':
-                    resources.is_deleted = 0
-                resources.save()
+            resource = ResourceModel.objects.get(res_id=args.res_id)
+            if resource:
+                resource.compute_list=args.compute_list
+                resource.resource_list=args.resource_list
+                resource.approval_status="processing"
+                resource.save()
             else:
                 ret = {
                     'code': 200,
@@ -715,6 +714,7 @@ class ResourceDetail(Resource):
                 if args.user_id == cur_id:  # 相同账户可以撤回或者删除自己的申请
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
+                        resources.approval_status="revoke"
                         resources.save()
                         ret = {
                             'code': 200,

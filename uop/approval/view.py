@@ -165,7 +165,14 @@ class ApprovalInfo(Resource):
 
 
 class Reservation(Resource):
+    """
+    预留审批
+    """
     def post(self):
+        """
+        预留审批通过，往crp发送数据
+        :return:
+        """
         code = 0
         res = ""
         msg = {}
@@ -295,6 +302,9 @@ class Reservation(Resource):
 
 
 class ReservationAPI(Resource):
+    """
+    预留失败时，重新预留往crp发送数据
+    """
     def put(self, res_id):
         code = 0
         res = ""
