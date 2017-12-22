@@ -408,15 +408,34 @@ class ResourceApplication(Resource):
         :return:
         """
         parser = reqparse.RequestParser()
+        parser.add_argument('resource_name', type=str)
+        parser.add_argument('project', type=str)
+        parser.add_argument('project_id', type=str)
+        parser.add_argument('department', type=str)
+        parser.add_argument('user_name', type=str)
+        parser.add_argument('user_id', type=str)
+        parser.add_argument('domain', type=str)
+        parser.add_argument('env', type=str)
+        parser.add_argument('formStatus', type=str)
+        parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         try:
             resource = ResourceModel.objects.get(res_id=args.res_id)
             if resource:
-                resource.compute_list=args.compute_list
-                resource.resource_list=args.resource_list
-                resource.approval_status="processing"
+                resource.resource_name=args.resource_name
+                resource.project=args.project
+                resource.project_id=args.project_id
+                resource.department=args.department
+                resource.user_name=args.user_name
+                resource.user_id=args.user_id
+                resource.domain=args.domain
+                resource.env=args.env
+                resource.application_status=args.formStatus
+                resource.approval_status = "processing"
+                resource.compute_list = args.compute_list
+                resource.resource_list = args.resource_list
                 resource.save()
             else:
                 ret = {
@@ -428,8 +447,7 @@ class ResourceApplication(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            # print e
-            Log.logger.error(str(e))
+            Log.logger.error(str(e.args))
             ret = {
                 'code': 500,
                 'result': {
