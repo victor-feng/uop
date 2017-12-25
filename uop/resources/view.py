@@ -336,7 +336,8 @@ class ResourceApplication(Resource):
                 'res': res
             }
         }
-        return jsonify(ret), code
+        ret=json.dumps(ret)
+        return ret, code
 
     @classmethod
     def delete(cls):
