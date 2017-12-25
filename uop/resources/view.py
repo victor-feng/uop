@@ -266,6 +266,7 @@ class ResourceApplication(Resource):
 
         result_list = []
         res={}
+        total_count=0
         try:
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
