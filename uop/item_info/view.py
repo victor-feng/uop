@@ -321,7 +321,7 @@ class BusinessProject(Resource):
         parser = reqparse.RequestParser()
         from config import APP_ENV
         tu = get_uid_token(APP_ENV)
-        Log.logger.info("uid:{}, token:{}".format(tu["id"], tu["token"]))
+        Log.logger.info("tu:{}".format(tu))
         return "success"
 
     def post(self):
