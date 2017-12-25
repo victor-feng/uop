@@ -213,6 +213,8 @@ class ResourceApplication(Resource):
             condition['user_name'] = args.name
         if args.env:
             condition['env'] = args.env
+        if args.instance_status:
+            condition["approval_status__in"] = ["success", "failed", "revoke"]
 
         if agg_by:
             pipeline = []
@@ -263,26 +265,10 @@ class ResourceApplication(Resource):
             total_count = 0
             if args.page_num and args.page_size:
                 skip_count = (args.page_num - 1) * args.page_size
-                if args.instance_status:
-                    if args.user_id:
-                        total_count=ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success","failed","revoke"]).count()
-                        resources = ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success","failed","revoke"]).order_by('-created_date').skip(
-                            skip_count).limit(args.page_size)
-                    else:
-                        total_count = ResourceModel.objects.filter(approval_status__in=["success", "failed","revoke"]).count()
-                        resources = ResourceModel.objects.filter(approval_status__in=["success", "failed", "revoke"]).order_by('-created_date').skip(
-                            skip_count).limit(args.page_size)
-                else:
-                    total_count=ResourceModel.objects.filter(**condition).count()
-                    resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(
-                        skip_count).limit(
-                        int(args.page_size))
+                total_count=ResourceModel.objects.filter(**condition).count()
+                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(args.page_size)
             else:
-                if args.instance_status:
-                    resources = ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success", "failed", "revoke"]).order_by(
-                    '-created_date')
-                else:
-                    resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+                resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
             res["total_count"]=total_count
         except Exception as e:
             err_msg=str(e.args)
