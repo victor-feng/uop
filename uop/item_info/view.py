@@ -319,7 +319,8 @@ class BusinessProject(Resource):
     '''
     def get(self):
         parser = reqparse.RequestParser()
-        tu = get_uid_token("dev")
+        from config import APP_ENV
+        tu = get_uid_token(APP_ENV)
         Log.logger.info("uid:{}, token:{}".format(tu["id"], tu["token"]))
         return "success"
 
