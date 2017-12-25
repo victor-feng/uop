@@ -267,7 +267,7 @@ class ResourceApplication(Resource):
         result_list = []
         res={}
         try:
-            #total_count = 0
+            total_count = 0
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
                 if args.instance_status:
@@ -297,7 +297,7 @@ class ResourceApplication(Resource):
                     'msg': "Resource find error.%s" % err_msg
                 }
             }
-            return ret
+            return jsonify(ret),500
         if len(resources):
             for res in resources:
                 result = dict()
@@ -336,7 +336,7 @@ class ResourceApplication(Resource):
                 'res': res
             }
         }
-        return ret, code
+        return jsonify(ret), code
 
     @classmethod
     def delete(cls):
