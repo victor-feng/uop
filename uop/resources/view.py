@@ -470,7 +470,7 @@ class ResourceApplication(Resource):
                 resource.resource_list=[]
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
-                    ins_id = str(uuid.uuid1())
+                    ins_id = compute.get('ins_id')
                     cpu = compute.get('cpu')
                     mem = compute.get('mem')
                     url = compute.get('url')
@@ -484,16 +484,16 @@ class ResourceApplication(Resource):
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                              health_check=health_check)
                     resource.compute_list.append(compute_ins)
-                for resource in resource_list:
-                    ins_name = resource.get('res_name', '未知名称')
-                    ins_id = str(uuid.uuid1())
-                    ins_type = resource.get('res_type')
-                    cpu = resource.get('cpu')
-                    mem = resource.get('mem')
-                    disk = resource.get('disk')
-                    quantity = resource.get('quantity')
-                    version = resource.get('version')
-                    volume_size = resource.get('volume_size', 0)
+                for res in resource_list:
+                    ins_name = res.get('res_name', '未知名称')
+                    ins_id = res.get('ins_id')
+                    ins_type = res.get('res_type')
+                    cpu = res.get('cpu')
+                    mem = res.get('mem')
+                    disk = res.get('disk')
+                    quantity = res.get('quantity')
+                    version = res.get('version')
+                    volume_size = res.get('volume_size', 0)
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size)
                     resource.resource_list.append(db_ins)
