@@ -268,16 +268,19 @@ class ResourceApplication(Resource):
         try:
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(
-                    int(args.page_size))
                 if args.instance_status:
                     resources = ResourceModel.objects.filter(approval_status__in=["success","failed","revoke"]).order_by('-created_date').skip(
                         skip_count).limit(int(args.page_size))
+                else:
+                    resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(
+                        skip_count).limit(
+                        int(args.page_size))
             else:
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
                 if args.instance_status:
                     resources = ResourceModel.objects.filter(approval_status__in=["success", "failed", "revoke"]).order_by(
                     '-created_date')
+                else:
+                    resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
         except Exception as e:
             Log.logger.error(str(e))
             # print e
