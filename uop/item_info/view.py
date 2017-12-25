@@ -318,13 +318,23 @@ class BusinessProject(Resource):
     -业务模块工程-    资源视图
     '''
     def get(self):
+        '''
+        根据？name=参数，返回相应的CMDB仓库数据
+        :return:
+        '''
         parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+        name = args.name
         from config import APP_ENV
-        tu = get_uid_token(APP_ENV)
-        Log.logger.info("tu:{}".format(tu))
+        #tu = get_uid_token(APP_ENV)["data"]
+        tu = get_uid_token(APP_ENV)["result"]
+        uid, token = tu["uid"], tu["token"]
+        Log.logger.info("uid:{}, token:{}, name:{}".format(uid, token, name))
         return "success"
 
     def post(self):
+        parser = reqparse.RequestParser()
         return "success"
 
 
