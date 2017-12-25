@@ -482,7 +482,7 @@ class ResourceApplication(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            err_msg=str(e.args)
+            err_msg=str(e)
             Log.logger.error(err_msg)
             ret = {
                 'code': 500,
