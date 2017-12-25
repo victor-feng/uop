@@ -20,7 +20,7 @@ def get_uid_token(dev, username="admin", password="admin123456", sign=""):
             "token":""
         }
     }
-    url = CMDB2_URL + "/cmdb/api/login/"
+    url = CMDB2_URL + "cmdb/api/login/"
     data = {
         "username": username,
         "password": password,
