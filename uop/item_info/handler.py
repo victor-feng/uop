@@ -35,4 +35,4 @@ def get_uid_token(dev, username="admin", password="admin123456", sign=""):
     except Exception as exc:
         uid_token["msg"] = str(exc)
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
-        return jsonify(uid_token)
+        return uid_token
