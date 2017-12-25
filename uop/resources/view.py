@@ -436,6 +436,7 @@ class ResourceApplication(Resource):
         :return:
         """
         parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str)
         parser.add_argument('resource_name', type=str)
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
