@@ -450,6 +450,7 @@ class ResourceApplication(Resource):
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
+        Log.logger.debug(args)
         try:
             resource = ResourceModel.objects.get(res_id=args.res_id)
             if resource:
@@ -476,12 +477,13 @@ class ResourceApplication(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            Log.logger.error(str(e.args))
+            err_msg=str(e.args)
+            Log.logger.error(err_msg)
             ret = {
                 'code': 500,
                 'result': {
                     'res': 'fail',
-                    'msg': 'Put resource application failed.'
+                    'msg': 'Put resource application failed. %s' % err_msg
                 }
             }
             return ret, 500
