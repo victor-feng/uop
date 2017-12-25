@@ -439,7 +439,8 @@ class ResourceApplication(Resource):
         user_id = args.user_id
         env = args.env
         application_status = args.formStatus
-        approval_status = "processing"
+        #approval_status = "processing"
+        approval_status = args.approval_status
         compute_list = args.compute_list
         resource_list = args.resource_list
         try:
