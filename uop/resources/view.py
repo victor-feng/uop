@@ -41,7 +41,6 @@ class ResourceApplication(Resource):
         parser.add_argument('department', type=str)
         parser.add_argument('user_name', type=str)
         parser.add_argument('user_id', type=str)
-        parser.add_argument('domain', type=str)
         parser.add_argument('env', type=str)
         parser.add_argument('formStatus', type=str)
         parser.add_argument('approval_status', type=str)
@@ -57,7 +56,6 @@ class ResourceApplication(Resource):
         res_id = str(uuid.uuid1())
         user_name = args.user_name
         user_id = args.user_id
-        domain = args.domain
         env = args.env
         created_date = datetime.datetime.now()
         application_status = args.formStatus
@@ -66,15 +64,11 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                              department_id=department_id, res_id=res_id, project_id=project_id,
-                                             user_name=user_name, user_id=user_id, domain=domain, env=env,
+                                             user_name=user_name, user_id=user_id,env=env,
                                              application_status=application_status, approval_status=approval_status,
                                              reservation_status="unreserved", created_date=created_date)
         for resource in resource_list:
-            # m = hashlib.md5()
             ins_name = resource.get('res_name', '未知名称')
-            # m.update(ins_name)
-            # ins_name = m.hexdigest()
-            # ins_id = resource.get('res_id')
             ins_id = str(uuid.uuid1())
             ins_type = resource.get('res_type')
             cpu = resource.get('cpu')
@@ -92,7 +86,6 @@ class ResourceApplication(Resource):
             for compute in compute_list:
                 ins_name = compute.get('ins_name')
                 ins_name_list.append(ins_name)
-                # ins_id = compute.get('ins_id')
                 ins_id = str(uuid.uuid1())
                 cpu = compute.get('cpu')
                 mem = compute.get('mem')
@@ -443,7 +436,6 @@ class ResourceApplication(Resource):
         parser.add_argument('department', type=str)
         parser.add_argument('user_name', type=str)
         parser.add_argument('user_id', type=str)
-        parser.add_argument('domain', type=str)
         parser.add_argument('env', type=str)
         parser.add_argument('formStatus', type=str)
         parser.add_argument('approval_status', type=str)
@@ -451,6 +443,7 @@ class ResourceApplication(Resource):
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         Log.logger.debug(args)
+        Log.logger.debug(args.resource_name)
         try:
             resource = ResourceModel.objects.get(res_id=args.res_id)
             if resource:
@@ -460,7 +453,6 @@ class ResourceApplication(Resource):
                 resource.department=args.department
                 resource.user_name=args.user_name
                 resource.user_id=args.user_id
-                resource.domain=args.domain
                 resource.env=args.env
                 resource.application_status=args.formStatus
                 resource.approval_status = "processing"
