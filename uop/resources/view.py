@@ -454,6 +454,7 @@ class ResourceApplication(Resource):
                 resource.env=env
                 resource.application_status=application_status
                 resource.approval_status = approval_status
+                resource.is_rollback = 0
                 resource.compute_list=[]
                 resource.resource_list=[]
                 for compute in compute_list:
