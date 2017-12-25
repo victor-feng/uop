@@ -271,9 +271,14 @@ class ResourceApplication(Resource):
             if args.page_num and args.page_size:
                 skip_count = (args.page_num - 1) * args.page_size
                 if args.instance_status:
-                    total_count=ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success","failed","revoke"]).count()
-                    resources = ResourceModel.objects.filter(approval_status__in=["success","failed","revoke"]).order_by('-created_date').skip(
-                        skip_count).limit(args.page_size)
+                    if args.user_id:
+                        total_count=ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success","failed","revoke"]).count()
+                        resources = ResourceModel.objects.filter(user_id=args.user_id,approval_status__in=["success","failed","revoke"]).order_by('-created_date').skip(
+                            skip_count).limit(args.page_size)
+                    else:
+                        total_count = ResourceModel.objects.filter(approval_status__in=["success", "failed","revoke"]).count()
+                        resources = ResourceModel.objects.filter(approval_status__in=["success", "failed", "revoke"]).order_by('-created_date').skip(
+                            skip_count).limit(args.page_size)
                 else:
                     total_count=ResourceModel.objects.filter(**condition).count()
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(
