@@ -193,8 +193,8 @@ class ResourceApplication(Resource):
         parser.add_argument('approval_status', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
         parser.add_argument('env', type=str, location='args')
-        parser.add_argument('page_num', type=str, location='args')
-        parser.add_argument('page_size', type=str, location='args')
+        parser.add_argument('page_num', type=int, location='args')
+        parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('instance_status', type=str, location='args')
 
         args = parser.parse_args()
