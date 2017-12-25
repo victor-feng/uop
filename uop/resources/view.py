@@ -265,7 +265,7 @@ class ResourceApplication(Resource):
             return ret, code
 
         result_list = []
-        resutls={}
+        res={}
         try:
             total_count = 0
             if args.page_num and args.page_size:
@@ -285,7 +285,7 @@ class ResourceApplication(Resource):
                     '-created_date')
                 else:
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
-            resutls["total_count"]=total_count
+            res["total_count"]=total_count
         except Exception as e:
             err_msg=str(e.args)
             Log.logger.error(err_msg)
@@ -299,20 +299,20 @@ class ResourceApplication(Resource):
             }
             return ret,500
         if len(resources):
-            for res in resources:
+            for resource in resources:
                 result = dict()
-                result['name'] = res.user_name
-                result['date'] = str(res.created_date)
-                result['resource'] = res.resource_name
-                result['formStatus'] = res.application_status
-                result['approval_status'] = res.approval_status
-                result['project'] = res.project
-                result['project_id'] = res.project_id
-                result['id'] = res.res_id
-                result['reservation_status'] = res.reservation_status
-                result['env'] = res.env
-                result['is_rollback'] = res.is_rollback
-                resource_id = res.res_id
+                result['name'] = resource.user_name
+                result['date'] = str(resource.created_date)
+                result['resource'] = resource.resource_name
+                result['formStatus'] = resource.application_status
+                result['approval_status'] = resource.approval_status
+                result['project'] = resource.project
+                result['project_id'] = resource.project_id
+                result['id'] = resource.res_id
+                result['reservation_status'] = resource.reservation_status
+                result['env'] = resource.env
+                result['is_rollback'] = resource.is_rollback
+                resource_id = resource.res_id
                 deploys = Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
                     dep = deploys[0]
@@ -327,13 +327,13 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
-            resutls["result_list"]=result_list
+            res["result_list"]=result_list
         code = 200
         ret = {
             'code': code,
             'result': {
                 'msg': 'success',
-                'res': resutls
+                'res': res
             }
         }
         return ret, code
