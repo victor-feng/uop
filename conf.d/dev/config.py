@@ -29,6 +29,7 @@ class DevelopmentConfig(BaseConfig):
         'prod': PROD_CRP_URL,
     }
     CMDB_URL = "http://cmdb-dev.syswin.com/"
+    CMDB2_URL = "http://cmdb2-demo.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"
 
