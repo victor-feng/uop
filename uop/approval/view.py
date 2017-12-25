@@ -103,6 +103,7 @@ class ApprovalInfo(Resource):
                 else:
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
+                    resource.reservation_status = "approval_fail"
                 approval.save()
                 if docker_network_id:
                     resource.docker_network_id = docker_network_id.strip()
