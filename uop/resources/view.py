@@ -267,7 +267,7 @@ class ResourceApplication(Resource):
         result_list = []
         res={}
         try:
-            total_count = 0
+            #total_count = 0
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
                 if args.instance_status:
@@ -287,13 +287,14 @@ class ResourceApplication(Resource):
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
             res["total_count"]=total_count
         except Exception as e:
-            Log.logger.error(str(e.args))
+            err_msg=str(e.args)
+            Log.logger.error(err_msg)
             code = 500
             ret = {
                 'code': code,
                 'result': {
                     'res': 'failed',
-                    'msg': "Resource find error."
+                    'msg': "Resource find error.%s" % err_msg
                 }
             }
             return ret
