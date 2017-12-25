@@ -36,6 +36,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('resource_id', type=str, location='args')
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
+        parser.add_argument('department', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -63,6 +64,8 @@ class DeploymentListAPI(Resource):
             condition['created_time__lte'] = args.end_time
         if args.approve_status:
             condition['approve_status'] = args.approve_status
+        if args.department:
+            condition["department"]=args.department
         if args.resource_id:
             resource_id = args.resource_id
             condition['resource_id'] = resource_id
@@ -205,6 +208,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('dep_id', type=str, location='json')
         parser.add_argument('disconf', type=list, location='json')
         parser.add_argument('database_password', type=str, location='json')
+        parser.add_argument('department', type=str, location='args')
 
         args = parser.parse_args()
         action = args.action
@@ -360,6 +364,7 @@ class DeploymentListAPI(Resource):
                 approve_suggestion=args.approve_suggestion,
                 database_password=args.database_password,
                 deploy_type=deploy_type,
+                department=args.department,
             )
 
             for instance_info in args.disconf:
@@ -818,16 +823,16 @@ class CapacityAPI(Resource):
         parser.add_argument('cluster_id', type=str)
         parser.add_argument('number', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('department_id', type=str)
-        parser.add_argument('creator_id', type=str)
+        parser.add_argument('department', type=str)
+        parser.add_argument('user_id', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('initiator', type=str)
         parser.add_argument('project_name', type=str)
 
         args = parser.parse_args()
         project_id = args.project_id
-        department_id = args.department_id
-        creator_id = args.creator_id
+        department = args.department
+        user_id = args.user_id
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
@@ -899,12 +904,13 @@ class CapacityAPI(Resource):
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
                                 capacity_info=capacity_info_str,
-                                deploy_type=deploy_type
+                                deploy_type=deploy_type,
+                                department=args.department,
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id, deploy_id=approval_id,
-                                 project_id=project_id, department_id=department_id,
-                                 creator_id=creator_id, create_date=create_date,
+                                 project_id=project_id, department=department,
+                                 user_id=user_id, create_date=create_date,
                                  approval_status=approval_status, capacity_status=capacity_status).save()
             else:
                 ret = {
@@ -1076,15 +1082,15 @@ class RollBackAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_name', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('department_id', type=str)
-        parser.add_argument('creator_id', type=str)
+        parser.add_argument('department', type=str)
+        parser.add_argument('user_id', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('initiator', type=str)
         parser.add_argument('project_name', type=str)
         args = parser.parse_args()
         project_id = args.project_id
-        department_id = args.department_id
-        creator_id = args.creator_id
+        department = args.department
+        user_id = args.user_id
         res_id = args.res_id
         initiator = args.initiator
         project_name = args.project_name
@@ -1129,14 +1135,15 @@ class RollBackAPI(Resource):
                 approve_suggestion="",
                 database_password=old_deployment.database_password,
                 disconf_list=old_deployment.disconf_list,
-                deploy_type=deploy_type
+                deploy_type=deploy_type,
+                department = department,
             )
             deploy_item.save()
 
             # 将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id, deploy_id=deploy_id,
-                     project_id=project_id, department_id=department_id,
-                     creator_id=creator_id, create_date=create_date,
+                     project_id=project_id, department=department,
+                     user_id=user_id, create_date=create_date,
                      approval_status=approval_status).save()
         except Exception as e:
             Log.logger.debug(e)

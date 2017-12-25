@@ -189,6 +189,7 @@ class ResourceApplication(Resource):
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('instance_status', type=str, location='args')
+        parser.add_argument('department', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -215,6 +216,8 @@ class ResourceApplication(Resource):
             condition['env'] = args.env
         if args.instance_status:
             condition["approval_status__in"] = ["success", "failed", "revoke"]
+        if args.department:
+            condition["department"]=args.department
 
         if agg_by:
             pipeline = []
@@ -262,10 +265,9 @@ class ResourceApplication(Resource):
         result_list = []
         res={}
         try:
-            total_count = 0
+            total_count = ResourceModel.objects.filter(**condition).count()
             if args.page_num and args.page_size:
                 skip_count = (args.page_num - 1) * args.page_size
-                total_count=ResourceModel.objects.filter(**condition).count()
                 resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(args.page_size)
             else:
                 resources = ResourceModel.objects.filter(**condition).order_by('-created_date')

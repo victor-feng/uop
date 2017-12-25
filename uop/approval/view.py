@@ -30,23 +30,23 @@ class ApprovalList(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('resource_id', type=str)
             parser.add_argument('project_id', type=str)
-            parser.add_argument('department_id', type=str)
-            parser.add_argument('creator_id', type=str)
+            parser.add_argument('department', type=str)
+            parser.add_argument('user_id', type=str)
             args = parser.parse_args()
 
             approval_id = str(uuid.uuid1())
             resource_id = args.resource_id
             project_id = args.project_id
-            department_id = args.department_id
-            creator_id = args.creator_id
+            department = args.department
+            user_id = args.user_id
             create_date = datetime.datetime.now()
             # approve_uid
             # approve_date
             # annotations
             approval_status = "processing"
             models.Approval(approval_id=approval_id, resource_id=resource_id,
-                            project_id=project_id, department_id=department_id,
-                            creator_id=creator_id, create_date=create_date,
+                            project_id=project_id, department=department,
+                            user_id=user_id, create_date=create_date,
                             approval_status=approval_status).save()
 
             resource = models.ResourceModel.objects.get(res_id=resource_id)
