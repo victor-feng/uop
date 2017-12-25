@@ -470,7 +470,7 @@ class ResourceApplication(Resource):
                 resource.resource_list=[]
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
-                    ins_id = compute.get('ins_id')
+                    ins_id = str(uuid.uuid1())
                     cpu = compute.get('cpu')
                     mem = compute.get('mem')
                     url = compute.get('url')
@@ -486,7 +486,7 @@ class ResourceApplication(Resource):
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
-                    ins_id = res.get('ins_id')
+                    ins_id = str(uuid.uuid1())
                     ins_type = res.get('res_type')
                     cpu = res.get('cpu')
                     mem = res.get('mem')
