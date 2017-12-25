@@ -444,20 +444,32 @@ class ResourceApplication(Resource):
         args = parser.parse_args()
         Log.logger.debug(args)
         Log.logger.debug(args.resource_name)
+        res_id = args.res_id
+        resource_name = args.resource_name
+        project = args.project
+        project_id = args.project_id
+        department = args.department
+        user_name = args.user_name
+        user_id = args.user_id
+        env = args.env
+        application_status = args.formStatus
+        approval_status = "processing"
+        compute_list = args.compute_list
+        resource_list = args.resource_list
         try:
             resource = ResourceModel.objects.get(res_id=args.res_id)
             if resource:
-                resource.resource_name=args.resource_name
-                resource.project=args.project
-                resource.project_id=args.project_id
-                resource.department=args.department
-                resource.user_name=args.user_name
-                resource.user_id=args.user_id
-                resource.env=args.env
-                resource.application_status=args.formStatus
-                resource.approval_status = "processing"
-                resource.compute_list = args.compute_list
-                resource.resource_list = args.resource_list
+                resource.resource_name=resource_name
+                resource.project=project
+                resource.project_id=project_id
+                resource.department=department
+                resource.user_name=user_name
+                resource.user_id=user_id
+                resource.env=env
+                resource.application_status=application_status
+                resource.approval_status = approval_status
+                resource.compute_list = compute_list
+                resource.resource_list = resource_list
                 resource.save()
             else:
                 ret = {
