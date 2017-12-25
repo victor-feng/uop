@@ -444,6 +444,7 @@ class ResourceApplication(Resource):
         args = parser.parse_args()
         Log.logger.debug(args)
         Log.logger.debug(args.resource_name)
+        Log.logger.debug(type(args.resource_name))
         res_id = args.res_id
         resource_name = args.resource_name
         project = args.project
@@ -457,7 +458,7 @@ class ResourceApplication(Resource):
         compute_list = args.compute_list
         resource_list = args.resource_list
         try:
-            resource = ResourceModel.objects.get(res_id=args.res_id)
+            resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
                 resource.resource_name=resource_name
                 resource.project=project
