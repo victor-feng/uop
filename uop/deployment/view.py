@@ -76,13 +76,16 @@ class DeploymentListAPI(Resource):
                     if domain_ip:
                         domain_info.append(ins_id)
         deployments = []
+        res={}
         try:
+            total_count=Deployment.objects.filter(**condition).count()
+            res["total_count"]=total_count
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
                 Deployments = Deployment.objects.filter(**condition).order_by('-created_time').skip(skip_count).limit(
                     int(args.page_size))
             else:
-                Deployments=Deployment.objects.filter(**condition).order_by('-created_time')
+                Deployments = Deployment.objects.filter(**condition).order_by('-created_time')
             for deployment in Deployments:
                 # 返回disconf的json
                 disconf = []
@@ -150,17 +153,25 @@ class DeploymentListAPI(Resource):
                     'is_rollback': deployment.is_rollback,
                     'approve_suggestion': deployment.approve_suggestion
                 })
+                res["deployments"]=deployments
         except Exception as e:
-            res = {
+            ret = {
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": e.message
+                    "msg": str(e.args)
                 }
             }
-            return res, 400
+            return ret, 400
         else:
-            return deployments, 200
+            ret = {
+                "code": 200,
+                "result": {
+                    "res": res,
+                    "msg": "success"
+                }
+            }
+            return ret, 200
 
     def post(self):
         parser = reqparse.RequestParser()

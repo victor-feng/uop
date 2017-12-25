@@ -265,13 +265,16 @@ class ResourceApplication(Resource):
             return ret, code
 
         result_list = []
+        res={}
         try:
             if args.page_num and args.page_size:
                 skip_count = (int(args.page_num) - 1) * int(args.page_size)
                 if args.instance_status:
+                    total_count=ResourceModel.objects.filter(approval_status__in=["success","failed","revoke"]).count()
                     resources = ResourceModel.objects.filter(approval_status__in=["success","failed","revoke"]).order_by('-created_date').skip(
                         skip_count).limit(int(args.page_size))
                 else:
+                    total_count=ResourceModel.objects.filter(**condition).count()
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(
                         skip_count).limit(
                         int(args.page_size))
@@ -281,14 +284,14 @@ class ResourceApplication(Resource):
                     '-created_date')
                 else:
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+            res["total_count"]=total_count
         except Exception as e:
-            Log.logger.error(str(e))
-            # print e
+            Log.logger.error(str(e.args))
             code = 500
             ret = {
                 'code': code,
                 'result': {
-                    'res': 'fail',
+                    'res': 'failed',
                     'msg': "Resource find error."
                 }
             }
@@ -322,12 +325,13 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
+                res["result_list"]=result_list
         code = 200
         ret = {
             'code': code,
             'result': {
-                'res': 'success',
-                'msg': result_list
+                'msg': 'success',
+                'res': res
             }
         }
         return ret, code
