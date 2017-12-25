@@ -336,6 +336,8 @@ class ResourceApplication(Resource):
                 'res': res
             }
         }
+        Log.logger.error("-------------------------------------------1111111111------------------------")
+        Log.logger.error(ret)
         ret=json.dumps(ret)
         return ret, code
 
