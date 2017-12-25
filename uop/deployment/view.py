@@ -34,6 +34,8 @@ class DeploymentListAPI(Resource):
         parser.add_argument('end_time', type=str, location='args')
         parser.add_argument('approve_status', type=str, location='args')
         parser.add_argument('resource_id', type=str, location='args')
+        parser.add_argument('page_num', type=str, location='args')
+        parser.add_argument('page_size', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -75,7 +77,13 @@ class DeploymentListAPI(Resource):
                         domain_info.append(ins_id)
         deployments = []
         try:
-            for deployment in Deployment.objects.filter(**condition).order_by('-created_time'):
+            if args.page_num and args.page_size:
+                skip_count = (int(args.page_num) - 1) * int(args.page_size)
+                Deployments = Deployment.objects.filter(**condition).order_by('-created_time').skip(skip_count).limit(
+                    int(args.page_size))
+            else:
+                Deployments=Deployment.objects.filter(**condition).order_by('-created_time')
+            for deployment in Deployments:
                 # 返回disconf的json
                 disconf = []
                 for disconf_info in deployment.disconf_list:
