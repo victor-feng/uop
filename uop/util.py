@@ -2,10 +2,13 @@
 
 from flask import current_app
 import IPy
+import time
 import requests
 import json
 from uop.models import NetWorkConfig
 import threading
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 def async(fun):
     def wraps(*args, **kwargs):
@@ -66,3 +69,54 @@ def check_network_use(env):
                 break
     return network_id
 
+class TimeToolkit(object):
+    @staticmethod
+    def utctimestamp2str(utctimestamp):
+        utcs = float(utctimestamp) / 1000
+        time_array = time.localtime(utcs)
+        utc_time = time.strftime("%Y-%m-%d %H:%M:%S", time_array)
+        datetime_time = datetime.strptime(utc_time, "%Y-%m-%d %H:%M:%S")
+        _localtime = datetime_time + timedelta(hours=8)
+        localtime = datetime.strftime(_localtime, "%Y-%m-%d %H:%M:%S")
+
+        return localtime
+
+    @staticmethod
+    def utctimestamp2local(utctimestamp):
+        utcs = long(utctimestamp) / 1000
+        time_array = time.localtime(utcs)
+        utc_time = time.strftime("%Y-%m-%d %H:%M:%S", time_array)
+        datetime_time = datetime.strptime(utc_time, "%Y-%m-%d %H:%M:%S")
+        localtime = datetime_time + timedelta(hours=8)
+
+        return localtime
+
+    @staticmethod
+    def timestramp2local(timestrap):
+        _timestrap = long(timestrap)
+        time_array = time.localtime(_timestrap)
+        utc_time = time.strftime("%Y-%m-%d %H:%M:%S", time_array)
+        datetime_time = datetime.strptime(utc_time, "%Y-%m-%d %H:%M:%S")
+
+        return datetime_time
+
+    @staticmethod
+    def get_utc_milli_ts():
+        return long(time.mktime(datetime.utcnow().timetuple())) * 1000
+
+    @staticmethod
+    def local2utctimestamp(dt, duration=None, flag=None):
+        if duration:
+            delta = dt + relativedelta(months=int(duration))
+        else:
+            delta = dt
+        print delta
+        if flag:
+            utc_delta = delta
+        else:
+            utc_delta = delta + timedelta(hours=-8)
+        print utc_delta
+        utc_delta_tuple = utc_delta.timetuple()
+        print utc_delta_tuple
+        utc_timestramp = long(time.mktime(utc_delta_tuple))
+        return utc_timestramp

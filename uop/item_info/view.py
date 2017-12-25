@@ -9,7 +9,7 @@ from flask import current_app
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 from uop.models import ItemInformation, ResourceModel
-
+from uop.item_info.handler import get_uid_token
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -313,7 +313,23 @@ class CheckImageUrl(Resource):
         return ret, code
 
 
+class BusinessProject(Resource):
+    '''
+    -业务模块工程-    资源视图
+    '''
+    def get(self):
+        parser = reqparse.RequestParser()
+        tu = get_uid_token("dev")
+        Log.logger.info("uid:{}, token:{}".format(tu["id"], tu["token"]))
+        return "success"
+
+    def post(self):
+        return "success"
+
+
+
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
 iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
 iteminfo_api.add_resource(CheckImageUrl, '/check_image_url')
+iteminfo_api.add_resource(BusinessProject, '/cmdbinfo')
