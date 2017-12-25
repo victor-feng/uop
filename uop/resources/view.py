@@ -442,9 +442,6 @@ class ResourceApplication(Resource):
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
-        Log.logger.debug(args)
-        Log.logger.debug(args.resource_name)
-        Log.logger.debug(type(args.resource_name))
         res_id = args.res_id
         resource_name = args.resource_name
         project = args.project
@@ -469,8 +466,37 @@ class ResourceApplication(Resource):
                 resource.env=env
                 resource.application_status=application_status
                 resource.approval_status = approval_status
-                resource.compute_list = compute_list
-                resource.resource_list = resource_list
+                resource.compute_list=[]
+                resource.resource_list=[]
+                for compute in compute_list:
+                    ins_name = compute.get('ins_name')
+                    ins_id = str(uuid.uuid1())
+                    cpu = compute.get('cpu')
+                    mem = compute.get('mem')
+                    url = compute.get('url')
+                    domain = compute.get('domain')
+                    domain_ip = compute.get('domain_ip')
+                    quantity = compute.get('quantity')
+                    port = compute.get('port')
+                    meta_str = compute.get('meta')
+                    health_check = compute.get('health_check', 0)
+                    compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
+                                             domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
+                                             health_check=health_check)
+                    resource.compute_list.append(compute_ins)
+                for resource in resource_list:
+                    ins_name = resource.get('res_name', '未知名称')
+                    ins_id = str(uuid.uuid1())
+                    ins_type = resource.get('res_type')
+                    cpu = resource.get('cpu')
+                    mem = resource.get('mem')
+                    disk = resource.get('disk')
+                    quantity = resource.get('quantity')
+                    version = resource.get('version')
+                    volume_size = resource.get('volume_size', 0)
+                    db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
+                                   quantity=quantity, version=version, volume_size=volume_size)
+                    resource.resource_list.append(db_ins)
                 resource.save()
             else:
                 ret = {
