@@ -86,9 +86,10 @@ class ApprovalInfo(Resource):
             parser.add_argument('mongodb_network_id', type=str)
             args = parser.parse_args()
 
-            approval = models.Approval.objects.filter(capacity_status="res").get(resource_id=res_id)
+            approvals = models.Approval.objects.filter(capacity_status="res",resource_id=res_id).order_by("-create_date")
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            if approval:
+            if approvals:
+                approval=approvals[0]
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
