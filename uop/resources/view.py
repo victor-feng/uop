@@ -265,7 +265,7 @@ class ResourceApplication(Resource):
             return ret, code
 
         result_list = []
-        res={}
+        resutls={}
         try:
             total_count = 0
             if args.page_num and args.page_size:
@@ -285,7 +285,7 @@ class ResourceApplication(Resource):
                     '-created_date')
                 else:
                     resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
-            res["total_count"]=total_count
+            resutls["total_count"]=total_count
         except Exception as e:
             err_msg=str(e.args)
             Log.logger.error(err_msg)
@@ -297,7 +297,7 @@ class ResourceApplication(Resource):
                     'msg': "Resource find error.%s" % err_msg
                 }
             }
-            return jsonify(ret),500
+            return ret,500
         if len(resources):
             for res in resources:
                 result = dict()
@@ -327,18 +327,15 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
-            res["result_list"]=result_list
+            resutls["result_list"]=result_list
         code = 200
         ret = {
             'code': code,
             'result': {
                 'msg': 'success',
-                'res': res
+                'res': resutls
             }
         }
-        Log.logger.error("-------------------------------------------1111111111------------------------")
-        Log.logger.error(ret)
-        ret=json.dumps(ret)
         return ret, code
 
     @classmethod
