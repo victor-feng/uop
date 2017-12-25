@@ -783,6 +783,7 @@ class ResourceDetail(Resource):
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
                         resources.approval_status="revoke"
+                        resources.reservation_status = "revoke"
                         resources.save()
                         ret = {
                             'code': 200,
