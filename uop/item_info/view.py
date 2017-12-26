@@ -47,13 +47,11 @@ class ItemInfo(Resource):
                 condition["item_name"] = args.item_name
             if args.item_code:
                 condition["item_code"] = args.item_code
-            if args.depart:
-                condition["item_depart"] = args.depart
+            if args.department:
+                condition["item_depart"] = args.department
             if args.start_time and args.end_time:
                 condition['create_date__gte'] = args.start_time
                 condition['create_date__lt'] = args.end_time
-            if args.department:
-                condition["department"] = args.department
             res={}
             try:
                 total_count=ItemInformation.objects.filter(**condition).count()
