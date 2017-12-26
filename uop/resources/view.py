@@ -313,7 +313,7 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
-            res["result_list"]=result_list
+        res["result_list"]=result_list
         code = 200
         ret = {
             'code': code,
