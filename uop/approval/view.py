@@ -120,7 +120,7 @@ class ApprovalInfo(Resource):
                 res = "A resource with that ID no longer exists"
         except Exception as e:
             code = 500
-            res = "Failed to approve the resource."
+            res = "Failed to approve the resource. %s" %str(e)
         finally:
             ret = {
                 "code": code,
