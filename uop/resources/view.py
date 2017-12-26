@@ -22,7 +22,9 @@ from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
 from uop.log import Log
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
