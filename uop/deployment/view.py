@@ -581,7 +581,7 @@ class DeploymentListAPI(Resource):
         args = parser.parse_args()
         resource_id = args.resource_id
         try:
-            deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            deploys = Deployment.objects.filter(resource_id=resource_id,deploy_result="deploy_fail").order_by('-created_time')
             if deploys:
                 deploy=deploys[0]
                 environment=deploy.environment
