@@ -256,24 +256,7 @@ class DeploymentListAPI(Resource):
             appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
 
             # 2、把配置推送到disconf
-            disconf_server_info = []
-            for disconf_info in deploy_obj.disconf_list:
-                if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
-                    continue
-                else:
-                    server_info = {'disconf_server_name': disconf_info.disconf_server_name,
-                                   'disconf_server_url': disconf_info.disconf_server_url,
-                                   'disconf_server_user': disconf_info.disconf_server_user,
-                                   'disconf_server_password': disconf_info.disconf_server_password,
-                                   'disconf_admin_content': disconf_info.disconf_admin_content,
-                                   'disconf_content': disconf_info.disconf_content,
-                                   'disconf_env': disconf_info.disconf_env,
-                                   'disconf_version': disconf_info.disconf_version,
-                                   'ins_name': disconf_info.ins_name,
-                                   'disconf_app_name': disconf_info.disconf_app_name,
-                                   }
-                    disconf_server_info.append(server_info)
-
+            disconf_server_info = deal_disconf_info(deploy_obj)
             ##推送到crp
             deploy_obj.approve_status = 'success'
             err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
