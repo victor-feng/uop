@@ -391,6 +391,7 @@ def deal_disconf_info(deploy_obj):
                            'disconf_app_name': disconf_info.disconf_app_name,
                            }
                 disconf_server_info.append(server_info)
+        return disconf_server_info
     except Exception as e:
         Log.logger.error("deal disconf info error %s" % str(e))
         return disconf_server_info
