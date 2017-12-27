@@ -584,16 +584,16 @@ class DeploymentListAPI(Resource):
             deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
             if deploys:
                 deploy=deploys[0]
-                deploy_name=deploy.deploy_name
                 #更新状态
                 deploy.deploy_result = 'deploying'
                 deploy.save()
                 #获取disconf信息
                 disconf_server_info=deal_disconf_info(deploy)
                 # 将computer信息如IP，更新到数据库
+                app_image=eval(deploy.app_image)
                 resource = ResourceModel.objects.get(res_id=args.resource_id)
                 cmdb_url = current_app.config['CMDB_URL']
-                appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+                appinfo = attach_domain_ip(app_image, resource, cmdb_url)
                 ##推送到crp
                 deploy.approve_status = 'success'
                 err_msg, resource_info = get_resource_by_id(deploy.resource_id)
