@@ -824,7 +824,7 @@ class RollBackReservation(Resource):
             data["mysql"] = []
             data["mongodb"] = []
             data["dns"] = []
-            data["disconf_server_info"] = disconf_server_info
+            data["disconf_server_info"] =[]
             data["deploy_id"] = deploy_id
             data["deploy_type"] = "rollback"
             CPR_URL = get_CRP_url(env)
