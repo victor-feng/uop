@@ -365,3 +365,32 @@ def attach_domain_ip(compute_list, res, cmdb_url):
     except Exception as e:
         Log.logger.error("attach domain_ip to appinfo error:{}".format(e.args))
         return appinfo
+
+
+def deal_disconf_info(deploy_obj):
+    """
+    处理disconf的相关信息
+    :param deploy_obj:
+    :return:
+    """
+    disconf_server_info = []
+    try:
+        for disconf_info in deploy_obj.disconf_list:
+            if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
+                continue
+            else:
+                server_info = {'disconf_server_name': disconf_info.disconf_server_name,
+                           'disconf_server_url': disconf_info.disconf_server_url,
+                           'disconf_server_user': disconf_info.disconf_server_user,
+                           'disconf_server_password': disconf_info.disconf_server_password,
+                           'disconf_admin_content': disconf_info.disconf_admin_content,
+                           'disconf_content': disconf_info.disconf_content,
+                           'disconf_env': disconf_info.disconf_env,
+                           'disconf_version': disconf_info.disconf_version,
+                           'ins_name': disconf_info.ins_name,
+                           'disconf_app_name': disconf_info.disconf_app_name,
+                           }
+                disconf_server_info.append(server_info)
+    except Exception as e:
+        Log.logger.error("deal disconf info error %s" % str(e))
+        return disconf_server_info

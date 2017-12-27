@@ -8,11 +8,11 @@ from flask import request, send_from_directory, jsonify
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import  ResourceModel, DisconfIns, ComputeIns, Deployment, Approval, Capacity, NetWorkConfig
+from uop.models import  ResourceModel, DisconfIns, Deployment, Approval, Capacity, NetWorkConfig
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
-from uop.deployment.handler import format_resource_info, get_resource_by_id, get_resource_by_id_mult, deploy_to_crp, upload_disconf_files_to_crp, disconf_write_to_file, attach_domain_ip
+from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip
 from uop.log import Log
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
@@ -212,8 +212,8 @@ class DeploymentListAPI(Resource):
 
         args = parser.parse_args()
         action = args.action
-        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         def write_file(uid, context, type):
             path = os.path.join(UPLOAD_FOLDER, type, 'script_' + uid)
             with open(path, 'wb') as f:
@@ -273,29 +273,6 @@ class DeploymentListAPI(Resource):
                                    'disconf_app_name': disconf_info.disconf_app_name,
                                    }
                     disconf_server_info.append(server_info)
-                    '''
-                    server_info = {'disconf_server_name':'172.28.11.111',
-                                   'disconf_server_url':'http://172.28.11.111:8081',
-                                   'disconf_server_user':'admin',
-                                   'disconf_server_password':'admin',
-                                   }
-
-                    disconf_api_connect = DisconfServerApi(server_info)
-                    if disconf_info.disconf_env.isdigit():
-                        env_id = disconf_info.disconf_env
-                    else:
-                        env_id = disconf_api_connect.disconf_env_id(env_name=disconf_info.disconf_env)
-                    result,message = disconf_api_connect.disconf_add_app_config_api_file(
-                                                    app_name=disconf_info.ins_name,
-                                                    myfilerar=disconf_admin_name,
-                                                    version=disconf_info.disconf_version,
-                                                    env_id=env_id
-                                                    )
-
-                disconf_result.append(dict(result=result,message=message))
-                    '''
-            # message = disconf_result
-            # message = disconf_server_info
 
             ##推送到crp
             deploy_obj.approve_status = 'success'
@@ -601,27 +578,45 @@ class DeploymentListAPI(Resource):
     def put(cls):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str)
-        parser.add_argument('action', type=str)
-        parser.add_argument('user', type=str)
         args = parser.parse_args()
         deploy_id = args.deploy_id
-        user = args.user
-        action = args.action
-
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
-            if len(deploy):
-                if action == 'delete':
-                    delete_time = datetime.datetime.now()
-                    deploy.is_deleted = 1
-                    deploy.deleted_time = delete_time
-                elif action == 'revoke':
-                    deploy.is_deleted = 0
+            if deploy:
+                deploy_name=deploy.deploy_name
+                #更新状态
+                deploy_obj = Deployment.objects.get(deploy_id=deploy_id)
+                deploy_obj.deploy_result = 'deploying'
+                deploy_obj.save()
+                # 管理员审批通过后修改resource表deploy_name,更新当前版本
+                resource = ResourceModel.objects.get(res_id=deploy.resource_id)
+                resource.deploy_name = deploy_name
+                resource.save()
+                #获取disconf信息
+                disconf_server_info=deal_disconf_info(deploy)
+                # 将computer信息如IP，更新到数据库
+                deploy.app_image = str(args.app_image)
+                deploy.save()
+                resource = ResourceModel.objects.get(res_id=args.resource_id)
+                cmdb_url = current_app.config['CMDB_URL']
+                appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+                ##推送到crp
+                deploy.approve_status = 'success'
+                err_msg, resource_info = get_resource_by_id(deploy.resource_id)
+                if not err_msg:
+                    err_msg, result = deploy_to_crp(deploy,
+                                                    args.environment,
+                                                    resource_info,
+                                                    args.resource_name,
+                                                    args.database_password,
+                                                    appinfo, disconf_server_info)
+                    if err_msg:
+                        deploy.deploy_result = 'deploy_fail'
                 deploy.save()
 
             else:
                 ret = {
-                    'code': 200,
+                    'code': 400,
                     'result': {
                         'res': 'success',
                         'msg': 'deployment not found.'
@@ -629,12 +624,13 @@ class DeploymentListAPI(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            Log.logger.error(str(e))
+            err_msg=str(e)
+            Log.logger.error(err_msg)
             ret = {
                 'code': 500,
                 'result': {
                     'res': 'fail',
-                    'msg': 'Put deployment  application failed.'
+                    'msg': 'Put deployment application failed. %s ' % err_msg
                 }
             }
             return ret, 500

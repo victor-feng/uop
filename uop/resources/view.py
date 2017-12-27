@@ -492,7 +492,7 @@ class ResourceApplication(Resource):
                 resource.save()
             else:
                 ret = {
-                    'code': 200,
+                    'code': 400,
                     'result': {
                         'res': 'success',
                         'msg': 'Resource not found.'
