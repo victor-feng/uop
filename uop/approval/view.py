@@ -11,8 +11,8 @@ from uop.log import Log
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-from uop.approval.handler import attach_domain_ip
 from uop.util import get_CRP_url
+from uop.deployment.handler import deal_disconf_info
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -792,6 +792,8 @@ class RollBackReservation(Resource):
         data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            deployment = models.Deployment.objects.get(deploy_id=deploy_id)
+            disconf_server_info=deal_disconf_info(deployment)
             resource.deploy_name = deploy_name
             env = resource.env
             res_compute_list = resource.compute_list
@@ -814,6 +816,7 @@ class RollBackReservation(Resource):
                         'url': compute.get("url"),
                         'ins_name': compute.get("ins_name"),
                         'ip': compute.get("ips"),
+                        'health_check': compute.get("health_check",0)
                     }
                 )
             data["appinfo"] = appinfo
@@ -821,7 +824,7 @@ class RollBackReservation(Resource):
             data["mysql"] = []
             data["mongodb"] = []
             data["dns"] = []
-            data["disconf_server_info"] = []
+            data["disconf_server_info"] = disconf_server_info
             data["deploy_id"] = deploy_id
             data["deploy_type"] = "rollback"
             CPR_URL = get_CRP_url(env)
