@@ -577,26 +577,20 @@ class DeploymentListAPI(Resource):
     @classmethod
     def put(cls):
         parser = reqparse.RequestParser()
-        parser.add_argument('deploy_id', type=str)
+        parser.add_argument('resource_id', type=str)
         args = parser.parse_args()
-        deploy_id = args.deploy_id
+        resource_id = args.resource_id
         try:
-            deploy = Deployment.objects.get(deploy_id=deploy_id)
-            if deploy:
+            deploys = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            if deploys:
+                deploy=deploys[0]
                 deploy_name=deploy.deploy_name
                 #更新状态
-                deploy_obj = Deployment.objects.get(deploy_id=deploy_id)
-                deploy_obj.deploy_result = 'deploying'
-                deploy_obj.save()
-                # 管理员审批通过后修改resource表deploy_name,更新当前版本
-                resource = ResourceModel.objects.get(res_id=deploy.resource_id)
-                resource.deploy_name = deploy_name
-                resource.save()
+                deploy.deploy_result = 'deploying'
+                deploy.save()
                 #获取disconf信息
                 disconf_server_info=deal_disconf_info(deploy)
                 # 将computer信息如IP，更新到数据库
-                deploy.app_image = str(args.app_image)
-                deploy.save()
                 resource = ResourceModel.objects.get(res_id=args.resource_id)
                 cmdb_url = current_app.config['CMDB_URL']
                 appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
