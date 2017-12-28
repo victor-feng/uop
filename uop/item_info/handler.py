@@ -98,7 +98,7 @@ def process_tmp_data(td):
     :param td:
     :return:
     '''
-    with open("./tmp.txt", "rb") as fp:
+    with open("./json.txt", "rb") as fp:
         whole_data = json.load(fp)
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
