@@ -396,7 +396,7 @@ class BusinessProject(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('model_id', type=str) #新增的实例继承的实体id
         parser.add_argument('instance_id', type=str)  # 上一级别的实例id
-        parser.add_argument('property', type=list)
+        parser.add_argument('property', type=list, location='json')
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()
