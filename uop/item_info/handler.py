@@ -118,9 +118,9 @@ def push_data_to_file(parent_id, model_id, property):
         with open(curdir + "/json.txt", "rb") as fp:
             whole_data = json.load(fp)["data"]
         Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), parent_id))
-        data = [p for p in property if str(p["code"]) == "name"][0]
+        data = [p for p in property if str(p["code"]) == "name"]
         node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
-        instance_list = [n["instance"] for n in node][0]
+        instance_list = [n["instance"] for n in node]
         node_id_list = [n["instance_id"] for n in instance_list]
         new_id = str(max(node_id_list) + 1)
         new_instance = {
