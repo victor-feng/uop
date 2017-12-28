@@ -4,22 +4,111 @@
 '''
 import json
 import requests
-from uop.log import Log
-from uop.util import TimeToolkit
-from config import configs
-from datetime import datetime
-from flask import jsonify
 import sys
 
-def get_uid_token(dev, username="admin", password="admin123456", sign=""):
-    CMDB2_URL = configs[dev].CMDB2_URL
-    uid_token = {
-        "code": -1,
-        "data": {
-            "uid":0,
-            "token":""
-        }
-    }
+from uop.log import Log
+from uop.util import TimeToolkit
+from config import configs, APP_ENV
+from datetime import datetime
+from flask import jsonify
+
+
+__all__ = [
+    "get_uid_token", "Aquery", "get_entity",
+    "subgrath_data", "package_data"
+]
+CMDB2_URL = configs[APP_ENV].CMDB2_URL
+CMDB2_MODULE ={
+    0: "Person",
+    1: "department", #部门
+    3: "Moudle", #模块
+    2: "yewu", #业务
+    4: "project", #工程
+}
+
+id_property = {
+    2: [
+        {
+            "id": 1,
+            "name": u"名称",
+            "code": "name",
+            "value_type": "str"
+        },
+        {
+            "id": 2,
+            "name": u"英文名称",
+            "code": "name",
+            "value_type": "str"
+        },
+    ],
+    3: [
+        {
+            "id": 1,
+            "name": u"名称",
+            "code": "name",
+            "value_type": "str"
+        },
+        {
+            "id": 2,
+            "name": u"英文名称",
+            "code": "name",
+            "value_type": "str"
+        },
+    ],
+    4: [
+        {
+            "id": 1,
+            "name": u"名称",
+            "code": "name",
+            "value_type": "str"
+        },
+        {
+            "id": 2,
+            "name": u"英文名称",
+            "code": "name",
+            "value_type": "str"
+        },
+    ],
+    5: [
+        {
+            "id": 1,
+            "name": u"名称",
+            "code": "name",
+            "value_type": "str"
+        },
+        {
+            "id": 2,
+            "name": u"英文名称",
+            "code": "name",
+            "value_type": "str"
+        },
+    ],
+}
+
+cmdb_data = {
+    "uid": 0,
+    "token": 0,
+    "sign":""
+}
+
+
+def process_tmp_data(td):
+    '''
+    临时从文本里获取数据
+    :param td:
+    :return:
+    '''
+    with open("./tmp.txt", "rb") as fp:
+        whole_data = json.load(fp)
+    instance_id = td["data"]["instance"]["instance_id"]
+    model_id = td["data"]["instance"]["model_id"]
+    data = [wd for wd in whole_data if wd["parent_id"] == instance_id][0]
+    data.update(property=id_property[data["entity_id"]])
+    return data
+
+# 获取uid，token
+def get_uid_token(username="admin", password="admin", sign=""):
+    uid, token = 0, 0
     url = CMDB2_URL + "cmdb/api/login/"
     data = {
         "username": username,
@@ -31,8 +120,156 @@ def get_uid_token(dev, username="admin", password="admin123456", sign=""):
     try:
         ret = requests.post(url, data=data_str)
         Log.logger.info(ret.json())
-        return ret.json()
+        uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
     except Exception as exc:
-        uid_token["msg"] = str(exc)
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
-        return uid_token
+    return uid, token
+
+#A类视图查询
+def Aquery(data):
+    '''
+    A 类视图 查询
+    :param data:
+    :return:
+    '''
+    query_result = {}
+    data_str = json.dumps(data)
+    url = CMDB2_URL + "cmdb/openapi/query/instance/"  # 查询 A类视图 查到下一层关系
+    try:
+        ret = process_tmp_data(data)
+        # ret = requests.post(url, data=data_str).json()
+        # if ret["code"] != 0:  # 过期，重新获取uid,token
+        #     data["uid"], data["token"] = get_uid_token()
+        #     data_str = json.dumps(data)
+            # ret = requests.post(url, data=data_str).json()
+        query_result = ret
+    except Exception as exc:
+        Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
+    return query_result
+
+
+#获取实体属性
+def get_entity(req_data):
+    '''
+    获取单个实体属性信息
+    {
+        "id": 实体id
+        "name": 实体名
+        "code": 实体英文名
+        "parameters":[
+            {
+                'id': 属性id
+                'name': 属性名
+                'code': 属性编码
+                'value_type': 属性类型
+            }
+        ]
+    }
+    :param req_data:
+    :return:
+    '''
+    url = CMDB2_URL + "cmdb/openapi/entity/"
+    data_str = json.dumps(req_data)
+    entity_info = {}
+    try:
+        ret = requests.post(url, data=data_str).json()
+        if ret["code"] != 0:
+            req_data["uid"], req_data["code"] = get_uid_token()
+            data_str = json.dumps(req_data)
+            ret = requests.post(url, data=data_str).json()
+        Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
+        entity_info = ret["data"]["parameters"]
+    except Exception as exc:
+        Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
+    return entity_info
+
+
+#插入子图
+def subgrath_data(args):
+    '''
+    插入子图数据，并返回图结果
+    :param args:
+    :return:
+    '''
+    entity_id, up_instance_id, name, code, uid, token = \
+        args.entity_id, args.up_instance_id, args.name, args.code, args.uid, args.token
+    if not uid or not token:
+        uid, token = get_uid_token()
+    url = CMDB2_URL + "cmdb/openapi/graph/"
+    graph_data = {}
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "instance": [
+                {
+                    "entity_id": entity_id,
+                    "instance_id": "",
+                    "name": name,
+                    "code": code,
+                    "parameters":[
+                        {}
+                    ]
+                }
+            ],
+            "relation": []
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        ret = requests.post(url, data=data_str).json()
+
+        pass
+    except Exception as exc:
+        pass
+    return graph_data
+
+
+
+#组装业务工程模块接口数据
+def package_data(ret, ut):
+    '''
+    传给前端的数据格式
+    "uid": 1,
+    "token": wtf,
+    "module_id":123, #实体id
+    "instance":[
+        {
+        "name":u"toon基础",
+        "instance_id":123-1 #实例id
+        },
+        {
+        "name":u"企通",
+        "instance_id":123-2
+        },
+    ],
+    ]
+    '''
+    # data = {
+    #     "uid": 1,
+    #     "token": 'wtf',
+    #     "parent_id":2,
+    #     "entity_id":3, #实体id
+    #     "instance":[
+    #         {
+    #             "name":u"toon基础",
+    #             "instance_id":'1231' #实例id
+    #         },
+    #         {
+    #             "name":u"企通",
+    #             "instance_id":'1232'
+    #         },
+    #         {
+    #             "name": u"政通",
+    #             "instance_id": '1233'
+    #         },
+    #         {
+    #             "name": u"食尚",
+    #             "instance_id": '1234'
+    #         },
+    #     ],
+    # }
+    ret.update(ut)
+    ret.pop("data")
+    return ret

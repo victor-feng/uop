@@ -29,7 +29,7 @@ class TestingConfig(BaseConfig):
     }
     
     CMDB_URL = "http://cmdb-test.syswin.com/"
-    CMDB2_URL = "http://cmdb2-demo.syswin.com/"
+    CMDB2_URL = "http://cmdb2.syswin.com/"
 
     UPLOAD_FOLDER = "/data/"
 

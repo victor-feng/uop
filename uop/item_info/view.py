@@ -5,11 +5,14 @@ import requests
 import datetime
 from uop.log import Log
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
-from flask import current_app
+from flask import current_app, jsonify
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 from uop.models import ItemInformation, ResourceModel
-from uop.item_info.handler import get_uid_token
+from uop.item_info.handler import *
+from config import configs, APP_ENV
+from uop.util import response_data
+
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -320,23 +323,67 @@ class BusinessProject(Resource):
     def get(self):
         '''
         根据？name=参数，返回相应的CMDB仓库数据
+        A 类视图去查 部门--->业务--->模块--->工程
+        :return:
+        '''
+        response = response_data(200, "success", "")
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('code', type=str)
+        parser.add_argument('uid', type=str)
+        parser.add_argument('token', type=str)
+        parser.add_argument('instance_id', type=str)
+        parser.add_argument('model_id', type=str)
+        args = parser.parse_args()
+        name, code, uid, token, instance_id, model_id = \
+            args.name, args.code, args.uid, args.token, args.instance_id, args.model_id
+        if not uid or not token:
+            uid, token = get_uid_token()
+        A_data = {
+            "uid": uid,
+            "token": token,
+            "sign":"",
+            "data":{
+                "instance":{
+                    "model_id": model_id,
+                    "instance_id": instance_id
+                },
+                "relation":[{
+                    "model_id":""
+                }]
+            }
+        }
+        Log.logger.info("the request data:{}".format(A_data))
+        try:
+            a_query_result = Aquery(A_data)
+            format_data = package_data(a_query_result, A_data)  # 重新组装数据
+            # parameters = get_entity(format_data["entity_id"]) # 获取A视图下一层实体属性
+            # format_data.update(property=parameters)
+            Log.logger.info(u"A视图搜素结果format_data: {}".format(format_data))
+            response["result"]["data"] = format_data
+        except Exception as exc:
+            response["code"] = 500
+            response["result"]["msg"] = str(exc)
+            Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
+        return jsonify(response)
+
+    def post(self):
+        '''
+        调用插入子图，插入 业务|模块|工程
+        注：
+            关系层采用默认的default，减少用户输入关系层的数据
         :return:
         '''
         parser = reqparse.RequestParser()
+        parser.add_argument('module_id', type=str) #新增的实例继承的实体id
+        parser.add_argument('up_instance_id', type=str)  # 上一级别的实例id
         parser.add_argument('name', type=str)
+        parser.add_argument('code', type=str)
+        parser.add_argument('uid', type=str)
+        parser.add_argument('token', type=str)
         args = parser.parse_args()
-        name = args.name
-        from config import APP_ENV
-        #tu = get_uid_token(APP_ENV)["data"]
-        tu = get_uid_token(APP_ENV)["result"]
-        uid, token = tu["uid"], tu["token"]
-        Log.logger.info("uid:{}, token:{}, name:{}".format(uid, token, name))
+        data_str = subgrath_data(args)
         return "success"
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        return "success"
-
 
 
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')

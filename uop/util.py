@@ -69,6 +69,7 @@ def check_network_use(env):
                 break
     return network_id
 
+
 class TimeToolkit(object):
     @staticmethod
     def utctimestamp2str(utctimestamp):
@@ -120,3 +121,14 @@ class TimeToolkit(object):
         print utc_delta_tuple
         utc_timestramp = long(time.mktime(utc_delta_tuple))
         return utc_timestramp
+
+
+def response_data(code, msg, data):
+    ret = {
+        'code': code,
+        'result': {
+            'msg': msg,
+            'data': data,
+        }
+    }
+    return ret
