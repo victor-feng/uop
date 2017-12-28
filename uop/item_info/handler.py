@@ -99,7 +99,7 @@ def get_data_from_file(td):
     model_id = td["data"]["instance"]["model_id"]
     # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
     data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)][0]
-    data.update(property=id_property[data["entity_id"]])
+    data.update(property=id_property[data["model_id"]])
     return data
 
 def push_data_to_file(parent_id, model_id, property):
@@ -249,7 +249,7 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     try:
         # ret = requests.post(url, data=data_str).json()
-        ret = gpush_data_to_file(instance_id, entity_id, property)
+        ret = push_data_to_file(instance_id, entity_id, property)
         pass
     except Exception as exc:
         pass
