@@ -970,7 +970,7 @@ class GetMyResourcesInfo(Resource):
             "vm_uuid": osid,
             "operation": operation,
         }
-        Log.logger.info("URL is:{}".format(url) )
+        Log.logger.info("URL is:{}".format(manager_url) )
         headers = {'Content-Type': 'application/json'}
         data_str = json.dumps(data)
         Log.logger.info("DATA is:{}".format(data_str))
