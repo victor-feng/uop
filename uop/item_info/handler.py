@@ -113,26 +113,29 @@ def push_data_to_file(parent_id, model_id, property):
     ]
     :return:
     '''
-    curdir = os.path.dirname(os.path.abspath(__file__))
-    with open(curdir + "/json.txt", "rb") as fp:
-        whole_data = json.load(fp)["data"]
-    # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
-    data = [p for p in property if str(p["code"]) == "name"][0]
-    node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
-    node_id_list = [int(n["instance"]["instance_id"]) for n in node]
-    new_id = str(max(node_id_list) + 1)
-    new_instance = {
-        "name": data["value"],
-        "instance_id": new_id
-    }
-    node["instance"].append(new_instance)
-    for k, v in enumerate(whole_data):
-        if str(v["parent_id"]) == str(parent_id):
-            whole_data[k] = node
-            break
-    Log.logger.info("new whole_data: {}".format(whole_data))
-    with open(curdir + "/json.txt", "w") as fp:
-        json.dump({"data": whole_data},fp)
+    try:
+        curdir = os.path.dirname(os.path.abspath(__file__))
+        with open(curdir + "/json.txt", "rb") as fp:
+            whole_data = json.load(fp)["data"]
+        Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), parent_id))
+        data = [p for p in property if str(p["code"]) == "name"][0]
+        node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
+        node_id_list = [int(n["instance"]["instance_id"]) for n in node]
+        new_id = str(max(node_id_list) + 1)
+        new_instance = {
+            "name": data["value"],
+            "instance_id": new_id
+        }
+        node["instance"].append(new_instance)
+        for k, v in enumerate(whole_data):
+            if str(v["parent_id"]) == str(parent_id):
+                whole_data[k] = node
+                break
+        Log.logger.info("new whole_data: {}".format(whole_data))
+        with open(curdir + "/json.txt", "w") as fp:
+            json.dump({"data": whole_data}, fp)
+    except Exception as exc:
+        Log.logger.error("push_data_to_file: {}".format(str(exc)))
     return node
 
 # 获取uid，token
