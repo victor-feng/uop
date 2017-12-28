@@ -103,7 +103,7 @@ def process_tmp_data(td):
         whole_data = json.load(fp)["data"]
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
-    Log.logger.info("whole_data:{},{}".format(whole_data, dir(whole_data)))
+    Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
     data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)][0]
     data.update(property=id_property[data["entity_id"]])
     return data
