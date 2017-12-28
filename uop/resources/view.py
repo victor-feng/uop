@@ -984,6 +984,8 @@ class GetMyResourcesInfo(Resource):
                 status = 'startting'
             elif operation == 'stop':
                 status = 'stopping'
+            elif operation == 'restart':
+                status = 'rebooting'
             ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
 
         return response
