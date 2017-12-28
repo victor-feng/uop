@@ -120,7 +120,8 @@ def push_data_to_file(parent_id, model_id, property):
         Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), parent_id))
         data = [p for p in property if str(p["code"]) == "name"][0]
         node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
-        node_id_list = [int(n["instance"]["instance_id"]) for n in node]
+        instance_list = [n["instance"] for n in node][0]
+        node_id_list = [n["instance_id"] for n in instance_list]
         new_id = str(max(node_id_list) + 1)
         new_instance = {
             "name": data["value"],
