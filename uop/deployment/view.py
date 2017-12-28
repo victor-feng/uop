@@ -632,12 +632,12 @@ class DeploymentAPI(Resource):
         res_code = 204
         parser = reqparse.RequestParser()
         parser.add_argument('options', type=str)
-        parser.add_argument('user_id', type=str)
+        parser.add_argument('department', type=str)
         args = parser.parse_args()
         deploys = Deployment.objects.filter(deploy_id=deploy_id)
         if deploys:
             for deploy in deploys:
-                if args.options == "rollback" and args.user_id == deploy.user_id:
+                if args.options == "rollback" and args.department == deploy.department:
                     flag = deploy.is_rollback
                     repo = ResourceModel.objects.filter(res_id=deploy.resource_id)
                     if repo:
