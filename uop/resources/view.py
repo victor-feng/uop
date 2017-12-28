@@ -970,8 +970,10 @@ class GetMyResourcesInfo(Resource):
             "vm_uuid": osid,
             "operation": operation,
         }
+        Log.logger.info("URL is:{}".format(manager_url) )
         headers = {'Content-Type': 'application/json'}
         data_str = json.dumps(data)
+        Log.logger.info("DATA is:{}".format(data_str))
         ret = requests.post(manager_url, data=data_str, headers=headers)
         # 操作成功 调用查询docker状态的接口
         response = ret.json()
