@@ -121,7 +121,6 @@ class ItemInfo(Resource):
             parser.add_argument('item_department', type=str)
             parser.add_argument('item_description', type=str)
             args = parser.parse_args()
-
             data = {}
             property_list = []
 
@@ -135,8 +134,6 @@ class ItemInfo(Resource):
                 property_list.append({"type": "string", "name": "部署单元描述", "value": args.item_description})
             data["property_list"] = property_list
             data_str = json.dumps(data)
-
-
             CMDB_URL = current_app.config['CMDB_URL']
             CMDB_API = CMDB_URL+'cmdb/api/'
             res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)

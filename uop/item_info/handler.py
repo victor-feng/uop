@@ -226,7 +226,7 @@ def subgrath_data(args):
     if not uid or not token:
         uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    graph_data = {}
+    format_data, graph_data = {}, {}
     data = {
         "uid": uid,
         "token": token,
