@@ -397,10 +397,9 @@ class BusinessProject(Resource):
         :return:
         '''
         parser = reqparse.RequestParser()
-        parser.add_argument('module_id', type=str) #新增的实例继承的实体id
-        parser.add_argument('up_instance_id', type=str)  # 上一级别的实例id
-        parser.add_argument('name', type=str)
-        parser.add_argument('code', type=str)
+        parser.add_argument('model_id', type=str) #新增的实例继承的实体id
+        parser.add_argument('instance_id', type=str)  # 上一级别的实例id
+        parser.add_argument('property', type=list)
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()

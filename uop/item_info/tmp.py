@@ -2,7 +2,7 @@
 a={"data":[
 	{
 			"parent_id":11,
-			"entity_id":2, #业务
+			"model_id":2, #业务
 	        "instance":[
 	            {
 	                "name":u"toon基础",
@@ -25,7 +25,7 @@ a={"data":[
 
 	{
 			"parent_id":21,
-			"entity_id":3, #模块
+			"model_id":3, #模块
 	        "instance":[
 	            {
 	                "name":u"模块1",
@@ -48,7 +48,7 @@ a={"data":[
 
     {
 			"parent_id":31,
-			"entity_id":4, #工程
+			"model_id":4, #工程
 	        "instance":[
 	            {
 	                "name":u"工程1",
@@ -71,7 +71,7 @@ a={"data":[
 
     {
 			"parent_id":0,
-			"entity_id":1, #部门
+			"model_id":1, #部门
 	        "instance":[
 	            {
 	                "name":u"运维部",

@@ -37,7 +37,7 @@ id_property = {
         {
             "id": 2,
             "name": u"英文名称",
-            "code": "name",
+            "code": "e-name",
             "value_type": "str"
         },
     ],
@@ -51,7 +51,7 @@ id_property = {
         {
             "id": 2,
             "name": u"英文名称",
-            "code": "name",
+            "code": "e-name",
             "value_type": "str"
         },
     ],
@@ -65,7 +65,7 @@ id_property = {
         {
             "id": 2,
             "name": u"英文名称",
-            "code": "name",
+            "code": "e-name",
             "value_type": "str"
         },
     ],
@@ -79,20 +79,14 @@ id_property = {
         {
             "id": 2,
             "name": u"英文名称",
-            "code": "name",
+            "code": "e-name",
             "value_type": "str"
         },
     ],
 }
 
-cmdb_data = {
-    "uid": 0,
-    "token": 0,
-    "sign":""
-}
 
-
-def process_tmp_data(td):
+def get_data_from_file(td):
     '''
     临时从文本里获取数据
     :param td:
@@ -103,9 +97,42 @@ def process_tmp_data(td):
         whole_data = json.load(fp)["data"]
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
-    Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
+    # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
     data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)][0]
     data.update(property=id_property[data["entity_id"]])
+    return data
+
+def push_data_to_file(parent_id, model_id, property):
+    '''
+    向文本里写数据
+    :param property:
+    [
+    {   "name" : "实例中文名",
+        ""
+    }
+    ]
+    :return:
+    '''
+    curdir = os.path.dirname(os.path.abspath(__file__))
+    with open(curdir + "/json.txt", "rb") as fp:
+        whole_data = json.load(fp)["data"]
+    # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
+    data = [p for p in property if str(p["code"]) == "name"][0]
+    node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
+    node_id_list = [int(n["instance"]["instance_id"]) for n in node]
+    new_id = str(max(node_id_list) + 1)
+    new_instance = {
+        "name": data["value"],
+        "instance_id": new_id
+    }
+    node["instance"].append(new_instance)
+    for k, v in enumerate(whole_data):
+        if str(v["parent_id"]) == str(parent_id):
+            whole_data[k] = node
+            break
+    Log.logger.info("new whole_data: {}".format(whole_data))
+    with open(curdir + "/json.txt", "w") as fp:
+        json.dump({"data": whole_data},fp)
     return data
 
 # 获取uid，token
@@ -127,6 +154,7 @@ def get_uid_token(username="admin", password="admin", sign=""):
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token
 
+
 #A类视图查询
 def Aquery(data):
     '''
@@ -138,7 +166,7 @@ def Aquery(data):
     data_str = json.dumps(data)
     url = CMDB2_URL + "cmdb/openapi/query/instance/"  # 查询 A类视图 查到下一层关系
     try:
-        ret = process_tmp_data(data)
+        ret = get_data_from_file(data)
         # ret = requests.post(url, data=data_str).json()
         # if ret["code"] != 0:  # 过期，重新获取uid,token
         #     data["uid"], data["token"] = get_uid_token()
@@ -193,8 +221,8 @@ def subgrath_data(args):
     :param args:
     :return:
     '''
-    entity_id, up_instance_id, name, code, uid, token = \
-        args.entity_id, args.up_instance_id, args.name, args.code, args.uid, args.token
+    entity_id, instance_id, property, uid, token = \
+        args.model_id, args.instance_id, args.property, args.uid, args.token
     if not uid or not token:
         uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/graph/"
@@ -220,8 +248,8 @@ def subgrath_data(args):
     }
     data_str = json.dumps(data)
     try:
-        ret = requests.post(url, data=data_str).json()
-
+        # ret = requests.post(url, data=data_str).json()
+        ret = gpush_data_to_file(instance_id, entity_id, property)
         pass
     except Exception as exc:
         pass
