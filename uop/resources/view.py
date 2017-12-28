@@ -799,7 +799,7 @@ class ResourceDetail(Resource):
                         return ret, 200
                         # elif options == "delete":
                         #     resources.delete()
-                resources.delete()
+                #resources.delete()
             else:
                 ret = {
                     'code': 200,
