@@ -959,7 +959,7 @@ class GetMyResourcesInfo(Resource):
             ret["result"]["msg"] = "parameter error"
             ret["result"]["res"] = "operation must be one of start|stop|restart"
             return ret, 500
-        if not osid or not osid or not user_id:
+        if not osid or not env or not user_id:
             ret["result"]["msg"] = "some parameters is null"
             ret["result"]["res"] = "osid:{}, user_id:{}, env:{}".format(osid, user_id, env)
             return ret, 500
