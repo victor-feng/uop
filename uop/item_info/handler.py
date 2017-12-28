@@ -110,7 +110,7 @@ def process_tmp_data(td):
 # 获取uid，token
 def get_uid_token(username="admin", password="admin", sign=""):
     uid, token = 0, 0
-    url = CMDB2_URL + "cmdb/api/login/"
+    url = CMDB2_URL + "cmdb/openapi/login/"
     data = {
         "username": username,
         "password": password,
