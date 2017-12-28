@@ -120,7 +120,6 @@ def push_data_to_file(parent_id, model_id, property):
         Log.logger.info("whole_data:{}\nparent_id:{}\nproperty:{},{}".format(whole_data, parent_id, property, type(property)))
         data = [p for p in property if str(p["code"]) == "name"]
         node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
-        Log.logger.info("node:{},type:{}".format(node, type(node)))
         node_id_list = [n["instance_id"] for n in node["instance"]]
         new_id = str(max(node_id_list) + 1)
         new_instance = {
@@ -132,6 +131,7 @@ def push_data_to_file(parent_id, model_id, property):
             if str(v["parent_id"]) == str(parent_id):
                 whole_data[k] = node
                 break
+        Log.logger.info("node:{},type:{}".format(node, type(node)))
         Log.logger.info("new whole_data: {}".format(whole_data))
         with open(curdir + "/json.txt", "w") as fp:
             json.dump({"data": whole_data}, fp)
