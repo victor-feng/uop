@@ -8,11 +8,11 @@ from flask import request, send_from_directory, jsonify
 from flask_restful import reqparse, Api, Resource
 from flask import current_app
 from uop.deployment import deployment_blueprint
-from uop.models import  ResourceModel, DisconfIns, ComputeIns, Deployment, Approval, Capacity, NetWorkConfig
+from uop.models import  ResourceModel, DisconfIns, Deployment, Approval, Capacity, NetWorkConfig
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
-from uop.deployment.handler import format_resource_info, get_resource_by_id, get_resource_by_id_mult, deploy_to_crp, upload_disconf_files_to_crp, disconf_write_to_file, attach_domain_ip
+from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip
 from uop.log import Log
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
@@ -36,6 +36,7 @@ class DeploymentListAPI(Resource):
         parser.add_argument('resource_id', type=str, location='args')
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
+        parser.add_argument('department', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -63,6 +64,8 @@ class DeploymentListAPI(Resource):
             condition['created_time__lte'] = args.end_time
         if args.approve_status:
             condition['approve_status'] = args.approve_status
+        if args.department:
+            condition["department"]=args.department
         if args.resource_id:
             resource_id = args.resource_id
             condition['resource_id'] = resource_id
@@ -205,11 +208,12 @@ class DeploymentListAPI(Resource):
         parser.add_argument('dep_id', type=str, location='json')
         parser.add_argument('disconf', type=list, location='json')
         parser.add_argument('database_password', type=str, location='json')
+        parser.add_argument('department', type=str, location='json')
 
         args = parser.parse_args()
         action = args.action
-        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
+        UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
         def write_file(uid, context, type):
             path = os.path.join(UPLOAD_FOLDER, type, 'script_' + uid)
             with open(path, 'wb') as f:
@@ -252,47 +256,7 @@ class DeploymentListAPI(Resource):
             appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
 
             # 2、把配置推送到disconf
-            disconf_server_info = []
-            for disconf_info in deploy_obj.disconf_list:
-                if (len(disconf_info.disconf_name.strip()) == 0) or (len(disconf_info.disconf_content.strip()) == 0):
-                    continue
-                else:
-                    server_info = {'disconf_server_name': disconf_info.disconf_server_name,
-                                   'disconf_server_url': disconf_info.disconf_server_url,
-                                   'disconf_server_user': disconf_info.disconf_server_user,
-                                   'disconf_server_password': disconf_info.disconf_server_password,
-                                   'disconf_admin_content': disconf_info.disconf_admin_content,
-                                   'disconf_content': disconf_info.disconf_content,
-                                   'disconf_env': disconf_info.disconf_env,
-                                   'disconf_version': disconf_info.disconf_version,
-                                   'ins_name': disconf_info.ins_name,
-                                   'disconf_app_name': disconf_info.disconf_app_name,
-                                   }
-                    disconf_server_info.append(server_info)
-                    '''
-                    server_info = {'disconf_server_name':'172.28.11.111',
-                                   'disconf_server_url':'http://172.28.11.111:8081',
-                                   'disconf_server_user':'admin',
-                                   'disconf_server_password':'admin',
-                                   }
-
-                    disconf_api_connect = DisconfServerApi(server_info)
-                    if disconf_info.disconf_env.isdigit():
-                        env_id = disconf_info.disconf_env
-                    else:
-                        env_id = disconf_api_connect.disconf_env_id(env_name=disconf_info.disconf_env)
-                    result,message = disconf_api_connect.disconf_add_app_config_api_file(
-                                                    app_name=disconf_info.ins_name,
-                                                    myfilerar=disconf_admin_name,
-                                                    version=disconf_info.disconf_version,
-                                                    env_id=env_id
-                                                    )
-
-                disconf_result.append(dict(result=result,message=message))
-                    '''
-            # message = disconf_result
-            # message = disconf_server_info
-
+            disconf_server_info = deal_disconf_info(deploy_obj)
             ##推送到crp
             deploy_obj.approve_status = 'success'
             err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
@@ -360,6 +324,7 @@ class DeploymentListAPI(Resource):
                 approve_suggestion=args.approve_suggestion,
                 database_password=args.database_password,
                 deploy_type=deploy_type,
+                department=args.department,
             )
 
             for instance_info in args.disconf:
@@ -595,28 +560,43 @@ class DeploymentListAPI(Resource):
     @classmethod
     def put(cls):
         parser = reqparse.RequestParser()
-        parser.add_argument('deploy_id', type=str)
-        parser.add_argument('action', type=str)
-        parser.add_argument('user', type=str)
+        parser.add_argument('resource_id', type=str)
         args = parser.parse_args()
-        deploy_id = args.deploy_id
-        user = args.user
-        action = args.action
-
+        resource_id = args.resource_id
         try:
-            deploy = Deployment.objects.get(deploy_id=deploy_id)
-            if len(deploy):
-                if action == 'delete':
-                    delete_time = datetime.datetime.now()
-                    deploy.is_deleted = 1
-                    deploy.deleted_time = delete_time
-                elif action == 'revoke':
-                    deploy.is_deleted = 0
+            deploys = Deployment.objects.filter(resource_id=resource_id,deploy_result="deploy_fail").order_by('-created_time')
+            if deploys:
+                deploy=deploys[0]
+                environment=deploy.environment
+                resource_name=deploy.resource_name
+                database_password=deploy.database_password
+                #更新状态
+                deploy.deploy_result = 'deploying'
+                deploy.save()
+                #获取disconf信息
+                disconf_server_info=deal_disconf_info(deploy)
+                # 将computer信息如IP，更新到数据库
+                app_image=eval(deploy.app_image)
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                cmdb_url = current_app.config['CMDB_URL']
+                appinfo = attach_domain_ip(app_image, resource, cmdb_url)
+                ##推送到crp
+                deploy.approve_status = 'success'
+                err_msg, resource_info = get_resource_by_id(resource_id)
+                if not err_msg:
+                    err_msg, result = deploy_to_crp(deploy,
+                                                    environment,
+                                                    resource_info,
+                                                    resource_name,
+                                                    database_password,
+                                                    appinfo, disconf_server_info)
+                    if err_msg:
+                        deploy.deploy_result = 'deploy_fail'
                 deploy.save()
 
             else:
                 ret = {
-                    'code': 200,
+                    'code': 400,
                     'result': {
                         'res': 'success',
                         'msg': 'deployment not found.'
@@ -624,12 +604,13 @@ class DeploymentListAPI(Resource):
                 }
                 return ret, 200
         except Exception as e:
-            Log.logger.error(str(e))
+            err_msg=str(e)
+            Log.logger.error(err_msg)
             ret = {
                 'code': 500,
                 'result': {
                     'res': 'fail',
-                    'msg': 'Put deployment  application failed.'
+                    'msg': 'Put deployment application failed. %s ' % err_msg
                 }
             }
             return ret, 500
@@ -651,12 +632,12 @@ class DeploymentAPI(Resource):
         res_code = 204
         parser = reqparse.RequestParser()
         parser.add_argument('options', type=str)
-        parser.add_argument('user_id', type=str)
+        parser.add_argument('department', type=str)
         args = parser.parse_args()
         deploys = Deployment.objects.filter(deploy_id=deploy_id)
         if deploys:
             for deploy in deploys:
-                if args.options == "rollback" and args.user_id == deploy.user_id:
+                if args.options == "rollback" and args.department == deploy.department:
                     flag = deploy.is_rollback
                     repo = ResourceModel.objects.filter(res_id=deploy.resource_id)
                     if repo:
@@ -818,16 +799,16 @@ class CapacityAPI(Resource):
         parser.add_argument('cluster_id', type=str)
         parser.add_argument('number', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('department_id', type=str)
-        parser.add_argument('creator_id', type=str)
+        parser.add_argument('department', type=str)
+        parser.add_argument('user_id', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('initiator', type=str)
         parser.add_argument('project_name', type=str)
 
         args = parser.parse_args()
         project_id = args.project_id
-        department_id = args.department_id
-        creator_id = args.creator_id
+        department = args.department
+        user_id = args.user_id
         cluster_id = args.cluster_id
         number = args.number
         res_id = args.res_id
@@ -899,12 +880,13 @@ class CapacityAPI(Resource):
                                 database_password=old_deployment.database_password,
                                 disconf_list=old_deployment.disconf_list,
                                 capacity_info=capacity_info_str,
-                                deploy_type=deploy_type
+                                deploy_type=deploy_type,
+                                department=args.department,
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id, deploy_id=approval_id,
-                                 project_id=project_id, department_id=department_id,
-                                 creator_id=creator_id, create_date=create_date,
+                                 project_id=project_id, department=department,
+                                 user_id=user_id, create_date=create_date,
                                  approval_status=approval_status, capacity_status=capacity_status).save()
             else:
                 ret = {
@@ -1076,15 +1058,15 @@ class RollBackAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_name', type=str)
         parser.add_argument('res_id', type=str)
-        parser.add_argument('department_id', type=str)
-        parser.add_argument('creator_id', type=str)
+        parser.add_argument('department', type=str)
+        parser.add_argument('user_id', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('initiator', type=str)
         parser.add_argument('project_name', type=str)
         args = parser.parse_args()
         project_id = args.project_id
-        department_id = args.department_id
-        creator_id = args.creator_id
+        department = args.department
+        user_id = args.user_id
         res_id = args.res_id
         initiator = args.initiator
         project_name = args.project_name
@@ -1129,14 +1111,15 @@ class RollBackAPI(Resource):
                 approve_suggestion="",
                 database_password=old_deployment.database_password,
                 disconf_list=old_deployment.disconf_list,
-                deploy_type=deploy_type
+                deploy_type=deploy_type,
+                department = department,
             )
             deploy_item.save()
 
             # 将回滚信息记录到申请审批表
             Approval(approval_id=approval_id, resource_id=res_id, deploy_id=deploy_id,
-                     project_id=project_id, department_id=department_id,
-                     creator_id=creator_id, create_date=create_date,
+                     project_id=project_id, department=department,
+                     user_id=user_id, create_date=create_date,
                      approval_status=approval_status).save()
         except Exception as e:
             Log.logger.debug(e)

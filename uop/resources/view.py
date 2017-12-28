@@ -22,7 +22,9 @@ from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
 from uop.log import Log
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CRP_URL = configs[APP_ENV].CRP_URL
 # TODO: move to global conf
@@ -189,6 +191,7 @@ class ResourceApplication(Resource):
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('instance_status', type=str, location='args')
+        parser.add_argument('department', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -215,6 +218,8 @@ class ResourceApplication(Resource):
             condition['env'] = args.env
         if args.instance_status:
             condition["approval_status__in"] = ["success", "failed", "revoke"]
+        if args.department:
+            condition["department"]=args.department
 
         if agg_by:
             pipeline = []
@@ -262,10 +267,9 @@ class ResourceApplication(Resource):
         result_list = []
         res={}
         try:
-            total_count = 0
+            total_count = ResourceModel.objects.filter(**condition).count()
             if args.page_num and args.page_size:
                 skip_count = (args.page_num - 1) * args.page_size
-                total_count=ResourceModel.objects.filter(**condition).count()
                 resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(args.page_size)
             else:
                 resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
@@ -311,7 +315,7 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
-            res["result_list"]=result_list
+        res["result_list"]=result_list
         code = 200
         ret = {
             'code': code,
@@ -437,7 +441,8 @@ class ResourceApplication(Resource):
         user_id = args.user_id
         env = args.env
         application_status = args.formStatus
-        approval_status = "processing"
+        #approval_status = "processing"
+        approval_status = args.approval_status
         compute_list = args.compute_list
         resource_list = args.resource_list
         try:
@@ -452,6 +457,7 @@ class ResourceApplication(Resource):
                 resource.env=env
                 resource.application_status=application_status
                 resource.approval_status = approval_status
+                resource.is_rollback = 0
                 resource.compute_list=[]
                 resource.resource_list=[]
                 for compute in compute_list:
@@ -486,7 +492,7 @@ class ResourceApplication(Resource):
                 resource.save()
             else:
                 ret = {
-                    'code': 200,
+                    'code': 400,
                     'result': {
                         'res': 'success',
                         'msg': 'Resource not found.'
@@ -767,7 +773,7 @@ class ResourceDetail(Resource):
     def delete(cls, res_id):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str, location='args')
+            parser.add_argument('department', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
             args = parser.parse_args()
             # print args
@@ -775,12 +781,13 @@ class ResourceDetail(Resource):
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
-                cur_id = resources.user_id
+                department = resources.department
                 flag = resources.is_rollback
-                if args.user_id == cur_id:  # 相同账户可以撤回或者删除自己的申请
+                if args.department == department:  # 相同账户可以撤回或者删除自己的申请
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
                         resources.approval_status="revoke"
+                        resources.reservation_status = "revoke"
                         resources.save()
                         ret = {
                             'code': 200,
@@ -792,7 +799,7 @@ class ResourceDetail(Resource):
                         return ret, 200
                         # elif options == "delete":
                         #     resources.delete()
-                resources.delete()
+                #resources.delete()
             else:
                 ret = {
                     'code': 200,
@@ -952,7 +959,7 @@ class GetMyResourcesInfo(Resource):
             ret["result"]["msg"] = "parameter error"
             ret["result"]["res"] = "operation must be one of start|stop|restart"
             return ret, 500
-        if not osid or not osid or not user_id:
+        if not osid or not env or not user_id:
             ret["result"]["msg"] = "some parameters is null"
             ret["result"]["res"] = "osid:{}, user_id:{}, env:{}".format(osid, user_id, env)
             return ret, 500

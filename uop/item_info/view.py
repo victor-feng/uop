@@ -36,52 +36,74 @@ class ItemInfo(Resource):
             parser.add_argument('item_code', type=str, location='args')
             parser.add_argument('start_time', type=str, location='args')
             parser.add_argument('end_time', type=str, location='args')
-            parser.add_argument('depart', type=str, location='args')
+            parser.add_argument('department', type=str, location='args')
+            parser.add_argument('page_num', type=int, location='args')
+            parser.add_argument('page_size', type=int, location='args')
             args = parser.parse_args()
 
-            args_dict = {}
+            condition = {}
             if args.user_id:
-                args_dict["user_id"] = args.user_id
+                condition["user_id"] = args.user_id
             if args.user_name:
-                args_dict["user"] = args.user_name
+                condition["user"] = args.user_name
             if args.item_name:
-                args_dict["item_name"] = args.item_name
+                condition["item_name"] = args.item_name
             if args.item_code:
-                args_dict["item_code"] = args.item_code
-            if args.depart:
-                args_dict["item_depart"] = args.depart
+                condition["item_code"] = args.item_code
+            if args.department:
+                condition["item_depart"] = args.department
             if args.start_time and args.end_time:
-                args_dict['create_date__gte'] = args.start_time
-                args_dict['create_date__lt'] = args.end_time
+                condition['create_date__gte'] = args.start_time
+                condition['create_date__lt'] = args.end_time
+            res={}
             try:
-                items = ItemInformation.objects.filter(**args_dict).order_by('-create_date')
+                total_count=ItemInformation.objects.filter(**condition).count()
+                if args.page_num and args.page_size:
+                    skip_count = (args.page_num - 1) * args.page_size
+                    items = ItemInformation.objects.filter(**condition).order_by('-create_date').skip(skip_count).limit(args.page_size)
+                else:
+                    items = ItemInformation.objects.filter(**condition).order_by('-create_date')
+                res["total_count"] = total_count
             except Exception as e:
-                items = []
-                code = 404
-                msg = '资源不存在'
+                code = 400
+                err_msg=str(e)
+                ret = {
+                    'code': code,
+                    'result': {
+                        'res': "failed",
+                        'msg': "Resource not find .%s" % err_msg
+                    }
+                }
+                return ret, code
 
             for item in items:
-                res = {}
-                res["user"] = item.user
-                res["user_id"] = item.user_id
-                res["item_id"] = item.item_id
-                res["item_name"] = item.item_name
-                res["item_code"] = item.item_code
-                res["item_depart"] = item.item_depart
-                res["item_description"] = item.item_description
-                res["create_date"] = str(item.create_date)
-                res_list.append(res)
-
-            #res = requests.get(CMDB_API + "repo_detail/" + item_id + "/")
-            #ret = eval(res.content.decode('unicode_escape'))
+                result = {}
+                result["user"] = item.user
+                result["user_id"] = item.user_id
+                result["item_id"] = item.item_id
+                result["item_name"] = item.item_name
+                result["item_code"] = item.item_code
+                result["item_depart"] = item.item_depart
+                result["item_description"] = item.item_description
+                result["create_date"] = str(item.create_date)
+                res_list.append(result)
+            res["res_list"] = res_list
         except Exception as e:
             code = 500
-
+            err_msg=str(e)
+            ret = {
+                'code': code,
+                'result': {
+                    'res': "failed",
+                    'msg': "UOP item info get error,%s" % err_msg
+                }
+            }
+            return ret, code
         ret = {
             'code': code,
             'result': {
-                'res': res_list,
-                'msg': ""
+                'res': res,
+                'msg': "success"
             }
         }
         return ret, code

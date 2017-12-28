@@ -86,6 +86,7 @@ class Deployment(db.Document):
     is_rollback = db.IntField(required=False, default=0)
     deleted_time = db.DateTimeField(default=datetime.datetime.now())
     capacity_info = db.StringField(required=False, default="{}")
+    department = db.StringField()
 
     meta = {
         'collection': 'deployment',
@@ -239,8 +240,8 @@ class Approval(db.DynamicDocument):
     resource_id = db.StringField(required=True)
     deploy_id = db.StringField(required=False)
     project_id = db.StringField(required=True)
-    department_id = db.StringField(required=True)
-    creator_id = db.StringField(required=True)
+    department = db.StringField(required=True)
+    user_id = db.StringField(required=True)
     create_date = db.DateTimeField(default=datetime.datetime.now())
     approve_uid = db.StringField(required=False)
     approve_date = db.DateTimeField(required=False)

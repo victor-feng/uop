@@ -11,8 +11,8 @@ from uop.log import Log
 from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
-from uop.approval.handler import attach_domain_ip
 from uop.util import get_CRP_url
+from uop.deployment.handler import deal_disconf_info
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -30,23 +30,23 @@ class ApprovalList(Resource):
             parser = reqparse.RequestParser()
             parser.add_argument('resource_id', type=str)
             parser.add_argument('project_id', type=str)
-            parser.add_argument('department_id', type=str)
-            parser.add_argument('creator_id', type=str)
+            parser.add_argument('department', type=str)
+            parser.add_argument('user_id', type=str)
             args = parser.parse_args()
 
             approval_id = str(uuid.uuid1())
             resource_id = args.resource_id
             project_id = args.project_id
-            department_id = args.department_id
-            creator_id = args.creator_id
+            department = args.department
+            user_id = args.user_id
             create_date = datetime.datetime.now()
             # approve_uid
             # approve_date
             # annotations
             approval_status = "processing"
             models.Approval(approval_id=approval_id, resource_id=resource_id,
-                            project_id=project_id, department_id=department_id,
-                            creator_id=creator_id, create_date=create_date,
+                            project_id=project_id, department=department,
+                            user_id=user_id, create_date=create_date,
                             approval_status=approval_status).save()
 
             resource = models.ResourceModel.objects.get(res_id=resource_id)
@@ -86,9 +86,10 @@ class ApprovalInfo(Resource):
             parser.add_argument('mongodb_network_id', type=str)
             args = parser.parse_args()
 
-            approval = models.Approval.objects.filter(capacity_status="res").get(resource_id=res_id)
+            approvals = models.Approval.objects.filter(capacity_status="res",resource_id=res_id).order_by("-create_date")
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            if approval:
+            if approvals:
+                approval=approvals[0]
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
@@ -102,6 +103,7 @@ class ApprovalInfo(Resource):
                 else:
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
+                    resource.reservation_status = "approval_fail"
                 approval.save()
                 if docker_network_id:
                     resource.docker_network_id = docker_network_id.strip()
@@ -118,7 +120,7 @@ class ApprovalInfo(Resource):
                 res = "A resource with that ID no longer exists"
         except Exception as e:
             code = 500
-            res = "Failed to approve the resource."
+            res = "Failed to approve the resource. %s" %str(e)
         finally:
             ret = {
                 "code": code,
@@ -790,6 +792,8 @@ class RollBackReservation(Resource):
         data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            deployment = models.Deployment.objects.get(deploy_id=deploy_id)
+            disconf_server_info=deal_disconf_info(deployment)
             resource.deploy_name = deploy_name
             env = resource.env
             res_compute_list = resource.compute_list
@@ -812,6 +816,7 @@ class RollBackReservation(Resource):
                         'url': compute.get("url"),
                         'ins_name': compute.get("ins_name"),
                         'ip': compute.get("ips"),
+                        'health_check': compute.get("health_check",0)
                     }
                 )
             data["appinfo"] = appinfo
@@ -819,7 +824,7 @@ class RollBackReservation(Resource):
             data["mysql"] = []
             data["mongodb"] = []
             data["dns"] = []
-            data["disconf_server_info"] = []
+            data["disconf_server_info"] =[]
             data["deploy_id"] = deploy_id
             data["deploy_type"] = "rollback"
             CPR_URL = get_CRP_url(env)
