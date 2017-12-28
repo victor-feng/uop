@@ -100,7 +100,7 @@ def process_tmp_data(td):
     '''
     curdir = os.path.dirname(os.path.abspath(__file__))
     with open(curdir + "/json.txt", "rb") as fp:
-        whole_data = json.load(fp)
+        whole_data = json.load(fp)["data"]
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
     data = [wd for wd in whole_data if wd["parent_id"] == instance_id][0]
