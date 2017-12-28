@@ -5,7 +5,7 @@
 import json
 import requests
 import sys
-
+import os
 from uop.log import Log
 from uop.util import TimeToolkit
 from config import configs, APP_ENV
@@ -98,7 +98,8 @@ def process_tmp_data(td):
     :param td:
     :return:
     '''
-    with open("./json.txt", "rb") as fp:
+    curdir = os.path.dirname(os.path.abspath(__file__))
+    with open(curdir + "/json.txt", "rb") as fp:
         whole_data = json.load(fp)
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
