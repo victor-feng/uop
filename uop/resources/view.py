@@ -773,7 +773,7 @@ class ResourceDetail(Resource):
     def delete(cls, res_id):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str, location='args')
+            parser.add_argument('department', type=str, location='args')
             parser.add_argument('options', type=str, location='args')
             args = parser.parse_args()
             # print args
@@ -781,9 +781,9 @@ class ResourceDetail(Resource):
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
-                cur_id = resources.user_id
+                department = resources.department
                 flag = resources.is_rollback
-                if args.user_id == cur_id:  # 相同账户可以撤回或者删除自己的申请
+                if args.department == department:  # 相同账户可以撤回或者删除自己的申请
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
                         resources.approval_status="revoke"
