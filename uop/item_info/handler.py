@@ -86,6 +86,7 @@ id_property = {
 }
 
 
+#临时从本地文件读取数据
 def get_data_from_file(td):
     '''
     临时从文本里获取数据
@@ -102,6 +103,8 @@ def get_data_from_file(td):
     data.update(property=id_property[data["model_id"]])
     return data
 
+
+#临时将数据写入本地文件
 def push_data_to_file(parent_id, model_id, property):
     '''
     向文本里写数据
@@ -138,6 +141,7 @@ def push_data_to_file(parent_id, model_id, property):
     except Exception as exc:
         Log.logger.error("push_data_to_file: {}".format(str(exc)))
     return node
+
 
 # 获取uid，token
 def get_uid_token(username="admin", password="admin", sign=""):
