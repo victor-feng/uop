@@ -133,7 +133,7 @@ def push_data_to_file(parent_id, model_id, property):
     Log.logger.info("new whole_data: {}".format(whole_data))
     with open(curdir + "/json.txt", "w") as fp:
         json.dump({"data": whole_data},fp)
-    return data
+    return node
 
 # 获取uid，token
 def get_uid_token(username="admin", password="admin", sign=""):
@@ -236,8 +236,6 @@ def subgrath_data(args):
                 {
                     "entity_id": entity_id,
                     "instance_id": "",
-                    "name": name,
-                    "code": code,
                     "parameters":[
                         {}
                     ]
@@ -249,12 +247,11 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     try:
         # ret = requests.post(url, data=data_str).json()
-        ret = push_data_to_file(instance_id, entity_id, property)
-        pass
+        graph_data=push_data_to_file(instance_id, entity_id, property)
+        format_data = package_data(graph_data, data)
     except Exception as exc:
-        pass
-    return graph_data
-
+        Log.logger.error("graph_data: {}".format(graph_data))
+    return format_data
 
 
 #组装业务工程模块接口数据

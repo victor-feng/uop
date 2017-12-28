@@ -403,8 +403,8 @@ class BusinessProject(Resource):
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()
-        data_str = subgrath_data(args)
-        return "success"
+        graph_data = subgrath_data(args)
+        return jsonify(graph_data)
 
 
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
