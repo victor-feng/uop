@@ -420,10 +420,12 @@ class CmdbModels(Resource):
         '''
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
-        parser.add_argument('filters', type=dict)
+        parser.add_argument('id', type=str)
+        parser.add_argument('code', type=str)
+        parser.add_argument('name', type=str)
         args = parser.parse_args()
-        filters = args.filters
-        Log.logger.info("args.filters:{},type:{}".format(filters, type(filters)))
+        filters = {"id": args.id, "code": args.code, "name": args.name}
+        Log.logger.info("args.filters:{}".format(filters))
         try:
             data = get_entity_from_file(filters) if filters else get_entity()
             response["result"]["data"] = data
