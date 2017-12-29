@@ -134,7 +134,7 @@ def push_data_to_file(parent_id, model_id, property):
                 "model_id": int(model_id),
                 "instance":[],
             }
-
+            new_id = str(model_id) + '1'
         new_instance = {
             "name": data["value"],
             "instance_id": new_id
