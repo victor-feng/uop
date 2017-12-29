@@ -928,11 +928,12 @@ class GetMyResourcesInfo(Resource):
         resource_status = request.args.get('resource_status', "")
         page_num = request.args.get('page_num', 1)
         env = request.args.get('env', "")
+        department = request.args.get('department', "")
         page_count = request.args.get('page_count', 10)
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
-            &page_count={}&env={}&user_id={}".format(resource_type, resource_name, item_name, start_time, end_time,
-                                                     resource_status, page_num, page_count, env, user_id)
+            &page_count={}&env={}&department={}&user_id={}".format(resource_type, resource_name, item_name, start_time, end_time,
+                                                     resource_status, page_num, page_count, env, department,user_id)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
