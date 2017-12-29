@@ -123,9 +123,18 @@ def push_data_to_file(parent_id, model_id, property):
             whole_data = json.load(fp)["data"]
         Log.logger.info("whole_data:{}\nparent_id:{}\nproperty:{},{}".format(whole_data, parent_id, property, type(property)))
         data = [p for p in property if str(p["code"]) == "name"][0]
-        node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)][0]
-        node_id_list = [int(n["instance_id"]) for n in node["instance"]]
-        new_id = str(max(node_id_list) + 1)
+        node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)]
+        if node:
+            node = node[0]
+            node_id_list = [int(n["instance_id"]) for n in node["instance"]]
+            new_id = str(max(node_id_list) + 1)
+        else:
+            node = {
+                "parent_id": int(parent_id),
+                "model_id": int(model_id),
+                "instance":[],
+            }
+
         new_instance = {
             "name": data["value"],
             "instance_id": new_id
@@ -180,7 +189,7 @@ def Aquery(data):
         # if ret["code"] != 0:  # 过期，重新获取uid,token
         #     data["uid"], data["token"] = get_uid_token()
         #     data_str = json.dumps(data)
-            # ret = requests.post(url, data=data_str).json()
+        # ret = requests.post(url, data=data_str).json()
         query_result = ret
     except Exception as exc:
         Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
