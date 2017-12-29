@@ -99,7 +99,8 @@ def get_data_from_file(td):
     instance_id = td["data"]["instance"]["instance_id"]
     model_id = td["data"]["instance"]["model_id"]
     # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
-    data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)][0]
+    data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)]
+    data = data[0] if data else {}
     data.update(property=id_property[data["model_id"]])
     return data
 
