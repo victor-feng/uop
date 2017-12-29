@@ -144,6 +144,8 @@ def push_data_to_file(parent_id, model_id, property):
             if str(v["parent_id"]) == str(parent_id):
                 whole_data[k] = node
                 break
+        else:
+            whole_data.append(node)
         Log.logger.info("node:{},type:{}".format(node, type(node)))
         Log.logger.info("new whole_data: {}".format(whole_data))
         with open(curdir + "/json.txt", "w") as fp:
