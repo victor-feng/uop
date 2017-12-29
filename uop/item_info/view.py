@@ -393,6 +393,7 @@ class BusinessProject(Resource):
             关系层采用默认的default，减少用户输入关系层的数据
         :return:
         '''
+        response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
         parser.add_argument('model_id', type=str) #新增的实例继承的实体id
         parser.add_argument('instance_id', type=str)  # 上一级别的实例id
@@ -400,8 +401,14 @@ class BusinessProject(Resource):
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()
-        graph_data = subgrath_data(args)
-        return jsonify(graph_data)
+        try:
+            graph_data = subgrath_data(args)
+            response["result"]["data"] = graph_data
+        except Exception as exc:
+            response["code"] = 500
+            response["result"]["msg"] = str(exc)
+            Log.logger.error(u"A类视图添加业务模块工程出错:{}".format(str(exc)))
+        return jsonify(response)
 
 
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
