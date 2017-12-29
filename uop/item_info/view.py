@@ -411,8 +411,33 @@ class BusinessProject(Resource):
         return jsonify(response)
 
 
+class CmdbModels(Resource):
+    def get(self):
+        '''
+        filters 参数为空时会去cmdb2.0获取最新的实体属性信息
+        非空时，会按照filters字典去匹配相应的实体
+        :return:
+        '''
+        response = response_data(200, "success", "")
+        parser = reqparse.RequestParser()
+        parser.add_argument('filters', type=dict, location='json')
+        args = parser.parse_args()
+        filters = args.flush
+        try:
+            data = get_entity_from_file(filters) if filters else get_entity()
+            response["result"]["data"] = data
+        except Exception as exc:
+            Log.logger.error("get CmdbModels error:{}".format(str(exc)))
+        return jsonify(response)
+
+    def post(self):
+        pass
+    pass
+
+
 iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
 iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
 iteminfo_api.add_resource(CheckImageUrl, '/check_image_url')
 iteminfo_api.add_resource(BusinessProject, '/cmdbinfo')
+iteminfo_api.add_resource(BusinessProject, '/cmdbmodels')

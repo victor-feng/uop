@@ -12,10 +12,10 @@ from config import configs, APP_ENV
 from datetime import datetime
 from flask import jsonify
 
-
+curdir = os.path.dirname(os.path.abspath(__file__))
 __all__ = [
     "get_uid_token", "Aquery", "get_entity",
-    "subgrath_data", "package_data"
+    "subgrath_data", "package_data", "get_entity_from_file"
 ]
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_MODULE ={
@@ -93,7 +93,6 @@ def get_data_from_file(td):
     :param td:
     :return:
     '''
-    curdir = os.path.dirname(os.path.abspath(__file__))
     with open(curdir + "/json.txt", "rb") as fp:
         whole_data = json.load(fp)["data"]
     instance_id = td["data"]["instance"]["instance_id"]
@@ -118,7 +117,6 @@ def push_data_to_file(parent_id, model_id, property):
     :return:
     '''
     try:
-        curdir = os.path.dirname(os.path.abspath(__file__))
         with open(curdir + "/json.txt", "rb") as fp:
             whole_data = json.load(fp)["data"]
         Log.logger.info("whole_data:{}\nparent_id:{}\nproperty:{},{}".format(whole_data, parent_id, property, type(property)))
@@ -175,6 +173,36 @@ def get_uid_token(username="admin", password="admin", sign=""):
     return uid, token
 
 
+# 将实体信息数据导入文件
+def push_entity_to_file(data):
+    entity_list = []
+    try:
+        for d in data:
+            for dc in d.get("children", []):
+                entity_list.append({
+                    "code": dc.get("code",""),
+                    "name": dc.get("name",""),
+                    "id": dc.get("id",""),
+                    "property": dc.get("parameters",[])
+                })
+        with open(curdir + "/.entity.txt", "w") as fp:
+            json.dump({"entity": entity_list}, fp)
+    except Exception as exc:
+        Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
+    return entity_list
+
+
+def get_entity_from_file(filters):
+    assert(isinstance(filters, dict))
+    if not os.path.exists(curdir + "/.entity.txt"):
+        whole_entity = get_entity()
+    else:
+        with open(curdir + "/.entity.txt", "rb") as fp:
+            whole_entity = json.load(fp)["entity"]
+    single_entity = filter(lambda x:set(x.values()) & set(filters.values()), whole_entity)
+    return single_entity
+
+
 #A类视图查询
 def Aquery(data):
     '''
@@ -198,10 +226,10 @@ def Aquery(data):
     return query_result
 
 
-#获取实体属性
-def get_entity(req_data):
+#获取所有模型实体的id及属性信息存到文件
+def get_entity():
     '''
-    获取单个实体属性信息
+    [
     {
         "id": 实体id
         "name": 实体名
@@ -215,10 +243,22 @@ def get_entity(req_data):
             }
         ]
     }
+    ]
     :param req_data:
     :return:
     '''
-    url = CMDB2_URL + "cmdb/openapi/entity/"
+    url = CMDB2_URL + "cmdb/openapi/entity/group/"
+    uid, token = get_uid_token()
+    req_data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "name":"",
+            "code":"",
+            "id":""
+        }
+    }
     data_str = json.dumps(req_data)
     entity_info = {}
     try:
@@ -228,7 +268,7 @@ def get_entity(req_data):
             data_str = json.dumps(req_data)
             ret = requests.post(url, data=data_str).json()
         Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
-        entity_info = ret["data"]["parameters"]
+        entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
     return entity_info
