@@ -423,6 +423,7 @@ class CmdbModels(Resource):
         parser.add_argument('filters', type=dict, location='json')
         args = parser.parse_args()
         filters = args.filters
+        Log.logger.info("args.filters:{},type:{}".format(filters, type(filters)))
         try:
             data = get_entity_from_file(filters) if filters else get_entity()
             response["result"]["data"] = data

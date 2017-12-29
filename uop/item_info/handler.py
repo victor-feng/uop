@@ -267,7 +267,7 @@ def get_entity():
             req_data["uid"], req_data["code"] = get_uid_token()
             data_str = json.dumps(req_data)
             ret = requests.post(url, data=data_str).json()
-        Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
+        # Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
         entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
