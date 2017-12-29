@@ -420,7 +420,7 @@ class CmdbModels(Resource):
         '''
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
-        parser.add_argument('filters', type=dict, location='json')
+        parser.add_argument('filters', type=dict)
         args = parser.parse_args()
         filters = args.filters
         Log.logger.info("args.filters:{},type:{}".format(filters, type(filters)))
