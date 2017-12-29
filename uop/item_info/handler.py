@@ -198,8 +198,9 @@ def get_entity_from_file(filters):
         whole_entity = get_entity()
     else:
         with open(curdir + "/.entity.txt", "rb") as fp:
-            whole_entity = eval(str(json.load(fp)["entity"]))
-    single_entity = filter(lambda x:set(x.setdefault('property', "property").values()) & set(filters.values()), whole_entity)
+            whole_entity = json.load(fp)["entity"]
+    whole_entity.pop("property")
+    single_entity = filter(lambda x:set(x.values()) & set(filters.values()), whole_entity)
     return single_entity
 
 
