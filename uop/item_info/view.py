@@ -424,7 +424,10 @@ class CmdbModels(Resource):
         parser.add_argument('code', type=str)
         parser.add_argument('name', type=str)
         args = parser.parse_args()
-        filters = {"id": args.id, "code": args.code, "name": args.name}
+        filters = {}
+        for k, v in args.items():
+            if v:
+                filters.setdefault(k, v)
         Log.logger.info("args.filters:{}".format(filters))
         try:
             data = get_entity_from_file(filters) if filters else get_entity()
