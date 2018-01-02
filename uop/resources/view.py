@@ -915,7 +915,7 @@ class GetDBInfo(Resource):
 
 class GetMyResourcesInfo(Resource):
     def get(self):
-        user_id = request.args.get('user_id')
+        user_id = request.args.get('user_id',"")
         resource_type = request.args.get('resource_type', "")
         resource_database = request.args.get('mysqlandmongo', "")
         resource_cache = request.args.get('cache', "")
@@ -930,10 +930,11 @@ class GetMyResourcesInfo(Resource):
         env = request.args.get('env', "")
         department = request.args.get('department', "")
         page_count = request.args.get('page_count', 10)
+        ip = request.args.get('ip',"")
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
-            &page_count={}&env={}&department={}".format(resource_type, resource_name, item_name, start_time, end_time,
-                                                     resource_status, page_num, page_count, env, department)
+            &page_count={}&env={}&user_id={}&department={}&ip={}".format(resource_type, resource_name, item_name, start_time, end_time,
+                                                     resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
