@@ -199,8 +199,10 @@ def get_entity_from_file(filters):
     else:
         with open(curdir + "/.entity.txt", "rb") as fp:
             whole_entity = json.load(fp)["entity"]
-    compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(json.loads(x["property"]))}, whole_entity)
+    compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
+    if single_entity:
+        single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(x["property"])}, single_entity)
     return single_entity
 
 
