@@ -50,36 +50,8 @@ def logger_setting(app):
     # set Log logger
     Log.logger = app.logger
 
-def set_logger(config):
-    log_name = config.get('LOG_NAME', _DEFAULT_LOG_NAME)
-    log_filename = config.get('LOG_FILENAME', '/var/log/' + log_name + '.log')
-    log_rotating_max = config.get('LOG_ROTATING_MAX', _DEFAULT_LOG_ROTATING_MAX)
-    log_rotating_backup_count = config.get('LOG_ROTATING_BACKUP_COUNT', _DEFAULT_LOG_ROTATING_BACKUP_COUNT)
-    log_formatter_config = config.get('LOG_FORMATTER', _DEFAULT_FORMATTER)
-    debug_config = config.get('DEBUG', False)
-    testing_config = config.get('TESTING', False)
-    warning_config = config.get('WARNING', True)
-    Logger = logging.getLoggerClass()
-    # set log filename and rotating log file
-    handler = RotatingFileHandler(log_filename, maxBytes=log_rotating_max, backupCount=log_rotating_backup_count)
+    return Log.logger
 
-    # set logging level
-    if debug_config is True:
-        handler.setLevel(logging.DEBUG)
-    elif testing_config is True:
-        handler.setLevel(logging.INFO)
-    elif warning_config is True:
-        handler.setLevel(logging.WARNING)
-    else:
-        handler.setLevel(logging.ERROR)
-
-    # set logging formatter
-    formatter = logging.Formatter(log_formatter_config)
-    handler.setFormatter(formatter)
-
-    Logger.addHandler(handler)
-
-    return Logger
 
 
 class Log(object):
@@ -91,8 +63,6 @@ class Log(object):
     def logger(self):
         if Log.flask_app_logger is not None:
             return Log.flask_app_logger
-        else:
-            return set_logger(Log.conf_object)
 
 
     @logger.setter
