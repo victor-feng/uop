@@ -8,7 +8,8 @@ from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async
 from uop.log import Log
-
+from config import configs, APP_ENV
+CMDB2_URL = configs[APP_ENV].CMDB2_URL
 
 __all__ = [
     "transition_state_logger", "transit_request_data",
@@ -25,6 +26,7 @@ def transition_state_logger(func):
         Log.logger.debug("Transition state is turned out " + self.state)
         return ret
     return wrapper
+
 
 # Transit request_data from the JSON nest structure to the chain structure with items_sequence and porerty_json_mapper
 def transit_request_data(items_sequence, porerty_json_mapper, request_data):
@@ -114,6 +116,7 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
 
     return request_items
 
+
 # Transit request_items from JSON property to CMDB item property p_code with property_json_mapper
 def transit_repo_items(property_json_mapper, request_items):
     if not isinstance(property_json_mapper, dict) and not isinstance(request_items, list):
@@ -136,10 +139,12 @@ def transit_repo_items(property_json_mapper, request_items):
             property_mappers_list.append(repo_item)
     return property_mappers_list
 
+
 def do_transit_repo_items(items_sequence_list, property_json_mapper, request_data):
     request_items = transit_request_data(items_sequence_list, property_json_mapper, request_data)
     property_mappers_list = transit_repo_items(property_json_mapper, request_items)
     return property_mappers_list
+
 
 def get_resources_all_pcode():
     resources = ResourceModel.objects.all()
@@ -149,6 +154,7 @@ def get_resources_all_pcode():
         if code:
             pcode_list.append(code)
     return pcode_list
+
 
 def filter_status_data(p_code):
     data = {
@@ -181,6 +187,7 @@ def filter_status_data(p_code):
             data["vm_status"].append(meta)
     return data
 
+
 @async
 def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
@@ -193,6 +200,7 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
         Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
     except Exception as exc:
         Log.logger.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
+
 
 @async
 def deploy_nginx_to_crp(resource_id,url,set_flag):
@@ -218,3 +226,9 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
     except Exception as e:
         Log.logger.error("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
+
+# 解析crp传回来的数据录入CMDB2.0
+def crp_data_cmdb(data):
+    assert(isinstance(data, dict))
+
+    pass
