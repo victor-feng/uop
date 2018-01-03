@@ -11,6 +11,7 @@ import datetime
 from uop.log import Log
 from config import APP_ENV, configs
 CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CRP_URL = configs[APP_ENV].CRP_URL
 
 __all__ = [
