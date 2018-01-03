@@ -3,11 +3,11 @@ import datetime
 from uop.models import StatusRecord
 from uop.log import Log
 
-def get_deploy_status(deploy_id, deploy_type, res_type):
+def get_deploy_status(deploy_id, deploy_type, res_type,unique_flag):
     try:
         docker_status_list = []
         s_type = '%s_%s' % (deploy_type, res_type)
-        status_records = StatusRecord.objects.filter(deploy_id=deploy_id, s_type=s_type).order_by('created_time')
+        status_records = StatusRecord.objects.filter(deploy_id=deploy_id, s_type=s_type,unique_flag=unique_flag).order_by('created_time')
         for sr in status_records:
             docker_status_list.append(sr.status)
         for s_status in docker_status_list:
