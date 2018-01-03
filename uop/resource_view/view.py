@@ -27,8 +27,16 @@ class ResourceView(Resource):
             parser.add_argument('columns_filter', type=str, location='args')
             parser.add_argument('layer_count', type=str, location='args')
             parser.add_argument('total_count', type=str, location='args')
+            parser.add_argument('cmdb', type=int)
             args = parser.parse_args()
-            result = cmdb_graph_search(args, res_id)
+            Log.logger.info("get graph from cmdb: {}".format(args.cmdb))
+            if args.cmdb == 1:
+                result = cmdb_graph_search(args, res_id)
+            elif args.cmdb == 2:
+                result = cmdb2_graph_search(args, res_id)
+            else:
+                result = cmdb_graph_search(args, res_id)
+                #result = response_data(500, "args.cmdb:{}".format(args.cmdb), "")
         except Exception as exc:
             Log.logger.error("get graph from cmdb error: {}".format(str(exc)))
             result = response_data(500, str(exc), "")

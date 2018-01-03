@@ -5,17 +5,21 @@
 import json
 import requests
 from flask import current_app
-from uop.resource_view import resource_view_blueprint
-from uop.resource_view.errors import resource_view_errors
 from uop.log import Log
 from uop.models import ResourceModel
+from uop.util import response_data
+from config import configs, APP_ENV
+from uop.item_info.handler import get_uid_token
 
+
+CMDB2_URL = configs[APP_ENV]
 
 __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
 ]
 
 def response_data_not_found():
+
     res = {
         'code': 2015,
         'result': {
@@ -113,5 +117,29 @@ def cmdb_graph_search(args, res_id):
 
 
 # cmdb2.0 图搜素
-def cmdb2_graph_search():
-    pass
+def cmdb2_graph_search(args, res_id):
+    view_dict = {
+        "B3": "e7a8ed688f2e4c19a3aa3a65", # 资源 --> 机房
+        "B2": "",
+        "B1": "",
+    }
+    url = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
+    uid, token = get_uid_token()
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "id": view_dict["B3"],
+            "name": "",
+            "entity": []
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        ret = requests.post(url, data=data_str)
+        result = response_data(200, ret.json(), "")
+    except Exception as exc:
+        Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
+        result = response_data(200, str(exc), "")
+    return result
