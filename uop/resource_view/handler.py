@@ -12,7 +12,7 @@ from config import configs, APP_ENV
 from uop.item_info.handler import get_uid_token
 
 
-CMDB2_URL = configs[APP_ENV]
+CMDB2_URL = configs[APP_ENV].CMDB2_URL
 
 __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
