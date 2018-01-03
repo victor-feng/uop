@@ -119,6 +119,7 @@ def cmdb_graph_search(args, res_id):
 # cmdb2.0 图搜素
 def cmdb2_graph_search(args, res_id):
     view_dict = {
+        "B4": "29930f94bf0844c6a0e060bd", # 资源 --> 环境 --> 机房
         "B3": "e7a8ed688f2e4c19a3aa3a65", # 资源 --> 机房
         "B2": "",
         "B1": "",
@@ -130,7 +131,7 @@ def cmdb2_graph_search(args, res_id):
         "token": token,
         "sign": "",
         "data": {
-            "id": view_dict["B3"],
+            "id": view_dict["B4"],
             "name": "",
             "entity": []
         }
