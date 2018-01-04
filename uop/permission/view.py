@@ -32,7 +32,7 @@ class UserManage(Resource):
         condition = {}
         data={}
         res_list=[]
-        if args.name:
+        if args.username:
             condition["username"] = args.username
         if args.id:
             condition["id"] = args.id
@@ -128,7 +128,11 @@ class AllPermManage(Resource):
     管理权限
     """
     def get(self):
-        pass
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('id', type=str)
+        parser.add_argument('role', type=str)
+        args = parser.parse_args()
 
     def post(self):
         pass
