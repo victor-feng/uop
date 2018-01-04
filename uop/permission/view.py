@@ -22,7 +22,7 @@ class UserManage(Resource):
     """
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, location='args')
+        parser.add_argument('username', type=str, location='args')
         parser.add_argument('role', type=str, location='args')
         parser.add_argument('id', type=str, location='args')
         parser.add_argument('department', type=str, location='args')
@@ -33,7 +33,7 @@ class UserManage(Resource):
         data={}
         res_list=[]
         if args.name:
-            condition["name"] = args.name
+            condition["username"] = args.username
         if args.id:
             condition["id"] = args.id
         if args.role:
@@ -50,7 +50,7 @@ class UserManage(Resource):
             for user in Users:
                 res = {}
                 res["id"] = user.id
-                res["name"] = user.name
+                res["username"] = user.username
                 res["role"] = user.role
                 res["department"] = user.department
                 res["updated_time"] = str(user.updated_time)
