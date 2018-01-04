@@ -265,16 +265,16 @@ def Aquery(args):
             data = ret.json()["data"]["instance"]
             data = filter(lambda x:x["entity_id"] == model_id, data)
             data = analyze_data(data, model_id)
-            result = response_data(200, "success", data.update({"uid": uid, "token": token}))
         else:
             Log.logger.info("url_action request data:{}".format(data_action))
             ret = requests.post(url_action, data=data_action_str)
             # Log.logger.info("url_action return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"]["instance"], model_id)
-            result = response_data(200, "success", data.update({"uid": uid, "token": token}))
     except Exception as exc:
         Log.logger.error("Aquery error:{}".format(str(exc)))
-        result = response_data(200, str(exc), "")
+        data = str(exc)
+    data.update({"uid": uid, "token": token})
+    result = response_data(200, "success", data)
     return result
 
 
