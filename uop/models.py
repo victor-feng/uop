@@ -74,6 +74,7 @@ class UserInfo(db.Document):
     department = db.StringField(required=False)
     role = db.StringField(required=False,max_length=50)
     is_admin = db.BooleanField(required=False, default=False)
+    is_external = db.BooleanField(required=False, default=False)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     last_login_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
