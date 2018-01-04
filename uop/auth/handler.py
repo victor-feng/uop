@@ -73,7 +73,7 @@ def get_menu_list(role):
     """
     meau_list = []
     try:
-        Permissions=PermissionList.objects.filter(role=role,prem_type="meau")
+        Permissions=PermissionList.objects.filter(role=role,perm_type="meau")
         for premission in Permissions:
             meau_dict = {}
             name=premission.name
