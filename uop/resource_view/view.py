@@ -15,7 +15,6 @@ from uop.util import response_data
 resource_view_api = Api(resource_view_blueprint, errors=resource_view_errors)
 
 
-
 class ResourceView(Resource):
     @classmethod
     def get(cls, res_id):

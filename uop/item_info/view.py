@@ -351,35 +351,14 @@ class BusinessProject(Resource):
         parser.add_argument('code', type=str)
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
-        parser.add_argument('instance_id', type=str)
-        parser.add_argument('model_id', type=str)
+        parser.add_argument('instance_id', type=str) # 查询该实例下一层包含的实例,若为空则视为请求该name的实例id
+        parser.add_argument('model_id', type=str) # 要获取的实体id
+        parser.add_argument('self_model_id', type=str)  # 该实例的实体id
         args = parser.parse_args()
-        name, code, uid, token, instance_id, model_id = \
-            args.name, args.code, args.uid, args.token, args.instance_id, args.model_id
-        if not uid or not token:
-            uid, token = get_uid_token()
-        A_data = {
-            "uid": uid,
-            "token": token,
-            "sign":"",
-            "data":{
-                "instance":{
-                    "model_id": model_id,
-                    "instance_id": instance_id
-                },
-                "relation":[{
-                    "model_id":""
-                }]
-            }
-        }
-        Log.logger.info("the request data:{}".format(A_data))
+        Log.logger.info("the request data:{}".format(args))
         try:
-            a_query_result = Aquery(A_data)
-            format_data = package_data(a_query_result, A_data)  # 重新组装数据
-            # parameters = get_entity(format_data["entity_id"]) # 获取A视图下一层实体属性
-            # format_data.update(property=parameters)
-            Log.logger.info(u"A视图搜素结果format_data: {}".format(format_data))
-            response["result"]["data"] = format_data
+            response = Aquery(args)
+            Log.logger.info(u"A视图搜素结果format_data: {}".format(response))
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)

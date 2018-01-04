@@ -202,7 +202,9 @@ def get_entity_from_file(filters):
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if single_entity:
-        single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(x["property"])}, single_entity)
+        se = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, single_entity)
+
+
     return single_entity
 
 
@@ -213,20 +215,73 @@ def Aquery(data):
     :param data:
     :return:
     '''
-    query_result = {}
-    data_str = json.dumps(data)
-    url = CMDB2_URL + "cmdb/openapi/query/instance/"  # 查询 A类视图 查到下一层关系
+    view_dict = {
+        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程
+        "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
+        "B3": "e7a8ed688f2e4c19a3aa3a65",  # 资源 --> 机房
+        "B2": "",
+        "B1": "",
+    }
+    name, code, uid, token, instance_id, model_id, self_model_id = \
+        args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
+    url_action = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
+    url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
+    data_action = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "id": view_dict["B5"],
+            "name": "",
+            "entity": [{
+                "id": "",  # 实体id
+                "parameters": [{
+                    "code": code,  # 属性code
+                    "value": name  # 属性值，必须具备唯一性， 如工号
+                }]
+            }]
+        }
+    }
+    data_instance = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "instance": {
+                "model_id": self_model_id ,
+                "instance_id": instance_id
+            }
+        }
+    }
+    data_action_str = json.dumps(data_action)
+    data_instance_str = json.dumps(data_instance)
     try:
-        ret = get_data_from_file(data)
-        # ret = requests.post(url, data=data_str).json()
-        # if ret["code"] != 0:  # 过期，重新获取uid,token
-        #     data["uid"], data["token"] = get_uid_token()
-        #     data_str = json.dumps(data)
-        # ret = requests.post(url, data=data_str).json()
-        query_result = ret
+        if instance_id:
+            ret = requests.post(url, data=data_instance_str)
+            data = ret.json()["data"]["instance"]
+            data = filter(lambda x:x["entity_id"] == model_id, data)
+            data = analyze_data(data, model_id)
+            result = response_data(200, data, "")
+        else:
+            ret = requests.post(url, data=data_action_str)
+            data = analyze_data(ret.json()["data"]["instance"], model_id)
+            result = response_data(200, data, "")
     except Exception as exc:
-        Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
-    return query_result
+        Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
+        result = response_data(200, str(exc), "")
+    return result
+
+
+#从B类视图中解析出A类数据
+def analyze_data(data, entity_id=None):
+    ret = {
+        "instance":[]
+    }
+    if entity_id:
+        data = filter(lambda ins: x.get("entity_id") == entity_id, data)
+    instance = map(lambda x: {"instance_id": x.get("instance_id"), "name": x.get("name")}, data)
+    ret["instance"] = instance
+    return data
 
 
 #获取所有模型实体的id及属性信息存到文件
