@@ -5,26 +5,6 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
-class PermissionList(db.Document):
-    id = db.StringField(required=True, max_length=50, unique=True)
-    name = db.StringField(required=False, max_length=50)
-    role = db.StringField(required=False, max_length=50)
-    buttons = db.DictField(required=False)
-    icons=db.DictField(required=False)
-    url = db.StringField(required=False)
-    menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_perm'))
-    api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
-    perm_type=db.StringField(required=True)
-    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    update_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-
-    meta = {
-            "collection": "permission_list",
-            "index": [{
-                'fields': ['name', 'id'],
-                'unique': True,
-                }]
-            }
 
 
 class Menu2_perm(db.EmbeddedDocument):
@@ -61,6 +41,30 @@ class Api_perm(db.EmbeddedDocument):
             ],
         'index_background': True
         }
+
+
+class PermissionList(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True)
+    name = db.StringField(required=False, max_length=50)
+    role = db.StringField(required=False, max_length=50)
+    buttons = db.DictField(required=False)
+    icons=db.DictField(required=False)
+    url = db.StringField(required=False)
+    menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_perm'))
+    api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
+    perm_type=db.StringField(required=True)
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    update_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+
+    meta = {
+            "collection": "permission_list",
+            "index": [{
+                'fields': ['name', 'id'],
+                'unique': True,
+                }]
+            }
+
+
 
 
 class UserInfo(db.Document):
