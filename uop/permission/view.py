@@ -178,9 +178,13 @@ class AllPermManage(Resource):
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
         parser.add_argument('api_permission', type=list, location="json")
+        parser.add_argument('action', type=str,
+                            choices=('create_meau_perm', 'create_meau2_perm', 'create_api_perm'),
+                            required=True,
+                            location='json')
         args = parser.parse_args()
         try:
-            Permissions=PermissionList(
+            Permission=PermissionList(
                 id = args.id,
                 name = args.name,
                 role = "super_admin",
@@ -196,15 +200,25 @@ class AllPermManage(Resource):
                 url = meau2.get("url")
                 parent_id = meau2.get("parent_id")
                 meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
-                Permissions.menu2_permission.append(meau2_perm_ins)
+                Permission.menu2_permission.append(meau2_perm_ins)
             for api_perm in args.api_permission:
                 id = api_perm.get("id")
                 name = api_perm.get("name")
                 endpoint = api_perm.get("endpoint")
                 method = api_perm.get("method")
                 api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,method=method)
-                Permissions.api_permission.append(api_perm_ins)
-            Permissions.save()
+                Permission.api_permission.append(api_perm_ins)
+            Permission.save()
+            if args.action == "create_meau2_perm":
+                Permission = PermissionList.objects.get(id=args.id)
+                for meau2 in args.meau2_permission:
+                    id = meau2.get("id")
+                    name = meau2.get("name")
+                    url = meau2.get("url")
+                    parent_id = meau2.get("parent_id")
+                    meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
+                    Permission.menu2_permission.append(meau2_perm_ins)
+                Permission.save()
             code = 200
             msg = "Create permission success"
             data = "Success"
@@ -218,13 +232,73 @@ class AllPermManage(Resource):
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
+        parser.add_argument('meau2_name', type=str)
+        parser.add_argument('action', type=str,
+                            choices=('dellete_meau_perm', 'delete_meau2_perm', 'delete_api_perm'),
+                            required=True,
+                            location='json')
         args = parser.parse_args()
         try:
-            pass
+            Permission = PermissionList.objects.get(name=args.name)
+            if args.action in ["delete_meau_perm","delete_api_perm"]:
+                Permission.delete()
+            if args.action == "delete_meau2_perm":
+                meau2_perms=Permission.menu2_permission
+                delete_meau2_perms=[]
+                for meau2 in meau2_perms:
+                    meau2_name = meau2.get("name")
+                    if meau2_name == args.meau2_name:
+                        delete_meau2_perms.append(meau2)
+                for delete_meau2 in delete_meau2_perms:
+                    meau2_perms.remove(delete_meau2)
+                Permission.save()
+            code = 200
+            msg = "Delete permission success"
+            data = "Success"
+        except Exception as e:
+            msg = "Delete permission error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=str)
+        parser.add_argument('name', type=str)
+        parser.add_argument('buttons', type=dict, location="json")
+        parser.add_argument('icons', type=dict, location="json")
+        parser.add_argument('url', type=str)
+        parser.add_argument('perm_type', type=str)
+        parser.add_argument('meau2_permission', type=list, location="json")
+        parser.add_argument('api_permission', type=list, location="json")
+        parser.add_argument('action', type=str,
+                            choices=('update_meau_perm', 'update_meau2_perm', 'update_api_perm'),
+                            required=True,
+                            location='json')
+        args = parser.parse_args()
+        try:
+            Permission = PermissionList.objects.get(name=args.name)
+            if args.id:
+                Permission.id = args.id
+            if args.name:
+                Permission.name = args.name
+            if args.buttons:
+                Permission.buttons = args.buttons
+            if args.icons:
+                Permission.icons = args.icons
+            if args.url:
+                Permission.url = args.url
+            if args.perm_type:
+                Permission.perm_type = args.perm_type
+            if args.meau2_permission:
+                pass
+            if args.api_permission:
+                pass
+
         except Exception as e:
             pass
-    def put(self):
-        pass
+
 
 
 
@@ -272,6 +346,38 @@ class RoleManage(Resource):
             msg = "Create role error,error msg is %s" % str(e)
             code = 500
             data = "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('new_name', type=str)
+        parser.add_argument('description', type=str)
+        args = parser.parse_args()
+        try:
+            Users = UserInfo.objects.filter(role=args.name)
+            Role = RoleInfo.objects.get(name=args.name)
+            if not Users:
+                if args.new_name:
+                    Role.name = args.new_name
+                if args.description:
+                    Role.description = args.description
+            else:
+                if args.description:
+                    Role.description = args.description
+                if args.name:
+                    Role.name = args.new_name
+                for user in Users:
+                    user.role = args.new_name
+                    user.save()
+            code = 200
+            msg = "Update role success"
+            data = "Success"
+        except Exception as e:
+            msg = "Update role error, error msg is %s" % str(e)
+            data = "Error"
+            code = 500
         ret = response_data(code, msg, data)
         return ret, code
 
