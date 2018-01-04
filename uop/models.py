@@ -12,8 +12,8 @@ class PermissionList(db.Document):
     buttons = db.DictField(required=False)
     icons=db.DictField(required=False)
     url = db.StringField(required=False)
-    menu2_permssion=db.ListField(db.EmbeddedDocumentField('Menu2_permssion'))
-    api_permssion = db.ListField(db.EmbeddedDocumentField('Api_permssion'))
+    menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_permission'))
+    api_permission = db.ListField(db.EmbeddedDocumentField('Api_permission'))
     prem_type=db.StringField(required=True)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     update_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
@@ -27,14 +27,14 @@ class PermissionList(db.Document):
             }
 
 
-class Menu2_permssion(db.EmbeddedDocument):
+class Menu2_permission(db.EmbeddedDocument):
     id=db.StringField(required=True, max_length=50)
     name=db.StringField(required=False)
     parent_id=db.StringField(required=True, max_length=50)
     url = db.StringField(required=False)
 
     meta = {
-        'collection': 'menu2_permssion',
+        'collection': 'menu2_permission',
         'index': [
             {
                 'fields': ['id','name'],
@@ -45,14 +45,14 @@ class Menu2_permssion(db.EmbeddedDocument):
         }
 
 
-class Api_permssion(db.EmbeddedDocument):
+class Api_permission(db.EmbeddedDocument):
     id = db.StringField(required=True, max_length=50)
     name=db.StringField(required=False)
     endpoint=db.StringField(required=False)
     method=db.ListField(required=False)
 
     meta = {
-        'collection': 'api_permssion',
+        'collection': 'api_permission',
         'index': [
             {
                 'fields': ['name'],
