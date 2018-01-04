@@ -73,15 +73,15 @@ def get_menu_list(role):
     """
     meau_list = []
     try:
-        Permssions=PermissionList.objects.filter(role=role,prem_type="meau")
-        for premssion in Permssions:
+        Permissions=PermissionList.objects.filter(role=role,prem_type="meau")
+        for premission in Permissions:
             meau_dict = {}
-            name=premssion.name
-            url=premssion.url
-            _id=premssion.id
-            buttons=premssion.buttons
-            icons=premssion.icons
-            children=premssion.menu2_permssion
+            name=premission.name
+            url=premission.url
+            _id=premission.id
+            buttons=premission.buttons
+            icons=premission.icons
+            children=premission.menu2_permission
             children=deal_children_data(children)
             meau_dict["name"] = name
             meau_dict["url"] = url
