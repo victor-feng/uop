@@ -54,7 +54,7 @@ class PermissionList(db.Document):
     api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
     perm_type=db.StringField(required=True)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    update_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
 
     meta = {
             "collection": "permission_list",

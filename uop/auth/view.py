@@ -162,9 +162,9 @@ class UserLogin(Resource):
                     menu_list = get_menu_list(role)
                 res = {
                     'user_id': user_id,
-                    'username': user.username,
+                    'username': user,
                     'department': department,
-                    'role': user.role,
+                    'role': role,
                     'menu_list': menu_list,
                 }
             else:

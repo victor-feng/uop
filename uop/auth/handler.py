@@ -5,6 +5,7 @@ import datetime
 from uop.log import Log
 from flask import current_app
 from uop.models import PermissionList
+from uop.util import deal_enbedded_data
 
 def add_person(name, user_id, department, contact_info, privilege):
     """
@@ -54,15 +55,7 @@ def add_person(name, user_id, department, contact_info, privilege):
     return success
 
 
-def deal_children_data(data):
-    res_list=[]
-    try:
-        for d in data:
-            d=d.to_json()
-            res_list.append(d)
-    except Exception as e:
-        Log.logger.error("UOP User deal children data error,error msg is %s" % str(e))
-    return res_list
+
 
 
 def get_menu_list(role):
@@ -82,7 +75,7 @@ def get_menu_list(role):
             buttons=premission.buttons
             icons=premission.icons
             children=premission.menu2_permission
-            children=deal_children_data(children)
+            children=deal_enbedded_data(children)
             meau_dict["name"] = name
             meau_dict["url"] = url
             meau_dict["id"] = _id

@@ -132,3 +132,11 @@ def response_data(code, msg, data):
         }
     }
     return ret
+
+
+def deal_enbedded_data(data):
+    res_list=[]
+    for d in data:
+        d=d.to_json()
+        res_list.append(d)
+    return res_list

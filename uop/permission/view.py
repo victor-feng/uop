@@ -6,10 +6,10 @@ import uuid
 from flask import request
 from flask_restful import reqparse, Api, Resource
 from uop.permission import perm_blueprint
-from uop.models import UserInfo,PermissionList,RoleInfo
+from uop.models import UserInfo,PermissionList,RoleInfo,Menu2_perm,Api_perm
 from uop.permission.errors import perm_errors
 from uop.log import Log
-from uop.util import response_data
+from uop.util import response_data,deal_enbedded_data
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -129,12 +129,101 @@ class AllPermManage(Resource):
     """
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str)
-        parser.add_argument('id', type=str)
-        parser.add_argument('role', type=str)
+        parser.add_argument('name', type=str, location='args')
+        parser.add_argument('role', type=str, location='args')
+        parser.add_argument('perm_type', type=str, location='args')
         args = parser.parse_args()
+        condition = {}
+        data={}
+        res_list=[]
+        if args.name:
+            condition["name"] = args.name
+        if args.role:
+            condition["role"] = args.role
+        if args.perm_type:
+            condition["perm_type"] = args.perm_type
+        try:
+            Permissions = PermissionList.objects.filter(**condition)
+            for permission in Permissions:
+                res={}
+                res["id"] = permission.id
+                res["name"] = permission.name
+                res["role"] = permission.role
+                res["buttons"] = permission.buttons
+                res["icons"] = permission.icons
+                res["url"] = permission.url
+                res["perm_type"] = permission.perm_type
+                res["created_time"] = permission.created_time
+                res["updated_time"] = permission.updated_time
+                res["meau2_permission"] = deal_enbedded_data(permission.permission)
+                res["api_permission"] = deal_enbedded_data(permission.api_permission)
+                res_list.append(res)
+            data["res_list"] = res_list
+            code = 200
+            msg = "Get permission info success"
+        except Exception as e:
+            msg = "Get permission info error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
 
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=str)
+        parser.add_argument('name', type=str)
+        parser.add_argument('buttons', type=dict, location="json")
+        parser.add_argument('icons', type=dict, location="json")
+        parser.add_argument('url', type=str)
+        parser.add_argument('perm_type', type=str)
+        parser.add_argument('meau2_permission', type=list, location="json")
+        parser.add_argument('api_permission', type=list, location="json")
+        args = parser.parse_args()
+        try:
+            Permissions=PermissionList(
+                id = args.id,
+                name = args.name,
+                role = "super_admin",
+                buttons = args.buttons,
+                icons = args.icons,
+                url = args.url,
+                perm_type = args.perm_type
+                )
+
+            for meau2 in args.meau2_permission:
+                id = meau2.get("id")
+                name = meau2.get("name")
+                url = meau2.get("url")
+                parent_id = meau2.get("parent_id")
+                meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
+                Permissions.menu2_permission.append(meau2_perm_ins)
+            for api_perm in args.api_permission:
+                id = api_perm.get("id")
+                name = api_perm.get("name")
+                endpoint = api_perm.get("endpoint")
+                method = api_perm.get("method")
+                api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,method=method)
+                Permissions.api_permission.append(api_perm_ins)
+            Permissions.save()
+            code = 200
+            msg = "Create permission success"
+            data = "Success"
+        except Exception as e:
+            code = 500
+            msg = "Create permission error,error msg is %s" % str(e)
+            data = "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
+
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+        try:
+            pass
+        except Exception as e:
+            pass
+    def put(self):
         pass
 
 
