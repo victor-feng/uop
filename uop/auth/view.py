@@ -6,13 +6,13 @@ import ldap
 import datetime
 import hashlib
 from flask import request
-from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
-from mongoengine import NotUniqueError
+from flask_restful import reqparse, Api, Resource
 from uop.auth import auth_blueprint
 from uop.models import UserInfo
 from uop.auth.errors import user_errors
-from uop.auth.handler import add_person
+from uop.auth.handler import add_person,get_menu_list
 from uop.log import Log
+from uop.util import response_data
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -82,9 +82,6 @@ class LdapConn(object):
                 }
                 Log.logger.info(d)
         Log.logger.debug('共找到结果 %s 条' % (len(result)))
-        # print '共找到结果 %s 条' % (len(result))
-        # for d in result:
-        #    print '%(sAMAccountName)s\t%(mail)s\t%(sn)s%(givenName)s\t%(mobile)s %(department)s' % d
         try:
             if con.simple_bind_s(self.cn, password):
                 Log.logger.debug('verify successfully')
@@ -98,259 +95,93 @@ class LdapConn(object):
         return self.flag, field_value
 
 
-class UserRegister(Resource):
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str)
-        parser.add_argument('username', type=str)
-        parser.add_argument('password', type=str)
-        args = parser.parse_args()
-
-        id = args.id
-        username = args.username
-        password = args.password
-
-        try:
-            UserInfo(id=id, username=username, password=password).save()
-            code = 200
-            res = u'注册成功'
-        except NotUniqueError:
-            code = 501
-            res = u'用户名已经存在'
-
-        res = {
-            "code": code,
-            "result": {
-                "res": res,
-                "msg": "test info"
-            }
-        }
-        return res, code
-
-    def get(self):
-        return "test info", 200
-
-
-class UserList(Resource):
+class UserLogin(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
         parser.add_argument('password', type=str)
         args = parser.parse_args()
-
         id = args.id
         password = args.password
         md5 = hashlib.md5()
         md5.update(password)
         salt_password = md5.hexdigest()
+        menu_list=[]
         try:
+            #用户表里有用户
             user = UserInfo.objects.get(id=id)
             if user.password == salt_password:
-                privilege = u"普通用户"
-                if user.is_admin:
-                    privilege = u"管理员"
-
-                # add user in cmdb
-                add_person(user.username, user.id, user.department, "", privilege)
+                add_person(user.username, user.id, user.department, "", "")
+                user.last_login_time=datetime.datetime.now()
+                user.save()
+                role=user.role
+                menu_list=get_menu_list(role)
                 code = 200
-                res = u'登录成功'
-                msg = {
+                msg = u'登录成功'
+                res = {
                     'user_id': user.id,
                     'username': user.username,
                     'department': user.department,
-                    'is_admin': user.is_admin,
-                    'is_external': user.is_external,
+                    'role':user.role,
+                    'menu_list':menu_list,
                 }
             else:
-                res = u'登录失败'
+                msg = u'登录失败'
                 code = 400
-                msg = u'验证错误'
+                res = u'验证错误'
         except UserInfo.DoesNotExist as e:
+            #用户表没有用户,验证ldap 创建用户
             conn = LdapConn(ldap_server, username, passwd_admin, base_dn, scope)
             verify_code, verify_res = conn.verify_user(id, password)
-
             verify_res_name = verify_res.get('name')  # 获取到用户名
             verify_res_department = verify_res.get('department')  # 获取到部门
             user = verify_res_name.decode('utf-8')
             department = verify_res_department.decode('utf-8')
             user_id = verify_res.get('id')  # 获取到工号
-            is_admin = False
-            is_external = False
-
+            role="user"
             if verify_code:
-                res = u'登录成功'
+                msg = u'登录成功'
                 code = 200
                 try:
+                    #不通过ldap手动创建的用户
                     user = UserInfo.objects.get(id=user_id)
                     user.save()
-                    is_admin = user.is_admin
-                    is_external = user.is_external
+                    role=user.role
                 except UserInfo.DoesNotExist:
                     user_obj = UserInfo()
                     user_obj.id = user_id
                     user_obj.username = user
                     user_obj.password = salt_password
-                    user_obj.is_admin = is_admin
                     user_obj.department = department
-                    user_obj.is_external = is_external
                     user_obj.created_time = datetime.datetime.now()
+                    user_obj.updated_time = datetime.datetime.now()
+                    user_obj.last_login_time = datetime.datetime.now()
+                    user_obj.role=role
                     user_obj.save()
-                    privilege = u"普通用户"
-                    if is_admin:
-                        privilege = u"管理员"
-                    add_person(user, user_id, department, "", privilege)
-                msg = {
+                    add_person(user, user_id, department, "","")
+                    menu_list = get_menu_list(role)
+                res = {
                     'user_id': user_id,
                     'username': user.username,
                     'department': department,
-                    'is_admin': user.is_admin,
-                    'is_external': is_external,
+                    'role': user.role,
+                    'menu_list': menu_list,
                 }
             else:
-                res = u'登录失败'
+                msg = u'登录失败'
                 code = 400
-                msg = u'ldap验证错误'
+                res = u'ldap验证错误'
 
-        res = {
-            "code": code,
-            "result": {
-                "res": res,
-                "msg": msg
-            }
-        }
-        return res
+        ret=response_data(code, msg, res)
+        return ret,code
 
 
-class AdminUserList(Resource):
-    def post(self):
-        data = json.loads(request.body)
-        id = data.get('id')
-        password = data.get('password')
-        user = UserInfo.objects.get(id=id)
-        md5 = hashlib.md5()
-        md5.update(password)
-        salt_password = md5.hexdigest()
-        if user:
-            if user.password == salt_password:
-                if user.is_admin:
-                    res = u'管理员登录成功'
-                    code = 200
-                else:
-                    res = u'您没有管理员权限'
-                    code = 405
-        else:
-            res = u'用户不存在'
-            code = 404
-        res = {
-            'code': code,
-            'result': {
-                'res': res,
-                'msg': ''
-            }
-        }
-        return json.dumps(res)
 
 
-class AdminUserDetail(Resource):
-    # @auth.login_required
-    def get(self, name):
-        res = []
-        users = UserInfo.objects.filter(username=name)
-        if not users:
-            users = UserInfo.objects.filter(id=name)
-
-        if users:
-            for user in users:
-                data = {
-                    'id': user.id,
-                    'username': user.username,
-                    'department': user.department,
-                    'is_admin': user.is_admin,
-                    'is_external': user.is_external,
-                    'created_time': str(user.created_time),
-                }
-        else:
-            data = u'用户不存在'
-        res.append(data)
-        return res
-
-    # @auth.login_required
-    def put(self, name):
-        data = json.loads(request.data)
-        admin_user = data.get('admin_user')
-        external_user = data.get('external_user')
-        user_id = data.get('user_id')
-        user = UserInfo.objects.get(id=user_id)
-        admin = UserInfo.objects.get(id=name)
-
-        if admin.is_admin:
-            if isinstance(admin_user, bool):
-                user.is_admin = admin_user
-            else:
-                user.is_admin = eval(admin_user)
-            if isinstance(external_user, bool):
-                user.is_external = external_user
-            else:
-                user.is_external = eval(external_user)
-            user.save()
-            data = {
-                'code': 200,
-                'id': user.id,
-                'username': user.username,
-                'department': user.department,
-                'is_admin': user.is_admin,
-                'is_external': user.is_external,
-                'created_time': str(user.created_time),
-            }
-        else:
-            data = {
-                'code': 300,
-                'msg': u'您没有管理员权限'
-            }
-        return data
-
-    # @auth.login_required
-    def delete(self, name):
-        user = UserInfo.objects.get(username=name)
-        user.delete()
-        code = 200
-        res = u'删除用户成功'
-        res = {
-            'code': code,
-            'result': {
-                'res': res,
-                'msg': ''
-            }
-        }
-        return res, 200
 
 
-class AllUserList(Resource):
-    # @auth.login_required
-    def get(self):
-        all_user = []
-        users = UserInfo.objects.all().order_by('-created_time')
-        for i in users:
-            data = {
-                'id': i.id,
-                'username': i.username,
-                'department': i.department,
-                'is_admin': i.is_admin,
-                'is_external': i.is_external,
-                'created_time': str(i.created_time)
-            }
-            all_user.append(data)
-        return all_user
 
 
-# admin user
-auth_api.add_resource(AdminUserList, '/adminlist')
-auth_api.add_resource(AdminUserDetail, '/admindetail/<name>')
-# common user
-auth_api.add_resource(UserRegister, '/users')
-auth_api.add_resource(UserList, '/userlist')
-auth_api.add_resource(AllUserList, '/all_user')
 
-if __name__ == "__main__":
-    conn = LdapConn()
-    conn.verify_user(147749, 'syswin1~')
+
+auth_api.add_resource(UserLogin, '/userlogin')

@@ -5,10 +5,62 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
-class User(db.Document):
-    email = db.StringField(required=True)
-    first_name = db.StringField(max_length=50)
-    last_name = db.StringField(max_length=50)
+class PermissionList(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True)
+    name = db.StringField(required=False, max_length=50)
+    role = db.StringField(required=False, max_length=50)
+    buttons = db.DictField(required=False)
+    icons=db.DictField(required=False)
+    url = db.StringField(required=False)
+    menu2_permssion=db.ListField(db.EmbeddedDocumentField('Menu2_permssion'))
+    api_permssion = db.ListField(db.EmbeddedDocumentField('Api_permssion'))
+    prem_type=db.StringField(required=True)
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    update_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+
+    meta = {
+            "collection": "permission_list",
+            "index": [{
+                'fields': ['name', 'id'],
+                'unique': True,
+                }]
+            }
+
+
+class Menu2_permssion(db.EmbeddedDocument):
+    id=db.StringField(required=True, max_length=50)
+    name=db.StringField(required=False)
+    parent_id=db.StringField(required=True, max_length=50)
+    url = db.StringField(required=False)
+
+    meta = {
+        'collection': 'menu2_permssion',
+        'index': [
+            {
+                'fields': ['id','name'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
+
+
+class Api_permssion(db.EmbeddedDocument):
+    id = db.StringField(required=True, max_length=50)
+    name=db.StringField(required=False)
+    endpoint=db.StringField(required=False)
+    method=db.ListField(required=False)
+
+    meta = {
+        'collection': 'api_permssion',
+        'index': [
+            {
+                'fields': ['name'],
+                'sparse': True,
+                }
+            ],
+        'index_background': True
+        }
 
 
 class UserInfo(db.Document):
@@ -16,14 +68,30 @@ class UserInfo(db.Document):
     username = db.StringField(required=False, max_length=50)
     password = db.StringField(required=True, max_length=50)
     department = db.StringField(required=False)
-    is_admin = db.BooleanField(required=False, default=False)
-    is_external = db.BooleanField(required=False, default=False)
+    role = db.StringField(required=False,max_length=50)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    last_login_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
 
     meta = {
             "collection": "uop_userinfo",
             "index": [{
                 'fields': ['username', 'id', 'department', 'is_admin'],
+                'unique': True,
+                }]
+            }
+
+class RoleInfo(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    name = db.StringField(required=True, max_length=50)
+    description = db.StringField(required=False)
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+
+    meta = {
+            "collection": "roleinfo",
+            "index": [{
+                'fields': ['role', 'id'],
                 'unique': True,
                 }]
             }

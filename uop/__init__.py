@@ -19,7 +19,7 @@ from uop.resource_view import resource_view_blueprint
 from uop.disconf import disconf_blueprint
 from uop.configure import configure_blueprint
 from uop.pool import pool_blueprint
-
+from uop.permission import perm_blueprint
 class Config(object):
     JOBS = [
         # {
@@ -74,5 +74,6 @@ def create_app(config_name):
     app.register_blueprint(disconf_blueprint, url_prefix='/api/disconf')
     app.register_blueprint(configure_blueprint, url_prefix='/api/configure')
     app.register_blueprint(pool_blueprint, url_prefix='/api/pool')
+    app.register_blueprint(perm_blueprint, url_prefix='/api/permission')
 
     return app

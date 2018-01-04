@@ -2,7 +2,9 @@
 import json
 import requests
 import datetime
+from uop.log import Log
 from flask import current_app
+from uop.models import PermissionList
 
 def add_person(name, user_id, department, contact_info, privilege):
     """
@@ -50,3 +52,45 @@ def add_person(name, user_id, department, contact_info, privilege):
         if res.status_code == 200:
             success = True
     return success
+
+
+def deal_children_data(data):
+    res_list=[]
+    try:
+        for d in data:
+            d=d.to_json()
+            res_list.append(d)
+    except Exception as e:
+        Log.logger.error("UOP User deal children data error,error msg is %s" % str(e))
+    return res_list
+
+
+def get_menu_list(role):
+    """
+    根据角色获取菜单列表
+    :param role:
+    :return:
+    """
+    meau_list = []
+    try:
+        Permssions=PermissionList.objects.filter(role=role,prem_type="meau")
+        for premssion in Permssions:
+            meau_dict = {}
+            name=premssion.name
+            url=premssion.url
+            _id=premssion.id
+            buttons=premssion.buttons
+            icons=premssion.icons
+            children=premssion.menu2_permssion
+            children=deal_children_data(children)
+            meau_dict["name"] = name
+            meau_dict["url"] = url
+            meau_dict["id"] = _id
+            meau_dict["buttons"] = buttons
+            meau_dict["icons"] = icons
+            meau_dict["children"] = children
+            meau_list.append(meau_dict)
+        return  meau_list
+    except Exception as e:
+        Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
+        return  meau_list
