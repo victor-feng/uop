@@ -226,6 +226,8 @@ def Aquery(args):
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
     url_action = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
     url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
+    if not uid or not token:
+        uid, token = get_uid_token()
     data_action = {
         "uid": uid,
         "token": token,
