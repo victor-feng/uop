@@ -216,7 +216,7 @@ def Aquery(args):
     :return:
     '''
     view_dict = {
-        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程
+        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程 405cf4f20d304da3945709d3
         "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
         "B3": "e7a8ed688f2e4c19a3aa3a65",  # 资源 --> 机房
         "B2": "",
@@ -257,6 +257,7 @@ def Aquery(args):
     data_instance_str = json.dumps(data_instance)
     try:
         if instance_id:
+            Log.logger.info("url_instance request data:{}".format(data_instance))
             ret = requests.post(url_instance, data=data_instance_str)
             Log.logger.info("url_instance return:{}".format(ret.json()))
             data = ret.json()["data"]["instance"]
@@ -264,6 +265,7 @@ def Aquery(args):
             data = analyze_data(data, model_id)
             result = response_data(200, data, "")
         else:
+            Log.logger.info("url_action request data:{}".format(url_action))
             ret = requests.post(url_action, data=data_action_str)
             Log.logger.info("url_action return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"]["instance"], model_id)
