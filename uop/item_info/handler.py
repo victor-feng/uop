@@ -267,7 +267,7 @@ def Aquery(args):
             data = analyze_data(data, model_id)
             result = response_data(200, "success", data)
         else:
-            Log.logger.info("url_action request data:{}".format(data_instance))
+            Log.logger.info("url_action request data:{}".format(data_action))
             ret = requests.post(url_action, data=data_action_str)
             # Log.logger.info("url_action return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"]["instance"], model_id)
@@ -287,7 +287,7 @@ def analyze_data(data, entity_id=None):
         data = filter(lambda x: x.get("entity_id") == entity_id, data)
     instance = map(lambda x: {"instance_id": x.get("instance_id"), "name": x.get("name")}, data)
     ret["instance"] = instance
-    return data
+    return ret
 
 
 #获取所有模型实体的id及属性信息存到文件
