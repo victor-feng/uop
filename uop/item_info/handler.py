@@ -265,13 +265,13 @@ def Aquery(args):
             data = ret.json()["data"]["instance"]
             data = filter(lambda x:x["entity_id"] == model_id, data)
             data = analyze_data(data, model_id)
-            result = response_data(200, data, "")
+            result = response_data(200, "success", data)
         else:
             Log.logger.info("url_action request data:{}".format(data_instance))
             ret = requests.post(url_action, data=data_action_str)
             Log.logger.info("url_action return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"]["instance"], model_id)
-            result = response_data(200, data, "")
+            result = response_data(200, "success", data)
     except Exception as exc:
         Log.logger.error("Aquery error:{}".format(str(exc)))
         result = response_data(200, str(exc), "")
@@ -284,7 +284,7 @@ def analyze_data(data, entity_id=None):
         "instance":[]
     }
     if entity_id:
-        data = filter(lambda ins: x.get("entity_id") == entity_id, data)
+        data = filter(lambda x: x.get("entity_id") == entity_id, data)
     instance = map(lambda x: {"instance_id": x.get("instance_id"), "name": x.get("name")}, data)
     ret["instance"] = instance
     return data
