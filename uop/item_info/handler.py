@@ -257,17 +257,17 @@ def Aquery(args):
     data_instance_str = json.dumps(data_instance)
     try:
         if instance_id:
-            ret = requests.post(url, data=data_instance_str)
+            ret = requests.post(url_instance, data=data_instance_str)
             data = ret.json()["data"]["instance"]
             data = filter(lambda x:x["entity_id"] == model_id, data)
             data = analyze_data(data, model_id)
             result = response_data(200, data, "")
         else:
-            ret = requests.post(url, data=data_action_str)
+            ret = requests.post(url_action, data=data_action_str)
             data = analyze_data(ret.json()["data"]["instance"], model_id)
             result = response_data(200, data, "")
     except Exception as exc:
-        Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
+        Log.logger.error("Aquery error:{}".format(str(exc)))
         result = response_data(200, str(exc), "")
     return result
 
