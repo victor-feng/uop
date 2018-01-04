@@ -258,12 +258,14 @@ def Aquery(args):
     try:
         if instance_id:
             ret = requests.post(url_instance, data=data_instance_str)
+            Log.logger.info("url_instance return:{}".format(ret.json()))
             data = ret.json()["data"]["instance"]
             data = filter(lambda x:x["entity_id"] == model_id, data)
             data = analyze_data(data, model_id)
             result = response_data(200, data, "")
         else:
             ret = requests.post(url_action, data=data_action_str)
+            Log.logger.info("url_action return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"]["instance"], model_id)
             result = response_data(200, data, "")
     except Exception as exc:
