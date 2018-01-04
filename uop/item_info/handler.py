@@ -209,7 +209,7 @@ def get_entity_from_file(filters):
 
 
 #A类视图查询
-def Aquery(data):
+def Aquery(args):
     '''
     A 类视图 查询
     :param data:
