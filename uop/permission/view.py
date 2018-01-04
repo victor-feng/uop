@@ -123,6 +123,18 @@ class PermManage(Resource):
         pass
 
 
+class AllPermManage(Resource):
+    """
+    管理权限
+    """
+    def get(self):
+        pass
+
+    def post(self):
+        pass
+
+
+
 class RoleManage(Resource):
     """
     管理角色
@@ -195,9 +207,10 @@ class RoleManage(Resource):
 
 
 
-perm_api.add_resource(UserManage, '/user_management')
-perm_api.add_resource(PermManage, '/perm_management')
-perm_api.add_resource(RoleManage, '/role_management')
+perm_api.add_resource(UserManage, '/user')
+perm_api.add_resource(PermManage, '/perm')
+perm_api.add_resource(RoleManage, '/role')
+perm_api.add_resource(AllPermManage, '/allperm')
 
 
 
