@@ -416,13 +416,12 @@ class RoleManage(Resource):
         try:
             Users=UserInfo.objects.filter(role=args.name)
             Role = RoleInfo.objects.get(name=args.name)
+            code = 200
             if not Users:
                 Role.delete()
-                code = 200
                 msg = "Delete role success"
                 data = "Success"
             else:
-                code = 400
                 msg = "Delete role failed.Some users are also part of this role"
                 data="Failed"
         except Exception as e:
