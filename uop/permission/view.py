@@ -151,6 +151,7 @@ class AllPermManage(Resource):
                 res["role"] = permission.role
                 res["buttons"] = permission.buttons
                 res["icons"] = permission.icons
+                res["operations"] = permission.operations
                 res["url"] = permission.url
                 res["perm_type"] = permission.perm_type
                 res["created_time"] = permission.created_time
@@ -174,6 +175,7 @@ class AllPermManage(Resource):
         parser.add_argument('name', type=str)
         parser.add_argument('buttons', type=dict, location="json")
         parser.add_argument('icons', type=dict, location="json")
+        parser.add_argument('operations', type=dict, location="json")
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
@@ -361,8 +363,8 @@ class RoleManage(Resource):
         parser.add_argument('description', type=str)
         args = parser.parse_args()
         try:
-            Users = UserInfo.objects.get(role=args.name)
-            Role = RoleInfo.objects.filter(name=args.name)
+            Users = UserInfo.objects.filter(role=args.name)
+            Role = RoleInfo.objects.get(name=args.name)
             if not Users:
                 if args.new_name:
                     Role.name = args.new_name
@@ -372,7 +374,7 @@ class RoleManage(Resource):
             else:
                 if args.description:
                     Role.description = args.description
-                if args.name:
+                if args.new_name:
                     Role.name = args.new_name
                 for user in Users:
                     user.role = args.new_name
