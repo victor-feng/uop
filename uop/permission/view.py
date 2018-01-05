@@ -213,7 +213,8 @@ class AllPermManage(Resource):
                     post = api_perm.get("post")
                     put = api_perm.get("put")
                     delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,delete=delete)
+                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,
+                                            delete=delete)
                     Permission.api_permission.append(api_perm_ins)
             elif args.action == "create_meau2_perm":
                 Permission_obj = PermissionList.objects.get(name=args.name)
@@ -289,23 +290,51 @@ class AllPermManage(Resource):
             Permission = PermissionList.objects.get(name=args.name)
             if args.id:
                 Permission.id = args.id
-            if args.name:
+            elif args.name:
                 Permission.name = args.name
-            if args.buttons:
+            elif args.button:
                 Permission.button = args.button
-            if args.icons:
+            elif args.icon:
                 Permission.icon = args.icon
-            if args.url:
+            elif args.operation:
+                Permission.operation = args.operation
+            elif args.url:
                 Permission.url = args.url
-            if args.perm_type:
+            elif args.perm_type:
                 Permission.perm_type = args.perm_type
-            if args.meau2_permission:
-                pass
-            if args.api_permission:
-                pass
+            elif args.action == "update_meau2_perm":
+                Permission.menu2_permission=[]
+                for meau2 in args.meau2_permission:
+                    id = meau2.get("id")
+                    name = meau2.get("name")
+                    url = meau2.get("url")
+                    parent_id = meau2.get("parent_id")
+                    meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
+                    Permission.menu2_permission.append(meau2_perm_ins)
+            elif args.action == "update_api_perm":
+                Permission.api_permission=[]
+                for api_perm in args.api_permission:
+                    id = api_perm.get("id")
+                    name = api_perm.get("name")
+                    endpoint = api_perm.get("endpoint")
+                    get = api_perm.get("get")
+                    post = api_perm.get("post")
+                    put = api_perm.get("put")
+                    delete = api_perm.get("delete")
+                    api_perm_ins = Api_perm(id=id, name=name, endpoint=endpoint, get=get, post=post, put=put,
+                                            delete=delete)
+                    Permission.api_permission.append(api_perm_ins)
+            Permission.save()
 
+            code = 200
+            msg = "Update permission success"
+            data = "Success"
         except Exception as e:
-            pass
+            msg = "Update permission error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
 
 
 
