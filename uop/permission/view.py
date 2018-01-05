@@ -195,7 +195,9 @@ class AllPermManage(Resource):
                             location='json')
         args = parser.parse_args()
         try:
+            perm_id = str(uuid.uuid1())
             Permission=PermissionList(
+                perm_id = perm_id,
                 id = args.id,
                 name = args.name,
                 role = "super_admin",
@@ -320,8 +322,6 @@ class AllPermManage(Resource):
             elif args.action == "update_api_perm":
                 Permission.api_permission=[]
                 for api_perm in args.api_permission:
-                    id = api_perm.get("id")
-                    name = api_perm.get("name")
                     endpoint = api_perm.get("endpoint")
                     get = api_perm.get("get")
                     post = api_perm.get("post")
@@ -383,7 +383,7 @@ class RoleManage(Resource):
                 msg = "Create role Failed,The role has already existed"
                 data = "Failed"
             else:
-                id=str(uuid.uuid1())
+                id = str(uuid.uuid1())
                 Role = RoleInfo(id=id,name=args.name,description=args.description,
                                 created_time=datetime.datetime.now(),updated_time=datetime.datetime.now())
                 Role.save()
