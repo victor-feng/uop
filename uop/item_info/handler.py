@@ -185,11 +185,11 @@ def push_entity_to_file(data):
                     "id": dc.get("id",""),
                     "property": dc.get("parameters",[])
                 })
-        with open(curdir + "/.entity.txt", "w") as fp:
-            json.dump({"entity": entity_list}, fp)
+        # with open(curdir + "/.entity.txt", "w") as fp:
+        #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
-    return entity_list
+    return {"entity": entity_list}
 
 
 def get_entity_from_file(filters):
@@ -201,11 +201,12 @@ def get_entity_from_file(filters):
         "project":      "59c0af57133442e7b34654a3"
     }
     assert(isinstance(filters, dict))
-    if not os.path.exists(curdir + "/.entity.txt"):
-        whole_entity = get_entity()
-    else:
-        with open(curdir + "/.entity.txt", "rb") as fp:
-            whole_entity = json.load(fp)["entity"]
+    # if not os.path.exists(curdir + "/.entity.txt"):
+    #     whole_entity = get_entity()
+    # else:
+    #     with open(curdir + "/.entity.txt", "rb") as fp:
+    #         whole_entity = json.load(fp)["entity"]
+    whole_entity = get_entity() # 不使用文件缓存
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if len(single_entity) == 5: # 缓存的实体id没问题，直接补充字段返回
