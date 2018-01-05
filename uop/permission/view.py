@@ -214,7 +214,7 @@ class AllPermManage(Resource):
                     meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
                     Permission.menu2_permission.append(meau2_perm_ins)
             elif args.action == "create_api_perm":
-                for api_perm in args.api_permission
+                for api_perm in args.api_permission:
                     id = api_perm.get("id")
                     name = api_perm.get("name")
                     endpoint = api_perm.get("endpoint")
