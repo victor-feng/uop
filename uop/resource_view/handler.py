@@ -156,15 +156,11 @@ def package_data(data):
     instance = data["instance"]
     relation = data["relation"]
     business = filter(lambda ins:ins["level_id"] == 2, instance)
-    # module = filter(lambda ins: ins["level_id"] == 3, instance)
-    # project = filter(lambda ins: ins["level_id"] == 4, instance)
-    # resource = filter(lambda ins: ins["level_id"] == 5, instance)
-    # for b in business:
-    #     mr = [{"title": b["name"], "id": b["instance_id"], "children": []} for m in module if m["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == b["instance_id"]]]
     for b in business:
         node = {"title": b["name"], "id": b["instance_id"], "children": attach_data(relation, b["instance_id"], instance, 3)}
         result.append(node)
     return result
+
 
 def attach_data(relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
