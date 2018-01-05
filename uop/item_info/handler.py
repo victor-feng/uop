@@ -277,9 +277,7 @@ def Aquery(args):
             Log.logger.info("url_instance request data:{}".format(data_instance))
             ret = requests.post(url_instance, data=data_instance_str)
             Log.logger.info("url_instance return:{}".format(ret.json()))
-            data = ret.json()["data"]["instance"]
-            data = filter(lambda x:x["entity_id"] == model_id, data)
-            data = analyze_data(data, model_id)
+            data = analyze_data(ret.json()["data"], model_id)
         else:
             # Log.logger.info("url_action request data:{}".format(data_action))
             # ret = requests.post(url_action, data=data_action_str)
