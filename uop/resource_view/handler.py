@@ -168,7 +168,7 @@ def package_data(data):
 def attach_data(relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
     if level < 5:
-        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(relation, instance, level + 1)} for ni in next_instance if
+        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(relation, ni["instance_id"], instance, level + 1)} for ni in next_instance if
          ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
     if level == 5:
         return [{"title": ni["name"], "id": ni["instance_id"]} for ni in next_instance]
