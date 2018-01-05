@@ -336,7 +336,7 @@ class RoleManage(Resource):
         args = parser.parse_args()
         try:
 
-            Role_obj = RoleInfo.objects.get(name=args.name)
+            Role_obj = RoleInfo.objects.filter(name=args.name)
             if  Role_obj:
                 code = 400
                 msg = "Create role Failed,The role has already existed"
@@ -363,8 +363,8 @@ class RoleManage(Resource):
         parser.add_argument('description', type=str)
         args = parser.parse_args()
         try:
-            Users = UserInfo.objects.filter(role=args.name)
-            Role = RoleInfo.objects.get(name=args.name)
+            Users = UserInfo.objects.get(role=args.name)
+            Role = RoleInfo.objects.filter(name=args.name)
             if not Users:
                 if args.new_name:
                     Role.name = args.new_name

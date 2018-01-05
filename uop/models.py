@@ -52,9 +52,10 @@ class PermissionList(db.Document):
     url = db.StringField(required=False)
     menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_perm'))
     api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
-    perm_type=db.StringField(required=True)
+    perm_type=db.StringField(required=False)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    env = db.StringField(required=False)
 
     meta = {
             "collection": "permission_list",
