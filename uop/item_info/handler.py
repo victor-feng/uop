@@ -206,7 +206,7 @@ def get_entity_from_file(filters):
     # else:
     #     with open(curdir + "/.entity.txt", "rb") as fp:
     #         whole_entity = json.load(fp)["entity"]
-    whole_entity = get_entity()["entity"] # 不使用文件缓存
+    whole_entity = get_entity()["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if len(single_entity) == 5: # 缓存的实体id没问题，直接补充字段返回
@@ -222,8 +222,11 @@ def get_entity_from_file(filters):
 def sort_list(item, key):
     assert(item, list)
     sorted_list = []
+    count = 0
     for k in key.iterkeys():
+        count += 1
         one = filter(lambda x: x["code"] == k, item)[0]
+        Log.logger.info(u"sort_list {}次:{}".format(count, one))
         sorted_list.append(one)
     return sorted_list
 
