@@ -204,7 +204,6 @@ def get_entity_from_file(filters):
     if single_entity:
         se = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, single_entity)
 
-
     return single_entity
 
 
@@ -225,6 +224,7 @@ def Aquery(args):
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
     url_action = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
+    url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
     url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
     if not uid or not token:
         uid, token = get_uid_token()
@@ -244,6 +244,20 @@ def Aquery(args):
             }]
         }
     }
+    data_list =  {
+            "uid": uid,
+            "token": token,
+            "sign":"",
+            "data":{
+                "instance":[{
+                    "instance_id":"",
+                    "name": name #工号
+                }],
+                "entity":{
+                    "model_id": self_model_id
+                }
+            }
+}
     data_instance = {
         "uid": uid,
         "token": token,
@@ -256,6 +270,7 @@ def Aquery(args):
         }
     }
     data_action_str = json.dumps(data_action)
+    data_list_str = json.dumps(data_list)
     data_instance_str = json.dumps(data_instance)
     try:
         if instance_id:
@@ -266,10 +281,14 @@ def Aquery(args):
             data = filter(lambda x:x["entity_id"] == model_id, data)
             data = analyze_data(data, model_id)
         else:
-            Log.logger.info("url_action request data:{}".format(data_action))
-            ret = requests.post(url_action, data=data_action_str)
-            # Log.logger.info("url_action return:{}".format(ret.json()))
-            data = analyze_data(ret.json()["data"]["instance"], model_id)
+            # Log.logger.info("url_action request data:{}".format(data_action))
+            # ret = requests.post(url_action, data=data_action_str)
+            # # Log.logger.info("url_action return:{}".format(ret.json()))
+            # data = analyze_data(ret.json()["data"]["instance"], model_id)
+            Log.logger.info("url_list request data:{}".format(data_list))
+            ret = requests.post(url_list, data=data_list_str)
+            Log.logger.info("url_action return:{}".format(ret.json()))
+            data = analyze_data(ret.json()["data"], model_id, flag=True)
     except Exception as exc:
         Log.logger.error("Aquery error:{}".format(str(exc)))
         data = str(exc)
@@ -279,15 +298,28 @@ def Aquery(args):
 
 
 #从B类视图中解析出A类数据
-def analyze_data(data, entity_id=None):
+def analyze_data(data, entity_id, flag=False):
     ret = {
         "instance":[]
     }
-    if entity_id:
-        data = filter(lambda x: x.get("entity_id") == entity_id, data)
-    instance = map(lambda x: {"instance_id": x.get("instance_id"), "name": x.get("name")}, data)
+    if flag: # list接口的数据
+        instance = map(lambda x: {"instance_id": x.get("id"), "name": x.get("name")}, data) # 拿到名字为name的用户的实例id，理论上只有一个
+    else: # instance接口的数据
+        data = filter(lambda x: x.get("entity_id") == entity_id, data)[0] # 理论上一层下只有一个实体id
+        instance = list(dequeued_list(data["instance"], lambda x: x.get("id"))) # 根据实例id去重
     ret["instance"] = instance
     return ret
+
+
+# 列表字典按键去重
+def dequeued_list(item, key):
+    assert(isinstance(item, list))
+    unique = set()
+    for i, v in enumerate(item):
+        if key(v) not in unique:
+            unique.add(key(v))
+            new = {"instance_id": v.get("id"), "name": v.get("name")}
+            yield new
 
 
 #获取所有模型实体的id及属性信息存到文件
