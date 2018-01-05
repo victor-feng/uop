@@ -50,7 +50,7 @@ class UserManage(Resource):
             Roles = RoleInfo.objects.all()
             for user in Users:
                 for role in Roles:
-                    if args.role == role.name:
+                    if user.role == role.name:
                         res = {}
                         res["id"] = user.id
                         res["username"] = user.username
