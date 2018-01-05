@@ -215,15 +215,12 @@ class AllPermManage(Resource):
                     Permission.menu2_permission.append(meau2_perm_ins)
             elif args.action == "create_api_perm":
                 for api_perm in args.api_permission:
-                    id = api_perm.get("id")
-                    name = api_perm.get("name")
                     endpoint = api_perm.get("endpoint")
                     get = api_perm.get("get")
                     post = api_perm.get("post")
                     put = api_perm.get("put")
                     delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,
-                                        delete=delete)
+                    api_perm_ins = Api_perm(endpoint=endpoint,get=get,post=post,put=put,delete=delete)
                     Permission.api_permission.append(api_perm_ins)
             elif args.action == "create_meau2_perm":
                 Permission_obj = PermissionList.objects.get(name=args.name)
@@ -330,8 +327,7 @@ class AllPermManage(Resource):
                     post = api_perm.get("post")
                     put = api_perm.get("put")
                     delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(id=id, name=name, endpoint=endpoint, get=get, post=post, put=put,
-                                            delete=delete)
+                    api_perm_ins = Api_perm(endpoint=endpoint, get=get, post=post, put=put,delete=delete)
                     Permission.api_permission.append(api_perm_ins)
             Permission.save()
 
