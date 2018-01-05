@@ -143,7 +143,7 @@ def cmdb2_graph_search(args, res_id):
         data = requests.post(url, data=data_str).json()["data"]
         if view_num == "B6":
             data = package_data(data)
-        result = response_data(200, data, "")
+        result = response_data(200, "success", data)
     except Exception as exc:
         Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
         result = response_data(200, str(exc), "")
@@ -164,6 +164,7 @@ def package_data(data):
     for b in business:
         node = {"title": b["name"], "id": b["instance_id"], "children": attach_data(relation, b["instance_id"], instance, 3)}
         result.append(node)
+    return result
 
 def attach_data(relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
