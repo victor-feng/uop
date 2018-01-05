@@ -45,7 +45,7 @@ class Api_perm(db.EmbeddedDocument):
 
 
 class PermissionList(db.Document):
-    prem_id= db.StringField(required=False, max_length=50,unique=True)
+    perm_id= db.StringField(required=False, max_length=50,unique=True)
     name = db.StringField(required=False, max_length=50, unique=True)
     id = db.StringField(required=True, max_length=50)
     role = db.StringField(required=False, max_length=50)
