@@ -31,9 +31,10 @@ def response_data_not_found():
 
 
 # cmdb1.0 图搜素
-def cmdb_graph_search(args, res_id):
+def cmdb_graph_search(args):
     try:
         param_str = "?"
+        res_id = args.res_id
         if args.reference_sequence:
             if param_str == "?":
                 param_str += "reference_sequence=" + args.reference_sequence
@@ -117,7 +118,7 @@ def cmdb_graph_search(args, res_id):
 
 
 # cmdb2.0 图搜素
-def cmdb2_graph_search(args, res_id):
+def cmdb2_graph_search(args):
     view_dict = {
         "B6": "ccb058ab3c8d47bc991efd7b", # 部门 --> 业务 --> 资源
         "B4": "29930f94bf0844c6a0e060bd", # 资源 --> 环境 --> 机房
@@ -127,7 +128,8 @@ def cmdb2_graph_search(args, res_id):
     }
     url = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
     uid, token = get_uid_token()
-    view_num = str(args.view_num)
+    view_num = args.view_num
+    res_id = args.res_id
     data = {
         "uid": uid,
         "token": token,
@@ -135,7 +137,15 @@ def cmdb2_graph_search(args, res_id):
         "data": {
             "id": view_dict[view_num] if view_num else view_dict["B4"],
             "name": "",
-            "entity": []
+            "entity": [
+                {
+                    "id": res_id,
+                    "parameters": [{
+                        "code": args.code,
+                        "value": args.value
+                    }]
+                }
+            ]
         }
     }
     data_str = json.dumps(data)
@@ -166,8 +176,8 @@ def attach_data(relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
     if level < 5:
         return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(relation, ni["instance_id"], instance, level + 1)} for ni in next_instance if
-         ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
+                ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
     if level == 5:
-        return [{"title": ni["name"], "id": ni["instance_id"]} for ni in next_instance]
+        return [{"title": ni["name"], "instance_id": ni["instance_id"], "code": ni["code"], "model_id": ni["entity_id"]} for ni in next_instance]
 
 

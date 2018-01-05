@@ -16,8 +16,8 @@ resource_view_api = Api(resource_view_blueprint, errors=resource_view_errors)
 
 
 class ResourceView(Resource):
-    @classmethod
-    def get(cls, res_id):
+
+    def get(self):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('reference_sequence', type=str, location='args')
@@ -28,14 +28,17 @@ class ResourceView(Resource):
             parser.add_argument('total_count', type=str, location='args')
             parser.add_argument('cmdb', type=int)
             parser.add_argument('view_num', type=str)
+            parser.add_argument('res_id', type=str)
+            parser.add_argument('code', type=str)
+            parser.add_argument('value', type=str)
             args = parser.parse_args()
             Log.logger.info("get graph from cmdb: {}".format(args.cmdb))
             if args.cmdb == 1:
-                result = cmdb_graph_search(args, res_id)
+                result = cmdb_graph_search(args)
             elif args.cmdb == 2:
-                result = cmdb2_graph_search(args, res_id)
+                result = cmdb2_graph_search(args)
             else:
-                result = cmdb_graph_search(args, res_id)
+                result = cmdb_graph_search(args)
                 #result = response_data(500, "args.cmdb:{}".format(args.cmdb), "")
         except Exception as exc:
             Log.logger.error("get graph from cmdb error: {}".format(str(exc)))
@@ -43,4 +46,4 @@ class ResourceView(Resource):
         return jsonify(result)
 
 
-resource_view_api.add_resource(ResourceView, '/res_view/<res_id>')
+resource_view_api.add_resource(ResourceView, '/res_view/')
