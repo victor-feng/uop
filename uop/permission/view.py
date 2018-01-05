@@ -173,9 +173,9 @@ class AllPermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
         parser.add_argument('name', type=str)
-        parser.add_argument('buttons', type=dict, location="json")
-        parser.add_argument('icons', type=dict, location="json")
-        parser.add_argument('operations', type=dict, location="json")
+        parser.add_argument('button', type=dict, location="json")
+        parser.add_argument('icon', type=dict, location="json")
+        parser.add_argument('operation', type=dict, location="json")
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
@@ -190,37 +190,41 @@ class AllPermManage(Resource):
                 id = args.id,
                 name = args.name,
                 role = "super_admin",
-                buttons = args.buttons,
-                icons = args.icons,
-                url = args.url,
                 perm_type = args.perm_type
                 )
+            if args.action == "create_meau_perm":
+                Permission.url =args.url
+                for meau2 in args.meau2_permission:
+                    id = meau2.get("id")
+                    name = meau2.get("name")
+                    url = meau2.get("url")
+                    parent_id = meau2.get("parent_id")
+                    meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
+                    Permission.menu2_permission.append(meau2_perm_ins)
+            elif args.action == "create_api_perm":
+                for api_perm in args.api_permission:
+                    id = api_perm.get("id")
+                    name = api_perm.get("name")
+                    endpoint = api_perm.get("endpoint")
+                    method = api_perm.get("method")
+                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,method=method)
+                    Permission.api_permission.append(api_perm_ins)
 
-            for meau2 in args.meau2_permission:
-                id = meau2.get("id")
-                name = meau2.get("name")
-                url = meau2.get("url")
-                parent_id = meau2.get("parent_id")
-                meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
-                Permission.menu2_permission.append(meau2_perm_ins)
-            for api_perm in args.api_permission:
-                id = api_perm.get("id")
-                name = api_perm.get("name")
-                endpoint = api_perm.get("endpoint")
-                method = api_perm.get("method")
-                api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,method=method)
-                Permission.api_permission.append(api_perm_ins)
-            Permission.save()
-            if args.action == "create_meau2_perm":
-                Permission = PermissionList.objects.get(id=args.id)
+            elif args.action == "create_meau2_perm":
+                Permission_obj = PermissionList.objects.get(name=args.name)
                 for meau2 in args.meau2_permission:
                     id = meau2.get("id")
                     name = meau2.get("name")
                     url = meau2.get("url")
                     parent_id = meau2.get("parent_id")
                     meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
-                    Permission.menu2_permission.append(meau2_perm_ins)
-                Permission.save()
+                    Permission_obj.menu2_permission.append(meau2_perm_ins)
+                Permission_obj.save()
+            else:
+                Permission.icons[args.icon] = True
+                Permission.buttons[args.button] = True
+                Permission.operations[args.operation] = True
+            Permission.save()
             code = 200
             msg = "Create permission success"
             data = "Success"
@@ -365,6 +369,20 @@ class RoleManage(Resource):
         try:
             Users = UserInfo.objects.filter(role=args.name)
             Role = RoleInfo.objects.get(name=args.name)
+            Role_obj = RoleInfo.objects.filter(name=args.new_name)
+            #新名字和旧名字不能相同
+            if args.name == args.new_name:
+                code=200
+                msg = "Update role Failed.The new name is the same as the old name"
+                data = "Failed"
+                ret = response_data(code, msg, data)
+                return ret, code
+            if Role_obj:
+                code = 200
+                msg = "Update role Failed,The role has already existed"
+                data = "Failed"
+                ret = response_data(code, msg, data)
+                return ret, code
             if not Users:
                 if args.new_name:
                     Role.name = args.new_name
