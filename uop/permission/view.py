@@ -198,7 +198,7 @@ class AllPermManage(Resource):
             perm_id = str(uuid.uuid1())
             Permission=PermissionList(
                 perm_id = perm_id,
-                id = args.id,
+                meau_id = args.id,
                 name = args.name,
                 role = "super_admin",
                 perm_type = args.perm_type,
@@ -209,11 +209,11 @@ class AllPermManage(Resource):
             if args.action == "create_meau_perm":
                 Permission.url =args.url
                 for meau2 in args.meau2_permission:
-                    id = meau2.get("id")
+                    meau2_id = meau2.get("id")
                     name = meau2.get("name")
                     url = meau2.get("url")
                     parent_id = meau2.get("parent_id")
-                    meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
+                    meau2_perm_ins=Menu2_perm(meau2_id=meau2_id,name=name,url=url,parent_id=parent_id)
                     Permission.menu2_permission.append(meau2_perm_ins)
             elif args.action == "create_api_perm":
                 for api_perm in args.api_permission:
