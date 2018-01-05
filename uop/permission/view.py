@@ -342,7 +342,7 @@ class RoleManage(Resource):
                 msg = "Create role Failed,The role has already existed"
                 data = "Failed"
             else:
-                id=str(uuid.uuid1   ())
+                id=str(uuid.uuid1())
                 Role = RoleInfo(id=id,name=args.name,description=args.description,
                                 created_time=datetime.datetime.now(),updated_time=datetime.datetime.now())
                 Role.save()
@@ -370,6 +370,7 @@ class RoleManage(Resource):
                     Role.name = args.new_name
                 if args.description:
                     Role.description = args.description
+
             else:
                 if args.description:
                     Role.description = args.description
@@ -378,6 +379,8 @@ class RoleManage(Resource):
                 for user in Users:
                     user.role = args.new_name
                     user.save()
+            Role.updated_time=datetime.datetime.now()
+            Role.save()
             code = 200
             msg = "Update role success"
             data = "Success"
