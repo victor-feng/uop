@@ -76,12 +76,12 @@ def get_login_permission(role):
                 meau_dict = {}
                 name=permission.name
                 url=permission.url
-                meau_id=permission.meau_id
+                _id=permission.id
                 children=permission.menu2_permission
                 children=deal_enbedded_data(children)
                 meau_dict["name"] = name
                 meau_dict["url"] = url
-                meau_dict["id"] = meau_id
+                meau_dict["id"] = _id
                 meau_dict["children"] = children
                 meau_list.append(meau_dict)
             elif permission.perm_type == "operation":
