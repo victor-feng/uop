@@ -89,7 +89,7 @@ class UserInfo(db.Document):
 
 class RoleInfo(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
-    name = db.StringField(required=True, max_length=50)
+    name = db.StringField(required=True, max_length=50,unique=True)
     description = db.StringField(required=False)
     updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
