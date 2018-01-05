@@ -200,6 +200,7 @@ def get_entity_from_file(filters):
         "Module":       "9e97b54a4a54472e9e913d4e",
         "project":      "59c0af57133442e7b34654a3"
     }
+    sort_key = ["Person", "department", "yewu", "Module", "project"]
     assert(isinstance(filters, dict))
     # if not os.path.exists(curdir + "/.entity.txt"):
     #     whole_entity = get_entity()
@@ -211,8 +212,9 @@ def get_entity_from_file(filters):
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if len(single_entity) == 5: # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(str(x["property"]))}, single_entity)
-        single_entity = sort_list(single_entity, filters)
-        # single_entity = list((lambda item, key: (filter(lambda x: x["code"] == k, item)[0] for k in key.iterkeys()))(single_entity, filters))
+        single_entity = list(
+                (lambda item, key:((filter(lambda x: x["code"] == k, item)[0] for k in key)))(single_entity, sort_key)
+        )
     else:
         single_entity = u"CMDB2.0 基础模型数据有变，联系管理员解决"
     return single_entity
@@ -221,14 +223,9 @@ def get_entity_from_file(filters):
 #列表字典按模板字典键排序
 def sort_list(item, key):
     assert(item, list)
-    sorted_list = []
-    count = 0
-    for k in key.iterkeys():
-        count += 1
+    for k in key:
         one = filter(lambda x: x["code"] == k, item)[0]
-        Log.logger.info(u"sort_list {}次:{}".format(count, one))
-        sorted_list.append(one)
-    return sorted_list
+        yield one
 
 
 #A类视图查询
