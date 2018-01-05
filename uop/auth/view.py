@@ -10,7 +10,7 @@ from flask_restful import reqparse, Api, Resource
 from uop.auth import auth_blueprint
 from uop.models import UserInfo
 from uop.auth.errors import user_errors
-from uop.auth.handler import add_person,get_menu_list
+from uop.auth.handler import add_person,get_login_permission
 from uop.log import Log
 from uop.util import response_data
 
@@ -115,7 +115,7 @@ class UserLogin(Resource):
                 user.last_login_time=datetime.datetime.now()
                 user.save()
                 role=user.role
-                menu_list=get_menu_list(role)
+                menu_list,buttons,icons,operations=get_login_permission(role)
                 code = 200
                 msg = u'登录成功'
                 res = {
@@ -124,6 +124,9 @@ class UserLogin(Resource):
                     'department': user.department,
                     'role':user.role,
                     'menu_list':menu_list,
+                    'buttons':buttons,
+                    'icons':icons,
+                    'operations':operations
                 }
             else:
                 msg = u'登录失败'
@@ -159,13 +162,16 @@ class UserLogin(Resource):
                     user_obj.role=role
                     user_obj.save()
                     add_person(user, user_id, department, "","")
-                    menu_list = get_menu_list(role)
+                    menu_list, buttons, icons, operations = get_login_permission(role)
                 res = {
                     'user_id': user_id,
                     'username': user,
                     'department': department,
                     'role': role,
                     'menu_list': menu_list,
+                    'buttons': buttons,
+                    'icons': icons,
+                    'operations': operations
                 }
             else:
                 msg = u'登录失败'

@@ -58,7 +58,7 @@ def add_person(name, user_id, department, contact_info, privilege):
 
 
 
-def get_menu_list(role):
+def get_login_permission(role):
     """
     根据角色获取菜单列表
     :param role:
@@ -66,15 +66,13 @@ def get_menu_list(role):
     """
     meau_list = []
     try:
+        #获取菜单权限
         Permissions=PermissionList.objects.filter(role=role,perm_type="meau")
         for permission in Permissions:
             meau_dict = {}
             name=permission.name
             url=permission.url
             _id=permission.id
-            buttons=permission.buttons
-            icons=permission.icons
-            operations=permission.operations
             children=permission.menu2_permission
             children=deal_enbedded_data(children)
             meau_dict["name"] = name
@@ -82,7 +80,16 @@ def get_menu_list(role):
             meau_dict["id"] = _id
             meau_dict["children"] = children
             meau_list.append(meau_dict)
-        return  meau_list
+        #获取按钮权限
+        Permissions = PermissionList.objects.filter(role=role, perm_type="button")
+        buttons = Permissions[0].buttons
+        #获取图标权限
+        Permissions = PermissionList.objects.filter(role=role, perm_type="icon")
+        icons = Permissions[0].icons
+        #获取操作权限
+        Permissions = PermissionList.objects.filter(role=role, perm_type="operation")
+        operations = Permissions[0].operations
+        return  meau_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
         return  meau_list
