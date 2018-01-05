@@ -315,7 +315,7 @@ class RoleManage(Resource):
                 res={}
                 res["id"] = role.id
                 res["name"] = role.name
-                res["created_time"] = role.created_time
+                res["created_time"] = str(role.created_time)
                 res["description"] = role.description
                 res_list.append(res)
             data["res_list"] = res_list
