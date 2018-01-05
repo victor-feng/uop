@@ -316,8 +316,12 @@ def analyze_data(data, entity_id, flag=False):
     if flag: # list接口的数据
         instance = map(lambda x: {"instance_id": x.get("id"), "name": x.get("name")}, data) # 拿到名字为name的用户的实例id，理论上只有一个
     else: # instance接口的数据
-        data = filter(lambda x: x.get("entity_id") == entity_id, data)[0] # 理论上一层下只有一个实体id
-        instance = list(dequeued_list(data["instance"], lambda x: x.get("id"))) # 根据实例id去重
+        data = filter(lambda x: x.get("entity_id") == entity_id, data)
+        if data:
+            data = data[0] # 理论上一层下只有一个实体id
+            instance = list(dequeued_list(data["instance"], lambda x: x.get("id"))) # 根据实例id去重
+        else:
+            instance = []
     ret["instance"] = instance
     return ret
 
