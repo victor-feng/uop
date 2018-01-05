@@ -67,20 +67,19 @@ def get_menu_list(role):
     meau_list = []
     try:
         Permissions=PermissionList.objects.filter(role=role,perm_type="meau")
-        for premission in Permissions:
+        for permission in Permissions:
             meau_dict = {}
-            name=premission.name
-            url=premission.url
-            _id=premission.id
-            buttons=premission.buttons
-            icons=premission.icons
-            children=premission.menu2_permission
+            name=permission.name
+            url=permission.url
+            _id=permission.id
+            buttons=permission.buttons
+            icons=permission.icons
+            operations=permission.operations
+            children=permission.menu2_permission
             children=deal_enbedded_data(children)
             meau_dict["name"] = name
             meau_dict["url"] = url
             meau_dict["id"] = _id
-            meau_dict["buttons"] = buttons
-            meau_dict["icons"] = icons
             meau_dict["children"] = children
             meau_list.append(meau_dict)
         return  meau_list

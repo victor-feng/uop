@@ -335,10 +335,9 @@ class RoleManage(Resource):
         parser.add_argument('description', type=str)
         args = parser.parse_args()
         try:
-
+            code = 200
             Role_obj = RoleInfo.objects.filter(name=args.name)
             if  Role_obj:
-                code = 400
                 msg = "Create role Failed,The role has already existed"
                 data = "Failed"
             else:
@@ -346,7 +345,6 @@ class RoleManage(Resource):
                 Role = RoleInfo(id=id,name=args.name,description=args.description,
                                 created_time=datetime.datetime.now(),updated_time=datetime.datetime.now())
                 Role.save()
-                code = 200
                 msg = "Create role success"
                 data = "Success"
         except Exception as e:
