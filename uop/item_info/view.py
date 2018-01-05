@@ -397,22 +397,23 @@ class CmdbModels(Resource):
         非空时，会按照filters字典去匹配相应的实体
         :return:
         '''
-        response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
         parser.add_argument('code', type=str)
         parser.add_argument('name', type=str)
         args = parser.parse_args()
         filters = {}
-        for k, v in args.items():
-            if v:
-                filters.setdefault(k, v)
-        Log.logger.info("args.filters:{}".format(filters))
+        # for k, v in args.items():
+        #     if v:
+        #         filters.setdefault(k, v)
+        # Log.logger.info("args.filters:{}".format(filters))
         try:
-            data = get_entity_from_file(filters) if filters else get_entity()
-            response["result"]["data"] = data
+            # data = get_entity_from_file(filters) if filters else get_entity()
+            data = get_entity_from_file(filters) # 保留filters，后期可以按其过滤
+            response = response_data(202, data, "") if isinstance(data, str) else response_data(200, "success", data)
         except Exception as exc:
             Log.logger.error("get CmdbModels error:{}".format(str(exc)))
+            response = response_data(500, str(exc), "")
         return jsonify(response)
 
     def post(self):

@@ -193,6 +193,13 @@ def push_entity_to_file(data):
 
 
 def get_entity_from_file(filters):
+    filters = {
+        "Person":       "d8098981df71428784e65427",
+        "department":   "9a544097f789495e8ee4f5eb",
+        "yewu":         "c73339db70cc4647b515eaca",
+        "Module":       "9e97b54a4a54472e9e913d4e",
+        "project":      "59c0af57133442e7b34654a3"
+    }
     assert(isinstance(filters, dict))
     if not os.path.exists(curdir + "/.entity.txt"):
         whole_entity = get_entity()
@@ -201,9 +208,10 @@ def get_entity_from_file(filters):
             whole_entity = json.load(fp)["entity"]
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
-    if single_entity:
-        se = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, single_entity)
-
+    if len(single_entity) == 5: # 缓存的实体id没问题，直接补充字段返回
+        single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(str(x["property"]))}, single_entity)
+    else:
+        single_entity = u"CMDB2.0 基础模型数据有变，联系管理员解决"
     return single_entity
 
 
@@ -245,19 +253,19 @@ def Aquery(args):
         }
     }
     data_list =  {
-            "uid": uid,
-            "token": token,
-            "sign":"",
-            "data":{
-                "instance":[{
-                    "instance_id":"",
-                    "name": name #工号
-                }],
-                "entity":{
-                    "model_id": self_model_id
-                }
+        "uid": uid,
+        "token": token,
+        "sign":"",
+        "data":{
+            "instance":[{
+                "instance_id":"",
+                "name": name #工号
+            }],
+            "entity":{
+                "model_id": self_model_id
             }
-}
+        }
+    }
     data_instance = {
         "uid": uid,
         "token": token,
