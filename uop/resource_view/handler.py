@@ -119,6 +119,7 @@ def cmdb_graph_search(args, res_id):
 # cmdb2.0 图搜素
 def cmdb2_graph_search(args, res_id):
     view_dict = {
+        "B6": "ccb058ab3c8d47bc991efd7b", # 部门 --> 业务 --> 资源
         "B4": "29930f94bf0844c6a0e060bd", # 资源 --> 环境 --> 机房
         "B3": "e7a8ed688f2e4c19a3aa3a65", # 资源 --> 机房
         "B2": "",
@@ -126,21 +127,50 @@ def cmdb2_graph_search(args, res_id):
     }
     url = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
     uid, token = get_uid_token()
+    view_num = str(args.view_num)
     data = {
         "uid": uid,
         "token": token,
         "sign": "",
         "data": {
-            "id": view_dict["B4"],
+            "id": view_dict[view_num] if view_num else view_dict["B4"],
             "name": "",
             "entity": []
         }
     }
     data_str = json.dumps(data)
     try:
-        ret = requests.post(url, data=data_str)
-        result = response_data(200, ret.json(), "")
+        data = requests.post(url, data=data_str).json()["data"]
+        if view_num == "B6":
+            data = package_data(data)
+        result = response_data(200, data, "")
     except Exception as exc:
         Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
         result = response_data(200, str(exc), "")
     return result
+
+
+def package_data(data):
+    assert(data, dict)
+    result = []
+    instance = data["instance"]
+    relation = data["relation"]
+    business = filter(lambda ins:ins["level_id"] == 2, instance)
+    # module = filter(lambda ins: ins["level_id"] == 3, instance)
+    # project = filter(lambda ins: ins["level_id"] == 4, instance)
+    # resource = filter(lambda ins: ins["level_id"] == 5, instance)
+    # for b in business:
+    #     mr = [{"title": b["name"], "id": b["instance_id"], "children": []} for m in module if m["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == b["instance_id"]]]
+    for b in business:
+        node = {"title": b["name"], "id": b["instance_id"], "children": attach_data(relation, b["instance_id"], instance, 3)}
+        result.append(node)
+
+def attach_data(relation, id, instance, level):
+    next_instance = filter(lambda ins: ins["level_id"] == level, instance)
+    if level < 5:
+        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(relation, instance, level + 1)} for ni in next_instance if
+         ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
+    if level == 5:
+        return [{"title": ni["name"], "id": ni["instance_id"]} for ni in next_instance]
+
+

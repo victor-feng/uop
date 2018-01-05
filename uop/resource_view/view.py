@@ -27,6 +27,7 @@ class ResourceView(Resource):
             parser.add_argument('layer_count', type=str, location='args')
             parser.add_argument('total_count', type=str, location='args')
             parser.add_argument('cmdb', type=int)
+            parser.add_argument('view_num', type=str)
             args = parser.parse_args()
             Log.logger.info("get graph from cmdb: {}".format(args.cmdb))
             if args.cmdb == 1:
