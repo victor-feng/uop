@@ -188,7 +188,7 @@ class AllPermManage(Resource):
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
-        parser.add_argument('api_permission', type=list, location="json")
+        parser.add_argument('api_permission', type=dict, location="json")
         parser.add_argument('action', type=str,
                             choices=('create_meau_perm', 'create_meau2_perm', 'create_api_perm'),
                             required=True,
@@ -214,17 +214,17 @@ class AllPermManage(Resource):
                     meau2_perm_ins=Menu2_perm(id=id,name=name,url=url,parent_id=parent_id)
                     Permission.menu2_permission.append(meau2_perm_ins)
             elif args.action == "create_api_perm":
-                for api_perm in args.api_permission:
-                    id = api_perm.get("id")
-                    name = api_perm.get("name")
-                    endpoint = api_perm.get("endpoint")
-                    get = api_perm.get("get")
-                    post = api_perm.get("post")
-                    put = api_perm.get("put")
-                    delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,
-                                            delete=delete)
-                    Permission.api_permission.append(api_perm_ins)
+                api_perm = args.api_permission
+                id = api_perm.get("id")
+                name = api_perm.get("name")
+                endpoint = api_perm.get("endpoint")
+                get = api_perm.get("get")
+                post = api_perm.get("post")
+                put = api_perm.get("put")
+                delete = api_perm.get("delete")
+                api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,
+                                        delete=delete)
+                Permission.api_permission.append(api_perm_ins)
             elif args.action == "create_meau2_perm":
                 Permission_obj = PermissionList.objects.get(name=args.name)
                 for meau2 in args.meau2_permission:
