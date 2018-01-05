@@ -149,9 +149,9 @@ class AllPermManage(Resource):
                 res["id"] = permission.id
                 res["name"] = permission.name
                 res["role"] = permission.role
-                res["buttons"] = permission.buttons
-                res["icons"] = permission.icons
-                res["operations"] = permission.operations
+                res["button"] = permission.button
+                res["icon"] = permission.icon
+                res["operation"] = permission.operation
                 res["url"] = permission.url
                 res["perm_type"] = permission.perm_type
                 res["created_time"] = permission.created_time
@@ -173,9 +173,9 @@ class AllPermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
         parser.add_argument('name', type=str)
-        parser.add_argument('button', type=dict, location="json")
-        parser.add_argument('icon', type=dict, location="json")
-        parser.add_argument('operation', type=dict, location="json")
+        parser.add_argument('button', type=str)
+        parser.add_argument('icon', type=str)
+        parser.add_argument('operation', type=str)
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
@@ -190,7 +190,10 @@ class AllPermManage(Resource):
                 id = args.id,
                 name = args.name,
                 role = "super_admin",
-                perm_type = args.perm_type
+                perm_type = args.perm_type,
+                button = args.button,
+                icon = args.icon,
+                operation = args.operation
                 )
             if args.action == "create_meau_perm":
                 Permission.url =args.url
@@ -206,10 +209,12 @@ class AllPermManage(Resource):
                     id = api_perm.get("id")
                     name = api_perm.get("name")
                     endpoint = api_perm.get("endpoint")
-                    method = api_perm.get("method")
-                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,method=method)
+                    get = api_perm.get("get")
+                    post = api_perm.get("post")
+                    put = api_perm.get("put")
+                    delete = api_perm.get("delete")
+                    api_perm_ins = Api_perm(id=id,name=name,endpoint=endpoint,get=get,post=post,put=put,delete=delete)
                     Permission.api_permission.append(api_perm_ins)
-
             elif args.action == "create_meau2_perm":
                 Permission_obj = PermissionList.objects.get(name=args.name)
                 for meau2 in args.meau2_permission:
@@ -220,10 +225,6 @@ class AllPermManage(Resource):
                     meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
                     Permission_obj.menu2_permission.append(meau2_perm_ins)
                 Permission_obj.save()
-            else:
-                Permission.icons[args.icon] = True
-                Permission.buttons[args.button] = True
-                Permission.operations[args.operation] = True
             Permission.save()
             code = 200
             msg = "Create permission success"
@@ -240,14 +241,12 @@ class AllPermManage(Resource):
         parser.add_argument('name', type=str)
         parser.add_argument('meau2_name', type=str)
         parser.add_argument('action', type=str,
-                            choices=('dellete_meau_perm', 'delete_meau2_perm', 'delete_api_perm'),
+                            choices=('delete_meau2_perm'),
                             required=True,
                             location='json')
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(name=args.name)
-            if args.action in ["delete_meau_perm","delete_api_perm"]:
-                Permission.delete()
             if args.action == "delete_meau2_perm":
                 meau2_perms=Permission.menu2_permission
                 delete_meau2_perms=[]
@@ -258,6 +257,8 @@ class AllPermManage(Resource):
                 for delete_meau2 in delete_meau2_perms:
                     meau2_perms.remove(delete_meau2)
                 Permission.save()
+            else:
+                Permission.delete()
             code = 200
             msg = "Delete permission success"
             data = "Success"
@@ -272,8 +273,9 @@ class AllPermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
         parser.add_argument('name', type=str)
-        parser.add_argument('buttons', type=dict, location="json")
-        parser.add_argument('icons', type=dict, location="json")
+        parser.add_argument('button', type=str)
+        parser.add_argument('icon', type=str)
+        parser.add_argument('operation', type=str)
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
         parser.add_argument('meau2_permission', type=list, location="json")
@@ -290,9 +292,9 @@ class AllPermManage(Resource):
             if args.name:
                 Permission.name = args.name
             if args.buttons:
-                Permission.buttons = args.buttons
+                Permission.button = args.button
             if args.icons:
-                Permission.icons = args.icons
+                Permission.icon = args.icon
             if args.url:
                 Permission.url = args.url
             if args.perm_type:

@@ -26,10 +26,11 @@ class Menu2_perm(db.EmbeddedDocument):
 
 
 class Api_perm(db.EmbeddedDocument):
-    id = db.StringField(required=True, max_length=50)
-    name=db.StringField(required=False)
     endpoint=db.StringField(required=False)
-    method=db.ListField(required=False)
+    get = db.StringField(required=False,default=True)
+    post = db.StringField(required=False,default=True)
+    put = db.StringField(required=False,default=True)
+    delete = db.StringField(required=False,default=True)
 
     meta = {
         'collection': 'api_perm',
@@ -47,9 +48,9 @@ class PermissionList(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True)
     name = db.StringField(required=False, max_length=50,unique=True)
     role = db.StringField(required=False, max_length=50)
-    buttons = db.DictField(required=False)
-    icons=db.DictField(required=False)
-    operations=db.DictField(required=False)
+    button = db.StringField(required=False)
+    icon=db.StringField(required=False)
+    operation=db.StringField(required=False)
     url = db.StringField(required=False)
     menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_perm'))
     api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
