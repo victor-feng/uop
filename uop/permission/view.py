@@ -47,16 +47,19 @@ class UserManage(Resource):
                 Users = UserInfo.objects.filter(**condition).order_by('-last_login_time').skip(skip_count).limit(args.page_size)
             else:
                 Users=UserInfo.objects.filter(**condition).order_by('-last_login_time')
+            Roles = RoleInfo.objects.all()
             for user in Users:
-                res = {}
-                res["id"] = user.id
-                res["username"] = user.username
-                res["role"] = user.role
-                res["department"] = user.department
-                res["updated_time"] = str(user.updated_time)
-                res["last_login_time"] = str(user.last_login_time)
-                res["created_time"] = str(user.created_time)
-                res_list.append(res)
+                for role in Roles:
+                    if args.role == role.name:
+                        res = {}
+                        res["id"] = user.id
+                        res["username"] = user.username
+                        res["role"] = role.description
+                        res["department"] = user.department
+                        res["updated_time"] = str(user.updated_time)
+                        res["last_login_time"] = str(user.last_login_time)
+                        res["created_time"] = str(user.created_time)
+                        res_list.append(res)
             data["total_count"] = total_count
             data["res_list"] = res_list
             code=200
@@ -114,7 +117,7 @@ class UserManage(Resource):
 
 class PermManage(Resource):
     """
-    管理权限
+    管理角色权限
     """
     def get(self):
         pass
@@ -122,10 +125,16 @@ class PermManage(Resource):
     def post(self):
         pass
 
+    def put(self):
+        pass
+
+    def delete(self):
+        pass
+
 
 class AllPermManage(Resource):
     """
-    管理权限
+    管理所有权限
     """
     def get(self):
         parser = reqparse.RequestParser()
@@ -408,6 +417,7 @@ class RoleManage(Resource):
                 data = "Failed"
                 ret = response_data(code, msg, data)
                 return ret, code
+            # 新名字不能存在
             if Role_obj:
                 code = 200
                 msg = "Update role Failed,The role has already existed"
@@ -419,7 +429,6 @@ class RoleManage(Resource):
                     Role.name = args.new_name
                 if args.description:
                     Role.description = args.description
-
             else:
                 if args.description:
                     Role.description = args.description
