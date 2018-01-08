@@ -163,8 +163,8 @@ class AllPermManage(Resource):
                 res["operation"] = permission.operation
                 res["url"] = permission.url
                 res["perm_type"] = permission.perm_type
-                res["created_time"] = permission.created_time
-                res["updated_time"] = permission.updated_time
+                res["created_time"] = str(permission.created_time)
+                res["updated_time"] = str(permission.updated_time)
                 res["menu2_permission"] = deal_enbedded_data(permission.menu2_permission)
                 res["api_permission"] = deal_enbedded_data(permission.api_permission)
                 res_list.append(res)
