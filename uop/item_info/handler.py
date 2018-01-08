@@ -224,7 +224,8 @@ def get_entity_from_file(filters):
         "redis": "de90d618f7504723b677f196",
         "mongodb": "9bc4a41eb6364022b2f2c093",
     }
-    sort_key = ["Person", "department", "yewu", "Module", "project", "host", "container", "virtual_device"]
+    sort_key = ["Person", "department", "yewu", "Module", "project"]
+    sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
     assert(isinstance(filters, dict))
     # if not os.path.exists(curdir + "/.entity.txt"):
     #     whole_entity = get_entity()
