@@ -198,6 +198,7 @@ def push_entity_to_file(data):
 
 def processs_chidren_final(entity_list, children):
     # entity_list = copy.deepcopy(entity_list)
+    Log.logger.info("in processs_chidren_final")
     for c in children:
         if not c.get("chidren"):
             entity_list.append({
