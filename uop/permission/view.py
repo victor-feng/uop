@@ -299,6 +299,8 @@ class AllPermManage(Resource):
                 Permission.endpoint = args.endpoint
             if args.level:
                 Permission.level = args.level
+            if args.parent_id:
+                Permission.parent_id = args.parent_id
             if args.api_get:
                 Permission.api_get = args.api_get
             if args.api_post:
