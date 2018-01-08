@@ -147,8 +147,6 @@ class AllPermManage(Resource):
         res_list=[]
         if args.name:
             condition["name"] = args.name
-        if args.role:
-            condition["role"] = args.role
         if args.perm_type:
             condition["perm_type"] = args.perm_type
         if args.perm_id:
