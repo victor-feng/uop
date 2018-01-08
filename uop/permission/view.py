@@ -197,11 +197,10 @@ class AllPermManage(Resource):
         parser.add_argument('endpoint', type=str, location="json")
         parser.add_argument('level', type=str, location="json")
         parser.add_argument('parent_id', type=str, location="json")
-        parser.add_argument('get', type=bool, location="json")
-        parser.add_argument('put', type=bool, location="json")
-        parser.add_argument('post', type=bool, location="json")
-        parser.add_argument('delete', type=bool, location="json")
-        args = parser.parse_args()
+        parser.add_argument('get', type=str, location="json")
+        parser.add_argument('put', type=str, location="json")
+        parser.add_argument('post', type=str, location="json")
+        parser.add_argument('delete', type=str, location="json")
         try:
             code = 200
             Permissions = PermissionList.objects.filter(name=args.name,role='super_admin')
