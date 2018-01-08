@@ -8,7 +8,7 @@ db = MongoEngine()
 
 
 class Menu2_perm(db.EmbeddedDocument):
-    meau2_id=db.StringField(required=True, max_length=50)
+    menu2_id=db.StringField(required=True, max_length=50)
     name=db.StringField(required=False)
     parent_id=db.StringField(required=True, max_length=50)
     url = db.StringField(required=False)
@@ -47,7 +47,7 @@ class Api_perm(db.EmbeddedDocument):
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
     name = db.StringField(required=True, max_length=50, unique=True,unique_with='role')
-    meau_id = db.StringField(required=False, max_length=50)
+    menu_id = db.StringField(required=False, max_length=50)
     role = db.StringField(required=False, max_length=50)
     button = db.StringField(required=False)
     icon=db.StringField(required=False)

@@ -64,33 +64,33 @@ def get_login_permission(role):
     :param role:
     :return:
     """
-    meau_list = []
+    menu_list = []
     buttons = []
     icons = []
     operations=[]
     try:
         #获取权限
-        Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","meau"])
+        Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"])
         for permission in Permissions:
-            if permission.perm_type == "meau":
-                meau_dict = {}
+            if permission.perm_type == "menu":
+                menu_dict = {}
                 name=permission.name
                 url=permission.url
-                meau_id=permission.meau_id
+                menu_id=permission.menu_id
                 children=permission.menu2_permission
                 children=deal_enbedded_data(children)
-                meau_dict["name"] = name
-                meau_dict["url"] = url
-                meau_dict["meau_id"] = meau_id
-                meau_dict["children"] = children
-                meau_list.append(meau_dict)
+                menu_dict["name"] = name
+                menu_dict["url"] = url
+                menu_dict["menu_id"] = menu_id
+                menu_dict["children"] = children
+                menu_list.append(menu_dict)
             elif permission.perm_type == "operation":
                 operations.append(permission.operation)
             elif permission.perm_type == "icon":
                 icons.append(permission.icon)
             elif permission.perm_type == "button":
                 buttons.append(permission.button)
-        return meau_list,buttons,icons,operations
+        return menu_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
-        return  meau_list
+        return  menu_list
