@@ -201,6 +201,7 @@ class AllPermManage(Resource):
         parser.add_argument('put', type=str, location="json")
         parser.add_argument('post', type=str, location="json")
         parser.add_argument('delete', type=str, location="json")
+        args = parser.parse_args()
         try:
             code = 200
             Permissions = PermissionList.objects.filter(name=args.name,role='super_admin')
