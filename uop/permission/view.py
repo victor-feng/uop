@@ -138,6 +138,7 @@ class AllPermManage(Resource):
     """
     def get(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('perm_id', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
         parser.add_argument('role', type=str, location='args')
         parser.add_argument('perm_type', type=str, location='args')
@@ -151,10 +152,13 @@ class AllPermManage(Resource):
             condition["role"] = args.role
         if args.perm_type:
             condition["perm_type"] = args.perm_type
+        if args.perm_id:
+            condition["perm_id"] = args.perm_id
         try:
             Permissions = PermissionList.objects.filter(**condition)
             for permission in Permissions:
                 res={}
+                res["perm_id"] = permission.perm_id
                 res["menu_id"] = permission.menu_id
                 res["name"] = permission.name
                 res["role"] = permission.role
@@ -196,6 +200,14 @@ class AllPermManage(Resource):
                             location='json')
         args = parser.parse_args()
         try:
+            code = 200
+            Permissions = PermissionList.objects.filter(name=args.name,role='super_admin')
+            #如果同一角色，有重名的，给前端返回失败信息
+            if Permissions:
+                msg = "Create permission Failed,The name has already existed"
+                data = "Failed"
+                ret = response_data(code, msg, data)
+                return ret, code
             perm_id = str(uuid.uuid1())
             Permission=PermissionList(
                 perm_id = perm_id,
@@ -230,7 +242,6 @@ class AllPermManage(Resource):
                     Permission_obj.menu2_permission.append(menu2_perm_ins)
                 Permission_obj.save()
             Permission.save()
-            code = 200
             msg = "Create permission success"
             data = "Success"
         except Exception as e:
@@ -244,11 +255,10 @@ class AllPermManage(Resource):
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str)
-        parser.add_argument('name', type=str)
         parser.add_argument('menu2_name', type=str)
         parser.add_argument('action', type=str,
                             choices=('delete_menu2_perm'),
-                            required=True,
+                            required=False,
                             location='json')
         args = parser.parse_args()
         try:
@@ -290,7 +300,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_permission', type=list, location="json")
         parser.add_argument('action', type=str,
                             choices=('update_menu_perm', 'update_menu2_perm', 'update_api_perm'),
-                            required=True,
+                            required=False,
                             location='json')
         args = parser.parse_args()
         try:
