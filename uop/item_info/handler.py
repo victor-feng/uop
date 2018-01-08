@@ -213,7 +213,7 @@ def get_entity_from_file(filters):
     whole_entity = get_entity()["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
-    if len(single_entity) == 8: # 缓存的实体id没问题，直接补充字段返回
+    if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(str(x["property"]))}, single_entity)
         single_entity = list(
                 (lambda item, key:((filter(lambda x: x["code"] == k, item)[0] for k in key)))(single_entity, sort_key)
