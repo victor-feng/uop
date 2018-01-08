@@ -4,11 +4,12 @@ import json
 import copy
 import requests
 import datetime
-from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async
 from uop.log import Log
 from config import configs, APP_ENV
+from uop.item_info.handler import *
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 
 __all__ = [
@@ -230,5 +231,40 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 # 解析crp传回来的数据录入CMDB2.0
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
-
+    Log.logger.info("###data:{}".format(data))
     pass
+
+
+# B类视图list，获取已经定义的关系列表
+def get_relations(view_id, uid=None, token=None):
+    view_dict = {
+        "B7": "410c4b3b2e7848b9b64d08d0",  # 工程 --> 物理机
+        "B6": "ccb058ab3c8d47bc991efd7b",  # 部门 --> 业务 --> 资源
+        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程 405cf4f20d304da3945709d3
+        "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
+        "B3": "e7a8ed688f2e4c19a3aa3a65",  # 资源 --> 机房
+        "B2": "",
+        "B1": "",
+    }
+    if not uid or not token:
+        uid, token = get_uid_token()
+    url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
+    relations = []
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "id": view_dict.get(view_id, ""),
+            "name": view_id
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        relations= requests.post(url, data=data_str).json()["relation"] # 获取视图关系实体信息
+        Log.logger.info("get_relations data:{}".format(relations))
+    except Exception as exc:
+        Log.logger.error("graph_data error: {}".format(str(exc)))
+    return relations
+
+

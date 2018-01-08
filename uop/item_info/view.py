@@ -365,6 +365,7 @@ class BusinessProject(Resource):
             Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
         return jsonify(response)
 
+
     def post(self):
         '''
         调用插入子图，插入 业务|模块|工程

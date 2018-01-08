@@ -5,7 +5,7 @@ import json
 import datetime
 from flask import request, current_app
 from flask_restful import reqparse, Api, Resource
-from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.res_callback import res_callback_blueprint
 from uop.res_callback.errors import res_callback_errors
 from uop.deploy_callback.handler import create_status_record
@@ -377,7 +377,7 @@ class ResourceProviderTransitions(object):
             p_code = item_property.get('result').get('res')[0].get('p_code')
             self.pcode_mapper['physical_server'] = p_code
             Log.logger.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
-                          % (physical_server, p_code))
+                             % (physical_server, p_code))
 
     def start(self):
         self.run()
@@ -671,20 +671,20 @@ class ResourceProviderCallBack(Resource):
                 }
             }
             return ret, code
-        else:
-            try:
-                cls.process_cmdb2(request_data)
-            except Exception as e:
-                Log.logger.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
-                code = 500
-                ret = {
-                    'code': code,
-                    'result': {
-                        'res': 'fail',
-                        'msg': "Resource find error."
-                    }
+        # else:
+        try:
+            cls.process_cmdb2(request_data)
+        except Exception as e:
+            Log.logger.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource find error."
                 }
-                return ret, code
+            }
+            return ret, code
         res = {
             "code": code,
             "result": {
@@ -801,6 +801,7 @@ class ResourceStatusProviderCallBack(Resource):
             }
         }
         return res, code
+
     @classmethod
     def get(cls):
         code = 200
