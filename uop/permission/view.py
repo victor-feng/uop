@@ -181,13 +181,13 @@ class AllPermManage(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('menu_id', type=str)
-        parser.add_argument('name', type=str)
-        parser.add_argument('button', type=str)
-        parser.add_argument('icon', type=str)
-        parser.add_argument('operation', type=str)
-        parser.add_argument('url', type=str)
-        parser.add_argument('perm_type', type=str)
+        parser.add_argument('menu_id', type=str,location="json")
+        parser.add_argument('name', type=str,location="json")
+        parser.add_argument('button', type=str,location="json")
+        parser.add_argument('icon', type=str,location="json")
+        parser.add_argument('operation', type=str,location="json")
+        parser.add_argument('url', type=str,location="json")
+        parser.add_argument('perm_type', type=str,location="json")
         parser.add_argument('menu2_permission', type=list, location="json")
         parser.add_argument('api_permission', type=list, location="json")
         parser.add_argument('action', type=str,
