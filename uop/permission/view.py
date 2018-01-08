@@ -206,7 +206,9 @@ class AllPermManage(Resource):
                 button = args.button,
                 icon = args.icon,
                 operation = args.operation,
-                url = args.url
+                url = args.url,
+                created_time=datetime.datetime.now(),
+                updated_time=datetime.datetime.now()
                 )
             if args.action == "create_api_perm":
                 for api_perm in args.api_permission:
@@ -326,6 +328,7 @@ class AllPermManage(Resource):
                     delete = api_perm.get("delete")
                     api_perm_ins = Api_perm(endpoint=endpoint, get=get, post=post, put=put,delete=delete)
                     Permission.api_permission.append(api_perm_ins)
+            Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
             code = 200
