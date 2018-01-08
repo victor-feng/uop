@@ -165,7 +165,7 @@ class AllPermManage(Resource):
                 res["perm_type"] = permission.perm_type
                 res["created_time"] = permission.created_time
                 res["updated_time"] = permission.updated_time
-                res["menu2_permission"] = deal_enbedded_data(permission.meau2_permission)
+                res["menu2_permission"] = deal_enbedded_data(permission.menu2_permission)
                 res["api_permission"] = deal_enbedded_data(permission.api_permission)
                 res_list.append(res)
             data["res_list"] = res_list
