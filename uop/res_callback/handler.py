@@ -233,8 +233,11 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
     Log.logger.info("###data:{}".format(data))
+    models_list = get_entity_from_file()
+    project_instance_id = data["resource_id"]
+
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    instance = post_docker_format(url, data)
+    instance = post_instance_format(url, data, models_list)
     relation = get_relations("B7")
     data = post_relation_format(url, instance, relation)
     data_str = json.dumps(data)
@@ -246,18 +249,21 @@ def crp_data_cmdb(data):
         Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def post_docker_format(url, raw):
-    models_list = get_entity_from_file()
-    docker = filter(lambda x:x["code"] == "container", models_list)[0]
-    instance = []
+get_model_id = lambda models, code: filter(lambda x:x["code"] == code, models)[0]["id"]
+
+
+def post_instance_format(url, raw, models_list):
+    docker_model = filter(lambda x:x["code"] == "container", models_list)[0]
+    tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
+    # docker = filter(lambda x: x["code"] == "container", models_list)[0]
+    instances = []
     for ct in raw["container"]:
         attach = {
             "image": ct["image_url"]
         }
-
         for ins in ct["instance"]:
             one = {
-                "model_id": docker["id"],
+                "model_id": docker_model["id"],
                 "name": ins.get("instance_name"),
                 "code": ins.get("instance_name"),
                 'parameters': list(
@@ -270,35 +276,36 @@ def post_docker_format(url, raw):
                             }
                             for pro in property
                         )
-                    )(docker["property"], ins, attach)
+                    )(docker_model["property"], ins, attach)
                 )
             }
-            instance.append(one)
-    one = {
-        "model_id": docker["id"],
-        "name": ins.get("instance_name"),
-        "code": ins.get("instance_name"),
+            instances.append(one)
+    tomcat = {
+        "model_id": tomcat_model["id"],
+        "name": raw.get("resource_name"),
+        "code": raw.get("resource_name"),
         'parameters': list(
             (
-                lambda property, instance, attach:
+                lambda property, instance:
                 (
                     {
                         "code": pro["code"],
-                        "value": instance.get(pro["code"]) if instance.get(pro["code"]) else attach.get(pro["code"])
+                        "value": instance.get(pro["code"])
                     }
                     for pro in property
                 )
-            )(docker["property"], ins, attach)
+            )(tomcat_model["property"], raw)
         )
     }
-    Log.logger.info("docker_format instance:{}".format(instance))
+    instances.append(tomcat)
+    Log.logger.info("docker_format instance:{}".format(instances))
     uid, token = get_uid_token()
     data = {
         "uid": uid,
         "token": token,
         "sign":"",
         "data":{
-            "instance": instance
+            "instance": instances
         }
     }
     data_str = data_str = json.dumps(data)
@@ -311,13 +318,35 @@ def post_docker_format(url, raw):
         Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
     data.pop("data")
     data.update({
-            "instance": instance
+        "instance": instance
     })
     return data
 
 
 def post_relation_format(url, instance, relation):
-    instance = instance["instance"]
+    instances = instance["instance"]
+    relation = []
+    model_id = {}
+    map(lambda i: model_id.setdefault(i["model_id"], []).append(i["instance_id"]), instances)
+    rel = [
+        r.update({"start_instance_id": model_id[r.get("start_model_id")],
+                  "end_instance_id": model_id[r.get("end_model_id")]}) for r in relation if set([r.get("start_model_id"), r.get("end_model_id")]) < set(model_id.keys())
+    ]
+    for r in rel:
+        if isinstance(r["start_instance_id"], list) and not isinstance(r["end_instance_id"], list):
+            for id in  r["start_instance_id"]:
+                tmp = r
+                tmp.update(start_instance_id = id)
+                relation.append(tmp)
+        elif isinstance(r["end_instance_id"], list) and not isinstance(r["start_instance_id"], list):
+            for id in  r["end_instance_id"]:
+                tmp = r
+                tmp.update(start_instance_id = id)
+                relation.append(tmp)
+        elif isinstance(r["end_instance_id"], list) and  isinstance(r["start_instance_id"], list): # 相同实体的不同实例之间的关系，后期加入
+            pass
+        else:
+            relation.append(r)
 
     data = {
         "uid": instance["uid"],
