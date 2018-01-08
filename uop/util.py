@@ -138,5 +138,6 @@ def deal_enbedded_data(data):
     res_list=[]
     for d in data:
         d=d.to_json()
+        d=json.loads(d)
         res_list.append(d)
     return res_list
