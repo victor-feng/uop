@@ -73,15 +73,24 @@ def get_login_permission(role):
         Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"])
         for permission in Permissions:
             if permission.perm_type == "menu":
+                children = []
                 menu_dict = {}
+                menu2_dict={}
                 name=permission.name
                 url=permission.url
                 menu_id=permission.menu_id
-                children=permission.menu2_permission
-                children=deal_enbedded_data(children)
-                menu_dict["name"] = name
-                menu_dict["url"] = url
-                menu_dict["menu_id"] = menu_id
+                level=permission.level
+                parent_id=permission.parent_id
+                if int(level) == 1:
+                    menu_dict["name"] = name
+                    menu_dict["url"] = url
+                    menu_dict["menu_id"] = menu_id
+                if parent_id and menu_dict["menu_id"] == parent_id:
+                    menu2_dict["name"] = name
+                    menu2_dict["url"] = url
+                    menu2_dict["menu_id"] = menu_id
+                    menu2_dict["parent_id"] = parent_id
+                    children.append(menu2_dict)
                 menu_dict["children"] = children
                 menu_list.append(menu_dict)
             elif permission.perm_type == "operation":
