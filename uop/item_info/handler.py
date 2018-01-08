@@ -197,7 +197,7 @@ def push_entity_to_file(data):
     return {"entity": entity_list}
 
 def processs_chidren_final(entity_list, children):
-    entity_list = copy.copy(entity_list)
+    # entity_list = copy.deepcopy(entity_list)
     for c in children:
         if not c.get("chidren"):
             entity_list.append({
