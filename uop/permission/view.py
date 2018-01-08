@@ -280,7 +280,7 @@ class AllPermManage(Resource):
         parser.add_argument('delete', type=bool, location="json")
         args = parser.parse_args()
         try:
-            Permission = PermissionList.objects.get(perm=args.perm_id)
+            Permission = PermissionList.objects.get(perm_id=args.perm_id)
             if args.meau_id:
                 Permission.menu_id = args.menu_id
             elif args.name:
