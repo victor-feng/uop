@@ -193,6 +193,7 @@ def push_entity_to_file(data):
                     #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
+    Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
     return {"entity": entity_list}
 
 def processs_chidren_final(entity_list, children):
