@@ -233,6 +233,11 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
     Log.logger.info("###data:{}".format(data))
+    instance = data.get("container")
+
+
+def docker_format():
+
     pass
 
 

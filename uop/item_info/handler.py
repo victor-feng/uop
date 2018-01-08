@@ -198,9 +198,12 @@ def get_entity_from_file(filters):
         "department":   "9a544097f789495e8ee4f5eb",
         "yewu":         "c73339db70cc4647b515eaca",
         "Module":       "9e97b54a4a54472e9e913d4e",
-        "project":      "59c0af57133442e7b34654a3"
+        "project":      "59c0af57133442e7b34654a3",
+        "host":         "b593293378c74ba6827847d3",
+        "container":    "d0f338299fa34ce2bf5dd873",
+        "virtual_device":"d4ad23e58f31497ca3ad2bab",
     }
-    sort_key = ["Person", "department", "yewu", "Module", "project"]
+    sort_key = ["Person", "department", "yewu", "Module", "project", "host", "container", "virtual_device"]
     assert(isinstance(filters, dict))
     # if not os.path.exists(curdir + "/.entity.txt"):
     #     whole_entity = get_entity()
@@ -210,7 +213,7 @@ def get_entity_from_file(filters):
     whole_entity = get_entity()["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
-    if len(single_entity) == 5: # 缓存的实体id没问题，直接补充字段返回
+    if len(single_entity) == 8: # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(str(x["property"]))}, single_entity)
         single_entity = list(
                 (lambda item, key:((filter(lambda x: x["code"] == k, item)[0] for k in key)))(single_entity, sort_key)
