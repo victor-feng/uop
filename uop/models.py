@@ -26,7 +26,6 @@ class Menu2_perm(db.EmbeddedDocument):
 
 
 class Api_perm(db.EmbeddedDocument):
-    endpoint=db.StringField(required=False)
     get = db.StringField(required=False,default=True)
     post = db.StringField(required=False,default=True)
     put = db.StringField(required=False,default=True)
@@ -53,9 +52,14 @@ class PermissionList(db.Document):
     icon=db.StringField(required=False)
     operation=db.StringField(required=False)
     url = db.StringField(required=False)
-    menu2_permission=db.ListField(db.EmbeddedDocumentField('Menu2_perm'))
-    api_permission = db.ListField(db.EmbeddedDocumentField('Api_perm'))
     perm_type=db.StringField(required=False)
+    endpoint=db.StringField(required=False)
+    get = db.BooleanField(required=False, default=True)
+    post = db.BooleanField(required=False, default=True)
+    put = db.BooleanField(required=False, default=True)
+    delete = db.BooleanField(required=False, default=True)
+    parent_id = db.StringField(required=False, max_length=50)
+    level = db.StringField(required=False, max_length=50)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
 

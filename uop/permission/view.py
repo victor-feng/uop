@@ -140,7 +140,6 @@ class AllPermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
-        parser.add_argument('role', type=str, location='args')
         parser.add_argument('perm_type', type=str, location='args')
         args = parser.parse_args()
         condition = {}
@@ -169,8 +168,13 @@ class AllPermManage(Resource):
                 res["perm_type"] = permission.perm_type
                 res["created_time"] = str(permission.created_time)
                 res["updated_time"] = str(permission.updated_time)
-                res["menu2_permission"] = deal_enbedded_data(permission.menu2_permission)
-                res["api_permission"] = deal_enbedded_data(permission.api_permission)
+                res["endpoint"] = permission.endpoint
+                res["level"] = permission.level
+                res["parent_id"] = permission.parent_id
+                res["get"] = permission.get
+                res["post"] = permission.post
+                res["put"] = permission.put
+                res["delete"] = permission.delete
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -192,12 +196,13 @@ class AllPermManage(Resource):
         parser.add_argument('operation', type=str,location="json")
         parser.add_argument('url', type=str,location="json")
         parser.add_argument('perm_type', type=str,location="json")
-        parser.add_argument('menu2_permission', type=list, location="json")
-        parser.add_argument('api_permission', type=list, location="json")
-        parser.add_argument('action', type=str,
-                            choices=('create_menu_perm', 'create_menu2_perm', 'create_api_perm'),
-                            required=False,
-                            location='json')
+        parser.add_argument('endpoint', type=str, location="json")
+        parser.add_argument('level', type=str, location="json")
+        parser.add_argument('parent_id', type=str, location="json")
+        parser.add_argument('get', type=bool, location="json")
+        parser.add_argument('put', type=bool, location="json")
+        parser.add_argument('post', type=bool, location="json")
+        parser.add_argument('delete', type=bool, location="json")
         args = parser.parse_args()
         try:
             code = 200
@@ -219,28 +224,16 @@ class AllPermManage(Resource):
                 icon = args.icon,
                 operation = args.operation,
                 url = args.url,
+                endpoint = args.endpoint,
+                level = args.level,
+                parent_id = args.parent_id,
+                get = args.get,
+                post=args.post,
+                put=args.put,
+                delete=args.delete,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
-            if args.action == "create_api_perm":
-                for api_perm in args.api_permission:
-                    endpoint = api_perm.get("endpoint")
-                    get = api_perm.get("get")
-                    post = api_perm.get("post")
-                    put = api_perm.get("put")
-                    delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(endpoint=endpoint,get=get,post=post,put=put,delete=delete)
-                    Permission.api_permission.append(api_perm_ins)
-            elif args.action == "create_menu2_perm":
-                Permission_obj = PermissionList.objects.get(name=args.name)
-                for menu2 in args.menu2_permission:
-                    menu2_id = menu2.get("menu2_id")
-                    name = menu2.get("name")
-                    url = menu2.get("url")
-                    parent_id = menu2.get("parent_id")
-                    menu2_perm_ins = Menu2_perm(menu2_id=menu2_id, name=name, url=url, parent_id=parent_id)
-                    Permission_obj.menu2_permission.append(menu2_perm_ins)
-                Permission_obj.save()
             Permission.save()
             msg = "Create permission success"
             data = "Success"
@@ -256,25 +249,10 @@ class AllPermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str)
         parser.add_argument('menu2_name', type=str)
-        parser.add_argument('action', type=str,
-                            choices=('delete_menu2_perm'),
-                            required=False,
-                            location='json')
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
-            if args.action == "delete_menu2_perm":
-                menu2_perms=Permission.menu2_permission
-                delete_menu2_perms=[]
-                for menu2 in menu2_perms:
-                    menu2_name = menu2.get("name")
-                    if menu2_name == args.menu2_name:
-                        delete_menu2_perms.append(menu2)
-                for delete_menu2 in delete_menu2_perms:
-                    menu2_perms.remove(delete_menu2)
-                Permission.save()
-            else:
-                Permission.delete()
+            Permission.delete()
             code = 200
             msg = "Delete permission success"
             data = "Success"
@@ -296,16 +274,17 @@ class AllPermManage(Resource):
         parser.add_argument('operation', type=str)
         parser.add_argument('url', type=str)
         parser.add_argument('perm_type', type=str)
-        parser.add_argument('menu2_permission', type=list, location="json")
-        parser.add_argument('api_permission', type=list, location="json")
-        parser.add_argument('action', type=str,
-                            choices=('update_menu_perm', 'update_menu2_perm', 'update_api_perm'),
-                            required=False,
-                            location='json')
+        parser.add_argument('endpoint', type=str, location="json")
+        parser.add_argument('level', type=str, location="json")
+        parser.add_argument('parent_id', type=str, location="json")
+        parser.add_argument('get', type=bool, location="json")
+        parser.add_argument('put', type=bool, location="json")
+        parser.add_argument('post', type=bool, location="json")
+        parser.add_argument('delete', type=bool, location="json")
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm=args.perm_id)
-            if args.id:
+            if args.meau_id:
                 Permission.menu_id = args.menu_id
             elif args.name:
                 Permission.name = args.name
@@ -319,25 +298,18 @@ class AllPermManage(Resource):
                 Permission.url = args.url
             elif args.perm_type:
                 Permission.perm_type = args.perm_type
-            elif args.action == "update_menu2_perm":
-                Permission.menu2_permission=[]
-                for menu2 in args.menu2_permission:
-                    menu2_id = menu2.get("menu2_id")
-                    name = menu2.get("name")
-                    url = menu2.get("url")
-                    parent_id = menu2.get("parent_id")
-                    menu2_perm_ins = Menu2_perm(menu2_id=menu2_id, name=name, url=url, parent_id=parent_id)
-                    Permission.menu2_permission.append(menu2_perm_ins)
-            elif args.action == "update_api_perm":
-                Permission.api_permission=[]
-                for api_perm in args.api_permission:
-                    endpoint = api_perm.get("endpoint")
-                    get = api_perm.get("get")
-                    post = api_perm.get("post")
-                    put = api_perm.get("put")
-                    delete = api_perm.get("delete")
-                    api_perm_ins = Api_perm(endpoint=endpoint, get=get, post=post, put=put,delete=delete)
-                    Permission.api_permission.append(api_perm_ins)
+            elif args.endpoint:
+                Permission.endpoint = args.endpoint
+            elif args.level:
+                Permission.level = args.level
+            elif args.get:
+                Permission.get = args.get
+            elif args.post:
+                Permission.post = args.post
+            elif args.put:
+                Permission.put = args.put
+            elif args.delete:
+                Permission.delete = args.delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
