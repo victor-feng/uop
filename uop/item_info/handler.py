@@ -180,7 +180,7 @@ def push_entity_to_file(data):
     try:
         for d in data:
             for dc in d.get("children", []):
-                if not dc.get("chidren"):
+                if not dc.get("children"):
                     entity_list.append({
                         "code": dc.get("code",""),
                         "name": dc.get("name",""),
@@ -188,19 +188,19 @@ def push_entity_to_file(data):
                         "property": dc.get("parameters",[])
                     })
                 else:
-                    processs_chidren_final(entity_list, dc.get("chidren"))
+                    processs_chidren_final(entity_list, dc.get("children"))
                     # with open(curdir + "/.entity.txt", "w") as fp:
                     #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
-    Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
+    # Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
     return {"entity": entity_list}
 
 def processs_chidren_final(entity_list, children):
     # entity_list = copy.deepcopy(entity_list)
     Log.logger.info("in processs_chidren_final")
     for c in children:
-        if not c.get("chidren"):
+        if not c.get("children"):
             entity_list.append({
                 "code": c.get("code", ""),
                 "name": c.get("name", ""),
