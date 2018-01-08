@@ -16,7 +16,8 @@ __all__ = [
     "transition_state_logger", "transit_request_data",
     "transit_repo_items", "do_transit_repo_items",
     "get_resources_all_pcode", "filter_status_data",
-    "push_vm_docker_status_to_cmdb", "deploy_nginx_to_crp"
+    "push_vm_docker_status_to_cmdb", "deploy_nginx_to_crp",
+    "crp_data_cmdb"
 ]
 
 # Transition state Log debug decorator

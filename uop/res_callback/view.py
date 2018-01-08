@@ -652,6 +652,7 @@ class ResourceProviderCallBack(Resource):
         :param request_data:
         :return:
         '''
+        crp_data_cmdb(request_data)
         pass
 
     @classmethod
