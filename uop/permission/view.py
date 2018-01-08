@@ -301,7 +301,7 @@ class AllPermManage(Resource):
                 Permission.level = args.level
             if args.get or str(args.get).lower() == 'false':
                 Permission.api_get = args.get
-            if args.post or str(args.pst).lower() == 'false':
+            if args.post or str(args.post).lower() == 'false':
                 Permission.api_post = args.post
             if args.put or str(args.put).lower() == 'false':
                 Permission.api_put = args.put
