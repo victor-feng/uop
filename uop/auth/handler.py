@@ -65,6 +65,8 @@ def get_login_permission(role):
     :return:
     """
     menu_list = []
+    menus = []
+    menu2s = []
     buttons = []
     icons = []
     operations=[]
@@ -73,7 +75,6 @@ def get_login_permission(role):
         Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"])
         for permission in Permissions:
             if permission.perm_type == "menu":
-                children = []
                 menu_dict = {}
                 menu2_dict={}
                 name=permission.name
@@ -85,20 +86,27 @@ def get_login_permission(role):
                     menu_dict["name"] = name
                     menu_dict["url"] = url
                     menu_dict["menu_id"] = menu_id
-                if parent_id and menu_dict["menu_id"] == parent_id:
+                    menu_dict["children"] = []
+                elif int(level) == 2:
                     menu2_dict["name"] = name
                     menu2_dict["url"] = url
                     menu2_dict["menu_id"] = menu_id
                     menu2_dict["parent_id"] = parent_id
-                    children.append(menu2_dict)
-                menu_dict["children"] = children
-                menu_list.append(menu_dict)
+                if menu_dict:
+                    menus.append(menu_dict)
+                if menu2_dict:
+                    menu2s.append(menu2_dict)
             elif permission.perm_type == "operation":
                 operations.append(permission.operation)
             elif permission.perm_type == "icon":
                 icons.append(permission.icon)
             elif permission.perm_type == "button":
                 buttons.append(permission.button)
+        for menu in menus:
+            for menu2 in menu2s:
+                if menu["menu_id"] == menu2["parent_id"]:
+                    menu["children"].append(menu2)
+                    menu_list.append(menu)
         return menu_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
