@@ -274,10 +274,10 @@ class AllPermManage(Resource):
         parser.add_argument('endpoint', type=str, location="json")
         parser.add_argument('level', type=str, location="json")
         parser.add_argument('parent_id', type=str, location="json")
-        parser.add_argument('get', type=bool, default=False, location="json")
-        parser.add_argument('put', type=bool, default=False, location="json")
-        parser.add_argument('post', type=bool, default=False, location="json")
-        parser.add_argument('delete', type=bool, default=False, location="json")
+        parser.add_argument('get', type=str,  location="json")
+        parser.add_argument('put', type=str,  location="json")
+        parser.add_argument('post', type=str,  location="json")
+        parser.add_argument('delete', type=str,  location="json")
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
@@ -299,13 +299,13 @@ class AllPermManage(Resource):
                 Permission.endpoint = args.endpoint
             if args.level:
                 Permission.level = args.level
-            if args.get or str(args.get).lower() == 'false':
+            if args.get:
                 Permission.api_get = args.get
-            if args.post or str(args.post).lower() == 'false':
+            if args.post:
                 Permission.api_post = args.post
-            if args.put or str(args.put).lower() == 'false':
+            if args.put:
                 Permission.api_put = args.put
-            if args.delete or str(args.delete).lower() == 'false':
+            if args.delete:
                 Permission.api_delete = args.delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
