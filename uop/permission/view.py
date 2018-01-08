@@ -169,10 +169,10 @@ class AllPermManage(Resource):
                 res["endpoint"] = permission.endpoint
                 res["level"] = permission.level
                 res["parent_id"] = permission.parent_id
-                res["get"] = permission.get
-                res["post"] = permission.post
-                res["put"] = permission.put
-                res["delete"] = permission.delete
+                res["get"] = permission.Get
+                res["post"] = permission.Post
+                res["put"] = permission.Put
+                res["delete"] = permission.Delete
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -225,10 +225,10 @@ class AllPermManage(Resource):
                 endpoint = args.endpoint,
                 level = args.level,
                 parent_id = args.parent_id,
-                get = args.get,
-                post=args.post,
-                put=args.put,
-                delete=args.delete,
+                Get = args.get,
+                Post=args.post,
+                Put=args.put,
+                Delete=args.delete,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
@@ -246,7 +246,6 @@ class AllPermManage(Resource):
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str)
-        parser.add_argument('menu2_name', type=str)
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
@@ -301,13 +300,13 @@ class AllPermManage(Resource):
             elif args.level:
                 Permission.level = args.level
             elif args.get:
-                Permission.get = args.get
+                Permission.Get = args.get
             elif args.post:
-                Permission.post = args.post
+                Permission.Post = args.post
             elif args.put:
-                Permission.put = args.put
+                Permission.Put = args.put
             elif args.delete:
-                Permission.delete = args.delete
+                Permission.Delete = args.delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
