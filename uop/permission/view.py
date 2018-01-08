@@ -153,6 +153,8 @@ class AllPermManage(Resource):
             condition["perm_type"] = args.perm_type
         try:
             Permissions = PermissionList.objects.filter(**condition)
+            Log.logger.error("111111111111111111111111111111")
+            Log.logger.error(Permissions)
             for permission in Permissions:
                 res={}
                 res["menu_id"] = permission.menu_id
@@ -175,6 +177,7 @@ class AllPermManage(Resource):
             msg = "Get permission info error,error msg is %s" % str(e)
             code = 500
             data = "Error"
+            Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
 
@@ -234,6 +237,7 @@ class AllPermManage(Resource):
             code = 500
             msg = "Create permission error,error msg is %s" % str(e)
             data = "Error"
+            Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
 
@@ -268,6 +272,7 @@ class AllPermManage(Resource):
             msg = "Delete permission error,error msg is %s" % str(e)
             code = 500
             data = "Error"
+            Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
 
@@ -332,6 +337,7 @@ class AllPermManage(Resource):
             msg = "Update permission error,error msg is %s" % str(e)
             code = 500
             data = "Error"
+            Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
 
