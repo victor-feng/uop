@@ -153,8 +153,6 @@ class AllPermManage(Resource):
             condition["perm_type"] = args.perm_type
         try:
             Permissions = PermissionList.objects.filter(**condition)
-            Log.logger.error("111111111111111111111111111111")
-            Log.logger.error(Permissions)
             for permission in Permissions:
                 res={}
                 res["menu_id"] = permission.menu_id
@@ -167,7 +165,7 @@ class AllPermManage(Resource):
                 res["perm_type"] = permission.perm_type
                 res["created_time"] = permission.created_time
                 res["updated_time"] = permission.updated_time
-                res["menu2_permission"] = deal_enbedded_data(permission.permission)
+                res["menu2_permission"] = deal_enbedded_data(permission.meau2_permission)
                 res["api_permission"] = deal_enbedded_data(permission.api_permission)
                 res_list.append(res)
             data["res_list"] = res_list
