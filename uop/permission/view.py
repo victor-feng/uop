@@ -279,6 +279,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_post', type=str,  location="json")
         parser.add_argument('api_delete', type=str,  location="json")
         args = parser.parse_args()
+        Log.logger.info(args)
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
             if args.menu_id:
