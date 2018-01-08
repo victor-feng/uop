@@ -7,41 +7,6 @@ db = MongoEngine()
 
 
 
-class Menu2_perm(db.EmbeddedDocument):
-    menu2_id=db.StringField(required=True, max_length=50)
-    name=db.StringField(required=False)
-    parent_id=db.StringField(required=True, max_length=50)
-    url = db.StringField(required=False)
-
-    meta = {
-        'collection': 'menu2_perm',
-        'index': [
-            {
-                'fields': ['id','name'],
-                'sparse': True,
-                }
-            ],
-        'index_background': True
-        }
-
-
-class Api_perm(db.EmbeddedDocument):
-    get = db.StringField(required=False,default=True)
-    post = db.StringField(required=False,default=True)
-    put = db.StringField(required=False,default=True)
-    delete = db.StringField(required=False,default=True)
-
-    meta = {
-        'collection': 'api_perm',
-        'index': [
-            {
-                'fields': ['name','id'],
-                'sparse': True,
-                }
-            ],
-        'index_background': True
-        }
-
 
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
@@ -54,10 +19,10 @@ class PermissionList(db.Document):
     url = db.StringField(required=False)
     perm_type=db.StringField(required=False)
     endpoint=db.StringField(required=False)
-    Get = db.BooleanField(required=False, default=True)
-    Post = db.BooleanField(required=False, default=True)
-    Put = db.BooleanField(required=False, default=True)
-    Delete = db.BooleanField(required=False, default=True)
+    api_get = db.BooleanField(required=False, default=True)
+    api_post = db.BooleanField(required=False, default=True)
+    api_put = db.BooleanField(required=False, default=True)
+    api_delete = db.BooleanField(required=False, default=True)
     parent_id = db.StringField(required=False, max_length=50)
     level = db.StringField(required=False, max_length=50)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())

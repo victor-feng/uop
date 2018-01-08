@@ -6,7 +6,7 @@ import uuid
 from flask import request
 from flask_restful import reqparse, Api, Resource
 from uop.permission import perm_blueprint
-from uop.models import UserInfo,PermissionList,RoleInfo,Menu2_perm,Api_perm
+from uop.models import UserInfo,PermissionList,RoleInfo
 from uop.permission.errors import perm_errors
 from uop.log import Log
 from uop.util import response_data,deal_enbedded_data
@@ -169,10 +169,10 @@ class AllPermManage(Resource):
                 res["endpoint"] = permission.endpoint
                 res["level"] = permission.level
                 res["parent_id"] = permission.parent_id
-                res["get"] = permission.Get
-                res["post"] = permission.Post
-                res["put"] = permission.Put
-                res["delete"] = permission.Delete
+                res["get"] = permission.api_get
+                res["post"] = permission.api_post
+                res["put"] = permission.api_put
+                res["delete"] = permission.api_delete
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -225,10 +225,10 @@ class AllPermManage(Resource):
                 endpoint = args.endpoint,
                 level = args.level,
                 parent_id = args.parent_id,
-                Get = args.get,
-                Post=args.post,
-                Put=args.put,
-                Delete=args.delete,
+                api_get = args.get,
+                api_post=args.post,
+                api_put=args.put,
+                api_delete=args.delete,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
@@ -300,13 +300,13 @@ class AllPermManage(Resource):
             elif args.level:
                 Permission.level = args.level
             elif args.get:
-                Permission.Get = args.get
+                Permission.api_get = args.get
             elif args.post:
-                Permission.Post = args.post
+                Permission.api_post = args.post
             elif args.put:
-                Permission.Put = args.put
+                Permission.api_put = args.put
             elif args.delete:
-                Permission.Delete = args.delete
+                Permission.api_delete = args.delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
