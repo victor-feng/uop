@@ -281,7 +281,7 @@ class AllPermManage(Resource):
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
-            if args.meau_id:
+            if args.menu_id:
                 Permission.menu_id = args.menu_id
             elif args.name:
                 Permission.name = args.name
