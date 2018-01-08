@@ -155,7 +155,7 @@ class AllPermManage(Resource):
             Permissions = PermissionList.objects.filter(**condition)
             for permission in Permissions:
                 res={}
-                res["id"] = permission.id
+                res["meau_id"] = permission.meau_id
                 res["name"] = permission.name
                 res["role"] = permission.role
                 res["button"] = permission.button
@@ -180,7 +180,7 @@ class AllPermManage(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str)
+        parser.add_argument('meau_id', type=str)
         parser.add_argument('name', type=str)
         parser.add_argument('button', type=str)
         parser.add_argument('icon', type=str)
@@ -199,7 +199,7 @@ class AllPermManage(Resource):
             Permission=PermissionList(
                 perm_id = perm_id,
                 name=args.name,
-                id = args.id,
+                meau_id = args.meau_id,
                 role = "super_admin",
                 perm_type = args.perm_type,
                 button = args.button,
@@ -219,11 +219,11 @@ class AllPermManage(Resource):
             elif args.action == "create_meau2_perm":
                 Permission_obj = PermissionList.objects.get(name=args.name)
                 for meau2 in args.meau2_permission:
-                    id = meau2.get("id")
+                    meau2_id = meau2.get("meau2_id")
                     name = meau2.get("name")
                     url = meau2.get("url")
                     parent_id = meau2.get("parent_id")
-                    meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
+                    meau2_perm_ins = Menu2_perm(meau2_id=meau2_id, name=name, url=url, parent_id=parent_id)
                     Permission_obj.menu2_permission.append(meau2_perm_ins)
                 Permission_obj.save()
             Permission.save()
@@ -239,6 +239,7 @@ class AllPermManage(Resource):
 
     def delete(self):
         parser = reqparse.RequestParser()
+        parser.add_argument('perm_id', type=str)
         parser.add_argument('name', type=str)
         parser.add_argument('meau2_name', type=str)
         parser.add_argument('action', type=str,
@@ -247,7 +248,7 @@ class AllPermManage(Resource):
                             location='json')
         args = parser.parse_args()
         try:
-            Permission = PermissionList.objects.get(name=args.name)
+            Permission = PermissionList.objects.get(perm_id=args.perm_id)
             if args.action == "delete_meau2_perm":
                 meau2_perms=Permission.menu2_permission
                 delete_meau2_perms=[]
@@ -272,7 +273,8 @@ class AllPermManage(Resource):
 
     def put(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str)
+        parser.add_argument('perm_id', type=str)
+        parser.add_argument('meau_id', type=str)
         parser.add_argument('name', type=str)
         parser.add_argument('button', type=str)
         parser.add_argument('icon', type=str)
@@ -287,9 +289,9 @@ class AllPermManage(Resource):
                             location='json')
         args = parser.parse_args()
         try:
-            Permission = PermissionList.objects.get(name=args.name)
+            Permission = PermissionList.objects.get(perm=args.perm_id)
             if args.id:
-                Permission.id = args.id
+                Permission.meau_id = args.meau_id
             elif args.name:
                 Permission.name = args.name
             elif args.button:
@@ -305,11 +307,11 @@ class AllPermManage(Resource):
             elif args.action == "update_meau2_perm":
                 Permission.menu2_permission=[]
                 for meau2 in args.meau2_permission:
-                    id = meau2.get("id")
+                    meau2_id = meau2.get("meau2_id")
                     name = meau2.get("name")
                     url = meau2.get("url")
                     parent_id = meau2.get("parent_id")
-                    meau2_perm_ins = Menu2_perm(id=id, name=name, url=url, parent_id=parent_id)
+                    meau2_perm_ins = Menu2_perm(meau2_id=meau2_id, name=name, url=url, parent_id=parent_id)
                     Permission.menu2_permission.append(meau2_perm_ins)
             elif args.action == "update_api_perm":
                 Permission.api_permission=[]
