@@ -263,14 +263,14 @@ class AllPermManage(Resource):
 
     def put(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('perm_id', type=str)
-        parser.add_argument('menu_id', type=str)
-        parser.add_argument('name', type=str)
-        parser.add_argument('button', type=str)
-        parser.add_argument('icon', type=str)
-        parser.add_argument('operation', type=str)
-        parser.add_argument('url', type=str)
-        parser.add_argument('perm_type', type=str)
+        parser.add_argument('perm_id', type=str,location="json")
+        parser.add_argument('menu_id', type=str,location="json")
+        parser.add_argument('name', type=str,location="json")
+        parser.add_argument('button', type=str,location="json")
+        parser.add_argument('icon', type=str,location="json")
+        parser.add_argument('operation', type=str,location="json")
+        parser.add_argument('url', type=str,location="json")
+        parser.add_argument('perm_type', type=str,location="json")
         parser.add_argument('endpoint', type=str, location="json")
         parser.add_argument('level', type=str, location="json")
         parser.add_argument('parent_id', type=str, location="json")
@@ -283,29 +283,29 @@ class AllPermManage(Resource):
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
             if args.menu_id:
                 Permission.menu_id = args.menu_id
-            elif args.name:
+            if args.name:
                 Permission.name = args.name
-            elif args.button:
+            if args.button:
                 Permission.button = args.button
-            elif args.icon:
+            if args.icon:
                 Permission.icon = args.icon
-            elif args.operation:
+            if args.operation:
                 Permission.operation = args.operation
-            elif args.url:
+            if args.url:
                 Permission.url = args.url
-            elif args.perm_type:
+            if args.perm_type:
                 Permission.perm_type = args.perm_type
-            elif args.endpoint:
+            if args.endpoint:
                 Permission.endpoint = args.endpoint
-            elif args.level:
+            if args.level:
                 Permission.level = args.level
-            elif args.get:
+            if args.get:
                 Permission.api_get = args.get
-            elif args.post:
+            if args.post:
                 Permission.api_post = args.post
-            elif args.put:
+            if args.put:
                 Permission.api_put = args.put
-            elif args.delete:
+            if args.delete:
                 Permission.api_delete = args.delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
