@@ -5,7 +5,7 @@ import json
 import datetime
 from flask import request, current_app
 from flask_restful import reqparse, Api, Resource
-from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import  ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.res_callback import res_callback_blueprint
 from uop.res_callback.errors import res_callback_errors
 from uop.deploy_callback.handler import create_status_record
