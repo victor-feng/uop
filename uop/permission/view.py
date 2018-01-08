@@ -192,7 +192,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_permission', type=list, location="json")
         parser.add_argument('action', type=str,
                             choices=('create_menu_perm', 'create_menu2_perm', 'create_api_perm'),
-                            required=True,
+                            required=False,
                             location='json')
         args = parser.parse_args()
         try:
