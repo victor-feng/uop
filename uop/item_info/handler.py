@@ -199,15 +199,15 @@ def push_entity_to_file(data):
 def processs_chidren_final(entity_list, children):
     entity_list = copy.copy(entity_list)
     for c in children:
-        if not dc.get("chidren"):
+        if not c.get("chidren"):
             entity_list.append({
-                "code": dc.get("code", ""),
-                "name": dc.get("name", ""),
-                "id": dc.get("id", ""),
-                "property": dc.get("parameters", [])
+                "code": c.get("code", ""),
+                "name": c.get("name", ""),
+                "id": c.get("id", ""),
+                "property": c.get("parameters", [])
             })
         else:
-            processs_chidren_final(entity_list, dc.get("chidren"))
+            processs_chidren_final(entity_list, c.get("chidren"))
 
 
 def get_entity_from_file(filters):
