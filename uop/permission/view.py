@@ -169,10 +169,10 @@ class AllPermManage(Resource):
                 res["endpoint"] = permission.endpoint
                 res["level"] = permission.level
                 res["parent_id"] = permission.parent_id
-                res["get"] = permission.api_get
-                res["post"] = permission.api_post
-                res["put"] = permission.api_put
-                res["delete"] = permission.api_delete
+                res["api_get"] = permission.api_get
+                res["api_post"] = permission.api_post
+                res["api_put"] = permission.api_put
+                res["api_delete"] = permission.api_delete
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -197,13 +197,11 @@ class AllPermManage(Resource):
         parser.add_argument('endpoint', type=str, location="json")
         parser.add_argument('level', type=str, location="json")
         parser.add_argument('parent_id', type=str, location="json")
-        parser.add_argument('get', type=str, location="json")
-        parser.add_argument('put', type=str, location="json")
-        parser.add_argument('post', type=str, location="json")
-        parser.add_argument('delete', type=str, location="json")
+        parser.add_argument('api_get', type=str, location="json")
+        parser.add_argument('api_put', type=str, location="json")
+        parser.add_argument('api_post', type=str, location="json")
+        parser.add_argument('api_delete', type=str, location="json")
         args = parser.parse_args()
-        Log.logger.info(args)
-        Log.logger.info(type(args.get))
         try:
             code = 200
             Permissions = PermissionList.objects.filter(name=args.name,role='super_admin')
@@ -227,10 +225,10 @@ class AllPermManage(Resource):
                 endpoint = args.endpoint,
                 level = args.level,
                 parent_id = args.parent_id,
-                api_get = args.get,
-                api_post=args.post,
-                api_put=args.put,
-                api_delete=args.delete,
+                api_get = args.api_get,
+                api_post=args.api_post,
+                api_put=args.api_put,
+                api_delete=args.api_delete,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
@@ -276,10 +274,10 @@ class AllPermManage(Resource):
         parser.add_argument('endpoint', type=str, location="json")
         parser.add_argument('level', type=str, location="json")
         parser.add_argument('parent_id', type=str, location="json")
-        parser.add_argument('get', type=str,  location="json")
-        parser.add_argument('put', type=str,  location="json")
-        parser.add_argument('post', type=str,  location="json")
-        parser.add_argument('delete', type=str,  location="json")
+        parser.add_argument('api_get', type=str,  location="json")
+        parser.add_argument('api_put', type=str,  location="json")
+        parser.add_argument('api_post', type=str,  location="json")
+        parser.add_argument('api_delete', type=str,  location="json")
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
@@ -302,13 +300,13 @@ class AllPermManage(Resource):
             if args.level:
                 Permission.level = args.level
             if args.get:
-                Permission.api_get = args.get
+                Permission.api_get = args.api_get
             if args.post:
-                Permission.api_post = args.post
+                Permission.api_post = args.api_post
             if args.put:
-                Permission.api_put = args.put
+                Permission.api_put = args.api_put
             if args.delete:
-                Permission.api_delete = args.delete
+                Permission.api_delete = args.api_delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
