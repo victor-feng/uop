@@ -4,7 +4,7 @@ import json
 import copy
 import requests
 import datetime
-from uop.models import User, ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async
 from uop.log import Log
