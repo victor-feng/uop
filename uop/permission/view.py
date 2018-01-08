@@ -299,13 +299,13 @@ class AllPermManage(Resource):
                 Permission.endpoint = args.endpoint
             if args.level:
                 Permission.level = args.level
-            if args.get:
+            if args.api_get:
                 Permission.api_get = args.api_get
-            if args.post:
+            if args.api_post:
                 Permission.api_post = args.api_post
-            if args.put:
+            if args.api_put:
                 Permission.api_put = args.api_put
-            if args.delete:
+            if args.api_delete:
                 Permission.api_delete = args.api_delete
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
