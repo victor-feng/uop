@@ -10,6 +10,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
+import copy
 from flask import jsonify
 
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -179,17 +180,33 @@ def push_entity_to_file(data):
     try:
         for d in data:
             for dc in d.get("children", []):
-                entity_list.append({
-                    "code": dc.get("code",""),
-                    "name": dc.get("name",""),
-                    "id": dc.get("id",""),
-                    "property": dc.get("parameters",[])
-                })
-        # with open(curdir + "/.entity.txt", "w") as fp:
-        #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
+                if not dc.get("chidren"):
+                    entity_list.append({
+                        "code": dc.get("code",""),
+                        "name": dc.get("name",""),
+                        "id": dc.get("id",""),
+                        "property": dc.get("parameters",[])
+                    })
+                else:
+                    processs_chidren_final(entity_list, dc.get("chidren"))
+                    # with open(curdir + "/.entity.txt", "w") as fp:
+                    #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
     return {"entity": entity_list}
+
+def processs_chidren_final(entity_list, children):
+    entity_list = copy.copy(entity_list)
+    for c in children:
+        if not dc.get("chidren"):
+            entity_list.append({
+                "code": dc.get("code", ""),
+                "name": dc.get("name", ""),
+                "id": dc.get("id", ""),
+                "property": dc.get("parameters", [])
+            })
+        else:
+            processs_chidren_final(entity_list, dc.get("chidren"))
 
 
 def get_entity_from_file(filters):
@@ -202,6 +219,10 @@ def get_entity_from_file(filters):
         "host":         "b593293378c74ba6827847d3",
         "container":    "d0f338299fa34ce2bf5dd873",
         "virtual_device":"d4ad23e58f31497ca3ad2bab",
+        "tomcat":   "d1b11a713e8842b2b93fe397",
+        "mysql": "e5024d360b924e0c8de3c6a8",
+        "redis": "de90d618f7504723b677f196",
+        "mongodb": "9bc4a41eb6364022b2f2c093",
     }
     sort_key = ["Person", "department", "yewu", "Module", "project", "host", "container", "virtual_device"]
     assert(isinstance(filters, dict))
@@ -216,7 +237,7 @@ def get_entity_from_file(filters):
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": eval(str(x["property"]))}, single_entity)
         single_entity = list(
-                (lambda item, key:((filter(lambda x: x["code"] == k, item)[0] for k in key)))(single_entity, sort_key)
+            (lambda item, key:((filter(lambda x: x["code"] == k, item)[0] for k in key)))(single_entity, sort_key)
         ) # 排个序
     else:
         single_entity = u"CMDB2.0 基础模型数据有变，联系管理员解决"

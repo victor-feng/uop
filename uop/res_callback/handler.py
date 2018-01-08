@@ -6,7 +6,7 @@ import requests
 import datetime
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment
 from uop.deployment.handler import attach_domain_ip
-from uop.util import async
+from uop.util import async, response_data
 from uop.log import Log
 from config import configs, APP_ENV
 from uop.item_info.handler import *
@@ -233,16 +233,112 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
     Log.logger.info("###data:{}".format(data))
-    instance = data.get("container")
+    url = CMDB2_URL + "cmdb/openapi/graph/"
+    instance = post_docker_format(url, data)
+    relation = get_relations("B7")
+    data = post_relation_format(url, instance, relation)
+    data_str = json.dumps(data)
+
+    try:
+        ret = requests.post(url, data=data_str).json()
+        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(ret))
+    except Exception as exc:
+        Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def docker_format():
+def post_docker_format(url, raw):
+    models_list = get_entity_from_file()
+    docker = filter(lambda x:x["code"] == "container", models_list)[0]
+    instance = []
+    for ct in raw["container"]:
+        attach = {
+            "image": ct["image_url"]
+        }
 
-    pass
+        for ins in ct["instance"]:
+            one = {
+                "model_id": docker["id"],
+                "name": ins.get("instance_name"),
+                "code": ins.get("instance_name"),
+                'parameters': list(
+                    (
+                        lambda property, instance, attach:
+                        (
+                            {
+                                "code": pro["code"],
+                                "value": instance.get(pro["code"]) if instance.get(pro["code"]) else attach.get(pro["code"])
+                            }
+                            for pro in property
+                        )
+                    )(docker["property"], ins, attach)
+                )
+            }
+            instance.append(one)
+    one = {
+        "model_id": docker["id"],
+        "name": ins.get("instance_name"),
+        "code": ins.get("instance_name"),
+        'parameters': list(
+            (
+                lambda property, instance, attach:
+                (
+                    {
+                        "code": pro["code"],
+                        "value": instance.get(pro["code"]) if instance.get(pro["code"]) else attach.get(pro["code"])
+                    }
+                    for pro in property
+                )
+            )(docker["property"], ins, attach)
+        )
+    }
+    Log.logger.info("docker_format instance:{}".format(instance))
+    uid, token = get_uid_token()
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign":"",
+        "data":{
+            "instance": instance
+        }
+    }
+    data_str = data_str = json.dumps(data)
+    try:
+        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
+        instance = requests.post(url, data=data_str).json()["data"]["instance"]
+        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(instance))
+    except Exception as exc:
+        instance = []
+        Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+    data.pop("data")
+    data.update({
+            "instance": instance
+    })
+    return data
+
+
+def post_relation_format(url, instance, relation):
+    instance = instance["instance"]
+
+    data = {
+        "uid": instance["uid"],
+        "token": instance["token"],
+        "sign": "",
+        "data": {
+            "relation": relation
+        }
+    }
+    data_str = data_str = json.dumps(data)
+    try:
+        Log.logger.info("post 'relations data' to cmdb/openapi/graph/ request:{}".format(data))
+        relation = requests.post(url, data=data_str).json()["data"]["relation"]
+        Log.logger.info("post 'relations data' to cmdb/openapi/graph/ result:{}".format(instance))
+    except Exception as exc:
+        Log.logger.error("post 'relations data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
 # B类视图list，获取已经定义的关系列表
 def get_relations(view_id, uid=None, token=None):
+    Log.logger.info("get_relations from {} view".format(view_id))
     view_dict = {
         "B7": "410c4b3b2e7848b9b64d08d0",  # 工程 --> 物理机
         "B6": "ccb058ab3c8d47bc991efd7b",  # 部门 --> 业务 --> 资源
