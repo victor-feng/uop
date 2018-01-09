@@ -537,7 +537,9 @@ def fix_instance(args):
     data_str = json.dumps(data)
     try:
         Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        instance = requests.post(url, data=data_str).json()["data"]["instance"]
+        instance = requests.post(url, data=data_str).json()
+        Log.logger.info("post return json:{]".format(instance))
+        instance = instance["data"]["instance"]
         Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ result:{}".format(instance))
     except Exception as exc:
         instance = []
