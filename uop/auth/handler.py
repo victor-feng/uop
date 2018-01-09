@@ -5,7 +5,6 @@ import datetime
 from uop.log import Log
 from flask import current_app
 from uop.models import PermissionList
-from uop.util import deal_enbedded_data
 
 def add_person(name, user_id, department, contact_info, privilege):
     """

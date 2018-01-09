@@ -5,10 +5,14 @@ import IPy
 import time
 import requests
 import json
-from uop.models import NetWorkConfig
+from uop.models import NetWorkConfig,PermissionList,RoleInfo
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+
+
+class ApiPermException(Exception):
+    pass
 
 def async(fun):
     def wraps(*args, **kwargs):
@@ -17,6 +21,7 @@ def async(fun):
         thread.start()
         return thread
     return wraps
+
 
 
 def get_CRP_url(env=None):
@@ -141,3 +146,36 @@ def deal_enbedded_data(data):
         d=json.loads(d)
         res_list.append(d)
     return res_list
+
+def get_api_permission():
+    """
+    #获取角色API权限
+    :return:
+    """
+    try:
+        api_all_perm={}
+        Roles=RoleInfo.objects.all()
+        for Role in Roles:
+            api_role_perm={}
+            api_endpoint_perm={}
+            Permissions=PermissionList.objects.filter(perm_type="api",role=Role.name)
+            for permission in Permissions:
+                api_method_perm={}
+                role=permission.role
+                endpoint=permission.endpoint
+                api_get=permission.api_get
+                api_post=permission.api_post
+                api_put=permission.api_put
+                api_delete=permission.api_delete
+                api_method_perm["GET"] = api_get
+                api_method_perm["POST"] = api_post
+                api_method_perm["PUT"] = api_put
+                api_method_perm["DELETE"] = api_delete
+                api_endpoint_perm[endpoint] = api_method_perm
+                api_role_perm[role] = api_endpoint_perm
+            #将全新加入到api_all_perm所有权限
+            api_all_perm = dict(api_all_perm,** api_role_perm)
+        return api_all_perm
+    except Exception as e:
+        err_msg = "Get api permission error,error msg is %s" % str(e)
+        raise ApiPermException(err_msg)
