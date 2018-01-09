@@ -503,8 +503,8 @@ def package_data(ret, ut):
 
 def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    model_id, instance_id, property, uid, token = \
-        args.model_id, args.instance_id, args.property, args.uid, args.token
+    model_id, instance_id, property, uid, token, name, code = \
+        args.model_id, args.instance_id, args.property, args.uid, args.token, args.name, args.code
     if not uid or not token:
         uid, token = get_uid_token()
     data = {
@@ -515,12 +515,12 @@ def fix_instance(args):
             "instance": [
                 {
                     "model_id": model_id,
-                    # "name": ins.get("instance_name"),
+                    "name": name,
                     "instance_id": instance_id,
-                    # "code": ins.get("instance_name"),
+                    "code": code,
                     'parameters': list(
                         (
-                            lambda property, instance:
+                            lambda property:
                             (
                                 {
                                     "code": pro["code"],
@@ -528,7 +528,7 @@ def fix_instance(args):
                                 }
                                 for pro in property
                             )
-                        )(docker_model["property"], ins)
+                        )(property)
                     )
                 }
             ]
