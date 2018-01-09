@@ -391,6 +391,25 @@ class BusinessProject(Resource):
         return jsonify(response)
 
 
+    def put(self):
+        response = response_data(200, "success", "")
+        parser = reqparse.RequestParser()
+        parser.add_argument('model_id', type=str)  # 修改的实体id
+        parser.add_argument('instance_id', type=str)  # 修改的实例id
+        parser.add_argument('property', type=list, location='json') #改后的属性
+        parser.add_argument('uid', type=str)
+        parser.add_argument('token', type=str)
+        args = parser.parse_args()
+        try:
+            graph_data = fix_instance(args)
+            response["result"]["data"] = graph_data
+        except Exception as exc:
+            response["code"] = 500
+            response["result"]["msg"] = str(exc)
+            Log.logger.error(u"修改业务模块工程出错:{}".format(str(exc)))
+        return jsonify(response)
+
+
 class CmdbModels(Resource):
     def get(self):
         '''

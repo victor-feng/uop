@@ -249,9 +249,6 @@ def crp_data_cmdb(data):
         Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-get_model_id = lambda models, code: filter(lambda x:x["code"] == code, models)[0]["id"]
-
-
 def post_instance_format(url, raw, models_list):
     docker_model = filter(lambda x:x["code"] == "container", models_list)[0]
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]

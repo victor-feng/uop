@@ -16,7 +16,8 @@ from flask import jsonify
 curdir = os.path.dirname(os.path.abspath(__file__))
 __all__ = [
     "get_uid_token", "Aquery", "get_entity",
-    "subgrath_data", "package_data", "get_entity_from_file"
+    "subgrath_data", "package_data", "get_entity_from_file",
+    "fix_instance"
 ]
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_MODULE ={
@@ -445,7 +446,7 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     try:
         # ret = requests.post(url, data=data_str).json()
-        graph_data=push_data_to_file(instance_id, entity_id, property)
+        graph_data = push_data_to_file(instance_id, entity_id, property)
         format_data = package_data(graph_data, data)
     except Exception as exc:
         Log.logger.error("graph_data: {}".format(graph_data))
@@ -498,3 +499,51 @@ def package_data(ret, ut):
     ret.update(ut)
     ret.pop("data")
     return ret
+
+
+def fix_instance(args):
+    url = CMDB2_URL + "cmdb/openapi/graph/"
+    model_id, instance_id, property, uid, token = \
+        args.model_id, args.instance_id, args.property, args.uid, args.token
+    if not uid or not token:
+        uid, token = get_uid_token()
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "instance": [
+                {
+                    "model_id": model_id,
+                    # "name": ins.get("instance_name"),
+                    "instance_id": instance_id,
+                    # "code": ins.get("instance_name"),
+                    'parameters': list(
+                        (
+                            lambda property, instance:
+                            (
+                                {
+                                    "code": pro["code"],
+                                    "value": pro["value"]
+                                }
+                                for pro in property
+                            )
+                        )(docker_model["property"], ins)
+                    )
+                }
+            ]
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
+        instance = requests.post(url, data=data_str).json()["data"]["instance"]
+        Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ result:{}".format(instance))
+    except Exception as exc:
+        instance = []
+        Log.logger.error("post 'fix instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+    data.pop("data")
+    data.update({
+        "instance": instance
+    })
+    return data
