@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import current_app
+from flask import current_app,jsonify
 import IPy
 import time
 import requests
 import json
-from uop.models import NetWorkConfig,PermissionList,RoleInfo
+from uop.models import NetWorkConfig,PermissionList,RoleInfo,UserInfo
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -179,3 +179,40 @@ def get_api_permission():
     except Exception as e:
         err_msg = "Get api permission error,error msg is %s" % str(e)
         raise ApiPermException(err_msg)
+
+
+def get_role(user_id):
+    try:
+        User = UserInfo.objects.get(id=user_id)
+        role = User.role
+        return role
+    except Exception as e:
+        err_msg = "Get role error,error msg is %s" % str(e)
+        raise ApiPermException(err_msg)
+
+
+
+def api_permission_control(request_info):
+    """
+    API权限控制装饰器
+    :param info:
+    :return:
+    """
+    def _access_control(func):
+        def wrap_func(*args, **kwargs):
+            try:
+                endpoint = request_info.endpoint
+                http_method = request_info.method
+                headers = request_info.headers
+                user_id = headers["User-Id"]
+                role = get_role(user_id)
+                Permissions = get_api_permission()
+                if not Permissions[role][endpoint][http_method]:
+                    return jsonify({'error': 'no permission',"code":403})
+                return func(*args, **kwargs)
+            except KeyError:
+                return jsonify({'error': 'no permission',"code":403})
+            except Exception as e:
+                return jsonify({'error': 'api permission control error,error msg %s' % str(e), "code": 500})
+        return wrap_func
+    return _access_control
