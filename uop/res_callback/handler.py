@@ -392,7 +392,7 @@ def get_relations(view_id, uid=None, token=None):
     }
     data_str = json.dumps(data)
     try:
-        relations= requests.post(url, data=data_str).json()["relation"] # 获取视图关系实体信息
+        relations = requests.post(url, data=data_str).json()["data"]["relation"] # 获取视图关系实体信息
         Log.logger.info("get_relations data:{}".format(relations))
     except Exception as exc:
         Log.logger.error("graph_data error: {}".format(str(exc)))
