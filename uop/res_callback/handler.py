@@ -262,9 +262,11 @@ def post_instance_format(url, raw, models_list):
             "image": ct["image_url"]
         }
         for ins in ct["instance"]:
+            ins["baseInfo"] = ins.get("instance_name")
             one = {
                 "model_id": docker_model["id"],
                 "name": ins.get("instance_name"),
+                "instance_id": "",
                 "code": ins.get("instance_name"),
                 'parameters': list(
                     (
@@ -282,6 +284,7 @@ def post_instance_format(url, raw, models_list):
             instances.append(one)
     tomcat = {
         "model_id": tomcat_model["id"],
+        "instance_id": "",
         "name": raw.get("resource_name"),
         "code": raw.get("resource_name"),
         'parameters': list(
