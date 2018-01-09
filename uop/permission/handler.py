@@ -10,6 +10,12 @@ class ApiPermException(Exception):
     pass
 
 
+method_dict={
+    "0":False,
+    "1":True
+}
+
+
 def get_api_permission():
     """
     #获取角色API权限
@@ -70,7 +76,8 @@ def api_permission_control(request_info):
                 user_id = headers["User-Id"]
                 role = get_role(user_id)
                 Permissions = get_api_permission()
-                if not Permissions[role][endpoint][http_method]:
+                res=Permissions[role][endpoint][http_method]
+                if not method_dict[res]:
                     return jsonify({'error': 'no permission',"code":403})
                 return func(*args, **kwargs)
             except KeyError:
