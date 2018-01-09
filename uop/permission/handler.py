@@ -82,7 +82,7 @@ def api_permission_control(request_info):
                 return func(*args, **kwargs)
             except KeyError:
                 return jsonify({'error': 'no permission',"code":403})
-            except Exception as e:
+            except ApiPermException as e:
                 return jsonify({'error': 'api permission control error,error msg %s' % str(e), "code": 500})
         return wrap_func
     return _access_control
