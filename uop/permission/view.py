@@ -21,7 +21,7 @@ class UserManage(Resource):
     """
     管理用户
     """
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, location='args')
@@ -74,7 +74,7 @@ class UserManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('role', type=str)
@@ -98,7 +98,7 @@ class UserManage(Resource):
         ret=response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)
@@ -140,7 +140,7 @@ class AllPermManage(Resource):
     管理所有权限
     """
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str, location='args')
@@ -190,7 +190,7 @@ class AllPermManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('menu_id', type=str,location="json")
@@ -249,7 +249,7 @@ class AllPermManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str)
@@ -268,7 +268,7 @@ class AllPermManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('perm_id', type=str,location="json")
@@ -340,7 +340,7 @@ class RoleManage(Resource):
     管理角色
     """
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def get(self):
         data={}
         res_list=[]
@@ -364,7 +364,7 @@ class RoleManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
@@ -390,7 +390,7 @@ class RoleManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
@@ -440,7 +440,7 @@ class RoleManage(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-    @api_permission_control(request)
+    #@api_permission_control(request)
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
