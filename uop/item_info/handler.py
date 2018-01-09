@@ -17,7 +17,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 __all__ = [
     "get_uid_token", "Aquery", "get_entity",
     "subgrath_data", "package_data", "get_entity_from_file",
-    "fix_instance"
+    "fix_instance", "delete_instance"
 ]
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_MODULE ={
@@ -549,3 +549,49 @@ def fix_instance(args):
         "instance": instance
     })
     return data
+
+
+def delete_instance(args):
+    url = CMDB2_URL + "cmdb/openapi/graph/"
+    delete_list = args.delete_list
+    assert(isinstance(delete_list, list))
+    uid, token = get_uid_token()
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            # "entity": [
+            #     {
+            #         "model_id": model_id,
+            #         "instance_id": instance_id,
+            #     }
+            # ]
+            "entity": delete_list
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        Log.logger.info("delete 'instances' to cmdb/openapi/graph/ request:{}".format(data))
+        instance = requests.delete(url, data=data_str).json()
+        Log.logger.info("delete return json:{}".format(instance))
+        Log.logger.info("delete 'instances' to cmdb/openapi/graph/ result:{}".format(instance))
+    except Exception as exc:
+        instance = []
+        Log.logger.error("delete 'instances' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+    data.pop("data")
+    data.update({
+        "instance": instance
+    })
+    return data
+
+
+
+
+
+
+
+
+
+
+

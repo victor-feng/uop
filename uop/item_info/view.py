@@ -365,7 +365,6 @@ class BusinessProject(Resource):
             Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
         return jsonify(response)
 
-
     def post(self):
         '''
         调用插入子图，插入 业务|模块|工程
@@ -390,7 +389,6 @@ class BusinessProject(Resource):
             Log.logger.error(u"A类视图添加业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
 
-
     def put(self):
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
@@ -409,6 +407,24 @@ class BusinessProject(Resource):
             response["code"] = 500
             response["result"]["msg"] = str(exc)
             Log.logger.error(u"修改业务模块工程出错:{}".format(str(exc)))
+        return jsonify(response)
+
+    def delete(self):
+        '''
+        批量删除实例
+        :return:
+        '''
+        response = response_data(200, "success", "")
+        parser = reqparse.RequestParser()
+        parser.add_argument('delete_list', type=list, location="json")  # 删除的实体id和删除的实例id的列表
+        args = parser.parse_args()
+        try:
+            graph_data = delete_instance(args)
+            response["result"]["data"] = graph_data
+        except Exception as exc:
+            response["code"] = 500
+            response["result"]["msg"] = str(exc)
+            Log.logger.error(u"删除业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
 
 
