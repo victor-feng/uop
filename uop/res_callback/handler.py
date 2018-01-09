@@ -233,7 +233,7 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
     Log.logger.info("###data:{}".format(data))
-    models_list = get_entity_from_file()
+    models_list = get_entity_from_file(data)
     project_instance_id = data["resource_id"]
 
     url = CMDB2_URL + "cmdb/openapi/graph/"
