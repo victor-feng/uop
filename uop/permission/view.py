@@ -123,7 +123,59 @@ class PermManage(Resource):
     管理角色权限
     """
     def get(self):
-        pass
+        parser = reqparse.RequestParser()
+        parser.add_argument('perm_id', type=str, location='args')
+        parser.add_argument('name', type=str, location='args')
+        parser.add_argument('role', type=str, location='args')
+        parser.add_argument('perm_type', type=str, location='args')
+        args = parser.parse_args()
+        data = {}
+        res_list = []
+        try:
+            role_permissions = PermissionList.objects.filter(role=args.role, perm_type=args.perm_type)
+            all_permissions = PermissionList.objects.filter(role="super_admin", perm_type=args.perm_type)
+            same_perm_list=[]
+            add_perm_list = []
+            for all_perm in all_permissions:
+                for role_perm in role_permissions:
+                    if role_perm.name == all_perm.name:
+                        same_perm_list.append(all_perm)
+
+            for all_perm in all_permissions:
+                if all_perm not in same_perm_list:
+                    add_perm_list.append(all_perm)
+            Permissions=list(role_permissions) + add_perm_list
+            for permission in Permissions:
+                res={}
+                res["perm_id"] = permission.perm_id
+                res["menu_id"] = permission.menu_id
+                res["name"] = permission.name
+                res["role"] = permission.role
+                res["button"] = permission.button
+                res["icon"] = permission.icon
+                res["operation"] = permission.operation
+                res["url"] = permission.url
+                res["perm_type"] = permission.perm_type
+                res["created_time"] = str(permission.created_time)
+                res["updated_time"] = str(permission.updated_time)
+                res["endpoint"] = permission.endpoint
+                res["level"] = permission.level
+                res["parent_id"] = permission.parent_id
+                res["api_get"] = permission.api_get
+                res["api_post"] = permission.api_post
+                res["api_put"] = permission.api_put
+                res["api_delete"] = permission.api_delete
+                res_list.append(res)
+            data["res_list"] = res_list
+            code = 200
+            msg = "Get permission info success"
+        except Exception as e:
+            msg = "Get permission info error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
 
     def put(self):
         parser = reqparse.RequestParser()
@@ -133,7 +185,8 @@ class PermManage(Resource):
         args = parser.parse_args()
         try:
             code = 200
-            same_perm_list=[]
+            same1_perm_list=[]
+            same2_perm_list = []
             create_perm_list=[]
             delete_perm_list = []
             have_permissions = PermissionList.objects.filter(role=args.role,perm_type=args.perm_type)
@@ -141,14 +194,15 @@ class PermManage(Resource):
             for perm in args.permission_list:
                 for have_perm in have_permissions:
                     if perm["name"] == have_perm.name:
-                        same_perm_list.append(perm)
+                        same1_perm_list.append(perm)
+                        same2_perm_list.append(have_perm)
             #要创建的的权限
             for perm in args.permission_list:
-                if perm not in same_perm_list:
+                if perm not in same1_perm_list:
                     create_perm_list.append(perm)
             #要删除的权限
             for have_perm in have_permissions:
-                if have_perm not in same_perm_list:
+                if have_perm not in same2_perm_list:
                     delete_perm_list.append(have_perm)
             # 创建没有的权限
             for perm in create_perm_list:
@@ -181,7 +235,7 @@ class PermManage(Resource):
 
             #已有的权限更新
             if args.perm_type == "api":
-                for perm in same_perm_list:
+                for perm in same1_perm_list:
                     Permission = PermissionList.objects.get(perm_id=perm["perm_id"])
                     if perm.get("menu_id"):
                         Permission.menu_id = perm.get("menu_id")
@@ -290,6 +344,7 @@ class AllPermManage(Resource):
         condition = {}
         data={}
         res_list=[]
+        condition["rele"] = "super_admin"
         if args.name:
             condition["name"] = args.name
         if args.perm_type:
