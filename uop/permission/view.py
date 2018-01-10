@@ -125,7 +125,7 @@ class PermManage(Resource):
     def get(self):
         pass
 
-    def post(self):
+    def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('permission_list', type=list, location="json")
         parser.add_argument('role', type=str, location="json")
@@ -214,18 +214,62 @@ class PermManage(Resource):
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
-            msg = "Create or Update role permission success"
+            msg = "Update role permission success"
             data = "Success"
         except Exception as e:
             code = 500
-            msg = "Create or Update role permission error,error msg is %s" % str(e)
+            msg = "Update role permission error,error msg is %s" % str(e)
             data = "Error"
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
 
-    def put(self):
-        pass
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('permission_list', type=list, location="json")
+        parser.add_argument('role', type=str, location="json")
+        parser.add_argument('perm_type', type=str, location='json')
+        args = parser.parse_args()
+        try:
+            code = 200
+            Permissions=PermissionList.objects.filter(role=args.role, perm_type=args.perm_type)
+            if Permissions:
+                msg = "Create role permission Failed,The role permissions has already existed"
+                data = "Failed"
+                ret = response_data(code, msg, data)
+                return ret, code
+            for perm in args.permission_list:
+                perm_id = str(uuid.uuid1())
+                Permission = PermissionList(
+                    perm_id=perm_id,
+                    name=perm.get("name"),
+                    menu_id=perm.get("menu_id"),
+                    role=args.role,
+                    perm_type=perm.get("perm_type"),
+                    button=perm.get("button"),
+                    icon=perm.get("icon"),
+                    operation=perm.get("operation"),
+                    url=perm.get("url"),
+                    endpoint=perm.get("endpoint"),
+                    level=perm.get("level"),
+                    parent_id=perm.get("parent_id"),
+                    api_get=perm.get("api_get"),
+                    api_post=perm.get("api_post"),
+                    api_put=perm.get("api_put"),
+                    api_delete=perm.get("api_delete"),
+                    created_time=datetime.datetime.now(),
+                    updated_time=datetime.datetime.now()
+                )
+                Permission.save()
+            msg = "Create role permission success"
+            data = "Success"
+        except Exception as e:
+            code = 500
+            msg = "Create role permission error,error msg is %s" % str(e)
+            data = "Error"
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
 
     def delete(self):
         pass
