@@ -344,7 +344,7 @@ class AllPermManage(Resource):
         condition = {}
         data={}
         res_list=[]
-        condition["rele"] = "super_admin"
+        condition["role"] = "super_admin"
         if args.name:
             condition["name"] = args.name
         if args.perm_type:
