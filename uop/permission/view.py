@@ -126,7 +126,103 @@ class PermManage(Resource):
         pass
 
     def post(self):
-        pass
+        parser = reqparse.RequestParser()
+        parser.add_argument('permission_list', type=list, location="json")
+        parser.add_argument('role', type=str, location="json")
+        parser.add_argument('perm_type', type=str, location='json')
+        args = parser.parse_args()
+        try:
+            code = 200
+            same_perm_list=[]
+            create_perm_list=[]
+            delete_perm_list = []
+            have_permissions = PermissionList.objects.filter(role=args.role,perm_type=args.perm_type)
+            #获取相同的权限
+            for perm in args.permission_list:
+                for have_perm in have_permissions:
+                    if perm["name"] == have_perm.name:
+                        same_perm_list.append(perm)
+            #要创建的的权限
+            for perm in args.permission_list:
+                if perm not in same_perm_list:
+                    create_perm_list.append(perm)
+            #要删除的权限
+            for have_perm in have_permissions:
+                if have_perm not in same_perm_list:
+                    delete_perm_list.append(have_perm)
+            # 创建没有的权限
+            for perm in create_perm_list:
+                perm_id = str(uuid.uuid1())
+                Permission = PermissionList(
+                    perm_id=perm_id,
+                    name=perm.get("name"),
+                    menu_id=perm.get("menu_id"),
+                    role=args.role,
+                    perm_type=perm.get("perm_type"),
+                    button=perm.get("button"),
+                    icon=perm.get("icon"),
+                    operation=perm.get("operation"),
+                    url=perm.get("url"),
+                    endpoint=perm.get("endpoint"),
+                    level=perm.get("level"),
+                    parent_id=perm.get("parent_id"),
+                    api_get=perm.get("api_get"),
+                    api_post=perm.get("api_post"),
+                    api_put=perm.get("api_put"),
+                    api_delete=perm.get("api_delete"),
+                    created_time=datetime.datetime.now(),
+                    updated_time=datetime.datetime.now()
+                )
+                Permission.save()
+            #删除多余权限
+            for perm in delete_perm_list:
+                Permission = PermissionList.objects.get(perm_id=perm.id)
+                Permission.delete()
+
+            #已有的权限更新
+            if args.perm_type == "menu":
+                for perm in same_perm_list:
+                    Permission = PermissionList.objects.get(perm_id=perm["perm_id"])
+                    if perm.get("menu_id"):
+                        Permission.menu_id = perm.get("menu_id")
+                    if perm.get("name"):
+                        Permission.name = perm.get("name")
+                    if perm.get("button"):
+                        Permission.button = perm.get("button")
+                    if perm.get("icon"):
+                        Permission.icon = perm.get("icon")
+                    if perm.get("operation"):
+                        Permission.operation = perm.get("operation")
+                    if perm.get("url"):
+                        Permission.url = perm.get("url")
+                    if perm.get("perm_type"):
+                        Permission.perm_type = perm.get("perm_type")
+                    if perm.get("endpoint"):
+                        Permission.endpoint = perm.get("endpoint")
+                    if perm.get("level"):
+                        Permission.level = perm.get("level")
+                    if perm.get("parent_id"):
+                        Permission.parent_id = perm.get("parent_id")
+                    if perm.get("api_get"):
+                        Permission.api_get = perm.get("api_get")
+                    if perm.get("api_post"):
+                        Permission.api_post = perm.get("api_post")
+                    if perm.get("api_put"):
+                        Permission.api_put = perm.get("api_put")
+                    if perm.get("api_delete"):
+                        Permission.api_delete = perm.get("api_delete")
+                    Permission.updated_time = datetime.datetime.now()
+                    Permission.save()
+
+            msg = "Create permission success"
+            data = "Success"
+        except Exception as e:
+            code = 500
+            msg = "Create permission error,error msg is %s" % str(e)
+            data = "Error"
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
 
     def put(self):
         pass
