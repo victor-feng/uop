@@ -180,7 +180,7 @@ class PermManage(Resource):
                 Permission.delete()
 
             #已有的权限更新
-            if args.perm_type == "menu":
+            if args.perm_type == "api":
                 for perm in same_perm_list:
                     Permission = PermissionList.objects.get(perm_id=perm["perm_id"])
                     if perm.get("menu_id"):
@@ -214,11 +214,11 @@ class PermManage(Resource):
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
-            msg = "Create permission success"
+            msg = "Create or Update role permission success"
             data = "Success"
         except Exception as e:
             code = 500
-            msg = "Create permission error,error msg is %s" % str(e)
+            msg = "Create or Update role permission error,error msg is %s" % str(e)
             data = "Error"
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
