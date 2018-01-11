@@ -259,39 +259,41 @@ class PermManage(Resource):
             #已有的权限更新
             if args.perm_type == "api":
                 for perm in same1_perm_list:
-                    Permission = PermissionList.objects.get(perm_id=perm.get("perm_id"))
-                    if perm.get("menu_id"):
-                        Permission.menu_id = perm.get("menu_id")
-                    if perm.get("name"):
-                        Permission.name = perm.get("name")
-                    if perm.get("button"):
-                        Permission.button = perm.get("button")
-                    if perm.get("icon"):
-                        Permission.icon = perm.get("icon")
-                    if perm.get("operation"):
-                        Permission.operation = perm.get("operation")
-                    if perm.get("url"):
-                        Permission.url = perm.get("url")
-                    if perm.get("perm_type"):
-                        Permission.perm_type = perm.get("perm_type")
-                    if perm.get("endpoint"):
-                        Permission.endpoint = perm.get("endpoint")
-                    if perm.get("level"):
-                        Permission.level = perm.get("level")
-                    if perm.get("parent_id"):
-                        Permission.parent_id = perm.get("parent_id")
-                    if perm.get("api_get"):
-                        Permission.api_get = perm.get("api_get")
-                    if perm.get("api_post"):
-                        Permission.api_post = perm.get("api_post")
-                    if perm.get("api_put"):
-                        Permission.api_put = perm.get("api_put")
-                    if perm.get("api_delete"):
-                        Permission.api_delete = perm.get("api_delete")
-                    if perm.get("isDropdown"):
-                        Permission.isDropdown = perm.get("isDropdown")
-                    Permission.updated_time = datetime.datetime.now()
-                    Permission.save()
+                    Permissions = PermissionList.objects.filter(perm_id=perm.get("perm_id"))
+                    if Permissions:
+                        Permission=Permissions[0]
+                        if perm.get("menu_id"):
+                            Permission.menu_id = perm.get("menu_id")
+                        if perm.get("name"):
+                            Permission.name = perm.get("name")
+                        if perm.get("button"):
+                            Permission.button = perm.get("button")
+                        if perm.get("icon"):
+                            Permission.icon = perm.get("icon")
+                        if perm.get("operation"):
+                            Permission.operation = perm.get("operation")
+                        if perm.get("url"):
+                            Permission.url = perm.get("url")
+                        if perm.get("perm_type"):
+                            Permission.perm_type = perm.get("perm_type")
+                        if perm.get("endpoint"):
+                            Permission.endpoint = perm.get("endpoint")
+                        if perm.get("level"):
+                            Permission.level = perm.get("level")
+                        if perm.get("parent_id"):
+                            Permission.parent_id = perm.get("parent_id")
+                        if perm.get("api_get"):
+                            Permission.api_get = perm.get("api_get")
+                        if perm.get("api_post"):
+                            Permission.api_post = perm.get("api_post")
+                        if perm.get("api_put"):
+                            Permission.api_put = perm.get("api_put")
+                        if perm.get("api_delete"):
+                            Permission.api_delete = perm.get("api_delete")
+                        if perm.get("isDropdown"):
+                            Permission.isDropdown = perm.get("isDropdown")
+                        Permission.updated_time = datetime.datetime.now()
+                        Permission.save()
 
             msg = "Update role permission success"
             data = "Success"
