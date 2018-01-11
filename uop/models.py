@@ -7,7 +7,6 @@ db = MongoEngine()
 
 
 
-
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
     name = db.StringField(required=True, max_length=50, unique=True,unique_with='role')
@@ -36,7 +35,6 @@ class PermissionList(db.Document):
                 'unique': True,
                 }]
             }
-
 
 
 
@@ -241,6 +239,7 @@ class ResourceModel(db.DynamicDocument):
     resource_name = db.StringField(required=True)
     project = db.StringField(required=True)
     project_id = db.StringField(required=False)
+    cmdb2_project_id = db.StringField(required=False)
     department = db.StringField(required=True)
     department_id = db.StringField(required=True)
     deploy_name = db.StringField()

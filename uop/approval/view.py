@@ -217,6 +217,7 @@ class Reservation(Resource):
         data['set_flag'] = 'res'
         data['unit_id'] = resource.project_id
         data['unit_name'] = resource.project
+        data["project_id"] = resource.cmdb2_project_id if resource.cmdb2_project_id else "a9b982b4187d4bfbb6d147b0"
         data['unit_des'] = ''
         data['user_id'] = resource.user_id
         data['username'] = resource.user_name

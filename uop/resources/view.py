@@ -40,6 +40,7 @@ class ResourceApplication(Resource):
         parser.add_argument('resource_name', type=str)
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
+        parser.add_argument('cmdb2_project_id', type=str)
         parser.add_argument('department', type=str)
         parser.add_argument('user_name', type=str)
         parser.add_argument('user_id', type=str)
@@ -53,6 +54,7 @@ class ResourceApplication(Resource):
         resource_name = args.resource_name
         project = args.project
         project_id = args.project_id
+        cmdb2_project_id = args.cmdb2_project_id
         department = args.department
         department_id = '1'
         res_id = str(uuid.uuid1())
@@ -65,7 +67,7 @@ class ResourceApplication(Resource):
         resource_list = args.resource_list
         compute_list = args.compute_list
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
-                                             department_id=department_id, res_id=res_id, project_id=project_id,
+                                             department_id=department_id, res_id=res_id, project_id=project_id,cmdb2_project_id=cmdb2_project_id,
                                              user_name=user_name, user_id=user_id,env=env,
                                              application_status=application_status, approval_status=approval_status,
                                              reservation_status="unreserved", created_date=created_date)
