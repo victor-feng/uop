@@ -582,10 +582,16 @@ class RoleManage(Resource):
 
     #@api_permission_control(request)
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, location='args')
+        args = parser.parse_args()
+        condition = {}
         data={}
         res_list=[]
+        if args.name:
+            condition["name"] = args.name
         try:
-            Roles=RoleInfo.objects.all()
+            Roles=RoleInfo.objects.filter(**condition)
             for role in Roles:
                 res={}
                 res["id"] = role.id
