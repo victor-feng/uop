@@ -253,7 +253,7 @@ class PermManage(Resource):
                 Permission.save()
             #删除多余权限
             for perm in delete_perm_list:
-                Permission = PermissionList.objects.get(perm_id=perm.id)
+                Permission = PermissionList.objects.get(perm_id=perm.perm_id)
                 Permission.delete()
 
             #已有的权限更新
