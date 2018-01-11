@@ -124,8 +124,6 @@ class PermManage(Resource):
     """
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('perm_id', type=str, location='args')
-        parser.add_argument('name', type=str, location='args')
         parser.add_argument('role', type=str, location='args')
         parser.add_argument('perm_type', type=str, location='args')
         args = parser.parse_args()
