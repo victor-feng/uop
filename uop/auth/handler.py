@@ -81,16 +81,20 @@ def get_login_permission(role):
                 menu_id=permission.menu_id
                 level=permission.level
                 parent_id=permission.parent_id
+                isDropdown = permission.isDropdown
                 if int(level) == 1:
                     menu_dict["name"] = name
                     menu_dict["url"] = url
                     menu_dict["menu_id"] = menu_id
+                    menu_dict["isDropdown"] = isDropdown
                     menu_dict["children"] = []
                 elif int(level) == 2:
                     menu2_dict["name"] = name
                     menu2_dict["url"] = url
                     menu2_dict["menu_id"] = menu_id
                     menu2_dict["parent_id"] = parent_id
+                    menu_dict["isDropdown"] = isDropdown
+                    menu_dict["children"] = []
                 if menu_dict:
                     menus.append(menu_dict)
                 if menu2_dict:

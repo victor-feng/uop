@@ -27,6 +27,7 @@ class PermissionList(db.Document):
     level = db.StringField(required=False, max_length=50)
     created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    isDropdown = db.BooleanField(required=False)
 
     meta = {
             "collection": "permission_list",

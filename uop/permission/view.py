@@ -165,6 +165,7 @@ class PermManage(Resource):
                 res["api_post"] = permission.api_post
                 res["api_put"] = permission.api_put
                 res["api_delete"] = permission.api_delete
+                res["isDropdown"] = permission.isDropdown
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -223,6 +224,7 @@ class PermManage(Resource):
                     api_post=perm.get("api_post"),
                     api_put=perm.get("api_put"),
                     api_delete=perm.get("api_delete"),
+                    isDropdown=perm.get("isDropdown"),
                     created_time=datetime.datetime.now(),
                     updated_time=datetime.datetime.now()
                 )
@@ -264,6 +266,8 @@ class PermManage(Resource):
                         Permission.api_put = perm.get("api_put")
                     if perm.get("api_delete"):
                         Permission.api_delete = perm.get("api_delete")
+                    if perm.get("isDropdown"):
+                        Permission.isDropdown = perm.get("isDropdown")
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
@@ -309,6 +313,7 @@ class PermManage(Resource):
                     api_post=perm.get("api_post"),
                     api_put=perm.get("api_put"),
                     api_delete=perm.get("api_delete"),
+                    isDropdown=perm.get("isDropdown"),
                     created_time=datetime.datetime.now(),
                     updated_time=datetime.datetime.now()
                 )
@@ -371,6 +376,7 @@ class AllPermManage(Resource):
                 res["api_post"] = permission.api_post
                 res["api_put"] = permission.api_put
                 res["api_delete"] = permission.api_delete
+                res["isDropdown"] = permission.isDropdown
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -400,6 +406,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_put', type=str, location="json")
         parser.add_argument('api_post', type=str, location="json")
         parser.add_argument('api_delete', type=str, location="json")
+        parser.add_argument('isDropdown', type=bool, location="json")
         args = parser.parse_args()
         try:
             code = 200
@@ -428,6 +435,7 @@ class AllPermManage(Resource):
                 api_post=args.api_post,
                 api_put=args.api_put,
                 api_delete=args.api_delete,
+                isDropdown=args.isDropdown,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
@@ -479,6 +487,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_put', type=str,  location="json")
         parser.add_argument('api_post', type=str,  location="json")
         parser.add_argument('api_delete', type=str,  location="json")
+        parser.add_argument('isDropdown', type=bool, location="json")
         args = parser.parse_args()
         Log.logger.info(args)
         try:
@@ -511,6 +520,8 @@ class AllPermManage(Resource):
                 Permission.api_put = args.api_put
             if args.api_delete:
                 Permission.api_delete = args.api_delete
+            if args.isDropdown:
+                Permission.isDropdown = args.isDropdown
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 
