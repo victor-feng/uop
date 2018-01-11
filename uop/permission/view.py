@@ -259,7 +259,7 @@ class PermManage(Resource):
             #已有的权限更新
             if args.perm_type == "api":
                 for perm in same1_perm_list:
-                    Permission = PermissionList.objects.get(perm_id=perm["perm_id"])
+                    Permission = PermissionList.objects.get(perm_id=perm.get("perm_id"))
                     if perm.get("menu_id"):
                         Permission.menu_id = perm.get("menu_id")
                     if perm.get("name"):
