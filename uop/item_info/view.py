@@ -396,8 +396,6 @@ class BusinessProject(Resource):
         parser.add_argument('instance_id', type=str)  # 修改的实例id
         parser.add_argument('property', type=list, location='json') #改后的属性
         parser.add_argument('uid', type=str)
-        parser.add_argument('name', type=str)
-        parser.add_argument('code', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()
         try:

@@ -646,15 +646,6 @@ class ResourceProviderCallBack(Resource):
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
 
     @classmethod
-    def process_cmdb2(cls, request_data):
-        '''
-        CMDB2.0 相关接口位置
-        :param request_data:
-        :return:
-        '''
-        crp_data_cmdb(request_data)
-
-    @classmethod
     def post(cls):
         code = 2002
         request_data = json.loads(request.data)
@@ -671,20 +662,8 @@ class ResourceProviderCallBack(Resource):
                 }
             }
             return ret, code
-        # else:
-        try:
-            cls.process_cmdb2(request_data)
-        except Exception as e:
-            Log.logger.exception("[UOP to CMDB2] Resource callback failed, Excepton: %s", e.args)
-            code = 500
-            ret = {
-                'code': code,
-                'result': {
-                    'res': 'fail',
-                    'msg': "Resource find error."
-                }
-            }
-            return ret, code
+        # 异步存到CMDB2
+        crp_data_cmdb(request_data)
         res = {
             "code": code,
             "result": {

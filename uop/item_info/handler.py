@@ -197,6 +197,7 @@ def push_entity_to_file(data):
     # Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
     return {"entity": entity_list}
 
+
 def processs_chidren_final(entity_list, children):
     # entity_list = copy.deepcopy(entity_list)
     Log.logger.info("in processs_chidren_final")
@@ -515,9 +516,7 @@ def fix_instance(args):
             "instance": [
                 {
                     "model_id": model_id,
-                    "name": name,
                     "instance_id": instance_id,
-                    "code": code,
                     'parameters': list(
                         (
                             lambda property:

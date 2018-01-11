@@ -230,143 +230,153 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 
 
 # 解析crp传回来的数据录入CMDB2.0
+@async
 def crp_data_cmdb(data):
     assert(isinstance(data, dict))
     Log.logger.info("###data:{}".format(data))
     models_list = get_entity_from_file(data)
-    project_instance_id = data["resource_id"]
-
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    instance = post_instance_format(url, data, models_list)
-    relation = get_relations("B7")
-    data = post_relation_format(url, instance, relation)
+    data = get_relations("B7") #
+    instances, relations = post_datas_cmdb(url, data, models_list, data["relations"])
+    data["relation"],data["instance"] = relations, instances
     data_str = json.dumps(data)
-
     try:
+        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str).json()
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def post_instance_format(url, raw, models_list):
+def post_datas_cmdb(url, raw, models_list, relations_model):
+    '''
+    构建crp资源预留后返回的数据，已实现tomcat--->容器的存储
+    目前按照code， 取实体信息，后期code
+    :param url:
+    :param raw:
+    :param models_list:
+    :param relations:
+    :return:
+    '''
     docker_model = filter(lambda x:x["code"] == "container", models_list)[0]
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
-    # docker = filter(lambda x: x["code"] == "container", models_list)[0]
-    instances = []
+    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]
+    project_model = filter(lambda x: x["code"] == "project", models_list)[0]
+    instances, relations = [], []
+
+    ## 一次预留生成的所有应用资源对应一个tomcat实例
+    raw["baseInfo"] = raw["resource_name"]
+    project_level = {
+        "instance_id": raw["project_id"],
+        "model_id": project_model["id"]
+    }
+    tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
+    instances.append(tomcat)
+    relations.append(r)
+
+    # docker数据解析
     for ct in raw["container"]:
         attach = {
             "image": ct["image_url"]
         }
-        for ins in ct["instance"]:
+        for index, ins in enumerate(ct["instance"]):
             ins["baseInfo"] = ins.get("instance_name")
-            one = {
-                "model_id": docker_model["id"],
-                "name": ins.get("instance_name"),
-                "instance_id": "",
-                "code": ins.get("instance_name"),
-                'parameters': list(
-                    (
-                        lambda property, instance, attach:
-                        (
-                            {
-                                "code": pro["code"],
-                                "value": instance.get(pro["code"]) if instance.get(pro["code"]) else attach.get(pro["code"])
-                            }
-                            for pro in property
-                        )
-                    )(docker_model["property"], ins, attach)
-                )
-            }
-            instances.append(one)
-    tomcat = {
-        "model_id": tomcat_model["id"],
+            i, r = format_data_cmdb(relations_model, ins, docker_model, attach, len(instances), tomcat, physical_server_model_id)
+            instances.append(i)
+            relations.append(r)
+
+    # 中间件、虚拟机数据解析
+    virtual_server_model = filter(lambda x: x["code"] == "virtual_device", models_list)[0]
+    for db_name, db_contents in raw["db_info"].items():
+        Log.logger.info("now analyze {} data".format(db_name))
+        db_model = filter(lambda x: x["code"] == db_name, models_list)[0] # db_name 设置保持与cmdb一致
+        attach = {
+            "version": db_contents["version"]
+        }
+        virtual_server = {
+            "mem": db_contents["mem"],
+            "cpu": db_contents["cpu"],
+            "disk": db_contents["disk"]
+        }
+        up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
+        instances.append(up_db)
+        relations.append(r)
+        for index, db in enumerate(db_contents["instance"]):
+            db["baseInfo"] = db.get("instance_name")
+            i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
+            instances.append(i)
+            relations.append(r)
+    Log.logger.info("[CMDB2.0 format DATA] instance:{}\n[CMDB2.0 format DATA] relations:{}\n".format(instances, relations))
+    return instances, relations
+
+
+def format_data_cmdb(relations, item, model, attach, index, up_level, physical_server_model_id=None):
+    '''
+
+    :param relations: 从视图中缓存下来的所有实体关系信息
+    :param item:   crp中当前层数据,例如：tomcat，docker，mysql等
+    :param model:   当前层数据对应的实体信息
+    :param attach: crp中当前层数据的补充信息
+    :param index: 第几个实例
+    :param up_level: 上一层实例信息
+    :param physical_server_model_id: 可能存在的物理机实例id
+    :return: 解析好的实例，及与实例相关的关系信息列表
+    '''
+    rels = []
+    i = {
+        "model_id": model["id"],
         "instance_id": "",
-        "name": raw.get("resource_name"),
-        "code": raw.get("resource_name"),
+        "_id": index + 1,
         'parameters': list(
             (
-                lambda property, instance:
+                lambda property, item, attach:
                 (
                     {
                         "code": pro["code"],
-                        "value": instance.get(pro["code"])
+                        "value": item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
                     }
                     for pro in property
                 )
-            )(tomcat_model["property"], raw)
+            )(model["property"], item, attach)
         )
     }
-    instances.append(tomcat)
-    Log.logger.info("docker_format instance:{}".format(instances))
-    uid, token = get_uid_token()
-    data = {
-        "uid": uid,
-        "token": token,
-        "sign":"",
-        "data":{
-            "instance": instances
-        }
-    }
-    data_str = data_str = json.dumps(data)
-    try:
-        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        instance = requests.post(url, data=data_str).json()["data"]["instance"]
-        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(instance))
-    except Exception as exc:
-        instance = []
-        Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
-    data.pop("data")
-    data.update({
-        "instance": instance
-    })
-    return data
-
-
-def post_relation_format(url, instance, relation):
-    instances = instance["instance"]
-    relation = []
-    model_id = {}
-    map(lambda i: model_id.setdefault(i["model_id"], []).append(i["instance_id"]), instances)
-    rel = [
-        r.update({"start_instance_id": model_id[r.get("start_model_id")],
-                  "end_instance_id": model_id[r.get("end_model_id")]}) for r in relation if set([r.get("start_model_id"), r.get("end_model_id")]) < set(model_id.keys())
+    if i.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+        r = [
+            dict(rel, start_id = i["_id"], end_instance_id = i.get("physical_server"))
+            for rel in relations if rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == physical_server_model_id
+        ]
+        if not r:
+            r = [
+                dict(rel, end_id=i["_id"], start_instance_id=i.get("physical_server"))
+                for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == physical_server_model_id
+            ]
+        rels.extend(r)
+    # 添加普通上下层关系
+    r = [
+        dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"])
+        for rel in relations if
+        rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == up_level["model_id"]
     ]
-    for r in rel:
-        if isinstance(r["start_instance_id"], list) and not isinstance(r["end_instance_id"], list):
-            for id in  r["start_instance_id"]:
-                tmp = r
-                tmp.update(start_instance_id = id)
-                relation.append(tmp)
-        elif isinstance(r["end_instance_id"], list) and not isinstance(r["start_instance_id"], list):
-            for id in  r["end_instance_id"]:
-                tmp = r
-                tmp.update(start_instance_id = id)
-                relation.append(tmp)
-        elif isinstance(r["end_instance_id"], list) and  isinstance(r["start_instance_id"], list): # 相同实体的不同实例之间的关系，后期加入
-            pass
-        else:
-            relation.append(r)
-
-    data = {
-        "uid": instance["uid"],
-        "token": instance["token"],
-        "sign": "",
-        "data": {
-            "relation": relation
-        }
-    }
-    data_str = data_str = json.dumps(data)
-    try:
-        Log.logger.info("post 'relations data' to cmdb/openapi/graph/ request:{}".format(data))
-        relation = requests.post(url, data=data_str).json()["data"]["relation"]
-        Log.logger.info("post 'relations data' to cmdb/openapi/graph/ result:{}".format(instance))
-    except Exception as exc:
-        Log.logger.error("post 'relations data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+    if not r:
+        r = [
+            dict(rel, end_id=i["_id"], start_id=up_level["instance_id"])
+            for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
+        ]
+    rels.extend(r)
+    Log.logger.info("Analyzed {}th data from crp: \n.".format(i["_id"], i))
+    Log.logger.info("Analyzed {}th data's relations from crp: \n.".format(i["_id"], rels))
+    return i, rels
 
 
 # B类视图list，获取已经定义的关系列表
 def get_relations(view_id, uid=None, token=None):
+    '''
+    按视图名字查询, id会有变动，保证名字不变就好
+    :param view_id:
+    :param uid:
+    :param token:
+    :return:
+    '''
     Log.logger.info("get_relations from {} view".format(view_id))
     view_dict = {
         "B7": "410c4b3b2e7848b9b64d08d0",  # 工程 --> 物理机
@@ -386,7 +396,7 @@ def get_relations(view_id, uid=None, token=None):
         "token": token,
         "sign": "",
         "data": {
-            "id": view_dict.get(view_id, ""),
+            "id": "",
             "name": view_id
         }
     }
@@ -396,6 +406,8 @@ def get_relations(view_id, uid=None, token=None):
         Log.logger.info("get_relations data:{}".format(relations))
     except Exception as exc:
         Log.logger.error("graph_data error: {}".format(str(exc)))
-    return relations
+    data["relations"] = relations
+    data.pop("data")
+    return data
 
 
