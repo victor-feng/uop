@@ -284,7 +284,7 @@ class PermManage(Resource):
         args = parser.parse_args()
         try:
             code = 200
-            Permissions=PermissionList.objects.filter(role=args.role, perm_type=args.perm_type)
+            Permissions=PermissionList.objects.filter(role=args.role)
             if Permissions:
                 msg = "Create role permission Failed,The role permissions has already existed"
                 data = "Failed"
