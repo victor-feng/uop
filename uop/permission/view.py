@@ -181,7 +181,6 @@ class PermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('permission_list', type=list, location="json")
         parser.add_argument('role', type=str, location="json")
-        parser.add_argument('perm_type', type=str, location='json')
         args = parser.parse_args()
         try:
             code = 200
@@ -189,7 +188,7 @@ class PermManage(Resource):
             same2_perm_list = []
             create_perm_list=[]
             delete_perm_list = []
-            have_permissions = PermissionList.objects.filter(role=args.role,perm_type=args.perm_type)
+            have_permissions = PermissionList.objects.filter(role=args.role)
             #获取相同的权限
             for perm in args.permission_list:
                 for have_perm in have_permissions:
@@ -282,7 +281,6 @@ class PermManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('permission_list', type=list, location="json")
         parser.add_argument('role', type=str, location="json")
-        parser.add_argument('perm_type', type=str, location='json')
         args = parser.parse_args()
         try:
             code = 200
