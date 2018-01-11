@@ -113,4 +113,4 @@ def get_login_permission(role):
         return menu_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
-        return  menu_list
+        return  menu_list,buttons,icons,operations
