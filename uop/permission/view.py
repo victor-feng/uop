@@ -129,6 +129,7 @@ class PermManage(Resource):
         args = parser.parse_args()
         data = {}
         res_list = []
+        role_perm_list = []
         try:
             role_permissions = PermissionList.objects.filter(role=args.role, perm_type=args.perm_type)
             all_permissions = PermissionList.objects.filter(role="super_admin", perm_type=args.perm_type)
@@ -165,7 +166,30 @@ class PermManage(Resource):
                 res["api_delete"] = permission.api_delete
                 res["isDropdown"] = permission.isDropdown
                 res_list.append(res)
+            for permission in role_permissions:
+                res={}
+                res["perm_id"] = permission.perm_id
+                res["menu_id"] = permission.menu_id
+                res["name"] = permission.name
+                res["role"] = permission.role
+                res["button"] = permission.button
+                res["icon"] = permission.icon
+                res["operation"] = permission.operation
+                res["url"] = permission.url
+                res["perm_type"] = permission.perm_type
+                res["created_time"] = str(permission.created_time)
+                res["updated_time"] = str(permission.updated_time)
+                res["endpoint"] = permission.endpoint
+                res["level"] = permission.level
+                res["parent_id"] = permission.parent_id
+                res["api_get"] = permission.api_get
+                res["api_post"] = permission.api_post
+                res["api_put"] = permission.api_put
+                res["api_delete"] = permission.api_delete
+                res["isDropdown"] = permission.isDropdown
+                role_perm_list.append(res)
             data["res_list"] = res_list
+            data["role_perm_list"] = role_perm_list
             code = 200
             msg = "Get permission info success"
         except Exception as e:
