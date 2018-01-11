@@ -242,7 +242,7 @@ def crp_data_cmdb(data):
     data_str = json.dumps(data)
     try:
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        ret = requests.post(url, data=data_str).json()
+        # ret = requests.post(url, data=data_str).json()
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
