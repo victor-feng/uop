@@ -329,7 +329,23 @@ class PermManage(Resource):
         return ret, code
 
     def delete(self):
-        pass
+        parser = reqparse.RequestParser()
+        parser.add_argument('role', type=str, location="json")
+        args = parser.parse_args()
+        try:
+            Permissions = PermissionList.objects.filter(role=args.role)
+            for Permission in Permissions:
+                Permission.delete()
+            code = 200
+            msg = "Delete role permission success"
+            data = "Success"
+        except Exception as e:
+            msg = "Delete role permission error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
 
 
 class AllPermManage(Resource):
