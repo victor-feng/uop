@@ -341,7 +341,7 @@ def analyze_data(data, entity_id, flag=False):
         "instance":[]
     }
     if flag: # list接口的数据
-        instance = map(lambda x: {"instance_id": x.get("id"), "name": x.get("name")}, data) # 拿到名字为name的用户的实例id，理论上只有一个
+        instance = map(lambda x: {"instance_id": x.get("id"), "name": x.get("name"), "property": x.get("parameters")}, data) # 拿到名字为name的用户的实例id，理论上只有一个
     else: # instance接口的数据
         data = filter(lambda x: x.get("entity_id") == entity_id, data)
         if data:
