@@ -214,7 +214,7 @@ def processs_chidren_final(entity_list, children):
             processs_chidren_final(entity_list, c.get("chidren"))
 
 
-def get_entity_from_file(filters):
+def get_entity_from_file(data):
     filters = {
         "Person":       "d8098981df71428784e65427",
         "department":   "9a544097f789495e8ee4f5eb",
@@ -237,7 +237,7 @@ def get_entity_from_file(filters):
     # else:
     #     with open(curdir + "/.entity.txt", "rb") as fp:
     #         whole_entity = json.load(fp)["entity"]
-    whole_entity = get_entity()["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
+    whole_entity = get_entity(data)["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
     Log.logger.info("get entity info from CMDB2.0: {}".format(len(whole_entity)))
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
@@ -369,7 +369,7 @@ def dequeued_list(item, key):
 
 
 #获取所有模型实体的id及属性信息存到文件
-def get_entity():
+def get_entity(data):
     '''
     [
     {
@@ -390,7 +390,9 @@ def get_entity():
     :return:
     '''
     url = CMDB2_URL + "cmdb/openapi/entity/group/"
-    uid, token = get_uid_token()
+    uid, token = data.get("uid"), data.get("token")
+    if not uid and not token:
+        uid, token = get_uid_token()
     req_data = {
         "uid": uid,
         "token": token,
@@ -425,17 +427,15 @@ def subgrath_data(args):
     '''
     next_model_id, last_model_id, property, uid, token, last_instance_id= \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
-    if not uid or not token:
-        uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
-    data = get_relations("B5")
+    data = get_relations("B5", uid, token)
     models_list = get_entity_from_file(data)
     if isinstance(models_list, str):
         return models_list
     model = filter(lambda x:x["id"] == next_model_id, models_list)[0]
     item = {}
-    nouse = map(lambda pro:item.setdefault(pro["code"], pro["value"]), property)
+    nouse = map(lambda pro: item.setdefault(pro["code"], pro["value"]), property)
     up_level = {
         "model_id": last_model_id,
         "instance_id": last_instance_id
