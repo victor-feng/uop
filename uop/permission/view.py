@@ -160,10 +160,10 @@ class PermManage(Resource):
                 res["endpoint"] = permission.endpoint
                 res["level"] = permission.level
                 res["parent_id"] = permission.parent_id
-                res["api_get"] = permission.api_get
-                res["api_post"] = permission.api_post
-                res["api_put"] = permission.api_put
-                res["api_delete"] = permission.api_delete
+                res["api_get"] = "0"
+                res["api_post"] = "0"
+                res["api_put"] = "0"
+                res["api_delete"] = "0"
                 res["isDropdown"] = permission.isDropdown
                 res_list.append(res)
             for permission in role_permissions:
