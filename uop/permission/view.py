@@ -674,9 +674,9 @@ class RoleManage(Resource):
                     Role.description = args.description
                 if args.new_name:
                     Role.name = args.new_name
-                for user in Users:
-                    user.role = args.new_name
-                    user.save()
+                    for user in Users:
+                        user.role = args.new_name
+                        user.save()
             Role.updated_time=datetime.datetime.now()
             Role.save()
             code = 200
