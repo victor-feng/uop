@@ -438,8 +438,10 @@ def subgrath_data(args):
     }
     i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
     data.pop("relations")
-    data["instance"] = [i]
-    data["relation"] = r
+    data["data"] = {
+        "instance":[i],
+        "relation":r
+    }
     data_str = json.dumps(data)
     try:
         Log.logger.info("graph_data: {}".format(data))
