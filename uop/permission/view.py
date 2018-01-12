@@ -34,6 +34,7 @@ class UserManage(Resource):
         condition = {}
         data={}
         res_list=[]
+        condition["username__ne"] = "super_admin"
         if args.username:
             condition["username"] = args.username
         if args.id:
