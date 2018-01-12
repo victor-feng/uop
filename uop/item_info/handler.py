@@ -277,7 +277,7 @@ def Aquery(args):
         "token": token,
         "sign": "",
         "data": {
-            "id": view_dict["B5"],
+            "id": "B5",
             "name": "",
             "entity": [{
                 "id": "",  # 实体id
