@@ -238,7 +238,7 @@ def get_entity_from_file(filters):
     #     with open(curdir + "/.entity.txt", "rb") as fp:
     #         whole_entity = json.load(fp)["entity"]
     whole_entity = get_entity()["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
-    Log.logger.info("get entity info from CMDB2.0: {}".format(whole_entity))
+    Log.logger.info("get entity info from CMDB2.0: {}".format(len(whole_entity)))
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
@@ -431,6 +431,8 @@ def subgrath_data(args):
     format_data, graph_data = {}, {}
     data = get_relations("B5")
     models_list = get_entity_from_file(data)
+    if isinstance(models_list, str):
+        return models_list
     model = filter(lambda x:x["id"] == next_model_id, models_list)[0]
     item = {
         "property": property

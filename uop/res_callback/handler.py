@@ -359,12 +359,12 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     ]
     if not r:
         r = [
-            dict(rel, end_id=i["_id"], start_id=up_level["instance_id"])
+            dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"])
             for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
         ]
     rels.extend(r)
-    Log.logger.info("Analyzed {}th data from crp: \n.".format(i["_id"], i))
-    Log.logger.info("Analyzed {}th data's relations from crp: \n.".format(i["_id"], rels))
+    Log.logger.info("Analyzed {}th data from crp:{} \n.".format(i["_id"], i))
+    Log.logger.info("Analyzed {}th data's relations from crp:{} \n.".format(i["_id"], rels))
     return i, rels
 
 

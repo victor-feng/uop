@@ -383,7 +383,11 @@ class BusinessProject(Resource):
         args = parser.parse_args()
         try:
             graph_data = subgrath_data(args)
-            response["result"]["data"] = graph_data
+            if isinstance(graph_data, str):
+                response["code"] = 202
+                response["result"]["msg"] = graph_data
+            else:
+                response["result"]["data"] = graph_data
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)
