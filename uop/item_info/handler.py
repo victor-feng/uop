@@ -434,7 +434,7 @@ def subgrath_data(args):
     if isinstance(models_list, str):
         return models_list
     model = filter(lambda x:x["id"] == next_model_id, models_list)[0]
-    item = map(lambda x: {pro["code"] :pro["value"]}, property)
+    item = map(lambda pro: {pro["code"] :pro["value"]}, property)
     up_level = {
         "model_id": last_model_id,
         "instance_id": last_instance_id
