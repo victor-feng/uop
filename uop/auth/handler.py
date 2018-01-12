@@ -69,6 +69,8 @@ def get_login_permission(role):
     buttons = []
     icons = []
     operations=[]
+    name1 = []
+    name2 = []
     try:
         #获取权限
         Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"])
@@ -88,6 +90,8 @@ def get_login_permission(role):
                     menu_dict["menu_id"] = menu_id
                     menu_dict["isDropdown"] = isDropdown
                     menu_dict["children"] = []
+                    menus.append(menu_dict)
+                    name1.append(name)
                 elif int(level) == 2:
                     menu2_dict["name"] = name
                     menu2_dict["url"] = url
@@ -95,10 +99,6 @@ def get_login_permission(role):
                     menu2_dict["parent_id"] = parent_id
                     menu_dict["isDropdown"] = isDropdown
                     menu_dict["children"] = []
-                if menu_dict:
-                    menus.append(menu_dict)
-                if menu2_dict:
-                    menu2s.append(menu2_dict)
             elif permission.perm_type == "operation":
                 operations.append(permission.operation)
             elif permission.perm_type == "icon":
@@ -109,7 +109,12 @@ def get_login_permission(role):
             for menu2 in menu2s:
                 if menu.get("menu_id") == menu2.get("parent_id"):
                     menu["children"].append(menu2)
-                    menu_list.append(menu)
+                    if len(menu["children"]) == 0:
+                        menu_list.append(menu)
+                        name2.append(menu.get("name"))
+        for menu in menus:
+            if menu.get("name") not in name2:
+                menu_list.append(menu)
         return menu_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
