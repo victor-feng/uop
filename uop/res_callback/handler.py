@@ -9,7 +9,7 @@ from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data
 from uop.log import Log
 from config import configs, APP_ENV
-from uop.item_info.handler import *
+
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 
 __all__ = [
@@ -411,3 +411,4 @@ def get_relations(view_id, uid=None, token=None):
     return data
 
 
+from uop.item_info.handler import *

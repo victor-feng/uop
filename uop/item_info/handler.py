@@ -10,7 +10,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.res_callback.handler import format_data_cmdb, get_relations
+from uop.res_callback.handler import *
 import copy
 from flask import jsonify
 
