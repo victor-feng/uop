@@ -594,6 +594,7 @@ class RoleManage(Resource):
         res_list=[]
         if args.name:
             condition["name"] = args.name
+        condition["name__ne"] = "super_admin"
         try:
             Roles=RoleInfo.objects.filter(**condition)
             for role in Roles:
