@@ -107,7 +107,7 @@ def get_login_permission(role):
                 buttons.append(permission.button)
         for menu in menus:
             for menu2 in menu2s:
-                if menu["menu_id"] == menu2["parent_id"]:
+                if menu.get("menu_id") == menu2.get("parent_id"):
                     menu["children"].append(menu2)
                     menu_list.append(menu)
         return menu_list,buttons,icons,operations
