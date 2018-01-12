@@ -394,7 +394,6 @@ class BusinessProject(Resource):
             Log.logger.error(u"添加业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
 
-
     def put(self):
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
@@ -412,7 +411,6 @@ class BusinessProject(Resource):
             response["result"]["msg"] = str(exc)
             Log.logger.error(u"修改业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
-
 
     def delete(self):
         '''

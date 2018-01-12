@@ -323,10 +323,6 @@ def Aquery(args):
             Log.logger.info("url_instance return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id)
         else:
-            # Log.logger.info("url_action request data:{}".format(data_action))
-            # ret = requests.post(url_action, data=data_action_str)
-            # # Log.logger.info("url_action return:{}".format(ret.json()))
-            # data = analyze_data(ret.json()["data"]["instance"], model_id)
             Log.logger.info("url_list request data:{}".format(data_list))
             ret = requests.post(url_list, data=data_list_str)
             Log.logger.info("url_action return:{}".format(ret.json()))
@@ -503,8 +499,8 @@ def package_data(ret, ut):
 
 def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    model_id, instance_id, property, uid, token, name, code = \
-        args.model_id, args.instance_id, args.property, args.uid, args.token, args.name, args.code
+    model_id, instance_id, property, uid, token = \
+        args.model_id, args.instance_id, args.property, args.uid, args.token
     if not uid or not token:
         uid, token = get_uid_token()
     data = {
