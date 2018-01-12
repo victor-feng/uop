@@ -129,8 +129,8 @@ class PermManage(Resource):
         res_list = []
         role_perm_list = []
         try:
-            role_permissions = PermissionList.objects.filter(role=args.role, perm_type=args.perm_type)
-            all_permissions = PermissionList.objects.filter(role="super_admin", perm_type=args.perm_type)
+            role_permissions = PermissionList.objects.filter(role=args.role, perm_type=args.perm_type).order_by('created_time')
+            all_permissions = PermissionList.objects.filter(role="super_admin", perm_type=args.perm_type).order_by('created_time')
             same_perm_list=[]
             add_perm_list = []
             for all_perm in all_permissions:
@@ -393,7 +393,7 @@ class AllPermManage(Resource):
         if args.perm_id:
             condition["perm_id"] = args.perm_id
         try:
-            Permissions = PermissionList.objects.filter(**condition)
+            Permissions = PermissionList.objects.filter(**condition).order_by('created_time')
             for permission in Permissions:
                 res={}
                 res["perm_id"] = permission.perm_id
@@ -448,7 +448,7 @@ class AllPermManage(Resource):
         args = parser.parse_args()
         try:
             code = 200
-            Permissions = PermissionList.objects.filter(name=args.name,role='super_admin')
+            Permissions = PermissionList.objects.filter(name=args.name,role='super_admin').order_by('created_time')
             #如果同一角色，有重名的，给前端返回失败信息
             if Permissions:
                 msg = "Create permission Failed,The name has already existed"
@@ -594,12 +594,13 @@ class RoleManage(Resource):
             condition["name"] = args.name
         condition["name__ne"] = "super_admin"
         try:
-            Roles=RoleInfo.objects.filter(**condition)
+            Roles=RoleInfo.objects.filter(**condition).order_by('created_time')
             for role in Roles:
                 res={}
                 res["id"] = role.id
                 res["name"] = role.name
                 res["created_time"] = str(role.created_time)
+                res["updated_time"] = str(role.updated_time)
                 res["description"] = role.description
                 res_list.append(res)
             data["res_list"] = res_list
