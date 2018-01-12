@@ -443,10 +443,12 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     try:
         Log.logger.info("graph_data: {}".format(data))
-        # ret = requests.post(url, data=data_str).json()
+        ret = requests.post(url, data=data_str).json()
+        Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
+        ret = []
         Log.logger.error("graph_data: {}".format(graph_data))
-    return data
+    return ret
 
 
 #组装业务工程模块接口数据
