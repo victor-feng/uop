@@ -143,8 +143,7 @@ class PermManage(Resource):
             for all_perm in all_permissions:
                 if all_perm not in same_perm_list:
                     add_perm_list.append(all_perm)
-            Permissions=list(role_permissions) + add_perm_list
-            for permission in Permissions:
+            for permission in add_perm_list:
                 res={}
                 res["perm_id"] = permission.perm_id
                 res["menu_id"] = permission.menu_id
@@ -188,6 +187,7 @@ class PermManage(Resource):
                 res["api_delete"] = permission.api_delete
                 res["isDropdown"] = permission.isDropdown
                 role_perm_list.append(res)
+            res_list=res_list + role_perm_list
             data["res_list"] = res_list
             data["role_perm_list"] = role_perm_list
             code = 200
