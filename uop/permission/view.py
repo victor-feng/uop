@@ -50,19 +50,16 @@ class UserManage(Resource):
                 Users = UserInfo.objects.filter(**condition).order_by('-last_login_time').skip(skip_count).limit(args.page_size)
             else:
                 Users=UserInfo.objects.filter(**condition).order_by('-last_login_time')
-            Roles = RoleInfo.objects.all()
             for user in Users:
-                for role in Roles:
-                    if user.role == role.name:
-                        res = {}
-                        res["id"] = user.id
-                        res["username"] = user.username
-                        res["role"] = role.description
-                        res["department"] = user.department
-                        res["updated_time"] = str(user.updated_time)
-                        res["last_login_time"] = str(user.last_login_time)
-                        res["created_time"] = str(user.created_time)
-                        res_list.append(res)
+                res = {}
+                res["id"] = user.id
+                res["username"] = user.username
+                res["role"] = user.role
+                res["department"] = user.department
+                res["updated_time"] = str(user.updated_time)
+                res["last_login_time"] = str(user.last_login_time)
+                res["created_time"] = str(user.created_time)
+                res_list.append(res)
             data["total_count"] = total_count
             data["res_list"] = res_list
             code=200
