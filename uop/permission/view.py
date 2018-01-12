@@ -251,10 +251,6 @@ class PermManage(Resource):
                     updated_time=datetime.datetime.now()
                 )
                 Permission.save()
-            #删除多余权限
-            for perm in delete_perm_list:
-                Permission = PermissionList.objects.get(perm_id=perm.perm_id)
-                Permission.delete()
 
             #已有的权限更新
             for perm in same1_perm_list:
@@ -291,6 +287,11 @@ class PermManage(Resource):
                     Permission.isDropdown = perm.get("isDropdown")
                 Permission.updated_time = datetime.datetime.now()
                 Permission.save()
+
+            #删除多余权限
+            for perm in delete_perm_list:
+                Permission = PermissionList.objects.get(perm_id=perm.perm_id)
+                Permission.delete()
             msg = "Update role permission success"
             data = "Success"
         except Exception as e:
