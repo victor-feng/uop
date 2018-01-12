@@ -248,7 +248,6 @@ class Reservation(Resource):
                         "quantity": db_res.quantity,
                         "version": db_res.version,
                         "volume_size": db_res.volume_size
-
                     }
                 )
             data['resource_list'] = res

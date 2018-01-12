@@ -10,6 +10,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
+from uop.res_callback.handler import format_data_cmdb, get_relations
 import copy
 from flask import jsonify
 
@@ -427,31 +428,23 @@ def subgrath_data(args):
         uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
-    data = {
-        "uid": uid,
-        "token": token,
-        "sign": "",
-        "data": {
-            "instance": [
-                {
-                    "entity_id": entity_id,
-                    "instance_id": "",
-                    "parameters":[
-                        {}
-                    ]
-                }
-            ],
-            "relation": []
-        }
+    data = get_relations("B5")
+    models_list = get_entity_from_file(data)
+    model = filter(lambda x:x["id"] == entity_id, models_list)[0]
+    item = {
+        "property": property
     }
+    i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
+    data.pop("relations")
+    data["instance"] = [i]
+    data["relation"] = r
     data_str = json.dumps(data)
     try:
+        Log.logger.info("graph_data: {}".format(data))
         # ret = requests.post(url, data=data_str).json()
-        graph_data = push_data_to_file(instance_id, entity_id, property)
-        format_data = package_data(graph_data, data)
     except Exception as exc:
         Log.logger.error("graph_data: {}".format(graph_data))
-    return format_data
+    return data
 
 
 #组装业务工程模块接口数据
