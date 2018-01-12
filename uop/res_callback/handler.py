@@ -240,6 +240,7 @@ def crp_data_cmdb(data):
     instances, relations = post_datas_cmdb(url, data, models_list, data["relations"])
     data["relation"],data["instance"] = relations, instances
     data_str = json.dumps(data)
+    ret = []
     try:
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
         # ret = requests.post(url, data=data_str).json()

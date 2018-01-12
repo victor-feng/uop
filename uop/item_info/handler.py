@@ -157,7 +157,7 @@ def push_data_to_file(parent_id, model_id, property):
 
 
 # 获取uid，token
-def get_uid_token(username="admin", password="admin", sign=""):
+def get_uid_token(username="admin", password="123456", sign=""):
     uid, token = 0, 0
     url = CMDB2_URL + "cmdb/openapi/login/"
     data = {
