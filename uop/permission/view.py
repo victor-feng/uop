@@ -144,8 +144,8 @@ class PermManage(Resource):
                 if all_perm not in same_perm_list:
                     add_perm_list.append(all_perm)
             #确保role权限在all权限中
-            for perm in role_perm_list:
-                if perm  in all_permissions:
+            for perm in role_permissions:
+                if  perm  in all_permissions:
                     re_role_perm_list.append(perm)
             for permission in add_perm_list:
                 res={}
