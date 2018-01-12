@@ -133,14 +133,20 @@ class PermManage(Resource):
             all_permissions = PermissionList.objects.filter(role="super_admin", perm_type=args.perm_type).order_by('created_time')
             same_perm_list=[]
             add_perm_list = []
+            re_role_perm_list = []
+            #相同的权限
             for all_perm in all_permissions:
                 for role_perm in role_permissions:
                     if role_perm.name == all_perm.name:
                         same_perm_list.append(all_perm)
-
+            #获取要增加的权限
             for all_perm in all_permissions:
                 if all_perm not in same_perm_list:
                     add_perm_list.append(all_perm)
+            #确保role权限在all权限中
+            for perm in role_perm_list:
+                if perm  in all_permissions:
+                    re_role_perm_list.append(perm)
             for permission in add_perm_list:
                 res={}
                 res["perm_id"] = permission.perm_id
@@ -163,7 +169,7 @@ class PermManage(Resource):
                 res["api_delete"] = "0"
                 res["isDropdown"] = permission.isDropdown
                 res_list.append(res)
-            for permission in role_permissions:
+            for permission in re_role_perm_list:
                 res={}
                 res["perm_id"] = permission.perm_id
                 res["menu_id"] = permission.menu_id
