@@ -97,8 +97,10 @@ def get_login_permission(role):
                     menu2_dict["url"] = url
                     menu2_dict["menu_id"] = menu_id
                     menu2_dict["parent_id"] = parent_id
-                    menu_dict["isDropdown"] = isDropdown
-                    menu_dict["children"] = []
+                    menu2_dict["isDropdown"] = isDropdown
+                    menu2_dict["children"] = []
+                    menu2s.append(menu2_dict)
+                    name2.append(name)
             elif permission.perm_type == "operation":
                 operations.append(permission.operation)
             elif permission.perm_type == "icon":
