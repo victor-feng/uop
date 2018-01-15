@@ -2,6 +2,7 @@
 from datetime import datetime
 from flask_mongoengine import MongoEngine
 db = MongoEngine()
+from uop.util import TimeToolkit
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
@@ -468,4 +469,4 @@ class NetWorkConfig(db.Document):
         'index_background': True
     }
 
-from uop.util import TimeToolkit
+
