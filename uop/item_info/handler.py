@@ -9,7 +9,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb
+from uop.models import Cmdb, Token
 from uop.res_callback.handler import *
 import base64
 
@@ -161,15 +161,13 @@ def push_data_to_file(parent_id, model_id, property):
 # 获取uid，token,并缓存
 def get_uid_token(flush=False):
     cmdb_info = Cmdb.objects.filter(username=CMDB2_USER)
+    tu = Token.objects.all()
     username, password, uid, token = "", "","", ""
     for ci in cmdb_info:
         username = ci.username
         password = base64.b64decode(ci.password)
-        uid, token = ci.uid, ci.token
-        break
-    else:
-        new_cmdb = Cmdb(username=CMDB2_USER, password="")
-        new_cmdb.save()
+    for one in tu:
+        uid, token = one.uid, one.token
     if uid and token and not flush:
         return uid, token
     url = CMDB2_URL + "cmdb/openapi/login/"
@@ -186,7 +184,7 @@ def get_uid_token(flush=False):
         Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
-            Cmdb.objects(username=username).update_one(uid=uid, token=token)
+            Token.objects(uid=uid).update_one(token=token)
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token

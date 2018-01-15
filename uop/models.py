@@ -32,9 +32,7 @@ class ViewCache(db.Document):
     }
 
 
-class Cmdb(db.Document):
-    username = db.StringField()
-    password = db.StringField()
+class Token(db.Document):
     token = db.StringField()
     uid = db.IntField()
     token_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
@@ -48,6 +46,9 @@ class Cmdb(db.Document):
         ]
     }
 
+class Cmdb(db.Document):
+    username = db.StringField()
+    password = db.StringField()
 
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
