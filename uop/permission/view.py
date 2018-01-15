@@ -416,6 +416,7 @@ class AllPermManage(Resource):
                 res["api_put"] = permission.api_put
                 res["api_delete"] = permission.api_delete
                 res["isDropdown"] = permission.isDropdown
+                res["menu_index"] = permission.menu_index
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
