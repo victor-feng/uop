@@ -26,7 +26,7 @@ class ViewCache(db.Document):
             'view_id',
             {
                 'fields': ['cache_date'],
-                'expireAfterSeconds': 10
+                'expireAfterSeconds': 60 * 60 * 24
             }
         ]
     }
