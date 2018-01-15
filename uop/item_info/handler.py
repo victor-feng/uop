@@ -177,7 +177,7 @@ def get_uid_token(flush=False):
     data = {
         "username": username,
         "password": password,
-        "sign": sign,
+        "sign": "",
         "timestamp": TimeToolkit.local2utctimestamp(datetime.now())
     }
     data_str = json.dumps(data)
