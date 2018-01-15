@@ -45,7 +45,7 @@ class Config(object):
                     'day_of_week': "mon-fri",
                     'hour': '0-23',
                     'minute': '0-59',
-                    'second': '*/5'
+                    'second': '*/60'
                 }
 
         }
