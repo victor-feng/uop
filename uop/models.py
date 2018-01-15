@@ -6,6 +6,21 @@ db = MongoEngine()
 
 
 
+class Cmdb(db.Document):
+    username = db.IntField()
+    password = db.StringField()
+    view_cache = db.StringField()
+    token = db.StringField()
+    meta = {
+        'indexes': [
+            'username',
+            {
+                'fields': ['token', 'view_cache'],
+                'expireAfterSeconds': 60 * 20
+            }
+        ]
+    }
+
 
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
@@ -35,7 +50,6 @@ class PermissionList(db.Document):
                 'unique': True,
                 }]
             }
-
 
 
 class UserInfo(db.Document):
