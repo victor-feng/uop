@@ -168,8 +168,9 @@ def get_uid_token(flush=False):
         username = ci.username
         password = base64.b64decode(ci.password)
         uid, token = ci.uid, ci.token
+        break
     else:
-        new_cmdb = Cmdb(username=CMDB2_USER)
+        new_cmdb = Cmdb(username=CMDB2_USER, password="")
         new_cmdb.save()
     if uid and token and not flush:
         return uid, token

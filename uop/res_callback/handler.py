@@ -379,7 +379,6 @@ def get_relations(view_id, uid=None, token=None):
     :return:
     '''
     Log.logger.info("get_relations from {} view".format(view_id))
-
     if not uid or not token:
         uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
