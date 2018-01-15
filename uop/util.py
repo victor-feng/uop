@@ -9,7 +9,7 @@ import json
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-
+from uop.models import NetWorkConfig
 
 
 
@@ -156,4 +156,3 @@ def deal_enbedded_data(data):
         d=json.loads(d)
         res_list.append(d)
     return res_list
-from uop.models import NetWorkConfig

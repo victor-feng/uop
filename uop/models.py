@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from flask_mongoengine import MongoEngine
 db = MongoEngine()
-from uop.util import TimeToolkit
+
+
+def local2utctime(dt, duration=None, flag=None):
+    if duration:
+        delta = dt + relativedelta(months=int(duration))
+    else:
+        delta = dt
+    if flag:
+        utc_delta = delta
+    else:
+        utc_delta = delta + timedelta(hours=-8)
+    return utc_delta
+
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
     content = db.StringField(default="")
-    cache_date = db.DateTimeField(auto_now_add=True, default=TimeToolkit.local2utctime(datetime.now()))
+    cache_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
     meta = {
         'indexes': [
             'view_id',
@@ -24,7 +37,7 @@ class Cmdb(db.Document):
     password = db.StringField()
     token = db.StringField()
     uid = db.IntField()
-    token_date = db.DateTimeField(auto_now_add=True, default=TimeToolkit.local2utctime(datetime.now()))
+    token_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
     meta = {
         'indexes': [
             'username',
