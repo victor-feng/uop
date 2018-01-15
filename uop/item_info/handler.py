@@ -162,7 +162,7 @@ def push_data_to_file(parent_id, model_id, property):
 
 # 获取uid，token,并缓存
 def get_uid_token(flush=False):
-    cmdb_info = Cmdb.objects.filters(username=CMDB2_USER)
+    cmdb_info = Cmdb.objects.filter(username=CMDB2_USER)
     username, password, uid, token = "", "","", ""
     for ci in cmdb_info:
         username = ci.username
