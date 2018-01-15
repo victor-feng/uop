@@ -57,6 +57,9 @@ def add_person(name, user_id, department, contact_info, privilege):
 
 
 
+
+
+
 def get_login_permission(role):
     """
     根据角色获取登录时的权限
@@ -73,7 +76,7 @@ def get_login_permission(role):
     name2 = []
     try:
         #获取权限
-        Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"])
+        Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"]).order_by("menu_index")
         for permission in Permissions:
             if permission.perm_type == "menu":
                 menu_dict = {}
@@ -84,11 +87,13 @@ def get_login_permission(role):
                 level=permission.level
                 parent_id=permission.parent_id
                 isDropdown = permission.isDropdown
+                menu_index = permission.menu_index
                 if int(level) == 1:
                     menu_dict["name"] = name
                     menu_dict["url"] = url
                     menu_dict["menu_id"] = menu_id
                     menu_dict["isDropdown"] = isDropdown
+                    menu_dict["menu_index"] = menu_index
                     menu_dict["children"] = []
                     menus.append(menu_dict)
                     name1.append(name)
@@ -98,6 +103,7 @@ def get_login_permission(role):
                     menu2_dict["menu_id"] = menu_id
                     menu2_dict["parent_id"] = parent_id
                     menu2_dict["isDropdown"] = isDropdown
+                    menu2_dict["menu_index"] = menu_index
                     menu2_dict["children"] = []
                     menu2s.append(menu2_dict)
                     name2.append(name)
