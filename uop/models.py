@@ -38,7 +38,7 @@ class Token(db.Document):
     token_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
     meta = {
         'indexes': [
-            'username',
+            'uid',
             {
                 'fields': ['token_date'],
                 'expireAfterSeconds': 60 * 20
