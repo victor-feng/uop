@@ -315,7 +315,7 @@ def Aquery(args):
         else:
             Log.logger.info("url_list request data:{}".format(data_list))
             ret = requests.post(url_list, data=data_list_str)
-            Log.logger.info("url_action return:{}".format(ret.json()))
+            Log.logger.info("url_list return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id, flag=True)
     except Exception as exc:
         Log.logger.error("Aquery error:{}".format(str(exc)))

@@ -26,11 +26,12 @@ class Cmdb(db.Document):
     password = db.StringField()
     token = db.StringField()
     uid = db.IntField()
+    token_date = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
     meta = {
         'indexes': [
             'username',
             {
-                'fields': ['token', "uid"],
+                'fields': ['token_date'],
                 'expireAfterSeconds': 60 * 20
             }
         ]
