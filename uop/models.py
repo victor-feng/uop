@@ -6,17 +6,31 @@ db = MongoEngine()
 
 
 
+class ViewCache(db.Document):
+    view_id = db.StringField(required=True)
+    content = db.StringField(default="")
+    cache_date = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    meta = {
+        'indexes': [
+            'view_id',
+            {
+                'fields': ['content'],
+                'expireAfterSeconds': 60 * 60 * 24
+            }
+        ]
+    }
+
+
 class Cmdb(db.Document):
     username = db.StringField()
     password = db.StringField()
-    view_cache = db.StringField()
     token = db.StringField()
     uid = db.IntField()
     meta = {
         'indexes': [
             'username',
             {
-                'fields': ['token', 'view_cache', "uid"],
+                'fields': ['token', "uid"],
                 'expireAfterSeconds': 60 * 20
             }
         ]

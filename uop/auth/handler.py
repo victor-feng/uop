@@ -5,11 +5,14 @@ import datetime
 from uop.log import Log
 from flask import current_app
 from uop.models import PermissionList
+from uop.res_callback.handler import *
+
 
 def add_person(name, user_id, department, contact_info, privilege):
     """
         cmdb1.0临时跳过了将用户权限信息入库操作
     """
+    add_person_to_cmdb2(name, user_id, department, contact_info, privilege)
     return True # 直接返回
     success = False
     already_exist = False
@@ -54,10 +57,12 @@ def add_person(name, user_id, department, contact_info, privilege):
     return success
 
 
-
-
-
-
+def add_person_to_cmdb2(name, user_id, department, contact_info, privilege):
+    person = {}
+    view_id = current_app.config["CMDB2_VIEWS"]["3"][0]
+    data = get_relations(view_id)
+    Log.logger.info("add_person_to_cmdb2:{}\n".format(data))
+    # format_data_cmdb()
 
 
 def get_login_permission(role):

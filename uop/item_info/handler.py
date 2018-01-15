@@ -4,7 +4,6 @@
 '''
 import json
 import requests
-import sys
 import os
 from uop.log import Log
 from uop.util import TimeToolkit, response_data
@@ -13,7 +12,6 @@ from datetime import datetime
 from uop.models import Cmdb
 from uop.res_callback.handler import *
 import base64
-from flask import jsonify
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 __all__ = [

@@ -4,13 +4,15 @@ import json
 import copy
 import requests
 import datetime
-from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data
 from uop.log import Log
 from config import configs, APP_ENV
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
+CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
+CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 
 __all__ = [
     "transition_state_logger", "transit_request_data",
@@ -370,7 +372,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
 
 
 # B类视图list，获取已经定义的关系列表
-def get_relations(view_id, uid=None, token=None):
+def get_relations(view_id):
     '''
     按视图名字查询, id会有变动，保证名字不变就好
     :param view_id:
@@ -379,28 +381,14 @@ def get_relations(view_id, uid=None, token=None):
     :return:
     '''
     Log.logger.info("get_relations from {} view".format(view_id))
-    if not uid or not token:
-        uid, token = get_uid_token()
-    url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
+    views = ViewCache.objects.filter(view_id=view_id)
     relations = []
-    data = {
-        "uid": uid,
-        "token": token,
-        "sign": "",
-        "data": {
-            "id": "",
-            "name": view_id
-        }
-    }
-    data_str = json.dumps(data)
-    try:
-        relations = requests.post(url, data=data_str).json()["data"][0]["relation"] # 获取视图关系实体信息,
-        Log.logger.info("get_relations data:{}".format(relations))
-    except Exception as exc:
-        Log.logger.error("graph_data error: {}".format(str(exc)))
+    data  = {}
+    for view in views:
+        relations = json.loads(view.content)
     data["relations"] = relations
-    data.pop("data")
     return data
+
 
 
 from uop.item_info.handler import *

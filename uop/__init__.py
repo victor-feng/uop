@@ -34,6 +34,18 @@ class Config(object):
             # 'args': (1, 2),
             'trigger': 'interval',
             'seconds': 60 * 5
+        },
+        {
+            'id': 'get_relations',
+            'func': 'uop.scheduler_util:get_relations',
+            'trigger':
+                {
+                    'type': 'cron',
+                    'day_of_week': "mon-fri",
+                    'hour': '0-23',
+                    'minute': '0-59',
+                    'second': '*/60'
+                }
         }
     ]
 

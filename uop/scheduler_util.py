@@ -6,10 +6,16 @@ import json
 import requests
 from models import db
 from uop.util import get_CRP_url
-from uop.models import ResourceModel, Deployment
+from uop.models import ResourceModel, Deployment, Cmdb, ViewCache
+from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
+from uop.util import async
+
 CMDB_URL = configs[APP_ENV].CMDB_URL
+CMDB2_URL = configs[APP_ENV].CMDB2_URL
+CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
+CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
@@ -149,3 +155,39 @@ def flush_crp_to_cmdb_by_osid(osid, env):
         cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
         ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
         Log.logger.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))
+
+
+# B类视图list，获取已经定义的关系列表
+def get_relations():
+    '''
+    按视图名字查询, id会有变动，保证名字不变就好
+    :param view_id:
+    :param uid:
+    :param token:
+    :return:
+    '''
+    uid, token = get_uid_token()
+    for id in [view[0] for num, view in CMDB2_VIEWS.items()]:
+        get_one_view(uid, token, id)
+
+
+@async
+def get_one_view(uid, token, view_id):
+    url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "id": "",
+            "name": view_id
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        relations = requests.post(url, data=data_str).json()["data"][0]["relation"]  # 获取视图关系实体信息,
+        view = ViewCache(view_id=view_id, content=json.dumps(relations))
+        view.save()
+        Log.logger.info("get_relations data:{}".format(relations))
+    except Exception as exc:
+        Log.logger.error("graph_data error: {}".format(str(exc)))
