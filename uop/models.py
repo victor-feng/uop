@@ -7,7 +7,7 @@ db = MongoEngine()
 
 
 class Cmdb(db.Document):
-    username = db.IntField()
+    username = db.StringField()
     password = db.StringField()
     view_cache = db.StringField()
     token = db.StringField()
