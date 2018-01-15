@@ -394,7 +394,7 @@ class AllPermManage(Resource):
         if args.perm_id:
             condition["perm_id"] = args.perm_id
         try:
-            Permissions = PermissionList.objects.filter(**condition).order_by('created_time')
+            Permissions = PermissionList.objects.filter(**condition).order_by("menu_index")
             for permission in Permissions:
                 res={}
                 res["perm_id"] = permission.perm_id
