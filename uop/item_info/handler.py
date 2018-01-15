@@ -189,8 +189,8 @@ def get_uid_token(flush=False):
                 for _ in one:
                     _.update_one(token=token)
             else:
-                token = Token(uid=uid, token=token)
-                token.save()
+                tu = Token(uid=uid, token=token)
+                tu.save()
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token
