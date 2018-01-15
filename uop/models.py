@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime
 from flask_mongoengine import MongoEngine
+from uop.util import TimeToolkit
 
 db = MongoEngine()
-
-
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
     content = db.StringField(default="")
-    cache_date = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    cache_date = db.DateTimeField(auto_now_add=True, default=TimeToolkit.local2utctime(datetime.now()))
     meta = {
         'indexes': [
             'view_id',
@@ -26,7 +25,7 @@ class Cmdb(db.Document):
     password = db.StringField()
     token = db.StringField()
     uid = db.IntField()
-    token_date = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    token_date = db.DateTimeField(auto_now_add=True, default=TimeToolkit.local2utctime(datetime.now()))
     meta = {
         'indexes': [
             'username',

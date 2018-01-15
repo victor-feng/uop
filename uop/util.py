@@ -126,6 +126,17 @@ class TimeToolkit(object):
         utc_timestramp = long(time.mktime(utc_delta_tuple))
         return utc_timestramp
 
+    @staticmethod
+    def local2utctime(dt, duration=None, flag=None):
+        if duration:
+            delta = dt + relativedelta(months=int(duration))
+        else:
+            delta = dt
+        if flag:
+            utc_delta = delta
+        else:
+            utc_delta = delta + timedelta(hours=-8)
+        return utc_delta
 
 def response_data(code, msg, data):
     ret = {
