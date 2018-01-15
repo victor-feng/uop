@@ -421,6 +421,8 @@ def subgrath_data(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
     data = get_relations(CMDB2_VIEWS["3"][0])
+    if not uid and not token:
+        data["uid"], data["token"] = get_uid_token()
     models_list = get_entity_from_file(data)
     if isinstance(models_list, str):
         return models_list
