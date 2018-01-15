@@ -556,7 +556,7 @@ def delete_instance(args):
         "token": token,
         "sign": "",
         "data": {
-            "entity": delete_list
+            "instance": delete_list
         }
     }
     data_str = json.dumps(data)

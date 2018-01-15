@@ -420,5 +420,4 @@ def get_relations(view_id):
     return data
 
 
-
 from uop.item_info.handler import *
