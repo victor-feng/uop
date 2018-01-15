@@ -55,6 +55,17 @@ def add_person(name, user_id, department, contact_info, privilege):
 
 
 
+def sorted_menu_list(menu_list):
+    res_list=[]
+    menu_dict={}
+    indexs=[]
+    for menu in menu_list:
+        menu_dict[menu["menu_index"]]=menu
+        indexs.append(menu["menu_index"])
+    indexs=sorted(indexs)
+    for i in indexs:
+        res_list.append(menu_dict[i])
+    return res_list
 
 
 
@@ -83,6 +94,7 @@ def get_login_permission(role):
                 menu2_dict={}
                 name=permission.name
                 url=permission.url
+                icon=permission.icon
                 menu_id=permission.menu_id
                 level=permission.level
                 parent_id=permission.parent_id
@@ -94,6 +106,7 @@ def get_login_permission(role):
                     menu_dict["menu_id"] = menu_id
                     menu_dict["isDropdown"] = isDropdown
                     menu_dict["menu_index"] = menu_index
+                    menu_dict["icon"] = icon
                     menu_dict["children"] = []
                     menus.append(menu_dict)
                     name1.append(name)
@@ -114,15 +127,15 @@ def get_login_permission(role):
             elif permission.perm_type == "button":
                 buttons.append(permission.button)
         for menu in menus:
+            if menu.get("name") not in name2:
+                menu_list.append(menu)
             for menu2 in menu2s:
                 if menu.get("menu_id") == menu2.get("parent_id"):
                     menu["children"].append(menu2)
                     if len(menu["children"]) == 0:
                         menu_list.append(menu)
                         name2.append(menu.get("name"))
-        for menu in menus:
-            if menu.get("name") not in name2:
-                menu_list.append(menu)
+        menu_list = sorted_menu_list(menu_list)
         return menu_list,buttons,icons,operations
     except Exception as e:
         Log.logger.error("UOP User get menu list error,error msg is %s" % str(e) )
