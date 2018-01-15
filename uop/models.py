@@ -46,6 +46,7 @@ class Token(db.Document):
         ]
     }
 
+
 class Cmdb(db.Document):
     username = db.StringField()
     password = db.StringField()
