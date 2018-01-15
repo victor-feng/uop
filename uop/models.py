@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from flask_mongoengine import MongoEngine
-from uop.util import TimeToolkit
+
 
 db = MongoEngine()
 
@@ -470,3 +470,4 @@ class NetWorkConfig(db.Document):
         'index_background': True
     }
 
+from uop.util import TimeToolkit
