@@ -14,8 +14,8 @@ class ViewCache(db.Document):
         'indexes': [
             'view_id',
             {
-                'fields': ['content'],
-                'expireAfterSeconds': 60 * 60 * 24
+                'fields': ['cache_date'],
+                'expireAfterSeconds': 10
             }
         ]
     }
