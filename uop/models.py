@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from flask_mongoengine import MongoEngine
-
-
 db = MongoEngine()
 
 class ViewCache(db.Document):

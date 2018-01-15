@@ -5,7 +5,7 @@ import IPy
 import time
 import requests
 import json
-from uop.models import NetWorkConfig,PermissionList,RoleInfo,UserInfo
+
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -156,3 +156,4 @@ def deal_enbedded_data(data):
         d=json.loads(d)
         res_list.append(d)
     return res_list
+from uop.models import NetWorkConfig
