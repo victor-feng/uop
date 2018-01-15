@@ -186,7 +186,6 @@ def get_one_view(uid, token, view_id):
     data_str = json.dumps(data)
     try:
         ret = requests.post(url, data=data_str).json()
-        Log.logger.info("get_relations data:{}".format(ret))
         if ret["code"] == 0:
             relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
             view = ViewCache(view_id=view_id, content=json.dumps(relations))
