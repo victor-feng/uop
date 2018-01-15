@@ -386,6 +386,36 @@ def get_relations(view_id):
     data  = {}
     for view in views:
         relations = json.loads(view.content)
+    if not relations:
+        uid, token = get_uid_token()
+        url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
+        data = {
+            "uid": uid,
+            "token": token,
+            "sign": "",
+            "data": {
+                "id": "",
+                "name": view_id
+            }
+        }
+        data_str = json.dumps(data)
+        try:
+            ret = requests.post(url, data=data_str).json()
+            if ret["code"] == 0:
+                relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
+                view = ViewCache(view_id=view_id, content=json.dumps(relations))
+                view.save()
+            elif ret["code"] == 121:
+                data["uid"], data["token"] = get_uid_token(True)
+                data_str = json.dumps(data)
+                ret = requests.post(url, data=data_str).json()
+                relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
+                view = ViewCache(view_id=view_id, content=json.dumps(relations))
+                view.save()
+            else:
+                Log.logger.info("get_relations data:{}".format(ret))
+        except Exception as exc:
+            Log.logger.error("get_relations error: {}".format(str(exc)))
     data["relations"] = relations
     return data
 

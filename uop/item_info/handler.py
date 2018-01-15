@@ -416,7 +416,7 @@ def subgrath_data(args):
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
-    data = get_relations(CMDB2_VIEWS["3"][0], uid, token)
+    data = get_relations(CMDB2_VIEWS["3"][0])
     models_list = get_entity_from_file(data)
     if isinstance(models_list, str):
         return models_list
