@@ -181,6 +181,7 @@ def get_uid_token(flush=False):
     }
     data_str = json.dumps(data)
     try:
+        Log.logger.info("login data:{}".format(data))
         ret = requests.post(url, data=data_str)
         Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
