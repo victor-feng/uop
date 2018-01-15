@@ -379,13 +379,7 @@ def get_relations(view_id, uid=None, token=None):
     :return:
     '''
     Log.logger.info("get_relations from {} view".format(view_id))
-    view_dict = {
-        "B7": "410c4b3b2e7848b9b64d08d0",  # 工程 --> 物理机
-        "B6": "ccb058ab3c8d47bc991efd7b",  # 部门 --> 业务 --> 资源
-        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程 405cf4f20d304da3945709d3
-        "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
-        "B3": "e7a8ed688f2e4c19a3aa3a65",  # 资源 --> 机房
-    }
+
     if not uid or not token:
         uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"

@@ -11,11 +11,12 @@ class Cmdb(db.Document):
     password = db.StringField()
     view_cache = db.StringField()
     token = db.StringField()
+    uid = db.IntField()
     meta = {
         'indexes': [
             'username',
             {
-                'fields': ['token', 'view_cache'],
+                'fields': ['token', 'view_cache', "uid"],
                 'expireAfterSeconds': 60 * 20
             }
         ]

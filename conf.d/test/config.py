@@ -30,7 +30,14 @@ class TestingConfig(BaseConfig):
     
     CMDB_URL = "http://cmdb-test.syswin.com/"
     CMDB2_URL = "http://cmdb2.syswin.com/"
-
+    CMDB2_OPEN_USER = "uop"
+    CMDB2_VIEWS = {
+        "1": ("B7", u"工程 --> 物理机"),
+        "2": ("B6", u"部门 --> 业务 --> 资源"),
+        "3": ("B5", u"人 --> 部门 --> 工程"),
+        "4": ("B4", u"资源 --> 环境 --> 机房"),
+        "5": ("B3", u"资源 --> 机房"),
+    }
     UPLOAD_FOLDER = "/data/"
 
 

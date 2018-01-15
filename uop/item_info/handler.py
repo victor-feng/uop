@@ -10,8 +10,9 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
+from uop.models import Cmdb
 from uop.res_callback.handler import *
-import copy
+import base64
 from flask import jsonify
 
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +21,10 @@ __all__ = [
     "subgrath_data", "package_data", "get_entity_from_file",
     "fix_instance", "delete_instance"
 ]
+
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
+CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
+CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 CMDB2_MODULE ={
     0: "Person",
     1: "department", #部门
@@ -156,9 +160,16 @@ def push_data_to_file(parent_id, model_id, property):
     return node
 
 
-# 获取uid，token
-def get_uid_token(username="admin", password="123456", sign=""):
-    uid, token = 0, 0
+# 获取uid，token,并缓存
+def get_uid_token(flush=False):
+    cmdb_info = Cmdb.objects.filters(username=CMDB2_USER)
+    username, password, uid, token = "", "","", ""
+    for ci in cmdb_info:
+        username = ci.username
+        password = base64.b64decode(ci.password)
+        uid, token = ci.uid, ci.token
+    if uid and token and not flush:
+        return uid, token
     url = CMDB2_URL + "cmdb/openapi/login/"
     data = {
         "username": username,
@@ -170,7 +181,10 @@ def get_uid_token(username="admin", password="123456", sign=""):
     try:
         ret = requests.post(url, data=data_str)
         Log.logger.info(ret.json())
-        uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
+        if ret.json()["code"] == 0:
+            uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
+            view_cache = get_relations(CMDB2_VIEWS["3"][0], uid, token)
+            Cmdb.objects(username=CMDB2_USER).update_one(uid=uid, token=token, view_cache=json.dumps(view_cache))
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token
@@ -258,33 +272,12 @@ def Aquery(args):
     :param data:
     :return:
     '''
-    view_dict = {
-        "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程 405cf4f20d304da3945709d3
-        "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
-    }
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
-    url_action = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
     url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
     url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
     if not uid or not token:
         uid, token = get_uid_token()
-    data_action = {
-        "uid": uid,
-        "token": token,
-        "sign": "",
-        "data": {
-            "id": "B5",
-            "name": "",
-            "entity": [{
-                "id": "",  # 实体id
-                "parameters": [{
-                    "code": code,  # 属性code
-                    "value": name  # 属性值，必须具备唯一性， 如工号
-                }]
-            }]
-        }
-    }
     data_list =  {
         "uid": uid,
         "token": token,
@@ -310,7 +303,6 @@ def Aquery(args):
             }
         }
     }
-    data_action_str = json.dumps(data_action)
     data_list_str = json.dumps(data_list)
     data_instance_str = json.dumps(data_instance)
     try:
@@ -422,7 +414,7 @@ def subgrath_data(args):
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
-    data = get_relations("B5", uid, token)
+    data = get_relations(CMDB2_VIEWS["3"][0], uid, token)
     models_list = get_entity_from_file(data)
     if isinstance(models_list, str):
         return models_list
@@ -556,12 +548,6 @@ def delete_instance(args):
         "token": token,
         "sign": "",
         "data": {
-            # "entity": [
-            #     {
-            #         "model_id": model_id,
-            #         "instance_id": instance_id,
-            #     }
-            # ]
             "entity": delete_list
         }
     }
