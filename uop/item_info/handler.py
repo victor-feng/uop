@@ -185,6 +185,7 @@ def get_uid_token(flush=False):
         Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
+            Cmdb.objects(username=username).update_one(uid=uid, token=token)
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token
