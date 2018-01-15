@@ -191,5 +191,13 @@ def get_one_view(uid, token, view_id):
             relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
             view = ViewCache(view_id=view_id, content=json.dumps(relations))
             view.save()
+        elif ret["code"] == 121:
+            data["uid"], data["token"] = get_uid_token(True)
+            ret = requests.post(url, data=data_str).json()
+            relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
+            view = ViewCache(view_id=view_id, content=json.dumps(relations))
+            view.save()
+        else:
+            Log.logger.info("get_relations data:{}".format(ret))
     except Exception as exc:
-        Log.logger.error("graph_data error: {}".format(str(exc)))
+        Log.logger.error("get_relations error: {}".format(str(exc)))
