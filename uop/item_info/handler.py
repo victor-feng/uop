@@ -168,7 +168,6 @@ def get_uid_token(flush=False):
         password = base64.b64decode(ci.password)
     for one in tu:
         uid, token = one.uid, one.token
-
     if uid and token and not flush:
         return uid, token
     url = CMDB2_URL + "cmdb/openapi/login/"
@@ -185,12 +184,13 @@ def get_uid_token(flush=False):
         Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
-            for one in Token.objects.filter(uid=uid):
-                if one:
-                    one.update_one(token=token)
-                else:
-                    token = Token(uid=uid, token=token)
-                    token.save()
+            one = Token.objects.filter(uid=uid)
+            if one:
+                for _ in one:
+                    _.update_one(token=token)
+            else:
+                token = Token(uid=uid, token=token)
+                token.save()
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
     return uid, token
