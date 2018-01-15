@@ -288,7 +288,7 @@ class PermManage(Resource):
                         Permission.api_put = perm.get("api_put")
                     if perm.get("api_delete"):
                         Permission.api_delete = perm.get("api_delete")
-                    if perm.get("isDropdown"):
+                    if str(perm.get("isDropdown")):
                         Permission.isDropdown = perm.get("isDropdown")
                     if perm.get("menu_index"):
                         Permission.menu_index = perm.get("menu_index")
