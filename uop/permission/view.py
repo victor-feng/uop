@@ -288,7 +288,7 @@ class PermManage(Resource):
                         Permission.api_put = perm.get("api_put")
                     if perm.get("api_delete"):
                         Permission.api_delete = perm.get("api_delete")
-                    if perm.get("isDropdown"):
+                    if str(perm.get("isDropdown")):
                         Permission.isDropdown = perm.get("isDropdown")
                     if perm.get("menu_index"):
                         Permission.menu_index = perm.get("menu_index")
@@ -535,7 +535,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_put', type=str,  location="json")
         parser.add_argument('api_post', type=str,  location="json")
         parser.add_argument('api_delete', type=str,  location="json")
-        parser.add_argument('isDropdown', type=str, location="json")
+        parser.add_argument('isDropdown', type=bool, location="json")
         parser.add_argument('menu_index', type=int, location="json")
         args = parser.parse_args()
         Log.logger.info(args)
@@ -569,8 +569,8 @@ class AllPermManage(Resource):
                 Permission.api_put = args.api_put
             if args.api_delete:
                 Permission.api_delete = args.api_delete
-            if args.isDropdown:
-                Permission.isDropdown = bool(args.isDropdown)
+            if str(args.isDropdown):
+                Permission.isDropdown = args.isDropdown
             if args.menu_index:
                 Permission.menu_index = args.menu_index
             Permission.updated_time = datetime.datetime.now()
