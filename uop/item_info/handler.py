@@ -261,9 +261,6 @@ def Aquery(args):
     view_dict = {
         "B5": "405cf4f20d304da3945709d3",  # 人 --> 部门 --> 工程 405cf4f20d304da3945709d3
         "B4": "29930f94bf0844c6a0e060bd",  # 资源 --> 环境 --> 机房
-        "B3": "e7a8ed688f2e4c19a3aa3a65",  # 资源 --> 机房
-        "B2": "",
-        "B1": "",
     }
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
