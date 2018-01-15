@@ -66,8 +66,8 @@ class PermissionList(db.Document):
     api_delete = db.StringField(required=False,default='0')
     parent_id = db.StringField(required=False, max_length=50)
     level = db.StringField(required=False, max_length=50)
-    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
     isDropdown = db.BooleanField(required=False)
     menu_index=db.IntField(required=False, max_length=50)
 
@@ -88,9 +88,9 @@ class UserInfo(db.Document):
     role = db.StringField(required=False,max_length=50)
     is_admin = db.BooleanField(required=False, default=False)
     is_external = db.BooleanField(required=False, default=False)
-    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    last_login_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
+    last_login_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
 
     meta = {
             "collection": "uop_userinfo",
@@ -104,8 +104,8 @@ class RoleInfo(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     name = db.StringField(required=True, max_length=50,unique=True)
     description = db.StringField(required=False)
-    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
-    created_time = db.DateTimeField(auto_now_add=True, default=datetime.datetime.now())
+    updated_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
+    created_time = db.DateTimeField(auto_now_add=True, default=datetime.now())
 
     meta = {
             "collection": "roleinfo",
@@ -151,7 +151,7 @@ class Deployment(db.Document):
     resource_id = db.StringField()
     deploy_name = db.StringField(required=True, unique_with='resource_id')
     resource_name = db.StringField()
-    created_time = db.DateTimeField(default=datetime.datetime.now())
+    created_time = db.DateTimeField(default=datetime.now())
     environment = db.StringField()
     release_notes = db.StringField()
     mysql_tag = db.StringField()
@@ -171,7 +171,7 @@ class Deployment(db.Document):
     disconf_list = db.ListField(db.EmbeddedDocumentField('DisconfIns'))
     is_deleted = db.IntField(required=False, default=0)
     is_rollback = db.IntField(required=False, default=0)
-    deleted_time = db.DateTimeField(default=datetime.datetime.now())
+    deleted_time = db.DateTimeField(default=datetime.now())
     capacity_info = db.StringField(required=False, default="{}")
     department = db.StringField()
 
@@ -223,7 +223,7 @@ class Capacity(db.EmbeddedDocument):
     #numbers = db.IntField(required=False)
     begin_number=db.IntField(required=False)
     end_number = db.IntField(required=False)
-    created_date = db.DateTimeField(default=datetime.datetime.now())
+    created_date = db.DateTimeField(default=datetime.now())
     network_id = db.StringField(required=False, default="")
     meta = {
         'collection': 'capacity',
@@ -288,7 +288,7 @@ class ResourceModel(db.DynamicDocument):
     res_id = db.StringField(required=True, unique=True)
     user_name = db.StringField(required=False)
     user_id = db.StringField(required=False)
-    # created_date = db.DateTimeField(default=datetime.datetime.now())
+    # created_date = db.DateTimeField(default=datetime.now())
     created_date = db.DateTimeField(required=False)
     domain = db.StringField(required=False)
     env = db.StringField(required=True, unique_with= 'resource_name')
@@ -330,7 +330,7 @@ class Approval(db.DynamicDocument):
     project_id = db.StringField(required=True)
     department = db.StringField(required=True)
     user_id = db.StringField(required=True)
-    create_date = db.DateTimeField(default=datetime.datetime.now())
+    create_date = db.DateTimeField(default=datetime.now())
     approve_uid = db.StringField(required=False)
     approve_date = db.DateTimeField(required=False)
     # processing/success/failed
@@ -357,7 +357,7 @@ class ItemInformation(db.DynamicDocument):
     item_code = db.StringField(required=True)
     item_depart = db.StringField(required=True)
     item_description = db.StringField(required=False)
-    create_date = db.DateTimeField(default=datetime.datetime.now)
+    create_date = db.DateTimeField(default=datetime.now)
     deleted = db.IntField(required=False, default=0)
 
 
@@ -422,7 +422,7 @@ class StatusRecord(db.Document):
     res_id = db.StringField()
     #resource_name = db.StringField()
     #deploy_name = db.StringField()
-    created_time = db.DateTimeField(default=datetime.datetime.now())
+    created_time = db.DateTimeField(default=datetime.now())
     status = db.StringField(default='')  # 状态
     msg = db.StringField(default='')  # 状态信息
     s_type = db.StringField(default='')
@@ -448,7 +448,7 @@ class StatusRecord(db.Document):
 class OperationLog(db.Document):
     deploy_id = db.StringField()
     res_id = db.StringField()
-    created_time = db.DateTimeField(default=datetime.datetime.now())
+    created_time = db.DateTimeField(default=datetime.now())
     msg = db.StringField()  
 
     meta = {
@@ -466,7 +466,7 @@ class NetWorkConfig(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     name = db.StringField()
     env = db.StringField()
-    created_time = db.DateTimeField(default=datetime.datetime.now())
+    created_time = db.DateTimeField(default=datetime.now())
     sub_network = db.StringField(default='') 
     vlan_id = db.StringField(default='') 
     is_deleted = db.IntField(required=False, default=0)
