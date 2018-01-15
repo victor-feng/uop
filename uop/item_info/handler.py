@@ -399,7 +399,7 @@ def get_entity(data):
     try:
         ret = requests.post(url, data=data_str).json()
         if ret["code"] != 0:
-            req_data["uid"], req_data["code"] = get_uid_token()
+            req_data["uid"], req_data["code"] = get_uid_token(True)
             data_str = json.dumps(req_data)
             ret = requests.post(url, data=data_str).json()
         # Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
@@ -439,7 +439,7 @@ def subgrath_data(args):
     }
     data_str = json.dumps(data)
     try:
-        Log.logger.info("graph_data: {}".format(data))
+        Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str).json()
         Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:

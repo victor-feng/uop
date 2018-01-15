@@ -417,7 +417,6 @@ def get_relations(view_id):
         except Exception as exc:
             Log.logger.error("get_relations error: {}".format(str(exc)))
     data["relations"] = relations
-    data["uid"], data["token"] = uid, token
     return data
 
 
