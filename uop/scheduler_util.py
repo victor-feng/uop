@@ -201,3 +201,7 @@ def get_one_view(uid, token, view_id):
             Log.logger.info("get_relations data:{}".format(ret))
     except Exception as exc:
         Log.logger.error("get_relations error: {}".format(str(exc)))
+
+if __name__ == "__main__":
+    get_relations()
+    pass
