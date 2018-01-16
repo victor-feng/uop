@@ -13,7 +13,7 @@ from uop.res_callback.handler import *
 from transitions import Machine
 from uop.util import get_CRP_url
 from uop.log import Log
-
+from uop.permission.handler import api_permission_control
 
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
 
@@ -496,6 +496,7 @@ class ResourceProviderCallBack(Resource):
     """
     资源预留回调
     """
+
     @classmethod
     def process_cmdb1(cls, request_data):
         resource_id = request_data.get('resource_id')
@@ -645,6 +646,7 @@ class ResourceProviderCallBack(Resource):
         CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
 
+    # @api_permission_control(request)
     @classmethod
     def post(cls):
         code = 2002
@@ -678,6 +680,8 @@ class ResourceStatusProviderCallBack(Resource):
     """
     资源预留状态记录回调
     """
+
+    # @api_permission_control(request)
     @classmethod
     def post(cls):
         code = 200
@@ -782,6 +786,7 @@ class ResourceStatusProviderCallBack(Resource):
         return res, code
 
     @classmethod
+    # @api_permission_control(request)
     def get(cls):
         code = 200
         parser = reqparse.RequestParser()
@@ -828,6 +833,7 @@ class ResourceStatusProviderCallBack(Resource):
 
 
 class ResourceDeleteCallBack(Resource):
+    # @api_permission_control(request)
     def post(self):
         code = 200
         request_data = json.loads(request.data)

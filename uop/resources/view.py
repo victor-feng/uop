@@ -22,6 +22,7 @@ from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url
 from config import APP_ENV, configs
 from uop.log import Log
+from uop.permission.handler import api_permission_control
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -33,7 +34,7 @@ resources_api = Api(resources_blueprint, errors=resources_errors)
 
 
 class ResourceApplication(Resource):
-
+    # @api_permission_control(request)
     @classmethod
     def post(cls):
         parser = reqparse.RequestParser()
@@ -176,6 +177,7 @@ class ResourceApplication(Resource):
 
         return res, 200
 
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         parser = reqparse.RequestParser()
@@ -328,6 +330,7 @@ class ResourceApplication(Resource):
         }
         return ret, code
 
+    # @api_permission_control(request)
     @classmethod
     def delete(cls):
         parser = reqparse.RequestParser()
@@ -414,6 +417,7 @@ class ResourceApplication(Resource):
         }
         return ret, 200
 
+    # @api_permission_control(request)
     @classmethod
     def put(cls):
         """
@@ -523,7 +527,7 @@ class ResourceApplication(Resource):
 
 
 class ResourceDetail(Resource):
-
+    # @api_permission_control(request)
     @classmethod
     def get(cls, res_id):
         result = {}
@@ -653,6 +657,7 @@ class ResourceDetail(Resource):
         }
         return ret, code
 
+    # @api_permission_control(request)
     @classmethod
     def put(cls, res_id):
         try:
@@ -771,6 +776,7 @@ class ResourceDetail(Resource):
 
         return res, 200
 
+    # @api_permission_control(request)
     @classmethod
     def delete(cls, res_id):
         try:
@@ -833,6 +839,7 @@ class ResourceDetail(Resource):
 
 
 class ResourceRecord(Resource):
+    # @api_permission_control(request)
     @classmethod
     def get(cls, user_id):
         result_list = []
@@ -874,6 +881,7 @@ class ResourceRecord(Resource):
 
 
 class GetDBInfo(Resource):
+    # @api_permission_control(request)
     def get(cls, res_id):
         err_msg, resource_info = get_resource_by_id(res_id)
         mysql_ip = {
@@ -916,6 +924,7 @@ class GetDBInfo(Resource):
 
 
 class GetMyResourcesInfo(Resource):
+    # @api_permission_control(request)
     def get(self):
         user_id = request.args.get('user_id',"")
         resource_type = request.args.get('resource_type', "")
@@ -941,6 +950,7 @@ class GetMyResourcesInfo(Resource):
         Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
 
+    # @api_permission_control(request)
     def put(self):
         code = 200
         ret = {
@@ -996,6 +1006,7 @@ class GetMyResourcesInfo(Resource):
 
 
 class Dockerlogs(Resource):
+    # @api_permission_control(request)
     def get(self):
         env = request.args.get('env')
         osid = request.args.get('osid')

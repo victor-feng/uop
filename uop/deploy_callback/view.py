@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
-from flask import current_app
+from flask import current_app,request
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.deploy_callback import deploy_cb_blueprint
 from uop.log import Log
 from uop.deploy_callback.errors import deploy_cb_errors
 from uop.deploy_callback.handler import get_deploy_status, create_status_record
 from uop.models import Deployment, ResourceModel, StatusRecord
+from uop.permission.handler import api_permission_control
 import requests
 import datetime
 import sys
@@ -23,6 +24,7 @@ deploy_type_dict = {
 
 
 class DeployCallback(Resource):
+    # @api_permission_control(request)
     @classmethod
     def put(cls, deploy_id):
         try:
@@ -146,6 +148,7 @@ class DeployCallback(Resource):
 
 
 class DeployStatusProviderCallBack(Resource):
+    # @api_permission_control(request)
     @classmethod
     def post(cls):
         try:
@@ -207,6 +210,7 @@ class DeployStatusProviderCallBack(Resource):
         }
         return res, code
 
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         code = 200

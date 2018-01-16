@@ -14,11 +14,13 @@ from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
 from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip
 from uop.log import Log
+from uop.permission.handler import api_permission_control
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
 class DeploymentListAPI(Resource):
 
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, location='args')
@@ -176,6 +178,7 @@ class DeploymentListAPI(Resource):
             }
             return ret, 200
 
+    # @api_permission_control(request)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('action', type=str,
@@ -437,6 +440,7 @@ class DeploymentListAPI(Resource):
             }
             return res, 200
 
+    # @api_permission_control(request)
     @classmethod
     def delete(cls):
         parser = reqparse.RequestParser()
@@ -557,6 +561,7 @@ class DeploymentListAPI(Resource):
         }
         return ret, 200
 
+    # @api_permission_control(request)
     @classmethod
     def put(cls):
         parser = reqparse.RequestParser()
@@ -625,9 +630,11 @@ class DeploymentListAPI(Resource):
 
 
 class DeploymentAPI(Resource):
+    # @api_permission_control(request)
     def put(self, deploy_id):
         pass
 
+    # @api_permission_control(request)
     def delete(self, deploy_id):
         res_code = 204
         parser = reqparse.RequestParser()
@@ -671,6 +678,7 @@ class DeploymentAPI(Resource):
 
 
 class DeploymentListByByInitiatorAPI(Resource):
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('initiator', type=str, location='args')
@@ -737,6 +745,7 @@ class DeploymentListByByInitiatorAPI(Resource):
 
 
 class Upload(Resource):
+    # @api_permission_control(request)
     def post(self):
         try:
             uid = str(uuid.uuid1())
@@ -776,6 +785,7 @@ class Upload(Resource):
 
 
 class Download(Resource):
+    # @api_permission_control(request)
     def get(self, file_name):
         try:
             download_dir = current_app.config['UPLOAD_FOLDER']
@@ -794,6 +804,7 @@ class Download(Resource):
 class CapacityAPI(Resource):
     '容量改变 扩容或者缩容 的提交申请'
 
+    # @api_permission_control(request)
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('cluster_id', type=str)
@@ -918,6 +929,7 @@ class CapacityAPI(Resource):
 
         # '资源实例的集群信息'
 
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('res_id', type=str, location='args')
@@ -993,6 +1005,9 @@ class CapacityAPI(Resource):
 
 class CapacityInfoAPI(Resource):
     # '获取扩容详情'
+
+
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str, location='args')
@@ -1022,6 +1037,9 @@ class CapacityInfoAPI(Resource):
 
 class RollBackAPI(Resource):
     # 应用回滚
+
+
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str, location='args')
@@ -1054,6 +1072,7 @@ class RollBackAPI(Resource):
         else:
             return deployments, 200
 
+    # @api_permission_control(request)
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_name', type=str)
