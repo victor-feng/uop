@@ -70,7 +70,7 @@ def add_person_to_cmdb2(name, user_id, department, contact_info, privilege):
     view_id = current_app.config["CMDB2_VIEWS"]["3"][0]
     data = get_relations(view_id)
     Log.logger.info("add_person_to_cmdb2:{}\n".format(data))
-    # per, r = format_data_cmdb(data["relations"], person, )
+    per, r = format_data_cmdb(data["relations"], person, )
 
 
 def sorted_menu_list(menu_list):

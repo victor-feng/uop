@@ -107,8 +107,8 @@ def cmdb_graph_search(args):
             Log.logger.debug("The Request Body is: " + req_str)
 
             ci_relation_query = requests.get(req_str)
-            Log.logger.debug(ci_relation_query)
-            Log.logger.debug(ci_relation_query.content)
+            # Log.logger.debug(ci_relation_query)
+            # Log.logger.debug(ci_relation_query.content)
             ci_relation_query_decode = ci_relation_query.content.decode('unicode_escape')
             result = json.loads(ci_relation_query_decode)
             return result
