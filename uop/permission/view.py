@@ -191,9 +191,9 @@ class PermManage(Resource):
             data["res_list"] = res_list
             data["role_perm_list"] = role_perm_list
             code = 200
-            msg = "Get permission info success"
+            msg = "Get role permission info success"
         except Exception as e:
-            msg = "Get permission info error,error msg is %s" % str(e)
+            msg = "Get role permission info error,error msg is %s" % str(e)
             code = 500
             data = "Error"
             Log.logger.error(msg)
@@ -401,7 +401,7 @@ class AllPermManage(Resource):
         if args.perm_id:
             condition["perm_id"] = args.perm_id
         try:
-            total_count = UserInfo.objects.filter(**condition).count()
+            total_count = PermissionList.objects.filter(**condition).count()
             if args.page_num and args.page_size:
                 skip_count = (args.page_num - 1) * args.page_size
                 Permissions =PermissionList.objects.filter(**condition).order_by('menu_index').skip(skip_count).limit(
