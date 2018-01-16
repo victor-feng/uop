@@ -144,14 +144,17 @@ def get_login_permission(role):
             elif permission.perm_type == "button":
                 buttons.append(permission.button)
         for menu in menus:
-            if menu.get("name") not in name2:
-                menu_list.append(menu)
             for menu2 in menu2s:
                 if menu.get("menu_id") == menu2.get("parent_id"):
-                    menu["children"].append(menu2)
                     if len(menu["children"]) == 0:
+                        menu["children"].append(menu2)
                         menu_list.append(menu)
                         name2.append(menu.get("name"))
+                    else:
+                        menu["children"].append(menu2)
+        for menu in menus:
+            if menu.get("name") not in name2:
+                menu_list.append(menu)
         menu_list = sorted_menu_list(menu_list)
         return menu_list,buttons,icons,operations
     except Exception as e:

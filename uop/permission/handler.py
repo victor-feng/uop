@@ -59,8 +59,6 @@ def get_role(user_id):
         err_msg = "Get role error,error msg is %s" % str(e)
         raise ApiPermException(err_msg)
 
-
-
 def api_permission_control(request_info):
     """
     API权限控制装饰器

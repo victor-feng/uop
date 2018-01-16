@@ -6,6 +6,7 @@ import uuid
 import datetime
 import requests
 import random
+from flask import request
 from flask_restful import reqparse, Api, Resource
 from uop.log import Log
 from uop.approval import approval_blueprint
@@ -13,7 +14,7 @@ from uop import models
 from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
 from uop.deployment.handler import deal_disconf_info
-
+from uop.permission.handler import api_permission_control
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
 
@@ -22,6 +23,8 @@ approval_api = Api(approval_blueprint, errors=approval_errors)
 
 
 class ApprovalList(Resource):
+
+    #@api_permission_control(request)
     def post(self):
         code = 0
         res = ""
@@ -71,6 +74,8 @@ class ApprovalList(Resource):
 
 
 class ApprovalInfo(Resource):
+
+    #@api_permission_control(request)
     def put(self, res_id):
         code = 0
         res = ""
@@ -132,6 +137,7 @@ class ApprovalInfo(Resource):
 
         return ret, code
 
+    #@api_permission_control(request)
     def get(self, res_id):
         code = 0
         res = ""
@@ -170,6 +176,8 @@ class Reservation(Resource):
     """
     预留审批
     """
+
+    #@api_permission_control(request)
     def post(self):
         """
         预留审批通过，往crp发送数据
@@ -307,6 +315,8 @@ class ReservationAPI(Resource):
     """
     预留失败时，重新预留往crp发送数据
     """
+
+    #@api_permission_control(request)
     def put(self, res_id):
         code = 0
         res = ""
@@ -412,41 +422,9 @@ class ReservationAPI(Resource):
         return ret, code
 
 
-class ReservationMock(Resource):
-    def post(self):
-        code = 0
-        res = ""
-        msg = {}
-        parser = reqparse.RequestParser()
-        parser.add_argument('resource_id', type=str)
-        args = parser.parse_args()
-        resource_id = args.resource_id
-        try:
-            resource = models.ResourceModel.objects.get(res_id=resource_id)
-        except Exception as e:
-            code = 410
-            res = "Failed to find the rsource"
-            ret = {
-                "code": code,
-                "result": {
-                    "res": res,
-                    "msg": msg
-                }
-            }
-            return ret, code
-        # MOCE
-        code = 200
-        ret = {
-            "code": code,
-            "result": {
-                "res": res,
-                "msg": msg
-            }
-        }
-        return ret, code
-
 
 class CapacityInfoAPI(Resource):
+    #@api_permission_control(request)
     def put(self):
         code = 0
         res = ""
@@ -518,6 +496,8 @@ class CapacityInfoAPI(Resource):
 
 
 class CapacityReservation(Resource):
+
+    #@api_permission_control(request)
     def post(self):
         code = 0
         res = ""
@@ -667,7 +647,9 @@ class CapacityReservation(Resource):
 
 
 class RollBackInfoAPI(Resource):
+
     # 审批过后更新审批表的信息
+    #@api_permission_control(request)
     def put(self):
         code = 0
         res = ""
@@ -726,6 +708,7 @@ class RollBackInfoAPI(Resource):
 
 class RollBackReservation(Resource):
     # 获取回滚的详情
+    #@api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str, location='args')
@@ -775,6 +758,7 @@ class RollBackReservation(Resource):
             return results, 200
 
     # 将回滚的数据发送到crp
+    #@api_permission_control(request)
     def post(self):
         code = 200
         res = ""
@@ -854,7 +838,6 @@ approval_api.add_resource(ApprovalList, '/approvals')
 approval_api.add_resource(ApprovalInfo, '/approvals/<string:res_id>')
 approval_api.add_resource(Reservation, '/reservation')
 approval_api.add_resource(ReservationAPI, '/reservation/<string:res_id>')
-# approval_api.add_resource(ReservationMock, '/reservation')
 approval_api.add_resource(CapacityInfoAPI, '/capacity/approvals')
 approval_api.add_resource(CapacityReservation, '/capacity/reservation')
 approval_api.add_resource(RollBackInfoAPI, '/rollback/approvals')
