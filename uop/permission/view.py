@@ -505,7 +505,9 @@ class AllPermManage(Resource):
         args = parser.parse_args()
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
-            Permission.delete()
+            Permissions = PermissionList.objects.filter(name=Permission.name)
+            for perm in Permissions:
+                perm.delete()
             code = 200
             msg = "Delete permission success"
             data = "Success"
