@@ -12,7 +12,7 @@ def add_person(name, user_id, department, contact_info, privilege):
     """
         cmdb1.0临时跳过了将用户权限信息入库操作
     """
-    add_person_to_cmdb2(name, user_id, department, contact_info, privilege)
+    # add_person_to_cmdb2(name, user_id, department, contact_info, privilege)
     return True # 直接返回
     success = False
     already_exist = False

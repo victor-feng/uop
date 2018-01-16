@@ -233,13 +233,13 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 
 # 解析crp传回来的数据录入CMDB2.0
 @async
-def crp_data_cmdb(data):
-    assert(isinstance(data, dict))
-    Log.logger.info("###data:{}".format(data))
-    models_list = get_entity_from_file(data)
+def crp_data_cmdb(args):
+    assert(isinstance(args, dict))
+    Log.logger.info("###data:{}".format(args))
+    models_list = get_entity_from_file(args)
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations("B7") #
-    instances, relations = post_datas_cmdb(url, data, models_list, data["relations"])
+    instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     data["relation"],data["instance"] = relations, instances
     data_str = json.dumps(data)
     ret = []
@@ -263,7 +263,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     '''
     docker_model = filter(lambda x:x["code"] == "container", models_list)[0]
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
-    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]
+    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["id"]
     project_model = filter(lambda x: x["code"] == "project", models_list)[0]
     instances, relations = [], []
 
@@ -326,6 +326,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     :return: 解析好的实例，及与实例相关的关系信息列表
     '''
     rels = []
+    host_instance_id = "2a4d89e3e48b471da0ea41c1"
     i = {
         "model_id": model["id"],
         "instance_id": "",
@@ -345,12 +346,18 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     }
     if i.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
         r = [
-            dict(rel, start_id = i["_id"], end_instance_id = i.get("physical_server"))
+            dict(
+                rel, start_id = i["_id"],
+                end_instance_id = host_instance_id # i.get("physical_server")
+            )
             for rel in relations if rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == physical_server_model_id
         ]
         if not r:
             r = [
-                dict(rel, end_id=i["_id"], start_instance_id=i.get("physical_server"))
+                dict(
+                    rel, end_id=i["_id"],
+                    start_instance_id=host_instance_id # i.get("physical_server")
+                )
                 for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == physical_server_model_id
             ]
         rels.extend(r)
