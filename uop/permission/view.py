@@ -10,7 +10,6 @@ from uop.models import UserInfo,PermissionList,RoleInfo
 from uop.permission.errors import perm_errors
 from uop.log import Log
 from uop.util import response_data
-from uop.permission.handler import api_permission_control
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
