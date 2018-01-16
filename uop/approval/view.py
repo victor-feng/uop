@@ -14,7 +14,7 @@ from uop import models
 from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
 from uop.deployment.handler import deal_disconf_info
-from uop.util import api_permission_control
+from uop.permission.handler import api_permission_control
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
 
