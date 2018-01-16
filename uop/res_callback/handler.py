@@ -270,7 +270,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     ## 一次预留生成的所有应用资源对应一个tomcat实例
     raw["baseInfo"] = raw["resource_name"]
     project_level = {
-        "instance_id": raw["project_id"],
+        "instance_id": raw["cmdb2_project_id"],
         "model_id": project_model["id"]
     }
     tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
