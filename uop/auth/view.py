@@ -13,6 +13,7 @@ from uop.auth.errors import user_errors
 from uop.auth.handler import add_person,get_login_permission
 from uop.log import Log
 from uop.util import response_data
+from uop.permission.handler import api_permission_control
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -96,6 +97,7 @@ class LdapConn(object):
 
 
 class UserLogin(Resource):
+    #@api_permission_control(request)
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str)

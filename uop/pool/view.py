@@ -3,18 +3,20 @@
 import requests
 import json
 from flask_restful import reqparse, Api, Resource
+from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
 from uop.models import ConfigureEnvModel,NetWorkConfig
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
+from uop.permission.handler import api_permission_control
 
 
 pool_api = Api(pool_blueprint, errors=pool_errors)
 
 
 class NetworksAPI(Resource):
-
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         try:
@@ -61,7 +63,7 @@ class NetworksAPI(Resource):
 
 
 class StatisticAPI(Resource):
-
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         try:

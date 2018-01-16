@@ -3,20 +3,21 @@
 import json
 import requests
 from flask_restful import reqparse, Api, Resource
-from flask import current_app, jsonify
+from flask import current_app, jsonify,request
 from uop.resource_view import resource_view_blueprint
 from uop.resource_view.errors import resource_view_errors
 from uop.log import Log
 from uop.models import ResourceModel
 from uop.resource_view.handler import *
 from uop.util import response_data
+from uop.permission.handler import api_permission_control
 
 
 resource_view_api = Api(resource_view_blueprint, errors=resource_view_errors)
 
 
 class ResourceView(Resource):
-
+    # @api_permission_control(request)
     def get(self):
         try:
             parser = reqparse.RequestParser()

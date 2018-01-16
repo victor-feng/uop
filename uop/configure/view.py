@@ -2,6 +2,7 @@
 import re
 from flask_restful import reqparse, Api, Resource, fields
 import requests
+from flask import request
 from uop.configure import configure_blueprint
 from uop.configure.handler import fuzzyfinder
 from uop.models import ConfigureEnvModel
@@ -10,11 +11,13 @@ from uop.models import ConfigureDisconfModel
 from uop.models import NetWorkConfig
 from uop.util import get_CRP_url
 from uop.log import Log
+from uop.permission.handler import api_permission_control
 
 configure_api = Api(configure_blueprint)
 
 
 class ConfigureEnv(Resource):
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         ret = ConfigureEnvModel.objects.all()
@@ -33,6 +36,7 @@ class ConfigureEnv(Resource):
 
 
 class Configure(Resource):
+    # @api_permission_control(request)
     @classmethod
     def get(cls):
         parser = reqparse.RequestParser()
@@ -76,6 +80,7 @@ class Configure(Resource):
         }
         return res
 
+    # @api_permission_control(request)
     @classmethod
     def post(cls):
         parser = reqparse.RequestParser()
@@ -129,6 +134,7 @@ class Configure(Resource):
         }
         return res
 
+    # @api_permission_control(request)
     @classmethod
     def put(cls):
         parser = reqparse.RequestParser()
@@ -175,6 +181,7 @@ class Configure(Resource):
         }
         return res
 
+    # @api_permission_control(request)
     @classmethod
     def delete(cls):
         parser = reqparse.RequestParser()
@@ -209,7 +216,7 @@ class Configure(Resource):
 
 
 class ConfigureNetwork(Resource):
-
+    # @api_permission_control(request)
     def get(self):
         try:
             parser = reqparse.RequestParser()
