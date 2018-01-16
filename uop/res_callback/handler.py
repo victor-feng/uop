@@ -240,7 +240,16 @@ def crp_data_cmdb(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations("B7") #
     instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
-    data["relation"],data["instance"] = relations, instances
+    uid, token = get_uid_token()
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign":"",
+        "data": {
+            "relation": relations,
+            "instance": instances
+        }
+    }
     data_str = json.dumps(data)
     ret = []
     try:
