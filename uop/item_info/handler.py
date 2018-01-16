@@ -186,8 +186,7 @@ def get_uid_token(flush=False):
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
             one = Token.objects.filter(uid=uid)
             if one:
-                for _ in one:
-                    _.update_one(token=token)
+                Token.objects(uid=uid).update_one(token=token)
             else:
                 tu = Token(uid=uid, token=token)
                 tu.save()

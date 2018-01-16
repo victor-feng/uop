@@ -355,17 +355,18 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             ]
         rels.extend(r)
     # 添加普通上下层关系
-    r = [
-        dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"])
-        for rel in relations if
-        rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == up_level["model_id"]
-    ]
-    if not r:
+    if up_level:
         r = [
-            dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"])
-            for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
+            dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"])
+            for rel in relations if
+            rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == up_level["model_id"]
         ]
-    rels.extend(r)
+        if not r:
+            r = [
+                dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"])
+                for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
+            ]
+        rels.extend(r)
     Log.logger.info("Analyzed {}th data from crp:{} \n.".format(i["_id"], i))
     Log.logger.info("Analyzed {}th data's relations from crp:{} \n.".format(i["_id"], rels))
     return i, rels
