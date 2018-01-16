@@ -283,7 +283,8 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     raw["baseInfo"] = raw["resource_name"]
     project_level = {
         "instance_id": raw["project_id"],
-        "model_id": project_model["id"]
+        "model_id": project_model["id"],
+        "_id": ""
     }
     tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
     instances.append(tomcat)
@@ -360,7 +361,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         r = [
             dict(
                 rel, start_id = i["_id"],
-                end_instance_id = host_instance_id # i.get("physical_server")
+                end_instance_id = host_instance_id, # i.get("physical_server")
+                end_id=""
             )
             for rel in relations if rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == physical_server_model_id
         ]
@@ -368,7 +370,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             r = [
                 dict(
                     rel, end_id=i["_id"],
-                    start_instance_id=host_instance_id # i.get("physical_server")
+                    start_instance_id=host_instance_id, # i.get("physical_server")
+                    start_id=""
                 )
                 for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == physical_server_model_id
             ]
@@ -376,13 +379,13 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     # 添加普通上下层关系
     if up_level:
         r = [
-            dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"])
+            dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"], end_id=up_level["_id"])
             for rel in relations if
             rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == up_level["model_id"]
         ]
         if not r:
             r = [
-                dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"])
+                dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"], start_id=up_level["_id"])
                 for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
             ]
         rels.extend(r)
