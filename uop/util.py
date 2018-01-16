@@ -10,6 +10,7 @@ import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from uop.models import NetWorkConfig
+from uop.permission.handler import get_role,get_api_permission,method_dict,ApiPermException
 
 
 
@@ -148,11 +149,28 @@ def response_data(code, msg, data):
     }
     return ret
 
-
-def deal_enbedded_data(data):
-    res_list=[]
-    for d in data:
-        d=d.to_json()
-        d=json.loads(d)
-        res_list.append(d)
-    return res_list
+def api_permission_control(request_info):
+    """
+    API权限控制装饰器
+    :param info:
+    :return:
+    """
+    def _access_control(func):
+        def wrap_func(*args, **kwargs):
+            try:
+                endpoint = request_info.endpoint
+                http_method = request_info.method
+                headers = request_info.headers
+                user_id = headers["User-Id"]
+                role = get_role(user_id)
+                Permissions = get_api_permission()
+                res=Permissions[role][endpoint][http_method]
+                if not method_dict[res]:
+                    return jsonify({'error': 'no permission',"code":403})
+                return func(*args, **kwargs)
+            except KeyError:
+                return jsonify({'error': 'no permission',"code":403})
+            except ApiPermException as e:
+                return jsonify({'error': 'api permission control error,error msg %s' % str(e), "code": 500})
+        return wrap_func
+    return _access_control

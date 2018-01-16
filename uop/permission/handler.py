@@ -59,30 +59,3 @@ def get_role(user_id):
         err_msg = "Get role error,error msg is %s" % str(e)
         raise ApiPermException(err_msg)
 
-
-
-def api_permission_control(request_info):
-    """
-    API权限控制装饰器
-    :param info:
-    :return:
-    """
-    def _access_control(func):
-        def wrap_func(*args, **kwargs):
-            try:
-                endpoint = request_info.endpoint
-                http_method = request_info.method
-                headers = request_info.headers
-                user_id = headers["User-Id"]
-                role = get_role(user_id)
-                Permissions = get_api_permission()
-                res=Permissions[role][endpoint][http_method]
-                if not method_dict[res]:
-                    return jsonify({'error': 'no permission',"code":403})
-                return func(*args, **kwargs)
-            except KeyError:
-                return jsonify({'error': 'no permission',"code":403})
-            except ApiPermException as e:
-                return jsonify({'error': 'api permission control error,error msg %s' % str(e), "code": 500})
-        return wrap_func
-    return _access_control
