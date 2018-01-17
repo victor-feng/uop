@@ -243,10 +243,10 @@ class PermManage(Resource):
                     endpoint=perm.get("endpoint"),
                     level=perm.get("level"),
                     parent_id=perm.get("parent_id"),
-                    api_get=perm.get("api_get",0),
-                    api_post=perm.get("api_post",0),
-                    api_put=perm.get("api_put",0),
-                    api_delete=perm.get("api_delete",0),
+                    api_get=perm.get("api_get",'0'),
+                    api_post=perm.get("api_post",'0'),
+                    api_put=perm.get("api_put",'0'),
+                    api_delete=perm.get("api_delete",'0'),
                     isDropdown=perm.get("isDropdown"),
                     menu_index = perm.get("menu_index"),
                     created_time=datetime.datetime.now(),
@@ -280,13 +280,13 @@ class PermManage(Resource):
                     if perm.get("parent_id"):
                         Permission.parent_id = perm.get("parent_id")
                     if perm.get("api_get"):
-                        Permission.api_get = perm.get("api_get",0)
+                        Permission.api_get = perm.get("api_get",'0')
                     if perm.get("api_post"):
-                        Permission.api_post = perm.get("api_post",0)
+                        Permission.api_post = perm.get("api_post",'0')
                     if perm.get("api_put"):
-                        Permission.api_put = perm.get("api_put",0)
+                        Permission.api_put = perm.get("api_put",'0')
                     if perm.get("api_delete"):
-                        Permission.api_delete = perm.get("api_delete",0)
+                        Permission.api_delete = perm.get("api_delete",'0')
                     if str(perm.get("isDropdown")):
                         Permission.isDropdown = perm.get("isDropdown")
                     if perm.get("menu_index"):
@@ -336,10 +336,10 @@ class PermManage(Resource):
                     endpoint=perm.get("endpoint"),
                     level=perm.get("level"),
                     parent_id=perm.get("parent_id"),
-                    api_get=perm.get("api_get",0),
-                    api_post=perm.get("api_post",0),
-                    api_put=perm.get("api_put",0),
-                    api_delete=perm.get("api_delete",0),
+                    api_get=perm.get("api_get",'0'),
+                    api_post=perm.get("api_post",'0'),
+                    api_put=perm.get("api_put",'0'),
+                    api_delete=perm.get("api_delete",'0'),
                     isDropdown=perm.get("isDropdown"),
                     menu_index=perm.get("menu_index"),
                     created_time=datetime.datetime.now(),
