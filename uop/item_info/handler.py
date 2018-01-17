@@ -180,7 +180,7 @@ def get_uid_token(flush=False):
     data_str = json.dumps(data)
     try:
         Log.logger.info("login data:{}".format(data))
-        ret = requests.post(url, data=data_str)
+        ret = requests.post(url, data=data_str, timeout=30)
         Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
@@ -313,12 +313,12 @@ def Aquery(args):
     try:
         if instance_id:
             Log.logger.info("url_instance request data:{}".format(data_instance))
-            ret = requests.post(url_instance, data=data_instance_str)
+            ret = requests.post(url_instance, data=data_instance_str, timeout=60)
             Log.logger.info("url_instance return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id)
         else:
             Log.logger.info("url_list request data:{}".format(data_list))
-            ret = requests.post(url_list, data=data_list_str)
+            ret = requests.post(url_list, data=data_list_str, timeout=60)
             Log.logger.info("url_list return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id, flag=True)
     except Exception as exc:
@@ -396,11 +396,11 @@ def get_entity(data):
     data_str = json.dumps(req_data)
     entity_info = {}
     try:
-        ret = requests.post(url, data=data_str).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] != 0:
             req_data["uid"], req_data["code"] = get_uid_token(True)
             data_str = json.dumps(req_data)
-            ret = requests.post(url, data=data_str).json()
+            ret = requests.post(url, data=data_str, timeout=60).json()
         # Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
         entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
@@ -441,7 +441,7 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     try:
         Log.logger.info("graph_data request: {}".format(data))
-        ret = requests.post(url, data=data_str).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
@@ -531,7 +531,7 @@ def fix_instance(args):
     data_str = json.dumps(data)
     try:
         Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        instance = requests.post(url, data=data_str).json()
+        instance = requests.post(url, data=data_str, timeout=60).json()
         Log.logger.info("post return json:{}".format(instance))
         instance = instance["data"]["instance"]
         Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ result:{}".format(instance))

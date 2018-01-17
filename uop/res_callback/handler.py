@@ -254,7 +254,7 @@ def crp_data_cmdb(args):
     ret = []
     try:
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        ret = requests.post(url, data=data_str).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
             Log.logger.debug("[CMDB2.0 create graph SUCCESS]")
         else:
@@ -288,7 +288,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     }
     tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
     instances.append(tomcat)
-    relations.append(r)
+    relations.extend(r)
 
     # docker数据解析
     for ct in raw["container"]:
@@ -299,7 +299,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             ins["baseInfo"] = ins.get("instance_name")
             i, r = format_data_cmdb(relations_model, ins, docker_model, attach, len(instances), tomcat, physical_server_model_id)
             instances.append(i)
-            relations.append(r)
+            relations.extend(r)
 
     # 中间件、虚拟机数据解析
     virtual_server_model = filter(lambda x: x["code"] == "virtual_device", models_list)[0]
@@ -316,7 +316,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         }
         up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
         instances.append(up_db)
-        relations.append(r)
+        relations.extend(r)
         for index, db in enumerate(db_contents["instance"]):
             db["baseInfo"] = db.get("instance_name")
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
@@ -423,7 +423,7 @@ def get_relations(view_id):
         }
         data_str = json.dumps(data)
         try:
-            ret = requests.post(url, data=data_str).json()
+            ret = requests.post(url, data=data_str, timeout=60).json()
             if ret["code"] == 0:
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
                 view = ViewCache(view_id=view_id, content=json.dumps(relations))
@@ -431,7 +431,7 @@ def get_relations(view_id):
             elif ret["code"] == 121:
                 data["uid"], data["token"] = get_uid_token(True)
                 data_str = json.dumps(data)
-                ret = requests.post(url, data=data_str).json()
+                ret = requests.post(url, data=data_str, timeout=60).json()
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
                 view = ViewCache(view_id=view_id, content=json.dumps(relations))
                 view.save()
