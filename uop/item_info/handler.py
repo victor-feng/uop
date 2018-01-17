@@ -186,9 +186,9 @@ def get_uid_token(flush=False):
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
             one = Token.objects.filter(uid=uid)
             if one:
-                Token.objects(uid=uid).update_one(token=token)
+                Token.objects(uid=uid).update_one(token=token, token_date=TimeToolkit.local2utctime(datetime.now()))
             else:
-                tu = Token(uid=uid, token=token)
+                tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctime(datetime.now()))
                 tu.save()
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))

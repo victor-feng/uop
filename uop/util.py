@@ -138,6 +138,7 @@ class TimeToolkit(object):
             utc_delta = delta + timedelta(hours=-8)
         return utc_delta
 
+
 def response_data(code, msg, data):
     ret = {
         'code': code,
@@ -148,3 +149,11 @@ def response_data(code, msg, data):
     }
     return ret
 
+
+def deal_enbedded_data(data):
+    res_list=[]
+    for d in data:
+        d=d.to_json()
+        d=json.loads(d)
+        res_list.append(d)
+    return res_list

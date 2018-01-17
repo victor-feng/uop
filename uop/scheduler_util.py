@@ -10,7 +10,7 @@ from uop.models import ResourceModel, Deployment, Cmdb, ViewCache
 from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
-from uop.util import async
+from uop.util import async, TimeToolkit
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
@@ -188,14 +188,14 @@ def get_one_view(uid, token, view_id):
         ret = requests.post(url, data=data_str).json()
         if ret["code"] == 0:
             relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-            view = ViewCache(view_id=view_id, content=json.dumps(relations))
+            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
             view.save()
         elif ret["code"] == 121:
             data["uid"], data["token"] = get_uid_token(True)
             data_str = json.dumps(data)
             ret = requests.post(url, data=data_str).json()
             relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-            view = ViewCache(view_id=view_id, content=json.dumps(relations))
+            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
             view.save()
         else:
             Log.logger.info("get_relations data:{}".format(ret))

@@ -6,7 +6,7 @@ import requests
 import datetime
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache
 from uop.deployment.handler import attach_domain_ip
-from uop.util import async, response_data
+from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
 from config import configs, APP_ENV
 
@@ -426,14 +426,14 @@ def get_relations(view_id):
             ret = requests.post(url, data=data_str, timeout=60).json()
             if ret["code"] == 0:
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-                view = ViewCache(view_id=view_id, content=json.dumps(relations))
+                view = ViewCache(view_id=view_id, content=json.dumps(relations, cache_date=TimeToolkit.local2utctime(datetime.datetime.now())))
                 view.save()
             elif ret["code"] == 121:
                 data["uid"], data["token"] = get_uid_token(True)
                 data_str = json.dumps(data)
                 ret = requests.post(url, data=data_str, timeout=60).json()
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-                view = ViewCache(view_id=view_id, content=json.dumps(relations))
+                view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
                 view.save()
             else:
                 Log.logger.info("get_relations data:{}".format(ret))

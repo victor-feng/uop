@@ -5,22 +5,13 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
-def local2utctime(dt, duration=None, flag=None):
-    if duration:
-        delta = dt + relativedelta(months=int(duration))
-    else:
-        delta = dt
-    if flag:
-        utc_delta = delta
-    else:
-        utc_delta = delta + timedelta(hours=-8)
-    return utc_delta
+
 
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
     content = db.StringField(default="")
-    cache_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
+    cache_date = db.DateTimeField()
     meta = {
         'indexes': [
             'view_id',
@@ -35,7 +26,7 @@ class ViewCache(db.Document):
 class Token(db.Document):
     token = db.StringField()
     uid = db.IntField()
-    token_date = db.DateTimeField(auto_now_add=True, default=local2utctime(datetime.now()))
+    token_date = db.DateTimeField()
     meta = {
         'indexes': [
             'uid',
