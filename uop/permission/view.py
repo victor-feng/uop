@@ -279,13 +279,13 @@ class PermManage(Resource):
                         Permission.level = perm.get("level")
                     if perm.get("parent_id"):
                         Permission.parent_id = perm.get("parent_id")
-                    if perm.get("api_get"):
+                    if str(perm.get("api_get")):
                         Permission.api_get = perm.get("api_get",'0')
-                    if perm.get("api_post"):
+                    if str(perm.get("api_post")):
                         Permission.api_post = perm.get("api_post",'0')
-                    if perm.get("api_put"):
+                    if str(perm.get("api_put")):
                         Permission.api_put = perm.get("api_put",'0')
-                    if perm.get("api_delete"):
+                    if str(perm.get("api_delete")):
                         Permission.api_delete = perm.get("api_delete",'0')
                     if str(perm.get("isDropdown")):
                         Permission.isDropdown = perm.get("isDropdown")
