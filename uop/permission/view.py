@@ -721,9 +721,13 @@ class RoleManage(Resource):
         try:
             Users=UserInfo.objects.filter(role=args.name)
             Role = RoleInfo.objects.get(name=args.name)
+            Permissions = PermissionList.objects.filter(role=args.name)
             code = 200
             if not Users:
                 Role.delete()
+                #删除这个角色所有的权限
+                for perm in Permissions:
+                    perm.delete()
                 msg = "Delete role success"
                 data = "Success"
             else:
