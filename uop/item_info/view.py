@@ -5,13 +5,12 @@ import requests
 import datetime
 from uop.log import Log
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
-from flask import current_app, jsonify,request
+from flask import current_app, jsonify
 from uop.item_info import iteminfo_blueprint
 from uop.item_info.errors import user_errors
 from uop.models import ItemInformation, ResourceModel
 from uop.item_info.handler import *
 from config import configs, APP_ENV
-from uop.permission.handler import api_permission_control
 from uop.util import response_data
 
 import sys
@@ -23,7 +22,6 @@ iteminfo_api = Api(iteminfo_blueprint, errors=user_errors)
 null = "null"
 
 class ItemInfo(Resource):
-    # @api_permission_control(request)
     @classmethod
     def get(cls,item_id):
         res_list = []
@@ -110,7 +108,6 @@ class ItemInfo(Resource):
         }
         return ret, code
 
-    # @api_permission_control(request)
     @classmethod
     def put(cls,item_id):
         ret = {}
@@ -158,7 +155,6 @@ class ItemInfo(Resource):
 
         return ret, code
 
-    # @api_permission_control(request)
     @classmethod
     def delete(cls, item_id):
         ret = {}
@@ -197,7 +193,6 @@ class ItemInfo(Resource):
 
 
 class ItemPostInfo(Resource):
-    # @api_permission_control(request)
     def post(self):
         # req = request
         ret = {}
@@ -276,7 +271,6 @@ class ItemPostInfo(Resource):
 
 
 class ItemInfoLoacl(Resource):
-    # @api_permission_control(request)
     def get(self,user_id):
         code = 200
         res_list = []
@@ -345,8 +339,6 @@ class BusinessProject(Resource):
     '''
     -业务模块工程-    资源视图
     '''
-
-    # @api_permission_control(request)
     def get(self):
         '''
         根据？name=参数，返回相应的CMDB仓库数据
@@ -373,7 +365,6 @@ class BusinessProject(Resource):
             Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
         return jsonify(response)
 
-    # @api_permission_control(request)
     def post(self):
         '''
         调用插入子图，插入 业务|模块|工程
@@ -391,7 +382,8 @@ class BusinessProject(Resource):
         parser.add_argument('token', type=str)
         args = parser.parse_args()
         try:
-            graph_data = subgrath_data(args)
+            graph_data = []
+            # graph_data = subgrath_data(args)
             if isinstance(graph_data, str):
                 response["code"] = 202
                 response["result"]["msg"] = graph_data
@@ -403,7 +395,6 @@ class BusinessProject(Resource):
             Log.logger.error(u"添加业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
 
-    # @api_permission_control(request)
     def put(self):
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
@@ -422,7 +413,6 @@ class BusinessProject(Resource):
             Log.logger.error(u"修改业务模块工程出错:{}".format(str(exc)))
         return jsonify(response)
 
-    # @api_permission_control(request)
     def delete(self):
         '''
         批量删除实例
@@ -443,7 +433,6 @@ class BusinessProject(Resource):
 
 
 class CmdbModels(Resource):
-    # @api_permission_control(request)
     def get(self):
         '''
         filters 参数为空时会去cmdb2.0获取最新的实体属性信息
