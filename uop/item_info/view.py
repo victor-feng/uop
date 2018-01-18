@@ -400,7 +400,7 @@ class BusinessProject(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('model_id', type=str)  # 修改的实体id
         parser.add_argument('instance_id', type=str)  # 修改的实例id
-        parser.add_argument('property', type=list, location='json') #改后的属性
+        parser.add_argument('property', type=list, location='json') # 改后的属性
         parser.add_argument('uid', type=str)
         parser.add_argument('token', type=str)
         args = parser.parse_args()
