@@ -254,7 +254,7 @@ def crp_data_cmdb(args):
     ret = []
     try:
         Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
-        ret = requests.post(url, data=data_str, timeout=60).json()
+        # ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
             Log.logger.debug("[CMDB2.0 create graph SUCCESS]")
         else:
@@ -349,6 +349,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 lambda property, item, attach:
                 (
                     {
+                        "id": pro["id"],
                         "code": pro["code"],
                         "value": item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
                     }
