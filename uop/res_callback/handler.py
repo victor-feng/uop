@@ -285,7 +285,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     raw["baseInfo"] = raw["resource_name"]
     project_level = {
         "instance_id": raw["project_id"],
-        "model_id": project_model["id"],
+        "model_id": project_model["entity_id"],
         "_id": ""
     }
     tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
