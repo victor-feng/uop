@@ -277,7 +277,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     '''
     docker_model = filter(lambda x:x["code"] == "container", models_list)[0]
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
-    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["id"]
+    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
     project_model = filter(lambda x: x["code"] == "project", models_list)[0]
     instances, relations = [], []
 
@@ -368,7 +368,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             return ""
 
     i = {
-        "model_id": model["id"],
+        "model_id": model["entity_id"],
         "instance_id": "",
         "_id": index + 1,
         'parameters': list(
@@ -376,14 +376,14 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 lambda property, item, attach:
                 (
                     {
-                        "id": pro["id"],
+                        # "id": pro["id"],
                         "value_type": pro["value_type"],
                         "code": pro["code"],
                         "value": judge_value_format(item,pro)
                     }
                     for pro in property
                 )
-            )(model["property"], item, attach)
+            )(model["parameters"], item, attach)
         )
     }
     if i.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
