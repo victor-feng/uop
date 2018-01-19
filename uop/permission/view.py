@@ -387,8 +387,6 @@ class AllPermManage(Resource):
         parser.add_argument('perm_id', type=str, location='args')
         parser.add_argument('name', type=str, location='args')
         parser.add_argument('perm_type', type=str, location='args')
-        parser.add_argument('page_num', type=int, location='args')
-        parser.add_argument('page_size', type=int, location='args')
         args = parser.parse_args()
         condition = {}
         data={}
@@ -401,13 +399,7 @@ class AllPermManage(Resource):
         if args.perm_id:
             condition["perm_id"] = args.perm_id
         try:
-            total_count = PermissionList.objects.filter(**condition).count()
-            if args.page_num and args.page_size:
-                skip_count = (args.page_num - 1) * args.page_size
-                Permissions =PermissionList.objects.filter(**condition).order_by('menu_index').skip(skip_count).limit(
-                    args.page_size)
-            else:
-                Permissions = PermissionList.objects.filter(**condition).order_by('menu_index')
+            Permissions = PermissionList.objects.filter(**condition).order_by('menu_index')
             for permission in Permissions:
                 res={}
                 res["perm_id"] = permission.perm_id
@@ -431,7 +423,6 @@ class AllPermManage(Resource):
                 res["isDropdown"] = permission.isDropdown
                 res["menu_index"] = permission.menu_index
                 res_list.append(res)
-            data["total_count"] = total_count
             data["res_list"] = res_list
             code = 200
             msg = "Get permission info success"
