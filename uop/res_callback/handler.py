@@ -295,7 +295,8 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     # docker数据解析
     for ct in raw["container"]:
         attach = {
-            "image": ct["image_url"]
+            "image": ct.get("image_url", ""),
+            "create_date": raw.get("created_time", "")
         }
         for index, ins in enumerate(ct["instance"]):
             ins["baseInfo"] = ins.get("instance_name")
@@ -309,12 +310,14 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         Log.logger.info("now analyze {} data".format(db_name))
         db_model = filter(lambda x: x["code"] == db_name, models_list)[0] # db_name 设置保持与cmdb一致
         attach = {
-            "version": db_contents["version"]
+            "version": db_contents["version"],
+            "create_date": raw.get("created_time", "")
         }
         virtual_server = {
             "mem": db_contents["mem"],
             "cpu": db_contents["cpu"],
-            "disk": db_contents["disk"]
+            "disk": db_contents["disk"],
+            "create_date": raw.get("created_time", "")
         }
         up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
         instances.append(up_db)
@@ -343,25 +346,26 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     rels = []
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
 
-    def judge_value_format(item, pro):
+    def judge_value_format(item, pro, attach):
         value_type = {
             "string": "",
             "int": 0,
             "double": 0
         }
-        if value_type.get(pro["value_type"]):
-            if item.get(pro["code"]):
+        if pro["value_type"] in value_type.keys():
+            one = item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
+            if one.get(pro["code"]):
                 if pro["value_type"] == "string":
-                    return str(item.get(pro["code"]))
+                    return str(one.get(pro["code"]))
                 elif pro["value_type"] == "int":
-                    return int(item.get(pro["code"]))
+                    return int(one.get(pro["code"]))
                 else: # 时间戳
                     try:
-                        time_str = item.get(pro["code"]).split('.')[0]
+                        time_str = one.get(pro["code"]).split('.')[0]
                         time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
                         return TimeToolkit.local2utctime(time_date)
                     except Exception as exc:
-                        return str(time.time()).split(".")[0]
+                        return int(str(time.time()).split(".")[0])
             else:
                 return value_type.get(pro["value_type"]) #统一空值类型
         else:
@@ -379,7 +383,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                         # "id": pro["id"],
                         "value_type": pro["value_type"],
                         "code": pro["code"],
-                        "value": judge_value_format(item,pro)
+                        "value": judge_value_format(item, pro, attach)
                     }
                     for pro in property
                 )
