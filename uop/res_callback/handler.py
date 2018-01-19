@@ -4,6 +4,7 @@ import json
 import copy
 import requests
 import datetime
+import time
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data, TimeToolkit
@@ -236,9 +237,10 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 def crp_data_cmdb(args):
     assert(isinstance(args, dict))
     Log.logger.info("###data:{}".format(args))
-    models_list = get_entity_from_file(args)
+    # models_list = get_entity_from_file(args)
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations("B7") #
+    models_list = data["entity"]
     instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
     data = {
@@ -340,6 +342,31 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     '''
     rels = []
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
+
+    def judge_value_format(item, pro):
+        value_type = {
+            "string": "",
+            "int": 0,
+            "double": 0
+        }
+        if value_type.get(pro["value_type"]):
+            if item.get(pro["code"]):
+                if pro["value_type"] == "string":
+                    return str(item.get(pro["code"]))
+                elif pro["value_type"] == "int":
+                    return int(item.get(pro["code"]))
+                else: # 时间戳
+                    try:
+                        time_str = item.get(pro["code"]).split('.')[0]
+                        time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+                        return TimeToolkit.local2utctime(time_date)
+                    except Exception as exc:
+                        return str(time.time()).split(".")[0]
+            else:
+                return value_type.get(pro["value_type"]) #统一空值类型
+        else:
+            return ""
+
     i = {
         "model_id": model["id"],
         "instance_id": "",
@@ -350,8 +377,9 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 (
                     {
                         "id": pro["id"],
+                        "value_type": pro["value_type"],
                         "code": pro["code"],
-                        "value": item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
+                        "value": judge_value_format(item,pro)
                     }
                     for pro in property
                 )
@@ -409,7 +437,8 @@ def get_relations(view_id):
     relations = []
     data  = {}
     for view in views:
-        relations = json.loads(view.content)
+        relations = json.loads(view.relation)
+        entity = json.loads(view.entity)
     if not relations:
         uid, token = get_uid_token()
         url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
@@ -426,21 +455,24 @@ def get_relations(view_id):
         try:
             ret = requests.post(url, data=data_str, timeout=60).json()
             if ret["code"] == 0:
-                relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-                view = ViewCache(view_id=view_id, content=json.dumps(relations, cache_date=TimeToolkit.local2utctime(datetime.datetime.now())))
+                relations = ret["data"][0]["relation"]  # 获取视图关系实体信息
+                entity = ret["data"][0]["entity"]  # 获取视图实体信息
+                view = ViewCache(view_id=view_id, relation=json.dumps(relations), entity=json.dumps(entity), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
                 view.save()
             elif ret["code"] == 121:
                 data["uid"], data["token"] = get_uid_token(True)
                 data_str = json.dumps(data)
                 ret = requests.post(url, data=data_str, timeout=60).json()
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-                view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
+                entity = ret["data"][0]["entity"]  # 获取视图实体信息
+                view = ViewCache(view_id=view_id, relation=json.dumps(relations), entity=json.dumps(entity), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
                 view.save()
             else:
                 Log.logger.info("get_relations data:{}".format(ret))
         except Exception as exc:
             Log.logger.error("get_relations error: {}".format(str(exc)))
     data["relations"] = relations
+    data["entity"] = entity
     return data
 
 

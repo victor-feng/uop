@@ -10,7 +10,8 @@ db = MongoEngine()
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
-    content = db.StringField(default="")
+    relation = db.StringField(default="")
+    entity = db.StringField(default="")
     cache_date = db.DateTimeField()
     meta = {
         'indexes': [
