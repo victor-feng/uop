@@ -354,14 +354,14 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         }
         if pro["value_type"] in value_type.keys():
             one = item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
-            if one.get(pro["code"]):
+            if one:
                 if pro["value_type"] == "string":
-                    return str(one.get(pro["code"]))
+                    return str(one)
                 elif pro["value_type"] == "int":
-                    return int(one.get(pro["code"]))
+                    return int(one)
                 else: # 时间戳
                     try:
-                        time_str = one.get(pro["code"]).split('.')[0]
+                        time_str = one.split('.')[0]
                         time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
                         return TimeToolkit.local2utctime(time_date)
                     except Exception as exc:
