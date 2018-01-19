@@ -671,11 +671,15 @@ class RoleManage(Resource):
         parser.add_argument('description', type=str)
         args = parser.parse_args()
         try:
-            Users = UserInfo.objects.filter(role=args.name)
-            Role = RoleInfo.objects.get(name=args.name)
-            Role_obj = RoleInfo.objects.filter(name=args.new_name)
+            name=args.name
+            new_name=args.new_name
+            description=args.description
+            Users = UserInfo.objects.filter(role=name)
+            Role = RoleInfo.objects.get(name=name)
+            Role_obj = RoleInfo.objects.filter(name=new_name)
+            Permissions = PermissionList.objects.filter(role=name)
             #新名字和旧名字不能相同
-            if args.name == args.new_name:
+            if name == new_name:
                 code=200
                 msg = "Update role Failed.The new name is the same as the old name"
                 data = "Failed"
@@ -689,17 +693,23 @@ class RoleManage(Resource):
                 ret = response_data(code, msg, data)
                 return ret, code
             if not Users:
-                if args.new_name:
-                    Role.name = args.new_name
-                if args.description:
-                    Role.description = args.description
+                if new_name:
+                    Role.name = new_name
+                    for perm in Permissions:
+                        perm.role = new_name
+                        perm.save()
+                if description:
+                    Role.description = description
             else:
-                if args.description:
-                    Role.description = args.description
-                if args.new_name:
-                    Role.name = args.new_name
+                if description:
+                    Role.description = description
+                if new_name:
+                    Role.name = new_name
+                    for perm in Permissions:
+                        perm.role = new_name
+                        perm.save()
                     for user in Users:
-                        user.role = args.new_name
+                        user.role = new_name
                         user.save()
             Role.updated_time=datetime.datetime.now()
             Role.save()
