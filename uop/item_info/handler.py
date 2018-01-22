@@ -422,10 +422,10 @@ def subgrath_data(args):
     data = get_relations(CMDB2_VIEWS["3"][0])
     if not uid and not token:
         data["uid"], data["token"] = get_uid_token()
-    models_list = get_relations(CMDB2_VIEWS["2"][0]) # B6
+    models_list = data["entity"]
     if isinstance(models_list, str):
         return models_list
-    model = filter(lambda x:x["id"] == next_model_id, models_list)[0]
+    model = filter(lambda x:x["entity_id"] == next_model_id, models_list)[0]
     item = {}
     nouse = map(lambda pro: item.setdefault(pro["code"], pro["value"]), property)
     up_level = {
