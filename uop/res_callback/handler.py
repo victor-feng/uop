@@ -353,7 +353,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             "double": 0
         }
         if str(pro["value_type"]) in value_type.keys():
-            one = item.get(str(pro["code"])) if item.get(pro["code"]) else attach.get(str(pro["code"]))
+            one = item.get(str(pro["code"])) if item.get(str(pro["code"])) else attach.get(str(pro["code"]))
             if one:
                 if str(pro["value_type"]) == "string":
                     return str(one)
