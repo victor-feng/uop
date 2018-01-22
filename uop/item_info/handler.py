@@ -312,14 +312,14 @@ def Aquery(args):
     data_instance_str = json.dumps(data_instance)
     try:
         if instance_id:
-            Log.logger.info("url_instance request data:{}".format(data_instance))
+            # Log.logger.info("url_instance request data:{}".format(data_instance))
             ret = requests.post(url_instance, data=data_instance_str, timeout=60)
-            Log.logger.info("url_instance return:{}".format(ret.json()))
+            # Log.logger.info("url_instance return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id)
         else:
-            Log.logger.info("url_list request data:{}".format(data_list))
+            # Log.logger.info("url_list request data:{}".format(data_list))
             ret = requests.post(url_list, data=data_list_str, timeout=60)
-            Log.logger.info("url_list return:{}".format(ret.json()))
+            # Log.logger.info("url_list return:{}".format(ret.json()))
             data = analyze_data(ret.json()["data"], model_id, flag=True)
     except Exception as exc:
         Log.logger.error("Aquery error:{}".format(str(exc)))
