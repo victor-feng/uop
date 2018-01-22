@@ -175,7 +175,7 @@ def get_uid_token(flush=False):
         "username": username,
         "password": password,
         "sign": "",
-        "timestamp": TimeToolkit.local2utctimestamp(datetime.now())
+        "timestamp": TimeToolkit.local2utctime(datetime.now())
     }
     data_str = json.dumps(data)
     try:
@@ -188,7 +188,7 @@ def get_uid_token(flush=False):
             if one:
                 Token.objects(uid=uid).update_one(token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
             else:
-                tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctime(datetime.now()))
+                tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
                 tu.save()
     except Exception as exc:
         Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
