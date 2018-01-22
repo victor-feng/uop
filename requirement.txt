@@ -25,4 +25,4 @@ ldap3==2.2.4
 python-ldap==2.4.32
 flask_apscheduler==1.7.0
 IPy==0.75
-
+XlsxWriter=1.0.2
