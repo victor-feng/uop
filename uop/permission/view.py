@@ -683,25 +683,18 @@ class RoleManage(Resource):
                 data = "Failed"
                 ret = response_data(code, msg, data)
                 return ret, code
-            if not Users:
-                if new_name:
-                    Role.name = new_name
-                    for perm in Permissions:
-                        perm.role = new_name
-                        perm.save()
-                if description:
-                    Role.description = description
-            else:
-                if description:
-                    Role.description = description
-                if new_name:
-                    Role.name = new_name
-                    for perm in Permissions:
-                        perm.role = new_name
-                        perm.save()
-                    for user in Users:
-                        user.role = new_name
-                        user.save()
+            if description:
+                Role.description = description
+            if new_name:
+                Role.name = new_name
+                #修改权限表里的角色
+                for perm in Permissions:
+                    perm.role = new_name
+                    perm.save()
+                #更新用户表里的角色
+                for user in Users:
+                    user.role = new_name
+                    user.save()
             Role.updated_time=datetime.datetime.now()
             Role.save()
             code = 200
