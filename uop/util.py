@@ -120,11 +120,7 @@ class TimeToolkit(object):
             utc_delta = delta
         else:
             utc_delta = delta + timedelta(hours=-8)
-        print utc_delta
-        utc_delta_tuple = utc_delta.timetuple()
-        print utc_delta_tuple
-        utc_timestramp = long(time.mktime(utc_delta_tuple))
-        return utc_timestramp
+        return utc_delta
 
     @staticmethod
     def local2utctime(dt, flag=None):

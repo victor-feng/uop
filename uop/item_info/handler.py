@@ -186,7 +186,7 @@ def get_uid_token(flush=False):
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
             one = Token.objects.filter(uid=uid)
             if one:
-                Token.objects(uid=uid).update_one(token=token, token_date=TimeToolkit.local2utctime(datetime.now()))
+                Token.objects(uid=uid).update_one(token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
             else:
                 tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctime(datetime.now()))
                 tu.save()

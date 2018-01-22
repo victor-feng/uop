@@ -355,9 +355,9 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         if str(pro["value_type"]) in value_type.keys():
             one = item.get(str(pro["code"])) if item.get(pro["code"]) else attach.get(str(pro["code"]))
             if one:
-                if pro["value_type"] == "string":
+                if str(pro["value_type"]) == "string":
                     return str(one)
-                elif pro["value_type"] == "int":
+                elif str(pro["value_type"]) == "int":
                     return int(one)
                 else: # 时间戳
                     try:
@@ -367,7 +367,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                     except Exception as exc:
                         return int(str(time.time()).split(".")[0])
             else:
-                return value_type.get(pro["value_type"]) #统一空值类型
+                return value_type.get(str(pro["value_type"])) #统一空值类型
         else:
             return ""
 
