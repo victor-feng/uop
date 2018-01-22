@@ -953,7 +953,7 @@ class GetMyResourcesInfo(Resource):
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
         if action == "Download":
-            data=ret.json().get("object_list",[])
+            data=ret.json()['res'].get("object_list",[])
             Log.logger.info("data--------------------------------------%s",data)
             Log.logger.info("data-------------------type-------------------%s", type(data))
             msg,excel_name=deal_myresource_to_excel(data)
