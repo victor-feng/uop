@@ -952,7 +952,7 @@ class GetMyResourcesInfo(Resource):
                                                      resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret))
-        Log.logger.info("ret:{}".format(ret.json()))
+        #Log.logger.info("ret:{}".format(ret.json()))
         if action == "Download":
             result=ret.json().get('result',{})
             res = result.get('res', {})
