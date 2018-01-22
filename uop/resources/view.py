@@ -947,8 +947,7 @@ class GetMyResourcesInfo(Resource):
         action = request.args.get('action')
         ip = request.args.get('ip',"")
         result_list = []
-        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
-            &page_count={}&env={}&user_id={}&department={}&ip={}".format(resource_type, resource_name, item_name, start_time, end_time,
+        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(resource_type, resource_name, item_name, start_time, end_time,
                                                      resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret))
