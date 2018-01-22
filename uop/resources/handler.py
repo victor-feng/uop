@@ -107,7 +107,7 @@ def deal_myresource_to_excel(data):
         download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
         if not os.path.exists(download_dir):
             os.makedirs(download_dir)
-        excel = "%s/%s.xlsx" % (UPLOAD_FOLDER,excel_name)
+        excel = "%s/%s.xlsx" % (download_dir,excel_name)
         workbook = xlsxwriter.Workbook(excel)
         worksheetResource = workbook.add_worksheet(u'我的资源')
         worksheetResource.set_column(0, 31, 18)
