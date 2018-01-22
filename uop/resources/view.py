@@ -953,9 +953,11 @@ class GetMyResourcesInfo(Resource):
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
         if action == "Download":
-            data=ret.json()['res'].get("object_list",[])
-            Log.logger.info("data--------------------------------------%s",data)
-            Log.logger.info("data-------------------type-------------------%s", type(data))
+            result=ret.json().get('result',{})
+            res = result.get('res', {})
+            data=res.get("object_list",[])
+            Log.logger.info("data--------------------------%s",data)
+            Log.logger.info("data---------length-----------------%s", len(data))
             msg,excel_name=deal_myresource_to_excel(data)
             if msg == "success":
                 download_dir = UPLOAD_FOLDER
