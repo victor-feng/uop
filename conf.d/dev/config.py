@@ -30,6 +30,7 @@ class DevelopmentConfig(BaseConfig):
     }
     CMDB_URL = "http://cmdb-dev.syswin.com/"
     CMDB2_URL = "http://cmdb2-test.syswin.com/"
+    host_instance_id = "2a4d89e3e48b471da0ea41c1"
     CMDB2_OPEN_USER = "uop"
     CMDB2_VIEWS = {
         "1": ("B7", u"工程 --> 物理机"),

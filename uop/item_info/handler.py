@@ -422,7 +422,7 @@ def subgrath_data(args):
     data = get_relations(CMDB2_VIEWS["3"][0])
     if not uid and not token:
         data["uid"], data["token"] = get_uid_token()
-    models_list = get_entity_from_file(data)
+    models_list = get_relations(CMDB2_VIEWS["2"][0]) # B6
     if isinstance(models_list, str):
         return models_list
     model = filter(lambda x:x["id"] == next_model_id, models_list)[0]
@@ -435,13 +435,14 @@ def subgrath_data(args):
     i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
     data.pop("relations")
     data["data"] = {
-        "instance":[i],
-        "relation":r
+        "instance": [i],
+        "relation": r
     }
     data_str = json.dumps(data)
+    ret = []
     try:
         Log.logger.info("graph_data request: {}".format(data))
-        ret = requests.post(url, data=data_str, timeout=60).json()
+        # ret = requests.post(url, data=data_str, timeout=60).json()
         Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
