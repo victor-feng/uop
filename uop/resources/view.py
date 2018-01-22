@@ -959,8 +959,8 @@ class GetMyResourcesInfo(Resource):
             if msg == "success":
                 download_dir = os.path.join(UPLOAD_FOLDER,'excel')
                 path=os.path.join(download_dir, excel_name)
-                #if os.path.isfile(path):
-                #return send_from_directory(download_dir,excel_name, as_attachment=True)
+                if os.path.isfile(path):
+                    send_from_directory(download_dir,excel_name, as_attachment=True)
                 ret = {
                     'code': 200,
                     'msg': msg,
