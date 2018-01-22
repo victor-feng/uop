@@ -12,7 +12,7 @@ from uop.log import Log
 from config import APP_ENV, configs
 import  xlsxwriter
 import uuid
-import sys
+import sys,os
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -104,6 +104,9 @@ def to_unicode(value):
 def deal_myresource_to_excel(data):
     try:
         excel_name="myresource" + str(uuid.uuid1())
+        download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
+        if not os.path.exists(download_dir):
+            os.makedirs(download_dir)
         excel = "%s/%s.xlsx" % (UPLOAD_FOLDER,excel_name)
         workbook = xlsxwriter.Workbook(excel)
         worksheetResource = workbook.add_worksheet(u'我的资源')
