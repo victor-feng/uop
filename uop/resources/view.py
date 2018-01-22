@@ -957,13 +957,21 @@ class GetMyResourcesInfo(Resource):
             data=res.get("object_list",[])
             msg,excel_name=deal_myresource_to_excel(data)
             if msg == "success":
-                download_dir = UPLOAD_FOLDER
-                if os.path.isfile(os.path.join(download_dir, excel_name)):
-                    return send_from_directory(download_dir,excel_name, as_attachment=True)
+                download_dir = os.path.join(UPLOAD_FOLDER,'excel')
+                path=os.path.join(download_dir, excel_name)
+                #if os.path.isfile(path):
+                #return send_from_directory(download_dir,excel_name, as_attachment=True)
+                ret = {
+                    'code': 200,
+                    'msg': msg,
+                    'path':path,
+                }
+                return ret, 400
             else:
                 ret = {
                     'code': 400,
-                    'msg': msg
+                    'msg': msg,
+                    'path':'null'
                 }
                 return ret,400
         else:
