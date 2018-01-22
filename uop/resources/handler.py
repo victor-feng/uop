@@ -125,11 +125,7 @@ def deal_myresource_to_excel(data):
         return "success",excel_name
     except Exception as e:
         err_msg= "deal my resource to excel error: %s" % str(e)
-        return  err_msg
-
-
-
-
+        return  err_msg,excel_name
 
 def deal_data(data):
     res_list=[]
