@@ -352,8 +352,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             "int": 0,
             "double": 0
         }
-        if pro["value_type"] in value_type.keys():
-            one = item.get(pro["code"]) if item.get(pro["code"]) else attach.get(pro["code"])
+        if str(pro["value_type"]) in value_type.keys():
+            one = item.get(str(pro["code"])) if item.get(pro["code"]) else attach.get(str(pro["code"]))
             if one:
                 if pro["value_type"] == "string":
                     return str(one)
@@ -381,8 +381,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 (
                     {
                         # "id": pro["id"],
-                        "value_type": pro["value_type"],
-                        "code": pro["code"],
+                        "value_type": str(pro["value_type"]),
+                        "code": str(pro["code"]),
                         "value": judge_value_format(item, pro, attach)
                     }
                     for pro in property
