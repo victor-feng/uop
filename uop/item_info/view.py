@@ -383,7 +383,7 @@ class BusinessProject(Resource):
         args = parser.parse_args()
         try:
             graph_data = []
-            # graph_data = subgrath_data(args)
+            graph_data = subgrath_data(args)
             if isinstance(graph_data, str):
                 response["code"] = 202
                 response["result"]["msg"] = graph_data
