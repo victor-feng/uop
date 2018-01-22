@@ -104,7 +104,7 @@ def to_unicode(value):
 def deal_myresource_to_excel(data):
     try:
         excel_name="myresource" + str(uuid.uuid1())
-        excel = "%s/%s.xlsx" % (configs[APP_ENV],excel_name)
+        excel = "%s/%s.xlsx" % (UPLOAD_FOLDER,excel_name)
         workbook = xlsxwriter.Workbook(excel)
         worksheetResource = workbook.add_worksheet(u'我的资源')
         worksheetResource.set_column(0, 31, 18)
