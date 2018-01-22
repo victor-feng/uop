@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
 import requests
+import os
 import copy
 import time
 import random
 from uop.log import Log
-from flask import request, make_response, current_app
+from flask import request,send_from_directory, make_response, current_app
 from flask import redirect
 from flask import jsonify
 import uuid
@@ -23,11 +24,13 @@ from uop.util import get_CRP_url
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
+from uop.resources.handler import deal_myresource_to_excel
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CRP_URL = configs[APP_ENV].CRP_URL
+UPLOAD_FOLDER=configs[APP_ENV].UPLOAD_FOLDER
 # TODO: move to global conf
 dns_env = {'develop': '172.28.5.21', 'test': '172.28.18.212'}
 resources_api = Api(resources_blueprint, errors=resources_errors)
@@ -941,6 +944,7 @@ class GetMyResourcesInfo(Resource):
         env = request.args.get('env', "")
         department = request.args.get('department', "")
         page_count = request.args.get('page_count', 10)
+        action = request.args.get('action')
         ip = request.args.get('ip',"")
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}\
@@ -948,7 +952,21 @@ class GetMyResourcesInfo(Resource):
                                                      resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
-        return ret.json()
+        if action == "Download":
+            data=ret.json().get("object_list",[])
+            msg,excel_name=deal_myresource_to_excel(data)
+            if msg == "success":
+                download_dir = UPLOAD_FOLDER
+                if os.path.isfile(os.path.join(download_dir, excel_name)):
+                    return send_from_directory(download_dir,excel_name, as_attachment=True)
+            else:
+                ret = {
+                    'code': 400,
+                    'msg': msg
+                }
+                return ret,400
+        else:
+            return ret.json()
 
     # @api_permission_control(request)
     def put(self):
