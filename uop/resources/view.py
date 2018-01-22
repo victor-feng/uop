@@ -940,10 +940,10 @@ class GetMyResourcesInfo(Resource):
         start_time = request.args.get('start_time', "")
         end_time = request.args.get('end_time', "")
         resource_status = request.args.get('resource_status', "")
-        page_num = request.args.get('page_num', 1)
+        page_num = request.args.get('page_num')
         env = request.args.get('env', "")
         department = request.args.get('department', "")
-        page_count = request.args.get('page_count', 10)
+        page_count = request.args.get('page_count')
         action = request.args.get('action')
         ip = request.args.get('ip',"")
         result_list = []
