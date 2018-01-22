@@ -283,6 +283,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
     ## 一次预留生成的所有应用资源对应一个tomcat实例
     raw["baseInfo"] = raw["resource_name"]
+    raw["create_date"] = raw["created_time"]
     project_level = {
         "instance_id": raw["project_id"],
         "model_id": project_model["entity_id"],
@@ -355,6 +356,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         if str(pro["value_type"]) in value_type.keys():
             one = item.get(str(pro["code"])) if item.get(str(pro["code"])) else attach.get(str(pro["code"]))
             if one:
+                Log.logger.info("one data:{}".format(one))
                 if str(pro["value_type"]) == "string":
                     return str(one)
                 elif str(pro["value_type"]) == "int":
