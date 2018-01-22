@@ -964,7 +964,7 @@ class GetMyResourcesInfo(Resource):
                     'msg': msg,
                     'path':path,
                 }
-                return ret, 400
+                return ret, 200
             else:
                 ret = {
                     'code': 400,
