@@ -278,7 +278,7 @@ class Reservation(Resource):
                     }
                 )
             data['compute_list'] = com
-
+        Log.logger.info("Data args is %s",data)
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
