@@ -345,7 +345,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     :return: 解析好的实例，及与实例相关的关系信息列表
     '''
     rels = []
-    host_instance_id = "2a4d89e3e48b471da0ea41c1"
+    # host_instance_id = "2a4d89e3e48b471da0ea41c1" # prod 测试用物理机
+    host_instance_id = "07a9542730b04cf099ea82ec" #  test 用物理机test
 
     def judge_value_format(item, pro, attach):
         value_type = {

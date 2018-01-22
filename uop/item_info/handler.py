@@ -434,6 +434,7 @@ def subgrath_data(args):
     }
     i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
     data.pop("relations")
+    data.pop("entity")
     data["data"] = {
         "instance": [i],
         "relation": r
@@ -442,7 +443,7 @@ def subgrath_data(args):
     ret = []
     try:
         Log.logger.info("graph_data request: {}".format(data))
-        # ret = requests.post(url, data=data_str, timeout=60).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
