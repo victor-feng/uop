@@ -414,13 +414,13 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     # 添加普通上下层关系
     if up_level:
         r = [
-            dict(rel, start_id=i["_id"], end_instance_id=up_level["instance_id"], end_id=up_level["_id"])
+            dict(rel, start_id=i["_id"], end_instance_id=up_level.get("instance_id",""), end_id=up_level.get("_id",""))
             for rel in relations if
             rel["start_model_id"] == i["model_id"] and rel["end_model_id"] == up_level["model_id"]
         ]
         if not r:
             r = [
-                dict(rel, end_id=i["_id"], start_instance_id=up_level["instance_id"], start_id=up_level["_id"])
+                dict(rel, end_id=i["_id"], start_instance_id=up_level.get("instance_id",""), start_id=up_level.get("_id",""))
                 for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
             ]
         rels.extend(r)
