@@ -950,14 +950,11 @@ class GetMyResourcesInfo(Resource):
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(resource_type, resource_name, item_name, start_time, end_time,
                                                      resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
-        Log.logger.info("ret:{}".format(ret))
-        #Log.logger.info("ret:{}".format(ret.json()))
+        Log.logger.info("ret:{}".format(ret.json()))
         if action == "Download":
             result=ret.json().get('result',{})
             res = result.get('res', {})
             data=res.get("object_list",[])
-            Log.logger.info("data--------------------------%s",data)
-            Log.logger.info("data---------length-----------------%s", len(data))
             msg,excel_name=deal_myresource_to_excel(data)
             if msg == "success":
                 download_dir = UPLOAD_FOLDER
