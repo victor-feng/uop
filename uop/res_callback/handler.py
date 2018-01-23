@@ -282,7 +282,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     instances, relations = [], []
 
     ## 一次预留生成的所有应用资源对应一个tomcat实例
-    raw["baseInfo"] = raw["resource_name"]
+    raw["baseinfo"] = raw["resource_name"]
     raw["create_date"] = raw["created_time"]
     project_level = {
         "instance_id": raw["project_id"],
@@ -300,7 +300,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             "create_date": raw.get("created_time", "")
         }
         for index, ins in enumerate(ct["instance"]):
-            ins["baseInfo"] = ins.get("instance_name")
+            ins["baseinfo"] = ins.get("instance_name")
             i, r = format_data_cmdb(relations_model, ins, docker_model, attach, len(instances), tomcat, physical_server_model_id)
             instances.append(i)
             relations.extend(r)
@@ -324,7 +324,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         instances.append(up_db)
         relations.extend(r)
         for index, db in enumerate(db_contents["instance"]):
-            db["baseInfo"] = db.get("instance_name")
+            db["baseinfo"] = db.get("instance_name")
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
             instances.append(i)
             relations.extend(r)
