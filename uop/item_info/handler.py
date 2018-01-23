@@ -364,7 +364,7 @@ def dequeued_list(item, key, entity_id):
                 "name": v.get("name"),
                 "property": v.get("parameters"),
                 "model_id": entity_id,
-                "view_num": get_view_num([view[2] for index, view in CMDB2_VIEWS.items() if view[2] == entity_id])
+                "view_num": get_view_num([view[0] for index, view in CMDB2_VIEWS.items() if view[2] == entity_id])
             }
             yield new
 
