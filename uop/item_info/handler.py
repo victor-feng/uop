@@ -10,7 +10,7 @@ from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
 from uop.models import Cmdb, Token
-from uop.res_callback.handler import *
+from uop.res_callback.handler import get_relations, format_data_cmdb
 import base64
 
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +23,8 @@ __all__ = [
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
+filters = configs[APP_ENV].CMDB2_ENTITY
+
 CMDB2_MODULE ={
     0: "Person",
     1: "department", #部门
@@ -91,26 +93,14 @@ id_property = {
 }
 
 
-filters = {
-    "Person": "d8098981df71428784e65427",
-    "department": "9a544097f789495e8ee4f5eb",
-    "yewu": "c73339db70cc4647b515eaca",
-    "Module": "9e97b54a4a54472e9e913d4e",
-    "project": "59c0af57133442e7b34654a3",
-    "host": "b593293378c74ba6827847d3",
-    "container": "d0f338299fa34ce2bf5dd873",
-    "virtual_device": "d4ad23e58f31497ca3ad2bab",
-    "tomcat": "d1b11a713e8842b2b93fe397",
-    "mysql": "e5024d360b924e0c8de3c6a8",
-    "redis": "de90d618f7504723b677f196",
-    "mongodb": "9bc4a41eb6364022b2f2c093",
-}
+
 resource = {
-"tomcat": "d1b11a713e8842b2b93fe397",
-    "mysql": "e5024d360b924e0c8de3c6a8",
-    "redis": "de90d618f7504723b677f196",
-    "mongodb": "9bc4a41eb6364022b2f2c093",
+    "tomcat": filters.get("tomcat"),
+    "mysql": filters.get("mysql"),
+    "redis": filters.get("redis"),
+    "mongodb": filters.get("mongodb"),
 }
+
 #临时从本地文件读取数据
 def get_data_from_file(td):
     '''
@@ -365,10 +355,17 @@ def analyze_data(data, entity_id, flag=False):
 def dequeued_list(item, key, entity_id):
     assert(isinstance(item, list))
     unique = set()
+    get_view_num = lambda x: x[0] if x else ""
     for i, v in enumerate(item):
         if key(v) not in unique:
             unique.add(key(v))
-            new = {"instance_id": v.get("id"), "name": v.get("name"), "property": v.get("parameters"), "model_id": entity_id}
+            new = {
+                "instance_id": v.get("id"),
+                "name": v.get("name"),
+                "property": v.get("parameters"),
+                "model_id": entity_id,
+                "view_num": get_view_num([view[2] for index, view in CMDB2_VIEWS.item() if view[2] == entity_id])
+            }
             yield new
 
 

@@ -13,7 +13,7 @@ from uop.item_info.handler import get_uid_token
 
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
-
+CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
 ]
@@ -119,14 +119,6 @@ def cmdb_graph_search(args):
 
 # cmdb2.0 图搜素
 def cmdb2_graph_search(args):
-    view_dict = {
-        "B8": "fde57c1d10ef4f608b86fcb5", # tomcat --> 机房
-        "B6": "7077ceb7c74d4a88b87494fa", # 部门 --> 业务 --> 资源
-        "B4": "29930f94bf0844c6a0e060bd", # 资源 --> 环境 --> 机房
-        "B3": "e7a8ed688f2e4c19a3aa3a65", # 资源 --> 机房
-        "B2": "",
-        "B1": "",
-    }
     url = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
     uid, token = get_uid_token()
     view_num = args.view_num
@@ -153,7 +145,7 @@ def cmdb2_graph_search(args):
     try:
         Log.logger.error("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str).json()["data"]
-        if view_num == "B6":
+        if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             data = package_data(data)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
     except Exception as exc:

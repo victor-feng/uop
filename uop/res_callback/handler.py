@@ -239,7 +239,7 @@ def crp_data_cmdb(args):
     Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    data = get_relations("B7") #
+    data = get_relations(CMDB2_VIEWS["1"][0]) # B7
     models_list = data["entity"]
     instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
