@@ -349,10 +349,12 @@ def analyze_data(data, entity_id, flag=False):
             fd = fd[0] # 理论上一层下只有一个实体id
             instance = list(dequeued_list(fd["instance"], lambda x: x.get("id"))) # 根据实例id去重
         else: # 没有entity_id 时，给出所有的资源信息
-            fd = filter(lambda x: x.get("entity_id") in resource.values(), data)
-            if fd:
-                fd = fd[0]  # 理论上一层下只有一个实体id
-                instance = list(dequeued_list(fd["instance"], lambda x: x.get("id")))  # 根据实例id去重
+            fds = filter(lambda x: x.get("entity_id") in resource.values(), data)
+            if fds:
+                instance = []
+                for fd in fds:
+                    one = list(dequeued_list(fd["instance"], lambda x: x.get("id")))  # 根据实例id去重
+                    instance.extend(one)
             else:
                 instance = []
     ret["instance"] = instance
