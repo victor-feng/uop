@@ -372,7 +372,7 @@ def dequeued_list(item, key, entity_id):
             yield new
 
 
-#获取所有模型实体的id及属性信息存到文件
+# 获取所有模型实体的id及属性信息存到文件
 def get_entity(data):
     '''
     [

@@ -296,7 +296,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     # docker数据解析
     for ct in raw["container"]:
         attach = {
-            "image": ct.get("image_url", ""),
+            "image_name": ct.get("image_url", ""),
             "create_date": raw.get("created_time", "")
         }
         for index, ins in enumerate(ct["instance"]):
@@ -315,7 +315,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             "create_date": raw.get("created_time", "")
         }
         virtual_server = {
-            "mem": db_contents["mem"],
+            "memory": db_contents["mem"],
             "cpu": db_contents["cpu"],
             "disk": db_contents["disk"],
             "create_date": raw.get("created_time", "")
@@ -355,7 +355,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             "double": 0
         }
         if str(pro["value_type"]) in value_type.keys():
-            one = item.get(str(pro["code"])) if item.get(str(pro["code"])) else attach.get(str(pro["code"]))
+            code = str(pro["code"]).lower()
+            one = item.get(code) if item.get(code) else attach.get(code)
             if one:
                 Log.logger.info("one data:{}".format(one))
                 if str(pro["value_type"]) == "string":
