@@ -312,7 +312,8 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         db_model = filter(lambda x: x["code"] == db_name, models_list)[0] # db_name 设置保持与cmdb一致
         attach = {
             "version": db_contents["version"],
-            "create_date": raw.get("created_time", "")
+            "create_date": raw.get("created_time", ""),
+            "baseinfo": db_contents["cluster_name"]
         }
         virtual_server = {
             "memory": db_contents["mem"],
