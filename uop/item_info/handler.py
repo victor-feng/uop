@@ -353,7 +353,7 @@ def analyze_data(data, entity_id, flag=False):
             if fds:
                 instance = []
                 for fd in fds:
-                    one = list(dequeued_list(fd["instance"], lambda x: x.get("id")))  # 根据实例id去重
+                    one = list(dequeued_list(fd["instance"], lambda x: x.get("id"), fd["entity_id"]))  # 根据实例id去重
                     instance.extend(one)
             else:
                 instance = []
@@ -362,13 +362,13 @@ def analyze_data(data, entity_id, flag=False):
 
 
 # 列表字典按键去重
-def dequeued_list(item, key):
+def dequeued_list(item, key, entity_id):
     assert(isinstance(item, list))
     unique = set()
     for i, v in enumerate(item):
         if key(v) not in unique:
             unique.add(key(v))
-            new = {"instance_id": v.get("id"), "name": v.get("name"), "property": v.get("parameters"), "model_id": v.get("entity_id")}
+            new = {"instance_id": v.get("id"), "name": v.get("name"), "property": v.get("parameters"), "model_id": entity_id}
             yield new
 
 
