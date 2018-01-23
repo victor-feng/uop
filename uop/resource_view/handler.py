@@ -136,8 +136,8 @@ def cmdb2_graph_search(args):
         "token": token,
         "sign": "",
         "data": {
-            "id": view_dict[view_num] if view_dict.get(view_num) else view_dict["B8"],
-            "name": "",
+            "id": "",
+            "name": view_num,
             "entity": [
                 {
                     "id": res_id,

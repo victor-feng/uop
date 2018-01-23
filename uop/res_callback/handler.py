@@ -327,7 +327,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             db["baseInfo"] = db.get("instance_name")
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
             instances.append(i)
-            relations.append(r)
+            relations.extend(r)
     Log.logger.info("[CMDB2.0 format DATA] instance:{}\n[CMDB2.0 format DATA] relations:{}\n".format(instances, relations))
     return instances, relations
 

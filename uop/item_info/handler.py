@@ -368,7 +368,7 @@ def dequeued_list(item, key):
     for i, v in enumerate(item):
         if key(v) not in unique:
             unique.add(key(v))
-            new = {"instance_id": v.get("id"), "name": v.get("name"), "property": v.get("parameters")}
+            new = {"instance_id": v.get("id"), "name": v.get("name"), "property": v.get("parameters"), "model_id": v.get("entity_id")}
             yield new
 
 
