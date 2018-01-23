@@ -91,6 +91,26 @@ id_property = {
 }
 
 
+filters = {
+    "Person": "d8098981df71428784e65427",
+    "department": "9a544097f789495e8ee4f5eb",
+    "yewu": "c73339db70cc4647b515eaca",
+    "Module": "9e97b54a4a54472e9e913d4e",
+    "project": "59c0af57133442e7b34654a3",
+    "host": "b593293378c74ba6827847d3",
+    "container": "d0f338299fa34ce2bf5dd873",
+    "virtual_device": "d4ad23e58f31497ca3ad2bab",
+    "tomcat": "d1b11a713e8842b2b93fe397",
+    "mysql": "e5024d360b924e0c8de3c6a8",
+    "redis": "de90d618f7504723b677f196",
+    "mongodb": "9bc4a41eb6364022b2f2c093",
+}
+resource = {
+"tomcat": "d1b11a713e8842b2b93fe397",
+    "mysql": "e5024d360b924e0c8de3c6a8",
+    "redis": "de90d618f7504723b677f196",
+    "mongodb": "9bc4a41eb6364022b2f2c093",
+}
 #临时从本地文件读取数据
 def get_data_from_file(td):
     '''
@@ -234,20 +254,7 @@ def processs_chidren_final(entity_list, children):
 
 
 def get_entity_from_file(data):
-    filters = {
-        "Person":       "d8098981df71428784e65427",
-        "department":   "9a544097f789495e8ee4f5eb",
-        "yewu":         "c73339db70cc4647b515eaca",
-        "Module":       "9e97b54a4a54472e9e913d4e",
-        "project":      "59c0af57133442e7b34654a3",
-        "host":         "b593293378c74ba6827847d3",
-        "container":    "d0f338299fa34ce2bf5dd873",
-        "virtual_device":"d4ad23e58f31497ca3ad2bab",
-        "tomcat":   "d1b11a713e8842b2b93fe397",
-        "mysql": "e5024d360b924e0c8de3c6a8",
-        "redis": "de90d618f7504723b677f196",
-        "mongodb": "9bc4a41eb6364022b2f2c093",
-    }
+
     sort_key = ["Person", "department", "yewu", "Module", "project"]
     sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
     assert(isinstance(filters, dict))
@@ -337,12 +344,17 @@ def analyze_data(data, entity_id, flag=False):
     if flag: # list接口的数据
         instance = map(lambda x: {"instance_id": x.get("id"), "name": x.get("name"), "property": x.get("parameters")}, data) # 拿到名字为name的用户的实例id，理论上只有一个
     else: # instance接口的数据
-        data = filter(lambda x: x.get("entity_id") == entity_id, data)
-        if data:
-            data = data[0] # 理论上一层下只有一个实体id
-            instance = list(dequeued_list(data["instance"], lambda x: x.get("id"))) # 根据实例id去重
-        else:
-            instance = []
+        fd = filter(lambda x: x.get("entity_id") == entity_id, data)
+        if fd:
+            fd = fd[0] # 理论上一层下只有一个实体id
+            instance = list(dequeued_list(fd["instance"], lambda x: x.get("id"))) # 根据实例id去重
+        else: # 没有entity_id 时，给出所有的资源信息
+            fd = filter(lambda x: x.get("entity_id") in resource.values(), data)
+            if fd:
+                fd = fd[0]  # 理论上一层下只有一个实体id
+                instance = list(dequeued_list(fd["instance"], lambda x: x.get("id")))  # 根据实例id去重
+            else:
+                instance = []
     ret["instance"] = instance
     return ret
 
