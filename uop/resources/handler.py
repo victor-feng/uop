@@ -28,12 +28,23 @@ __all__ = [
 ]
 
 status_dict={
-    "active":"运行中",
-    "error":"错误",
-    "shutoff":"关机",
-    "failed":"虚机不存在",
-    "rebuild": "部署中",
-    '':''
+    "active":u"运行中",
+    "error":u"错误",
+    "shutoff":u"关机",
+    "failed":u"虚机不存在",
+    "rebuild":u"部署中",
+    '':u''
+}
+
+field_dict={
+    "resource_type":u"实例类型",
+	"resource_name":u"部署实例名称",
+	"env":u"所属环境",
+	"item_name":u"所属部署单元",
+	"create_date":u"创建日期",
+	"resource_ip":u"IP",
+	"resource_config":u"配置",
+	"resource_status":u"状态",
 }
 
 class ExcelException(object):
@@ -101,7 +112,7 @@ def to_unicode(value):
 
 
 
-def deal_myresource_to_excel(data):
+def deal_myresource_to_excel(data,field_list):
     try:
         excel_name="myresource_" + str(uuid.uuid1()) +'.xlsx'
         download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
@@ -115,8 +126,10 @@ def deal_myresource_to_excel(data):
             {'border': 1, 'align': 'center', 'bg_color': '6699ff', 'font_size': 10, 'font_name': u'微软雅黑', 'bold': True,
              'text_wrap': True, 'valign': 'vcenter'})
         body = workbook.add_format({'border': 1, 'align': 'center', 'font_size': 10, 'font_name': u'微软雅黑'})
-        head_cols=[u"实例类型",u"部署实例名称",u"所属环境",u"所属部署单元",u"创建日期",u"IP",u"配置",u"状态"]
-        res_list=deal_data(data)
+        head_cols=[]
+        for field in field_list:
+            head_cols.append(field_dict[field])
+        res_list=deal_data(data,field_list)
         for i in range(0,len(head_cols)):
             h_col = to_unicode(head_cols[i])
             worksheetResource.write(0,i,h_col,head)
@@ -130,35 +143,35 @@ def deal_myresource_to_excel(data):
         err_msg= "deal my resource to excel error: %s" % str(e)
         return  err_msg,excel_name
 
-def deal_data(data):
+def deal_data(data,field_list):
     res_list=[]
     try:
         for d in data:
             res=[]
-            resource_config=d.get('resource_config',[
-                            {
-                                "name": "CPU",
-                                "value": "2\u6838"
-                            },
-                            {
-                                "name": "\u5185\u5b58",
-                                "value": "2GB"
-                            }
-                        ])
-            cpu_name=resource_config[0].get('name')
-            cpu_value = resource_config[0].get('value').split('\\')[0] + u'核'
-            mem_name = "内存"
-            mem_value = resource_config[1].get('value')
-            config="%s:%s %s:%s"% (cpu_name,cpu_value,mem_name,mem_value)
-            res.append(d.get('resource_type',''))
-            res.append(d.get('resource_name',''))
-            res.append(d.get('env',''))
-            res.append(d.get('item_name',''))
-            res.append(d.get('create_date', ''))
-            res.append(d.get('resource_ip', ''))
-            res.append(config)
-            status=status_dict[d.get('resource_status', '')]
-            res.append(status)
+            for field in field_list:
+                if field == 'resource_config':
+                    resource_config=d.get('resource_config',[
+                                    {
+                                        "name": "CPU",
+                                        "value": "2\u6838"
+                                    },
+                                    {
+                                        "name": "\u5185\u5b58",
+                                        "value": "2GB"
+                                    }
+                                ])
+                    cpu_name=resource_config[0].get('name')
+                    cpu_value = resource_config[0].get('value').split('\\')[0] + u'核'
+                    mem_name = "内存"
+                    mem_value = resource_config[1].get('value')
+                    config="%s:%s %s:%s"% (cpu_name,cpu_value,mem_name,mem_value)
+                    res.append(config)
+                elif field == "resource_status":
+                    status = status_dict[d.get('resource_status', '')]
+                    res.append(status)
+                else:
+                    field_data = d.get(field,'')
+                    res.append(field_data)
             res_list.append(res)
         return res_list
     except Exception as e:
