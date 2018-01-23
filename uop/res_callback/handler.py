@@ -360,7 +360,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             if one:
                 Log.logger.info("one data:{}".format(one))
                 if str(pro["value_type"]) == "string":
-                    return str(one.decode(encoding="utf-8"))
+                    return str(one).decode(encoding="utf-8")
                 elif str(pro["value_type"]) == "int":
                     return int(one)
                 else: # 时间戳
