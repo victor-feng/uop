@@ -35,20 +35,20 @@ class Config(object):
             'trigger': 'interval',
             'seconds': 60 * 5
         },
-        # {
-        #     'id': 'get_relations',
-        #     'func': 'uop.scheduler_util:get_relations',
-        #     # 'args': (1, 2),
-        #     'trigger':
-        #         {
-        #             'type': 'cron',
-        #             'day_of_week': "mon-fri",
-        #             'hour': '0',
-        #             'minute': '0',
-        #             'second': '0'
-        #         }
-        #
-        # }
+        {
+            'id': 'get_relations',
+            'func': 'uop.scheduler_util:get_relations',
+            # 'args': (1, 2),
+            'trigger':
+                {
+                    'type': 'cron',
+                    'day_of_week': "mon-fri",
+                    'hour': '0',
+                    'minute': '0',
+                    'second': '0'
+                }
+
+        }
     ]
 
     SCHEDULER_API_ENABLED = True

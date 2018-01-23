@@ -167,7 +167,7 @@ def get_relations():
     :return:
     '''
     uid, token = get_uid_token()
-    for id in [view[0] for num, view in CMDB2_VIEWS.items()]:
+    for id in [view[0] for num, view in CMDB2_VIEWS.items() if num in ["1","2","3"]]:
         get_one_view(uid, token, id)
 
 
@@ -185,17 +185,17 @@ def get_one_view(uid, token, view_id):
     }
     data_str = json.dumps(data)
     try:
-        ret = requests.post(url, data=data_str).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
-            relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
+            relations = ret["data"][0]["relation"]  # 获取视图关系实体信息
+            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
             view.save()
         elif ret["code"] == 121:
             data["uid"], data["token"] = get_uid_token(True)
             data_str = json.dumps(data)
-            ret = requests.post(url, data=data_str).json()
-            relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
-            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctime(datetime.datetime.now()))
+            ret = requests.post(url, data=data_str, timeout=60).json()
+            relations = ret["data"][0]["relation"]  # 获取视图关系实体信息
+            view = ViewCache(view_id=view_id, content=json.dumps(relations), cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
             view.save()
         else:
             Log.logger.info("get_relations data:{}".format(ret))
