@@ -372,7 +372,12 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             "double": 0
         }
         if str(pro["value_type"]) in value_type.keys():
-            code = str(pro["code"]).lower()
+            get_code = lambda x: x[0] if x else "" #由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
+            code = get_code(list(
+                (
+                    c for c in [str(pro["code"]).lower(), str(pro["code"]), str(pro["code"]).upper()] if item.get(c) or attach.get(c)
+                )
+            )) # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
             one = item.get(code) if item.get(code) else attach.get(code)
             if one:
                 Log.logger.info("one data:{}".format(one))
@@ -388,7 +393,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                     except Exception as exc:
                         return int(str(time.time()).split(".")[0])
             else:
-                return value_type.get(str(pro["value_type"])) #统一空值类型
+                return value_type.get(str(pro["value_type"])) # 统一空值类型
         else:
             return ""
 
@@ -401,7 +406,6 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 lambda property, item, attach:
                 (
                     {
-                        # "id": pro["id"],
                         "value_type": str(pro["value_type"]),
                         "code": str(pro["code"]),
                         "value": judge_value_format(item, pro, attach)

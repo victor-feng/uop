@@ -443,10 +443,11 @@ def package_data(ret, ut):
 
 def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
-    model_id, instance_id, property, uid, token = \
+    model_id, instance_id, item, uid, token = \
         args.model_id, args.instance_id, args.property, args.uid, args.token
     if not uid or not token:
         uid, token = get_uid_token()
+    entity = get_relations(CMDB2_VIEWS["1"][0])["entity"]  # B7
     data = {
         "uid": uid,
         "token": token,
@@ -458,15 +459,16 @@ def fix_instance(args):
                     "instance_id": instance_id,
                     'parameters': list(
                         (
-                            lambda property:
+                            lambda property, item:
                             (
                                 {
-                                    "code": pro["code"],
-                                    "value": pro["value"]
+                                    "code": str(pro["code"]),
+                                    "value_type": pro["value_type"],
+                                    "value": item.get(str(pro["code"]))
                                 }
                                 for pro in property
                             )
-                        )(property)
+                        )(entity["parameters"], item)
                     )
                 }
             ]
