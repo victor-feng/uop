@@ -42,9 +42,13 @@ class ResourceApplication(Resource):
     def post(cls):
         parser = reqparse.RequestParser()
         parser.add_argument('resource_name', type=str)
+        parser.add_argument('project_name', type=str)
+        parser.add_argument('module_name', type=str)
+        parser.add_argument('business_name', type=str)
+        parser.add_argument('cmdb2_project_id', type=str)
+
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
-        parser.add_argument('cmdb2_project_id', type=str)
         parser.add_argument('department', type=str)
         parser.add_argument('user_name', type=str)
         parser.add_argument('user_id', type=str)
@@ -56,9 +60,14 @@ class ResourceApplication(Resource):
         args = parser.parse_args()
 
         resource_name = args.resource_name
+        project_name = args.project_name
+        module_name = args.module_name
+        business_name = args.business_name
+        cmdb2_project_id = args.cmdb2_project_id
+
         project = args.project
         project_id = args.project_id
-        cmdb2_project_id = args.cmdb2_project_id
+
         department = args.department
         department_id = '1'
         res_id = str(uuid.uuid1())
@@ -944,13 +953,36 @@ class GetMyResourcesInfo(Resource):
         env = request.args.get('env', "")
         department = request.args.get('department', "")
         page_count = request.args.get('page_count')
+        action = request.args.get('action')
         ip = request.args.get('ip',"")
         result_list = []
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(resource_type, resource_name, item_name, start_time, end_time,
                                                      resource_status, page_num, page_count, env,user_id, department,ip)
         ret = requests.get(url)
         Log.logger.info("ret:{}".format(ret.json()))
-        return ret.json()
+        if action == "Download":
+            result=ret.json().get('result',{})
+            res = result.get('res', {})
+            data=res.get("object_list",[])
+            msg,excel_name=deal_myresource_to_excel(data)
+            if msg == "success":
+                download_dir = os.path.join(UPLOAD_FOLDER,'excel')
+                path=os.path.join(download_dir, excel_name)
+                ret = {
+                    'code': 200,
+                    'msg': msg,
+                    'path':path,
+                }
+                return ret, 400
+            else:
+                ret = {
+                    'code': 400,
+                    'msg': msg,
+                    'path':'null'
+                }
+                return ret,400
+        else:
+            return ret.json()
 
     # @api_permission_control(request)
     def put(self):
@@ -1005,55 +1037,6 @@ class GetMyResourcesInfo(Resource):
             ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
 
         return response
-
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('user_id', type=str, default='', location='json')
-        parser.add_argument('resource_type', type=str, default='', location='json')
-        parser.add_argument('mysqlandmongo', type=str, default='', location='json')
-        parser.add_argument('cache', type=str, default='', location='json')
-        parser.add_argument('resource_name', type=str, default='', location='json')
-        parser.add_argument('item_name', type=str, default='', location='json')
-        parser.add_argument('start_time', type=str, default='', location='json')
-        parser.add_argument('end_time', type=str, default='', location='json')
-        parser.add_argument('resource_status', default='', type=str, location='json')
-        parser.add_argument('env', type=str, default='', location='json')
-        parser.add_argument('department', type=str, default='', location='json')
-        parser.add_argument('ip', type=str, default='', location='json')
-        parser.add_argument('page_num', type=str, location='json')
-        parser.add_argument('page_count', type=str, location='json')
-        parser.add_argument('field_list', type=list, default=[], location='json')
-        args = parser.parse_args()
-        field_list=args.field_list
-        resource_type=args.resource_type
-        resource_database=args.mysqlandmongo
-        resource_cache=args.cache
-        resource_type = resource_database or resource_cache or resource_type
-        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-            resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
-            args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
-        ret = requests.get(url)
-        result = ret.json().get('result', {})
-        res = result.get('res', {})
-        data = res.get("object_list", [])
-        msg, excel_name = deal_myresource_to_excel(data,field_list)
-        if msg == "success":
-            download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
-            path = os.path.join(download_dir, excel_name)
-            ret = {
-                'code': 200,
-                'msg': msg,
-                'path': path,
-            }
-            return ret, 200
-        else:
-            ret = {
-                'code': 400,
-                'msg': msg,
-                'path': 'null'
-            }
-            return ret, 400
 
 
 class Dockerlogs(Resource):

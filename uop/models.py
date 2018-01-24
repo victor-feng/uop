@@ -276,6 +276,12 @@ class ResourceModel(db.DynamicDocument):
     project = db.StringField(required=True)
     project_id = db.StringField(required=False)
     cmdb2_project_id = db.StringField(required=False)
+    cmdb2_resource_id = db.ListField(db.StringField(requeired=False))
+
+    project_name = db.StringField(required=False)
+    module_name = db.StringField(required=False)
+    business_name = db.StringField(required=False)
+
     department = db.StringField(required=True)
     department_id = db.StringField(required=True)
     deploy_name = db.StringField()

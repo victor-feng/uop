@@ -10,7 +10,9 @@ from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
 from config import configs, APP_ENV
+from threading import Lock
 
+save_lock = Lock()
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
@@ -241,6 +243,7 @@ def crp_data_cmdb(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations(CMDB2_VIEWS["1"][0]) # B7
     models_list = data["entity"]
+    resource = ResourceModel.objects(res_id=args.get('resource_id'))
     instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
     data = {
@@ -255,14 +258,27 @@ def crp_data_cmdb(args):
     data_str = json.dumps(data)
     ret = []
     try:
-        Log.logger.info("post 'instances data' to cmdb/openapi/graph/ request:{}".format(data))
+        Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         # ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
-            Log.logger.debug("[CMDB2.0 create graph SUCCESS]")
+            save_resource_id(ret["data"]["instance"], resource)
         else:
-            Log.logger.info("post 'instances data' to cmdb/openapi/graph/ result:{}".format(ret))
+            Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
-        Log.logger.error("post 'instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+        Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+
+
+def save_resource_id(instances, resource):
+    ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
+    if ins_id:
+        try:
+            with save_lock:
+                resource.update_one(cmdb2_resource_id=ins_id)
+            Log.logger.debug("[CMDB2.0 create graph SUCCESS]")
+        except Exception as exc:
+            Log.logger.error("save 'graph data' to UOP error:{}".format(str(exc)))
+    else:
+        Log.logger.warning("[CMDB2 插入预留数据出错，返回了空的实例id，请联系管理员查看CMDB2]")
 
 
 def post_datas_cmdb(url, raw, models_list, relations_model):
@@ -395,7 +411,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             )(model["parameters"], item, attach)
         )
     }
-    if i.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+    if item.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
         r = [
             dict(
                 rel, start_id = i["_id"],
