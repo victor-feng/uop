@@ -969,7 +969,7 @@ class GetMyResourcesInfo(Resource):
             resource_type, resource_name, item_name, start_time, end_time,
             resource_status, page_num, page_count, env, user_id, department, ip)
         ret = requests.get(url)
-        Log.logger.info("ret:{}".format(ret.json()))
+        # Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
 
     # @api_permission_control(request)
