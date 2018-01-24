@@ -448,6 +448,8 @@ def fix_instance(args):
     if not uid or not token:
         uid, token = get_uid_token()
     entity = get_relations(CMDB2_VIEWS["1"][0])["entity"]  # B7
+    fix_model = filter(lambda x: x["entity_id"] == model_id, entity)[0]
+
     data = {
         "uid": uid,
         "token": token,
@@ -468,7 +470,7 @@ def fix_instance(args):
                                 }
                                 for pro in property
                             )
-                        )(entity["parameters"], item)
+                        )(fix_model["parameters"], item)
                     )
                 }
             ]
