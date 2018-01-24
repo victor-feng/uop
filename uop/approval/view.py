@@ -194,7 +194,7 @@ class Reservation(Resource):
         new_computelist = args.compute_list
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            item_info = models.ItemInformation.objects.get(item_name=resource.project)
+            # item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
             Log.logger.error(str(e))
             code = 410
@@ -226,7 +226,7 @@ class Reservation(Resource):
         data['mysql_network_id'] = resource.mysql_network_id
         data['redis_network_id'] = resource.redis_network_id
         data['mongodb_network_id'] = resource.mongodb_network_id
-        data['cmdb_repo_id'] = item_info.item_id
+        # data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
