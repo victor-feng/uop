@@ -582,6 +582,10 @@ class ResourceDetail(Resource):
         result['department_id'] = resource.department_id
         result['res_id'] = res_id
         result['user_name'] = resource.user_name
+        result['project_name'] = resource.project_name
+        result['module_name'] = resource.module_name
+        result['business_name'] = resource.business_name
+        result['cmdb2_project_id'] = resource.cmdb2_project_id
         result['user_id'] = resource.user_id
         result['domain'] = resource.domain
         result['env'] = resource.env
