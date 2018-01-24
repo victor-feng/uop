@@ -450,7 +450,7 @@ def fix_instance(args):
     entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
     get_fix_model = lambda x: x[0] if x else "CMDB模型有变动，在视图{}未找到实体{}的信息，请联系管理员".format(CMDB2_VIEWS["3"][0], model_id)
     fix_model = get_fix_model(filter(lambda x: x["entity_id"] == model_id, entity))
-    get_value = lambda itme, pro, code: judge_value_format([i.get(code) for i in itme if i.get(code)], pro, {})
+    get_value = lambda item, pro, code: judge_value_format([{i.get("code"): i.get("value")}for i in item if i.get("code") == code], pro, {})
     data = {
         "uid": uid,
         "token": token,
