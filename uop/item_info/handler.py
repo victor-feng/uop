@@ -10,7 +10,7 @@ from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
 from uop.models import Cmdb, Token
-from uop.res_callback.handler import get_relations, format_data_cmdb
+from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
 
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -450,7 +450,7 @@ def fix_instance(args):
     entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
     get_fix_model = lambda x: x[0] if x else "CMDB模型有变动，在视图{}未找到实体{}的信息，请联系管理员".format(CMDB2_VIEWS["3"][0], model_id)
     fix_model = get_fix_model(filter(lambda x: x["entity_id"] == model_id, entity))
-    get_value = lambda itme, code: [i.get(code) for i in itme if i.get(code)][0]
+    get_value = lambda itme, pro, code: judge_value_format([i.get(code) for i in itme if i.get(code)], pro, {})
     data = {
         "uid": uid,
         "token": token,
@@ -467,7 +467,7 @@ def fix_instance(args):
                                 {
                                     "code": str(pro["code"]),
                                     "value_type": pro["value_type"],
-                                    "value": get_value(item, str(pro["code"]))
+                                    "value": get_value(item, pro, str(pro["code"]))
                                 }
                                 for pro in property
                             )

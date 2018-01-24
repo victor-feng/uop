@@ -349,6 +349,46 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     return instances, relations
 
 
+def judge_value_format(item, pro, attach):
+    value_type = {
+        "string": "",
+        "int": 0,
+        "double": 0
+    }
+    if isinstance(item, list):
+        if item:
+            item = item[0]
+        else:
+            return value_type.get(str(pro["value_type"]))
+
+    if str(pro["value_type"]) in value_type.keys():
+        get_code = lambda x: x[0] if x else ""  # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
+        code = get_code(list(
+            (
+                c for c in [str(pro["code"]).lower(), str(pro["code"]), str(pro["code"]).upper()] if
+            item.get(c) or attach.get(c)
+            )
+        ))  # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
+        one = item.get(code) if item.get(code) else attach.get(code)
+        if one:
+            Log.logger.info("one data:{}".format(one))
+            if str(pro["value_type"]) == "string":
+                return str(one).decode(encoding="utf-8")
+            elif str(pro["value_type"]) == "int":
+                return int(one)
+            else:  # 时间戳
+                try:
+                    time_str = one.split('.')[0]
+                    time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+                    return TimeToolkit.local2utctime(time_date)
+                except Exception as exc:
+                    return int(str(time.time()).split(".")[0])
+        else:
+            return value_type.get(str(pro["value_type"]))  # 统一空值类型
+    else:
+        return ""
+
+
 def format_data_cmdb(relations, item, model, attach, index, up_level, physical_server_model_id=None):
     '''
 
@@ -364,39 +404,6 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
     rels = []
     # host_instance_id = "2a4d89e3e48b471da0ea41c1" # prod 测试用物理机
     host_instance_id = "07a9542730b04cf099ea82ec" #  test 用物理机test
-
-    def judge_value_format(item, pro, attach):
-        value_type = {
-            "string": "",
-            "int": 0,
-            "double": 0
-        }
-        if str(pro["value_type"]) in value_type.keys():
-            get_code = lambda x: x[0] if x else "" #由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
-            code = get_code(list(
-                (
-                    c for c in [str(pro["code"]).lower(), str(pro["code"]), str(pro["code"]).upper()] if item.get(c) or attach.get(c)
-                )
-            )) # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
-            one = item.get(code) if item.get(code) else attach.get(code)
-            if one:
-                Log.logger.info("one data:{}".format(one))
-                if str(pro["value_type"]) == "string":
-                    return str(one).decode(encoding="utf-8")
-                elif str(pro["value_type"]) == "int":
-                    return int(one)
-                else: # 时间戳
-                    try:
-                        time_str = one.split('.')[0]
-                        time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
-                        return TimeToolkit.local2utctime(time_date)
-                    except Exception as exc:
-                        return int(str(time.time()).split(".")[0])
-            else:
-                return value_type.get(str(pro["value_type"])) # 统一空值类型
-        else:
-            return ""
-
     i = {
         "model_id": model["entity_id"],
         "instance_id": "",
