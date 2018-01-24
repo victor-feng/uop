@@ -447,9 +447,8 @@ def fix_instance(args):
         args.model_id, args.instance_id, args.property, args.uid, args.token
     if not uid or not token:
         uid, token = get_uid_token()
-    entity = get_relations(CMDB2_VIEWS["1"][0])["entity"]  # B7
+    entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
     fix_model = filter(lambda x: x["entity_id"] == model_id, entity)[0]
-
     data = {
         "uid": uid,
         "token": token,
