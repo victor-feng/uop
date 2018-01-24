@@ -448,7 +448,9 @@ def fix_instance(args):
     if not uid or not token:
         uid, token = get_uid_token()
     entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
-    fix_model = filter(lambda x: x["entity_id"] == model_id, entity)[0]
+    get_fix_model = lambda x: x[0] if x else "CMDB模型有变动，在视图{}未找到实体{}的信息，请联系管理员".format(CMDB2_VIEWS["3"][0], model_id)
+    fix_model = get_fix_model(filter(lambda x: x["entity_id"] == model_id, entity))
+    get_value = lambda itme, code: [i.get(code) for i in itme if i.get(code)][0]
     data = {
         "uid": uid,
         "token": token,
@@ -465,7 +467,7 @@ def fix_instance(args):
                                 {
                                     "code": str(pro["code"]),
                                     "value_type": pro["value_type"],
-                                    "value": item.get(str(pro["code"]))
+                                    "value": get_value(item, str(pro["code"]))
                                 }
                                 for pro in property
                             )
@@ -475,6 +477,8 @@ def fix_instance(args):
             ]
         }
     }
+    if isinstance(fix_model, str):
+        return {"warning": fix_model}
     data_str = json.dumps(data)
     try:
         Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
