@@ -259,7 +259,7 @@ def crp_data_cmdb(args):
     ret = []
     try:
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
-        # ret = requests.post(url, data=data_str, timeout=60).json()
+        ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
             save_resource_id(ret["data"]["instance"], resource)
         else:
