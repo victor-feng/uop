@@ -314,7 +314,13 @@ class ResourceApplication(Resource):
                 result['resource'] = resource.resource_name
                 result['formStatus'] = resource.application_status
                 result['approval_status'] = resource.approval_status
+
                 result['project'] = resource.project
+                result['project_name'] = resource.project_name
+                result['module_name'] = resource.module_name
+                result['business_name'] = resource.business_name
+                result['cmdb2_project_id'] = resource.cmdb2_project_id
+
                 result['project_id'] = resource.project_id
                 result['id'] = resource.res_id
                 result['reservation_status'] = resource.reservation_status
