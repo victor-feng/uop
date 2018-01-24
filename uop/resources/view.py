@@ -80,7 +80,11 @@ class ResourceApplication(Resource):
         resource_list = args.resource_list
         compute_list = args.compute_list
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
-                                             department_id=department_id, res_id=res_id, project_id=project_id,cmdb2_project_id=cmdb2_project_id,
+                                             department_id=department_id, res_id=res_id, project_id=project_id,
+                                             cmdb2_project_id=cmdb2_project_id,
+                                             project_name=project_name,
+                                             module_name=module_name,
+                                             business_name=business_name,
                                              user_name=user_name, user_id=user_id,env=env,
                                              application_status=application_status, approval_status=approval_status,
                                              reservation_status="unreserved", created_date=created_date)
