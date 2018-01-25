@@ -243,7 +243,10 @@ def Aquery(args):
             # Log.logger.info("url_instance request data:{}".format(data_instance))
             ret = requests.post(url_instance, data=data_instance_str, timeout=60)
             # Log.logger.info("url_instance return:{}".format(ret.json()))
-            data = analyze_data(ret.json()["data"], model_id)
+            if ret.json()["code"] == -1:
+                return response_data(500, u"请求参数错误，查看instance_id是否和model_id对应", "")
+            else:
+                data = analyze_data(ret.json()["data"], model_id)
         else:
             # Log.logger.info("url_list request data:{}".format(data_list))
             ret = requests.post(url_list, data=data_list_str, timeout=60)
