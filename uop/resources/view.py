@@ -24,7 +24,7 @@ from uop.util import get_CRP_url
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -959,7 +959,7 @@ class GetMyResourcesInfo(Resource):
         resource_type = resource_database or resource_cache or resource_type
         resource_name = request.args.get('resource_name', "")
         item_name = request.args.get('item_name', "")
-        # item_code = request.args.get('item_code',"")
+        project_id = request.args.get('project_id', "")
         start_time = request.args.get('start_time', "")
         end_time = request.args.get('end_time', "")
         resource_status = request.args.get('resource_status', "")
@@ -969,6 +969,26 @@ class GetMyResourcesInfo(Resource):
         page_count = request.args.get('page_count')
         ip = request.args.get('ip', "")
         result_list = []
+        params = {
+            "resource_type": resource_type,
+            "start_time": start_time,
+            "end_time":  end_time,
+            "page_num": page_num,
+            'page_count': page_count,
+            'item_name':  project_id,
+            "resource_name": resource_name,
+            'ip': ip,
+            "env": env,
+            "resource_status": resource_status
+        }
+        filters = {
+            "dep": department,
+            "user": user_id,
+            "page_num": page_num,
+            "page_count":page_count
+        }
+        if APP_ENV == "development":
+            return get_from_cmdb2(params, filters)
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
             resource_type, resource_name, item_name, start_time, end_time,
             resource_status, page_num, page_count, env, user_id, department, ip)

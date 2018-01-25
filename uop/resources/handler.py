@@ -10,6 +10,8 @@ import random
 import datetime
 from uop.log import Log
 from config import APP_ENV, configs
+from uop.models import ResourceModel
+from flask import jsonify
 import  xlsxwriter
 import uuid
 import sys,os
@@ -85,6 +87,59 @@ def _match_condition_generator(args):
     return match
 
 
+def pageinit(items, offset, limit):
+    if offset < 0 or limit < 0:
+        return []
+    assert isinstance(items, list)
+    total_len = len(items)
+    pages = total_len / limit
+    o_page = 1 if total_len % limit else 0
+    total_pages = pages + o_page
+    total_pages = total_pages if total_pages else 1
+    if total_pages > offset:
+        pre = (offset - 1) * limit
+        last = offset * limit
+        page_contents = items[pre:last]
+    elif total_pages == offset:
+        pre = (offset - 1) * limit
+        page_contents = items[pre:]
+    else:
+        page_contents = []
+    return page_contents, total_pages
+
+
+def get_from_cmdb2(data, filters):
+    url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
+    response = {
+        "code": 2002,
+        "result": {
+            "msg": "success",
+            "res": {
+                "current_page": filters["page_num"],
+                "object_list": [],
+                "total_page": 0
+            }
+        }
+    }
+    try:
+        ret = requests.post(url, data=json.dumps(data), timeout=60).json()
+        if ret["code"] != 0:
+            response["code"] = ret["code"]
+            response["result"]["msg"] = ret["msg"]
+        resources = ResourceModel.objects.filter(department=filters["dep"])
+        cmdb2_resource_id_list = []
+        for res in resources:
+            for id in res.cmdb2_resource_id:
+                cmdb2_resource_id_list.append(id)
+        data = [r for r in ret["data"] if r.get("id") in cmdb2_resource_id_list]
+        object_list, total_page = pageinit(data, filters["page_num"], filters["page_count"])
+        response["result"]["res"]["object_list"] = object_list
+        response["result"]["res"]["total_page"] = total_page
+    except Exception as exc:
+        response["code"] = 500
+        response["result"]["msg"] = str(exc)
+    return jsonify(response)
+
 
 def to_unicode(value):
     try:
@@ -109,7 +164,6 @@ def to_unicode(value):
     except Exception,e:
         err_msg='execute to_unicode error: %s' % str(e)
         raise ExcelException(err_msg)
-
 
 
 def deal_myresource_to_excel(data,field_list):
@@ -144,6 +198,7 @@ def deal_myresource_to_excel(data,field_list):
     except Exception as e:
         err_msg= "deal my resource to excel error: %s" % str(e)
         return  err_msg,excel_name
+
 
 def deal_data(data,field_list):
     res_list=[]
