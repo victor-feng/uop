@@ -1081,8 +1081,6 @@ class GetMyResourcesInfo(Resource):
         res = result.get('res', {})
         data = res.get("object_list", [])
         msg, excel_name = deal_myresource_to_excel(data, field_list)
-        Log.logger.info("-----------------------field_list---------------%s",  field_list)
-        Log.logger.info("-----------------------excel_name------------%s", excel_name)
         if msg == "success":
             download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
             path = os.path.join(download_dir, excel_name)
