@@ -1053,6 +1053,7 @@ class GetMyResourcesInfo(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, default='', location='json')
+        parser.add_argument('project_id', type=str, default='', location='json')
         parser.add_argument('resource_type', type=str, default='', location='json')
         parser.add_argument('mysqlandmongo', type=str, default='', location='json')
         parser.add_argument('cache', type=str, default='', location='json')

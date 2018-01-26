@@ -108,7 +108,7 @@ def pageinit(items, offset, limit):
     return page_contents, total_pages
 
 
-def get_from_cmdb2(data, filters):
+def get_from_cmdb2(args, filters):
     url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
     response = {
         "code": 2002,
@@ -122,12 +122,13 @@ def get_from_cmdb2(data, filters):
         }
     }
     try:
-        ret = requests.post(url, data=json.dumps(data), timeout=60).json()
+        ret = requests.post(url, data=json.dumps(args), timeout=60).json()
         if ret["code"] != 0:
             response["code"] = ret["code"]
             response["result"]["msg"] = ret["msg"]
         resources = ResourceModel.objects.filter(department=filters["dep"])
         cmdb2_resource_id_list = []
+        Log.logger.info("cmdb2_resource_id_list:{}， args:{}, ret:{}".format(cmdb2_resource_id_list, args, ret))
         for res in resources:
             for id in res.cmdb2_resource_id:
                 cmdb2_resource_id_list.append(id)
