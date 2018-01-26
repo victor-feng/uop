@@ -387,7 +387,7 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     ret = []
     try:
-        # Log.logger.info("graph_data request: {}".format(data))
+        Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str, timeout=60).json()
         # Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
