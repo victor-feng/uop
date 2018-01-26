@@ -57,6 +57,7 @@ def make_random_database_password():
     return str(random.randint(100000, 999999)) + chr(random.randint(65, 90)) + chr(
         random.randint(97, 122)) + '!'
 
+
 def _match_condition_generator(args):
     match = dict()
     if args.user_id or args.resource_name or args.project or args.formStatus or args.approval_status\
