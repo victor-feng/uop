@@ -545,23 +545,50 @@ class AllPermManage(Resource):
             if args.menu_id:
                 Permission.menu_id = args.menu_id
             if args.name:
-                Permission.name = args.name
+                Permissions = PermissionList.objects.filter(name=Permission.name)
+                for perm in Permissions:
+                    perm.name=args.name
+                    perm.save()
             if args.button:
-                Permission.button = args.button
+                Permissions = PermissionList.objects.filter(button=Permission.button)
+                for perm in Permissions:
+                    perm.button = args.button
+                    perm.save()
             if args.icon:
-                Permission.icon = args.icon
+                Permissions = PermissionList.objects.filter(icon=Permission.icon)
+                for perm in Permissions:
+                    perm.icon = args.icon
+                    perm.save()
             if args.operation:
-                Permission.operation = args.operation
+                Permissions = PermissionList.objects.filter(operation=Permission.operation)
+                for perm in Permissions:
+                    perm.operation = args.operation
+                    perm.save()
             if args.url:
-                Permission.url = args.url
+                Permissions = PermissionList.objects.filter(url=Permission.url)
+                for perm in Permissions:
+                    perm.url = args.url
+                    perm.save()
             if args.perm_type:
-                Permission.perm_type = args.perm_type
+                Permissions = PermissionList.objects.filter(perm_type=Permission.perm_type)
+                for perm in Permissions:
+                    perm.perm_type = args.perm_type
+                    perm.save()
             if args.endpoint:
-                Permission.endpoint = args.endpoint
+                Permissions = PermissionList.objects.filter(endpoint=Permission.endpoint)
+                for perm in Permissions:
+                    perm.url = args.url
+                    perm.save()
             if args.level:
-                Permission.level = args.level
+                Permissions = PermissionList.objects.filter(level=Permission.level)
+                for perm in Permissions:
+                    perm.level = args.level
+                    perm.save()
             if args.parent_id:
-                Permission.parent_id = args.parent_id
+                Permissions = PermissionList.objects.filter(parent_id=Permission.parent_id)
+                for perm in Permissions:
+                    perm.parent_id = args.parent_id
+                    perm.save()
             if args.api_get:
                 Permission.api_get = args.api_get
             if args.api_post:
@@ -573,7 +600,10 @@ class AllPermManage(Resource):
             if str(args.isDropdown):
                 Permission.isDropdown = args.isDropdown
             if args.menu_index:
-                Permission.menu_index = args.menu_index
+                Permissions = PermissionList.objects.filter(menu_index=Permission.menu_index)
+                for perm in Permissions:
+                    perm.menu_index = args.menu_index
+                    perm.save()
             Permission.updated_time = datetime.datetime.now()
             Permission.save()
 

@@ -84,3 +84,4 @@ def api_permission_control(request_info):
                 return jsonify({'error': 'api permission control error,error msg %s' % str(e), "code": 500})
         return wrap_func
     return _access_control
+
