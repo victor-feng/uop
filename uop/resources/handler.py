@@ -129,7 +129,7 @@ def get_from_cmdb2(args, filters):
             response["code"] = ret["code"]
             response["result"]["msg"] = ret["msg"]
         Log.logger.info(u"部门：{}".format(filters["dep"]))
-        resources = ResourceModel.objects.filter(department=filters["dep"])
+        resources = ResourceModel.objects.filter(department=filters["dep"], env=filters["env"])
         cmdb2_resource_id_list = []
         for res in resources:
             for id in res.cmdb2_resource_id:

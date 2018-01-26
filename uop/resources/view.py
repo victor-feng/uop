@@ -980,7 +980,7 @@ class GetMyResourcesInfo(Resource):
             'item_name':  project_id,
             "resource_name": resource_name,
             'ip': ip,
-            "env": env,
+            # "env": env,
             "resource_status": resource_status,
             "uid": uid,
             "token": token
@@ -989,7 +989,8 @@ class GetMyResourcesInfo(Resource):
             "dep": department,
             "user": user_id,
             "page_num": page_num,
-            "page_count":page_count
+            "page_count":page_count,
+            "env": env
         }
         if APP_ENV == "development":
             return get_from_cmdb2(params, filters)
