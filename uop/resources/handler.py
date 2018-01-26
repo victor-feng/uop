@@ -128,12 +128,13 @@ def get_from_cmdb2(args, filters):
             response["result"]["msg"] = ret["msg"]
         resources = ResourceModel.objects.filter(department=filters["dep"])
         cmdb2_resource_id_list = []
-        Log.logger.info("cmdb2_resource_id_list:{}， args:{}, ret:{}".format(cmdb2_resource_id_list, args, ret))
+
         for res in resources:
             for id in res.cmdb2_resource_id:
                 cmdb2_resource_id_list.append(id)
         data = [r for r in ret["data"] if r.get("id") in cmdb2_resource_id_list]
-        object_list, total_page = pageinit(data, filters["page_num"], filters["page_count"])
+        Log.logger.info("cmdb2_resource_id_list:{}， data:{}, ret:{}".format(cmdb2_resource_id_list, data, ret))
+        object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
         response["result"]["res"]["object_list"] = object_list
         response["result"]["res"]["total_page"] = total_page
     except Exception as exc:
