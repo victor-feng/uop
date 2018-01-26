@@ -542,70 +542,42 @@ class AllPermManage(Resource):
         Log.logger.info(args)
         try:
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
-            if args.menu_id:
-                Permission.menu_id = args.menu_id
-            if args.name:
-                Permissions = PermissionList.objects.filter(name=Permission.name)
-                for perm in Permissions:
+            Permissions = PermissionList.objects.filter(name=Permission.name)
+            for perm in Permissions:
+                if args.menu_id:
+                    perm.menu_id = args.menu_id
+                if args.name:
                     perm.name=args.name
-                    perm.save()
-            if args.button:
-                Permissions = PermissionList.objects.filter(button=Permission.button)
-                for perm in Permissions:
+                if args.button:
                     perm.button = args.button
-                    perm.save()
-            if args.icon:
-                Permissions = PermissionList.objects.filter(icon=Permission.icon)
-                for perm in Permissions:
+                if args.icon:
                     perm.icon = args.icon
-                    perm.save()
-            if args.operation:
-                Permissions = PermissionList.objects.filter(operation=Permission.operation)
-                for perm in Permissions:
+                if args.operation:
                     perm.operation = args.operation
-                    perm.save()
-            if args.url:
-                Permissions = PermissionList.objects.filter(url=Permission.url)
-                for perm in Permissions:
+                if args.url:
                     perm.url = args.url
-                    perm.save()
-            if args.perm_type:
-                Permissions = PermissionList.objects.filter(perm_type=Permission.perm_type)
-                for perm in Permissions:
-                    perm.perm_type = args.perm_type
-                    perm.save()
-            if args.endpoint:
-                Permissions = PermissionList.objects.filter(endpoint=Permission.endpoint)
-                for perm in Permissions:
+                if args.perm_type:
+                    perm.perm_type = args.perm_typ
+                if args.endpoint:
                     perm.url = args.url
-                    perm.save()
-            if args.level:
-                Permissions = PermissionList.objects.filter(level=Permission.level)
-                for perm in Permissions:
-                    perm.level = args.level
-                    perm.save()
-            if args.parent_id:
-                Permissions = PermissionList.objects.filter(parent_id=Permission.parent_id)
-                for perm in Permissions:
+                if args.level:
+                    Permission.level = args.level
+                if args.parent_id:
                     perm.parent_id = args.parent_id
-                    perm.save()
-            if args.api_get:
-                Permission.api_get = args.api_get
-            if args.api_post:
-                Permission.api_post = args.api_post
-            if args.api_put:
-                Permission.api_put = args.api_put
-            if args.api_delete:
-                Permission.api_delete = args.api_delete
-            if str(args.isDropdown):
-                Permission.isDropdown = args.isDropdown
-            if args.menu_index:
-                Permissions = PermissionList.objects.filter(menu_index=Permission.menu_index)
-                for perm in Permissions:
+                if args.api_get:
+                    perm.api_get = args.api_get
+                if args.api_post:
+                    perm.api_post = args.api_post
+                if args.api_put:
+                    perm.api_put = args.api_put
+                if args.api_delete:
+                    perm.api_delete = args.api_delete
+                if str(args.isDropdown):
+                    perm.isDropdown = args.isDropdown
+                if args.menu_index:
                     perm.menu_index = args.menu_index
-                    perm.save()
-            Permission.updated_time = datetime.datetime.now()
-            Permission.save()
+                perm.updated_time = datetime.datetime.now()
+                perm.save()
 
             code = 200
             msg = "Update permission success"
