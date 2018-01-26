@@ -557,7 +557,7 @@ class AllPermManage(Resource):
                 if args.url:
                     perm.url = args.url
                 if args.perm_type:
-                    perm.perm_type = args.perm_typ
+                    perm.perm_type = args.perm_type
                 if args.endpoint:
                     perm.url = args.url
                 if args.level:
