@@ -25,6 +25,7 @@ from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2
+from uop.item_info.handler import get_uid_token
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -969,6 +970,7 @@ class GetMyResourcesInfo(Resource):
         page_count = request.args.get('page_count')
         ip = request.args.get('ip', "")
         result_list = []
+        uid, token = get_uid_token()
         params = {
             "resource_type": resource_type,
             "start_time": start_time,
@@ -979,7 +981,9 @@ class GetMyResourcesInfo(Resource):
             "resource_name": resource_name,
             'ip': ip,
             "env": env,
-            "resource_status": resource_status
+            "resource_status": resource_status,
+            "uid": uid,
+            "token": token
         }
         filters = {
             "dep": department,
