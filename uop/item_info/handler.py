@@ -65,7 +65,7 @@ def push_data_to_file(parent_id, model_id, property):
     try:
         with open(curdir + "/json.txt", "rb") as fp:
             whole_data = json.load(fp)["data"]
-        Log.logger.info("whole_data:{}\nparent_id:{}\nproperty:{},{}".format(whole_data, parent_id, property, type(property)))
+        # Log.logger.info("whole_data:{}\nparent_id:{}\nproperty:{},{}".format(whole_data, parent_id, property, type(property)))
         data = [p for p in property if str(p["code"]) == "name"][0]
         node = [wd for wd in whole_data if str(wd["parent_id"]) == str(parent_id)]
         if node:
@@ -90,8 +90,8 @@ def push_data_to_file(parent_id, model_id, property):
                 break
         else:
             whole_data.append(node)
-        Log.logger.info("node:{},type:{}".format(node, type(node)))
-        Log.logger.info("new whole_data: {}".format(whole_data))
+        # Log.logger.info("node:{},type:{}".format(node, type(node)))
+        # Log.logger.info("new whole_data: {}".format(whole_data))
         with open(curdir + "/json.txt", "w") as fp:
             json.dump({"data": whole_data}, fp)
     except Exception as exc:
@@ -120,9 +120,9 @@ def get_uid_token(flush=False):
     }
     data_str = json.dumps(data)
     try:
-        Log.logger.info("login data:{}".format(data))
+        # Log.logger.info("login data:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=30)
-        Log.logger.info(ret.json())
+        # Log.logger.info(ret.json())
         if ret.json()["code"] == 0:
             uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
             one = Token.objects.filter(uid=uid)
@@ -161,7 +161,7 @@ def push_entity_to_file(data):
 
 def processs_chidren_final(entity_list, children):
     # entity_list = copy.deepcopy(entity_list)
-    Log.logger.info("in processs_chidren_final")
+    # Log.logger.info("in processs_chidren_final")
     for c in children:
         if not c.get("children"):
             entity_list.append({
@@ -185,7 +185,7 @@ def get_entity_from_file(data):
     #     with open(curdir + "/.entity.txt", "rb") as fp:
     #         whole_entity = json.load(fp)["entity"]
     whole_entity = get_entity(data)["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
-    Log.logger.info("get entity info from CMDB2.0: {}".format(len(whole_entity)))
+    # Log.logger.info("get entity info from CMDB2.0: {}".format(len(whole_entity)))
     compare_entity = map(lambda  x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": str(x["property"])}, whole_entity)
     single_entity = filter(lambda x:set(x.values()) & set(filters.values()), compare_entity)
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
@@ -387,9 +387,9 @@ def subgrath_data(args):
     data_str = json.dumps(data)
     ret = []
     try:
-        Log.logger.info("graph_data request: {}".format(data))
+        # Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str, timeout=60).json()
-        Log.logger.info("graph_data result: {}".format(ret))
+        # Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
         Log.logger.error("graph_data: {}".format(graph_data))
@@ -484,11 +484,11 @@ def fix_instance(args):
         return {"warning": fix_model}
     data_str = json.dumps(data)
     try:
-        Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
+        # Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ request:{}".format(data))
         instance = requests.post(url, data=data_str, timeout=60).json()
-        Log.logger.info("post return json:{}".format(instance))
+        # Log.logger.info("post return json:{}".format(instance))
         instance = instance["data"]["instance"]
-        Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ result:{}".format(instance))
+        # Log.logger.info("post 'fix instances data' to cmdb/openapi/graph/ result:{}".format(instance))
     except Exception as exc:
         instance = []
         Log.logger.error("post 'fix instances data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
@@ -514,10 +514,10 @@ def delete_instance(args):
     }
     data_str = json.dumps(data)
     try:
-        Log.logger.info("delete 'instances' to cmdb/openapi/graph/ request:{}".format(data))
+        # Log.logger.info("delete 'instances' to cmdb/openapi/graph/ request:{}".format(data))
         instance = requests.delete(url, data=data_str).json()
-        Log.logger.info("delete return json:{}".format(instance))
-        Log.logger.info("delete 'instances' to cmdb/openapi/graph/ result:{}".format(instance))
+        # Log.logger.info("delete return json:{}".format(instance))
+        # Log.logger.info("delete 'instances' to cmdb/openapi/graph/ result:{}".format(instance))
     except Exception as exc:
         instance = []
         Log.logger.error("delete 'instances' to cmdb/openapi/graph/ error:{}".format(str(exc)))

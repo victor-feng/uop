@@ -167,11 +167,11 @@ def filter_status_data(p_code):
     data = {
         "vm_status":[]
     }
-    Log.logger.info("filter_status_data.p_code:{}".format(p_code))
+    # Log.logger.info("filter_status_data.p_code:{}".format(p_code))
     res = ResourceModel.objects.filter(cmdb_p_code=p_code)
     for r in res:
         osid_ip_list = r.os_ins_ip_list
-        Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
+        # Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
         for oi in osid_ip_list:
             meta = {}
             meta["resource_id"] = r.res_id
@@ -201,10 +201,10 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
     data = filter_status_data(p_code)
-    Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
+    # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         ret = requests.post(url, data=json.dumps(data)).json()
-        Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
+        # Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
     except Exception as exc:
         Log.logger.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
 
@@ -238,7 +238,7 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
 @async
 def crp_data_cmdb(args):
     assert(isinstance(args, dict))
-    Log.logger.info("###data:{}".format(args))
+    # Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations(CMDB2_VIEWS["1"][0]) # B7
@@ -258,7 +258,7 @@ def crp_data_cmdb(args):
     data_str = json.dumps(data)
     ret = []
     try:
-        Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
+        # Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=60).json()
         if ret["code"] == 0:
             save_resource_id(ret["data"]["instance"], resource)
@@ -324,7 +324,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     # 中间件、虚拟机数据解析
     virtual_server_model = filter(lambda x: x["code"] == "virtual_device", models_list)[0]
     for db_name, db_contents in raw["db_info"].items():
-        Log.logger.info("now analyze {} data".format(db_name))
+        # Log.logger.info("now analyze {} data".format(db_name))
         db_model = filter(lambda x: x["code"] == db_name, models_list)[0] # db_name 设置保持与cmdb一致
         attach = {
             "version": db_contents["version"],
@@ -345,7 +345,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
             instances.append(i)
             relations.extend(r)
-    Log.logger.info("[CMDB2.0 format DATA] instance:{}\n[CMDB2.0 format DATA] relations:{}\n".format(instances, relations))
+    # Log.logger.info("[CMDB2.0 format DATA] instance:{}\n[CMDB2.0 format DATA] relations:{}\n".format(instances, relations))
     return instances, relations
 
 
@@ -371,7 +371,7 @@ def judge_value_format(item, pro, attach):
         ))  # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
         one = item.get(code) if item.get(code) else attach.get(code)
         if one:
-            Log.logger.info("one data:{}".format(one))
+            # Log.logger.info("one data:{}".format(one))
             if str(pro["value_type"]) == "string":
                 return str(one).decode(encoding="utf-8")
             elif str(pro["value_type"]) == "int":
@@ -454,8 +454,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
                 for rel in relations if rel["end_model_id"] == i["model_id"] and rel["start_model_id"] == up_level["model_id"]
             ]
         rels.extend(r)
-    Log.logger.info("Analyzed {}th data from crp:{} \n.".format(i["_id"], i))
-    Log.logger.info("Analyzed {}th data's relations from crp:{} \n.".format(i["_id"], rels))
+    # Log.logger.info("Analyzed {}th data from crp:{} \n.".format(i["_id"], i))
+    # Log.logger.info("Analyzed {}th data's relations from crp:{} \n.".format(i["_id"], rels))
     return i, rels
 
 

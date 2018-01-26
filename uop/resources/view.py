@@ -975,7 +975,7 @@ class GetMyResourcesInfo(Resource):
             "resource_type": resource_type,
             "start_time": start_time,
             "end_time":  end_time,
-            "page_num": page_num,
+            "page_num": -1, # 获取所有数据
             'page_count': page_count,
             'item_name':  project_id,
             "resource_name": resource_name,
