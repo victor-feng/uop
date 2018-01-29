@@ -399,6 +399,9 @@ class ResourceApplication(Resource):
                     os_inst_ip_list.append(os_ip_dict)
                 crp_data = {
                     "resources_id": resources.res_id,
+                    "resource_name":resources.resource_name,
+                    "resource_type": resources.resource_type,
+                    "cloud":resources.cloud,
                     "os_ins_ip_list": os_inst_ip_list,
                     "vid_list": resources.vid_list,
                     "set_flag": 'res'

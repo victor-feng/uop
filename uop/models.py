@@ -308,7 +308,8 @@ class ResourceModel(db.DynamicDocument):
     mysql_network_id = db.StringField(required=False)
     redis_network_id = db.StringField(required=False)
     mongodb_network_id = db.StringField(required=False)
-
+    cloud = db.StringField(required=False) #1 = cloud1.0 ,2=cloud2.0
+    resource_type = db.StringField(required=False) #资源的类型是应用app，还是中间件middleware
 
 
     meta = {
