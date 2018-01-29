@@ -563,7 +563,7 @@ class App(Resource):
         data = []
         resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department) # 本部门的工程实例
         if resources:
-            data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.approval_status} for res in resources]
+            data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status} for res in resources]
         response = response_data(200, "success", data)
         return jsonify(response)
 
