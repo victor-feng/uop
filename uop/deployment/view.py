@@ -131,10 +131,10 @@ class DeploymentListAPI(Resource):
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
                 project_name, business_name, module_name = "" , "", ""
                 if resource:
-                    for res in resource:
-                        project_name = res.project_name
-                        business_name = res.business_name
-                        module_name = res.module_name
+                    for r in resource:
+                        project_name = r.project_name
+                        business_name = r.business_name
+                        module_name = r.module_name
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
