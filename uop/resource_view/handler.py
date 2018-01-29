@@ -178,12 +178,16 @@ def attach_data(resources, relation, id, instance, level):
 
 def attach_resource_env(next_instance, resources):
     children = {}
+    get_view_num = lambda x: x[0] if x else ""
     if resources:
         for res in resources:
             children.setdefault(str(res.env), []).extend([{
                         "title": ni["name"],
                         "instance_id": ni["instance_id"],
                         "code": ni["code"],
+                        "view_num": get_view_num(
+                                     [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == ni["entity_id"]]
+                        ),
                         "model_id": ni["entity_id"]
                     }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
             ])
