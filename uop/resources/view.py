@@ -20,16 +20,17 @@ from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig,Approval
 from uop.resources.errors import resources_errors
 from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
-from uop.util import get_CRP_url
+from uop.util import get_CRP_url, response_data
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2
-from uop.item_info.handler import get_uid_token
+from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 CMDB_URL = configs[APP_ENV].CMDB_URL
+ENTITY  = configs[APP_ENV].CMDB2_ENTITY
 CRP_URL = configs[APP_ENV].CRP_URL
 UPLOAD_FOLDER=configs[APP_ENV].UPLOAD_FOLDER
 # TODO: move to global conf
@@ -548,6 +549,21 @@ class ResourceApplication(Resource):
         }
         return ret, 200
 
+
+class App(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('project_id', type=str, location='args')
+        parser.add_argument('department', type=str, location='args')
+        args = parser.parse_args()
+        # args.instance_id = args.project_id
+        # args.model_id = ENTITY["tomcat"]
+        # args.self_model_id = ENTITY["project"]
+        # instances = Aquery(args)["instance"] # 工程下所有的tomcat实例
+        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department) # 本部门的工程实例
+        data = [{"name": res.resource_name, "res_id": res.res_id} for res in resources]
+        response = response_data(200, "success", data)
+        return jsonify(response)
 
 class ResourceDetail(Resource):
     # @api_permission_control(request)
@@ -1148,6 +1164,7 @@ class Dockerlogs(Resource):
 
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
+resources_api.add_resource(App, '/app/')
 resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
 resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
 resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
