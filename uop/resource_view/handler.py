@@ -187,5 +187,6 @@ def attach_resource_env(next_instance, resources):
                 }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
         ])
     Log.logger.info("children resources:{}".format(children))
+    return children
 
 
