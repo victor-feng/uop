@@ -128,13 +128,22 @@ class DeploymentListAPI(Resource):
                         app["is_nginx"] = 1
                     elif ins_id not in domain_info:
                         app["is_nginx"] = 0
+                resource = ResourceModel.objects.get(res_id=deployment.resource_id)
+                project_name, business_name, module_name = "" , "", ""
+                if resource:
+                    for res in resource:
+                        project_name = res.project_name
+                        business_name = res.business_name
+                        module_name = res.module_name
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
                     'initiator': deployment.initiator,
                     'user_id': deployment.user_id,
                     'project_id': deployment.project_id,
-                    'project_name': deployment.project_name,
+                    'project_name': project_name,
+                    'business_name': business_name,
+                    'module_name':module_name,
                     'resource_id': deployment.resource_id,
                     'resource_name': deployment.resource_name,
                     'environment': deployment.environment,
