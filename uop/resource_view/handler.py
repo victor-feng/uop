@@ -178,15 +178,15 @@ def attach_data(resources, relation, id, instance, level):
 
 def attach_resource_env(next_instance, resources):
     children = {}
-    for res in resources:
-        children.setdefault(str(res.env), []).extend([{
-                    "title": ni["name"],
-                    "instance_id": ni["instance_id"],
-                    "code": ni["code"],
-                    "model_id": ni["entity_id"]
-                }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
-        ])
-    Log.logger.info("children resources:{}".format(children))
+    if resources:
+        for res in resources:
+            children.setdefault(str(res.env), []).extend([{
+                        "title": ni["name"],
+                        "instance_id": ni["instance_id"],
+                        "code": ni["code"],
+                        "model_id": ni["entity_id"]
+                    }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
+            ])
     return children
 
 
