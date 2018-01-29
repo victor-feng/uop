@@ -146,7 +146,8 @@ def cmdb2_graph_search(args):
         Log.logger.error("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str).json()["data"]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
-            data = package_data(data)
+            resources = ResourceModel.objects.filter(department=args.department)
+            data = package_data(data, resources)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
     except Exception as exc:
         Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
@@ -154,24 +155,37 @@ def cmdb2_graph_search(args):
     return result
 
 
-def package_data(data):
+def package_data(data, resources):
     assert(data, dict)
     result = []
     instance = data["instance"]
     relation = data["relation"]
     business = filter(lambda ins:ins["level_id"] == 2, instance)
     for b in business:
-        node = {"title": b["name"], "id": b["instance_id"], "children": attach_data(relation, b["instance_id"], instance, 3)}
+        node = {"title": b["name"], "id": b["instance_id"], "children": attach_data(resources, relation, b["instance_id"], instance, 3)}
         result.append(node)
     return result
 
 
-def attach_data(relation, id, instance, level):
+def attach_data(resources, relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
     if level < 5:
-        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(relation, ni["instance_id"], instance, level + 1)} for ni in next_instance if
+        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(resources, relation, ni["instance_id"], instance, level + 1)} for ni in next_instance if
                 ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
     if level == 5:
-        return [{"title": ni["name"], "instance_id": ni["instance_id"], "code": ni["code"], "model_id": ni["entity_id"]} for ni in next_instance]
+        return attach_resource_env(next_instance, resources)
+
+
+def attach_resource_env(next_instance, resources):
+    children = {}
+    for res in resources:
+        children.setdefault(str(res.env), []).extend([{
+                    "title": ni["name"],
+                    "instance_id": ni["instance_id"],
+                    "code": ni["code"],
+                    "model_id": ni["entity_id"]
+                }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
+        ])
+    Log.logger.info("children resources:{}".format(children))
 
 

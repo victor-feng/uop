@@ -14,6 +14,7 @@ __all__ = [
     "disconf_write_to_file", "attach_domain_ip"
 ]
 
+
 def format_resource_info(items):
     resource_info = {}
     for item in items.get('items'):

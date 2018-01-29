@@ -32,6 +32,7 @@ class ResourceView(Resource):
             parser.add_argument('res_id', type=str) # 对应cmdb1.0的资源id，cmdb2.0中的资源实体id
             parser.add_argument('code', type=str)
             parser.add_argument('value', type=str)
+            parser.add_argument('department', type=str)
             args = parser.parse_args()
             Log.logger.info("get graph from CMDB{}.0".format(args.cmdb))
             if args.cmdb == 1:

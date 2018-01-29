@@ -1074,6 +1074,7 @@ class GetMyResourcesInfo(Resource):
 
         return response
 
+
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, default='', location='json')
