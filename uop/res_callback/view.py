@@ -505,6 +505,7 @@ class ResourceProviderCallBack(Resource):
         set_flag = request_data.get('set_flag')
         resource = ResourceModel.objects.get(res_id=resource_id)
         env = resource.env
+        cloud = resource.cloud
         is_write_to_cmdb = False
         # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
         if status == "ok":
@@ -515,7 +516,10 @@ class ResourceProviderCallBack(Resource):
                     for j in resource.compute_list:
                         if i.get('ins_id') == j.ins_id:
                             # j.ips = [ins.get('ip') for ins in i.get('instance')]
-                            ips = j.ips
+                            if cloud == "2":
+                                ips=[]
+                            else:
+                                ips = j.ips
                             for ins in i.get('instance'):
                                 ip = ins.get('ip')
                                 ips.append(ip)
@@ -558,9 +562,9 @@ class ResourceProviderCallBack(Resource):
         os_ip_list = []
         os_ins_list = resource.os_ins_list
         os_ins_ip_list = resource.os_ins_ip_list
-        if os_ins_list:
+        if os_ins_list and cloud != "2":
             os_ids = os_ins_list
-        if os_ins_ip_list:
+        if os_ins_ip_list and cloud !="2":
             os_ip_list = os_ins_ip_list
         container = request_data.get('container')
         for _container in container:
@@ -616,24 +620,44 @@ class ResourceProviderCallBack(Resource):
         status_record.s_type = "set"
         status_record.set_flag = set_flag
         status_record.created_time = datetime.datetime.now()
-        if status == 'ok':
-            if set_flag == "res":
-                status_record.status = "set_success"
-                status_record.msg = "预留成功"
-            if set_flag == "increase":
-                status_record.status = "increase_success"
-                status_record.msg = "docker扩容成功"
-                status_record.deploy_id = deploy_id
+        if cloud == "2":
+            if status == 'ok':
+                if set_flag == "res":
+                    status_record.status = "set_success"
+                    status_record.msg = "应用集群创建成功"
+                if set_flag == "increase":
+                    status_record.status = "increase_success"
+                    status_record.msg = "应用集群扩缩容成功"
+                    status_record.deploy_id = deploy_id
+            else:
+                if set_flag == "res":
+                    status_record.status = "set_fail"
+                    status_record.msg = "应用集群创建失败,错误日志为: %s" % error_msg
+                elif set_flag == "increase":
+                    status_record.status = "increase_fail"
+                    status_record.msg = "应用集群扩缩容失败,错误日志为: %s" % error_msg
+                    status_record.deploy_id = deploy_id
+                    dep.deploy_result = "increase_fail"
+                    dep.save()
         else:
-            if set_flag == "res":
-                status_record.status = "set_fail"
-                status_record.msg = "预留失败,错误日志为: %s" % error_msg
-            elif set_flag == "increase":
-                status_record.status = "increase_fail"
-                status_record.msg = "扩容失败,错误日志为: %s" % error_msg
-                status_record.deploy_id = deploy_id
-                dep.deploy_result = "increase_fail"
-                dep.save()
+            if status == 'ok':
+                if set_flag == "res":
+                    status_record.status = "set_success"
+                    status_record.msg = "预留成功"
+                if set_flag == "increase":
+                    status_record.status = "increase_success"
+                    status_record.msg = "docker扩容成功"
+                    status_record.deploy_id = deploy_id
+            else:
+                if set_flag == "res":
+                    status_record.status = "set_fail"
+                    status_record.msg = "预留失败,错误日志为: %s" % error_msg
+                elif set_flag == "increase":
+                    status_record.status = "increase_fail"
+                    status_record.msg = "扩容失败,错误日志为: %s" % error_msg
+                    status_record.deploy_id = deploy_id
+                    dep.deploy_result = "increase_fail"
+                    dep.save()
         status_record.save()
         resource.reservation_status = status_record.status
         resource.save()

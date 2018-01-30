@@ -59,6 +59,8 @@ class ResourceApplication(Resource):
         parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
+        parser.add_argument('cloud', type=str)
+        parser.add_argument('resource_type', type=str)
         args = parser.parse_args()
 
         resource_name = args.resource_name
@@ -81,6 +83,8 @@ class ResourceApplication(Resource):
         approval_status = "unsubmit"
         resource_list = args.resource_list
         compute_list = args.compute_list
+        cloud = args.cloud
+        resource_type = args.resource_type
         resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                              department_id=department_id, res_id=res_id, project_id=project_id,
                                              cmdb2_project_id=cmdb2_project_id,
@@ -89,7 +93,8 @@ class ResourceApplication(Resource):
                                              business_name=business_name,
                                              user_name=user_name, user_id=user_id,env=env,
                                              application_status=application_status, approval_status=approval_status,
-                                             reservation_status="unreserved", created_date=created_date)
+                                             reservation_status="unreserved", created_date=created_date,
+                                             cloud = cloud,resource_type = resource_type)
         for resource in resource_list:
             ins_name = resource.get('res_name', '未知名称')
             ins_id = str(uuid.uuid1())
@@ -214,6 +219,8 @@ class ResourceApplication(Resource):
         parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('instance_status', type=str, location='args')
         parser.add_argument('department', type=str, location='args')
+        parser.add_argument('cloud', type=str, location='args')
+        parser.add_argument('resource_type', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -242,6 +249,10 @@ class ResourceApplication(Resource):
             condition["approval_status__in"] = ["success", "failed", "revoke"]
         if args.department:
             condition["department"]=args.department
+        if args.cloud:
+            condition["cloud"]=args.cloud
+        if args.resource_type:
+            condition["resource_type"]=args.resource_type
 
         if agg_by:
             pipeline = []
@@ -328,6 +339,8 @@ class ResourceApplication(Resource):
                 result['reservation_status'] = resource.reservation_status
                 result['env'] = resource.env
                 result['is_rollback'] = resource.is_rollback
+                result['cloud'] = resource.cloud
+                result['resource_type'] = resource.resource_type
                 resource_id = resource.res_id
                 deploys = Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
@@ -464,6 +477,8 @@ class ResourceApplication(Resource):
         parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
+        parser.add_argument('cloud', type=str)
+        parser.add_argument('resource_type', type=str)
         args = parser.parse_args()
         res_id = args.res_id
         resource_name = args.resource_name
@@ -478,6 +493,8 @@ class ResourceApplication(Resource):
         approval_status = args.approval_status
         compute_list = args.compute_list
         resource_list = args.resource_list
+        cloud = args.cloud
+        resource_type = args.resource_type
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
@@ -491,8 +508,10 @@ class ResourceApplication(Resource):
                 resource.application_status=application_status
                 resource.approval_status = approval_status
                 resource.is_rollback = 0
-                resource.compute_list=[]
-                resource.resource_list=[]
+                resource.compute_list = []
+                resource.resource_list = []
+                resource.resource_type = resource_type
+                resource.cloud = cloud
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
                     ins_id = str(uuid.uuid1())
@@ -619,6 +638,8 @@ class ResourceDetail(Resource):
         result['mysql_network_name'] = ""
         result['redis_network_name'] = ""
         result['mongodb_network_name'] = ""
+        result['resource_type'] = resource.resource_type
+        result['cloud'] = resource.cloud
         docker_network_id = resource.docker_network_id
         mysql_network_id = resource.mysql_network_id
         redis_network_id = resource.redis_network_id
@@ -748,6 +769,8 @@ class ResourceDetail(Resource):
         parser.add_argument('approval_status', type=str)
         parser.add_argument('resource_list', type=list, location='json')
         parser.add_argument('compute_list', type=list, location='json')
+        parser.add_argument('cloud', type=str)
+        parser.add_argument('resource_type', type=str)
         args = parser.parse_args()
 
         resource_application.resource_name = args.resource_name
@@ -771,6 +794,8 @@ class ResourceDetail(Resource):
         #     return
         resource_application.resource_list = []
         resource_application.compute_list = []
+        resource_application.cloud = args.cloud
+        resource_application.resource_type = args.resource_type
 
         for resource in resource_list:
             ins_name = resource.get('res_name')
