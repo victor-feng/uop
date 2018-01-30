@@ -499,6 +499,7 @@ class CapacityReservation(Resource):
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             item_info = models.ItemInformation.objects.get(item_name=resource.project)
+            approval = models.Approval.objects.get(approval_id=approval_id)
         except Exception as e:
             Log.logger.error(str(e))
             code = 410
@@ -531,6 +532,9 @@ class CapacityReservation(Resource):
         data['redis_network_id'] = resource.redis_network_id
         data['mongodb_network_id'] = resource.mongodb_network_id
         data['cmdb_repo_id'] = item_info.item_id
+        data['cloud'] = resource.cloud
+        data['resource_type'] = resource.resource_type
+        data['set_flag'] = approval.capacity_status
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         number = 0
@@ -581,31 +585,35 @@ class CapacityReservation(Resource):
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
-            approval = models.Approval.objects.get(approval_id=approval_id)
-            if approval.capacity_status == 'increase':
+            cloud = resource.cloud
+            if cloud == '2':
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
-            elif approval.capacity_status == 'reduce':
-                reduce_list = []
-                for os_ins in resource.os_ins_ip_list:
-                    if os_ins.ip in ips:
-                        reduce_list.append(os_ins)
-                reduce_list = random.sample(reduce_list, number)
-                os_inst_id_list = []
-                reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
-                for os_ip_dict in reduce_list:
-                    os_inst_id = os_ip_dict["os_ins_id"]
-                    os_inst_id_list.append(os_inst_id)
-                crp_data = {
-                    "resources_id": resource.res_id,
-                    "os_ins_ip_list": reduce_list,
-                    "vid_list": [],
-                    "set_flag": 'reduce'
-                }
-                env_ = get_CRP_url(resource.env)
-                crp_url = '%s%s' % (env_, 'api/resource/deletes')
-                crp_data = json.dumps(crp_data)
-                msg = requests.delete(crp_url, data=crp_data)
+            else:
+                if approval.capacity_status == 'increase':
+                    CPR_URL = get_CRP_url(data['env'])
+                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                elif approval.capacity_status == 'reduce':
+                    reduce_list = []
+                    for os_ins in resource.os_ins_ip_list:
+                        if os_ins.ip in ips:
+                            reduce_list.append(os_ins)
+                    reduce_list = random.sample(reduce_list, number)
+                    os_inst_id_list = []
+                    reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
+                    for os_ip_dict in reduce_list:
+                        os_inst_id = os_ip_dict["os_ins_id"]
+                        os_inst_id_list.append(os_inst_id)
+                    crp_data = {
+                        "resources_id": resource.res_id,
+                        "os_ins_ip_list": reduce_list,
+                        "vid_list": [],
+                        "set_flag": 'reduce'
+                    }
+                    env_ = get_CRP_url(resource.env)
+                    crp_url = '%s%s' % (env_, 'api/resource/deletes')
+                    crp_data = json.dumps(crp_data)
+                    msg = requests.delete(crp_url, data=crp_data)
         except Exception as e:
             res = "failed to connect CRP service."
             code = 500
