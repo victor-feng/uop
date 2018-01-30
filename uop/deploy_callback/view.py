@@ -61,6 +61,7 @@ class DeployCallback(Resource):
             parser.add_argument('end_flag', type=bool)
             parser.add_argument('deploy_type', type=str)
             parser.add_argument('unique_flag', type=str)
+            parser.add_argument('cloud', type=str)
             args = parser.parse_args()
         except Exception as e:
             Log.logger.error("###parser error:{}".format(e.args))
@@ -74,6 +75,7 @@ class DeployCallback(Resource):
         end_flag = args.end_flag
         deploy_type = args.deploy_type
         unique_flag = args.unique_flag
+        cloud = args.cloud
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -81,33 +83,43 @@ class DeployCallback(Resource):
         status_record.s_type = "%s_%s" % (deploy_type, res_type)
         status_record.set_flag = "res"
         status_record.created_time = datetime.datetime.now()
-        if dep.deploy_result == "success":
-            dep.deploy_result = "%s_docker_success" % deploy_type
-            status_record.status = "%s_docker_success" % deploy_type
-            status_record.unique_flag = unique_flag
-            status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
-            deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
-        elif dep.deploy_result == "fail":
-            if res_type == "docker":
-                dep.deploy_result = "%s_docker_fail" % deploy_type
-                status_record.status = "%s_docker_fail" % deploy_type
+        if cloud == "2":
+            if dep.deploy_result == "success":
+                dep.deploy_result == "%_success" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg = "%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (
-                deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name, msg)
+                status_record.msg = "应用集群%s成功" % deploy_type_dict[deploy_type]
             else:
-                status_record.status = "deploy_%s_fail" % res_type
-                status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type, msg)
+                dep.deploy_result == "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-        status_record.save()
-        res_status, count = get_deploy_status(deploy_id, deploy_type, res_type,unique_flag)
-        if res_status == True and end_flag == True:
-            dep.deploy_result = "%s_success" % deploy_type
-            create_status_record(resource_id, deploy_id, deploy_type, "%s成功" % deploy_type_dict[deploy_type],
-                                 "%s_success" % deploy_type, "res")
-        elif res_status == False and end_flag == True:
-            dep.deploy_result = "%s_fail" % deploy_type
-            create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
-                                 "%s_fail" % deploy_type, "res")
+                status_record.msg ="应用集群%s失败" % deploy_type_dict[deploy_type]
+        else:
+            if dep.deploy_result == "success":
+                dep.deploy_result = "%s_docker_success" % deploy_type
+                status_record.status = "%s_docker_success" % deploy_type
+                status_record.unique_flag = unique_flag
+                status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
+                deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
+            elif dep.deploy_result == "fail":
+                if res_type == "docker":
+                    dep.deploy_result = "%s_docker_fail" % deploy_type
+                    status_record.status = "%s_docker_fail" % deploy_type
+                    status_record.unique_flag = unique_flag
+                    status_record.msg = "%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (
+                    deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name, msg)
+                else:
+                    status_record.status = "deploy_%s_fail" % res_type
+                    status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type, msg)
+                    status_record.unique_flag = unique_flag
+            status_record.save()
+            res_status, count = get_deploy_status(deploy_id, deploy_type, res_type,unique_flag)
+            if res_status == True and end_flag == True:
+                dep.deploy_result = "%s_success" % deploy_type
+                create_status_record(resource_id, deploy_id, deploy_type, "%s成功" % deploy_type_dict[deploy_type],
+                                     "%s_success" % deploy_type, "res")
+            elif res_status == False and end_flag == True:
+                dep.deploy_result = "%s_fail" % deploy_type
+                create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
+                                     "%s_fail" % deploy_type, "res")
         dep.save()
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
