@@ -514,7 +514,6 @@ class CapacityReservation(Resource):
             return ret, code
 
         data = dict()
-        data['set_flag'] = 'increase'
         data['unit_id'] = resource.project_id
         # data['network_id'] = resource.network_id.strip()
         data['unit_name'] = resource.project
@@ -564,7 +563,10 @@ class CapacityReservation(Resource):
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
-                        number = abs(capacity_.begin_number - capacity_.end_number)
+                        if resource.cloud == "2":
+                            number = capacity_.end_number
+                        else:
+                            number = abs(capacity_.begin_number - capacity_.end_number)
                         com.append(
                             {
                                 "instance_name": db_com.ins_name,
