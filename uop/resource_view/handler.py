@@ -170,13 +170,19 @@ def package_data(data, resources):
 def attach_data(resources, relation, id, instance, level):
     next_instance = filter(lambda ins: ins["level_id"] == level, instance)
     if level < 5:
-        return [{"title": ni["name"], "id": ni["instance_id"], "children": attach_data(resources, relation, ni["instance_id"], instance, level + 1)} for ni in next_instance if
-                ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]]
+        return [
+            {
+                "title": ni["name"],
+                "id": ni["instance_id"],
+                "children": attach_data(resources, relation, ni["instance_id"], instance, level + 1)
+            } for ni in next_instance if ni["instance_id"] in
+                            [r["end_id"] for r in relation if r["start_id"] == id]
+        ]
     if level == 5:
-        return attach_resource_env(next_instance, resources)
+        return attach_resource_env(next_instance, resources, relation, id)
 
 
-def attach_resource_env(next_instance, resources):
+def attach_resource_env(next_instance, resources, relation, id):
     children = {}
     get_view_num = lambda x: x[0] if x else ""
     if resources:
@@ -189,7 +195,8 @@ def attach_resource_env(next_instance, resources):
                                      [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == ni["entity_id"]]
                         ),
                         "model_id": ni["entity_id"]
-                    }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id
+                    }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id and
+                                                          ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]
             ])
     return children
 
