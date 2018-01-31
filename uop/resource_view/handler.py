@@ -146,7 +146,7 @@ def cmdb2_graph_search(args):
         Log.logger.error("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str).json()["data"]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
-            resources = ResourceModel.objects.filter(department=args.department) if args.department else ResourceModel.objects.all()
+            resources = ResourceModel.objects.filter(department=args.department) if args.department == "admin" else ResourceModel.objects.all()
             data = package_data(data, resources)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
     except Exception as exc:
