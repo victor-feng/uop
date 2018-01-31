@@ -146,7 +146,7 @@ def cmdb2_graph_search(args):
         Log.logger.error("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str).json()["data"]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
-            resources = ResourceModel.objects.filter(department=args.department)
+            resources = ResourceModel.objects.filter(department=args.department) if args.department else ResourceModel.objects.all()
             data = package_data(data, resources)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
     except Exception as exc:
@@ -196,7 +196,7 @@ def attach_resource_env(next_instance, resources, relation, id):
                                      [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == ni["entity_id"]]
                         ),
                         "model_id": ni["entity_id"]
-                    }for ni in next_instance if dep_judge(ni, res) and
+                    }for ni in next_instance if ni["instance_id"] in res.cmdb2_resource_id and
                                                           ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]
             ])
     return children
