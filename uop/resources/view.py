@@ -24,7 +24,7 @@ from uop.util import get_CRP_url, response_data
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -426,8 +426,8 @@ class ResourceApplication(Resource):
                 cmdb_p_code = resources.cmdb_p_code
                 resources.delete()
                 # 回写CMDB
-                cmdb_url = '%s%s%s' % (CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
-                requests.delete(cmdb_url)
+                delete_cmdb1(cmdb_p_code)
+                delete_cmdb2(res_id)
             else:
                 ret = {
                     'code': 200,
@@ -1194,6 +1194,15 @@ class Dockerlogs(Resource):
             return ret
 
 
+class testdeltecmdb(Resource):
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('res_id', type=str)
+        args = parser.parse_args()
+        res_id = args.res_id
+        delete_cmdb2(res_id)
+        return "success"
+
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(App, '/app/')
@@ -1201,3 +1210,4 @@ resources_api.add_resource(ResourceRecord, '/fakerecords/<string:user_id>/')
 resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
 resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
 resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
+resources_api.add_resource(testdeltecmdb, '/testdeltecmdb/')

@@ -9,8 +9,10 @@ import time
 import random
 import datetime
 from uop.log import Log
+from uop.util import async
 from config import APP_ENV, configs
 from uop.models import ResourceModel
+from uop.item_info.handler import delete_instance
 from flask import jsonify
 import  xlsxwriter
 import uuid
@@ -238,3 +240,20 @@ def deal_data(data,field_list):
     except Exception as e:
         err_msg= "deal my resource data error: %s" % str(e)
         raise ExcelException(err_msg)
+
+
+def delete_cmdb1(code):
+    cmdb_url = '%s%s%s' % (CMDB_URL, 'cmdb/api/repores_delete/', code)
+    requests.delete(cmdb_url)
+
+
+@async
+def delete_cmdb2(res_id):
+    resource = ResourceModel.objects.filter(res_id=res_id)
+    instance_list = []
+    if resource:
+        null = [instance_list.extend(res.cmdb2_resource_id) for res in resource if res.cmdb2_resource_id]
+    class args(object):
+        delete_list = instance_list
+    ret = delete_instance(args)
+    Log.logger.info("testdeltecmdb:{}".format(ret))
