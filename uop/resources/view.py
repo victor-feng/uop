@@ -1161,11 +1161,15 @@ class Dockerlogs(Resource):
     def get(self):
         env = request.args.get('env')
         osid = request.args.get('osid')
+        resource_name = request.args.get('resource_name')
+        cloud = request.args.get('cloud')
         user_id = request.args.get('user_id')
         crp_url = get_CRP_url(env)
         url = crp_url + "api/openstack/docker/logs/"
         data = json.dumps({
-            "osid": osid
+            "osid": osid,
+            "resource_name":resource_name,
+            "cloud":cloud,
         })
         try:
             Log.logger.info("osid:{}".format(data))
