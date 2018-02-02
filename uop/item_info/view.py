@@ -452,7 +452,7 @@ class CmdbModels(Resource):
         try:
             # data = get_entity_from_file(filters) if filters else get_entity()
             data = get_entity_from_file(filters) # 保留filters，后期可以按其过滤
-            response = response_data(202, data, "") if isinstance(data, str) else response_data(200, "success", json.loads(data))
+            response = response_data(202, data, "") if isinstance(data, str) else response_data(200, "success", data)
             Log.logger.info("get CmdbModels data:{}".format(response))
         except Exception as exc:
             Log.logger.error("get CmdbModels error:{}".format(str(exc)))
