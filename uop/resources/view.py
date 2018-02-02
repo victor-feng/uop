@@ -1203,6 +1203,7 @@ class testdeltecmdb(Resource):
         delete_cmdb2(res_id)
         return "success"
 
+
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(App, '/app/')
