@@ -199,6 +199,9 @@ class ComputeIns(db.EmbeddedDocument):
     docker_meta = db.StringField(required=False)
     capacity_list = db.ListField(db.EmbeddedDocumentField('Capacity'), default=[])
     health_check = db.IntField(required=False)
+    network_id = db.StringField(required=False)
+    networkName = db.StringField(required=False)
+    tenantName = db.StringField(required=False)
 
     meta = {
         'collection': 'compute_ins',
@@ -241,6 +244,7 @@ class DBIns(db.EmbeddedDocument):
     quantity = db.IntField(required=False, default_value=0)
     version = db.StringField(required=False)
     volume_size = db.IntField(required=False, default_value=0)
+    network_id = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'index': [
