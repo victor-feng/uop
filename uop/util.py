@@ -131,10 +131,10 @@ class TimeToolkit(object):
 
 def response_data(code, msg, data):
     ret = {
-        'code': code,
-        'result': {
-            'msg': msg,
-            'data': data,
+        "code": code,
+        "result": {
+            "msg": msg,
+            "data": data,
         }
     }
     return ret
