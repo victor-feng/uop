@@ -609,7 +609,6 @@ class CapacityReservation(Resource):
                     crp_data = {
                         "resources_id": resource.res_id,
                         "os_ins_ip_list": reduce_list,
-                        "vid_list": [],
                         "set_flag": 'reduce'
                     }
                     env_ = get_CRP_url(resource.env)
