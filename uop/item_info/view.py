@@ -433,7 +433,7 @@ class BusinessProject(Resource):
 
 
 class CmdbModels(Resource):
-    def post(self):
+    def get(self):
         '''
         filters 参数为空时会去cmdb2.0获取最新的实体属性信息
         非空时，会按照filters字典去匹配相应的实体
