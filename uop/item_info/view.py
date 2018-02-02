@@ -457,7 +457,7 @@ class CmdbModels(Resource):
         except Exception as exc:
             Log.logger.error("get CmdbModels error:{}".format(str(exc)))
             response = response_data(500, str(exc), "")
-        return json.dumps(response)
+        return json.loads(response)
 
     def post(self):
         pass
