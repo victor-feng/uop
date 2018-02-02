@@ -1062,8 +1062,8 @@ class GetMyResourcesInfo(Resource):
         osid = request.json.get('osid', "")
         env = request.json.get('env', "")
         operation = request.json.get('operation', "")
-        resource_id = request.json.get('resource_id', "")
-        resource_ip = request.json.get('resource_ip', "")
+        resource_name = request.json.get('resource_name', "")
+        cloud = request.json.get('cloud', "2")
         Log.logger.info(
             "get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env,
                                                                                               operation))
@@ -1081,6 +1081,8 @@ class GetMyResourcesInfo(Resource):
         data = {
             "vm_uuid": osid,
             "operation": operation,
+            "cloud":cloud,
+            "resource_name":resource_name
         }
         Log.logger.info("URL is:{}".format(manager_url) )
         headers = {'Content-Type': 'application/json'}
@@ -1102,8 +1104,9 @@ class GetMyResourcesInfo(Resource):
 
         return response
 
-
+    # @api_permission_control(request)
     def post(self):
+        """ 导出我的资源信息，生产excel文件"""
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, default='', location='json')
         parser.add_argument('project_id', type=str, default='', location='json')

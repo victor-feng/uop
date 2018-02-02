@@ -498,7 +498,7 @@ class CapacityReservation(Resource):
         approval_id = args.approval_id
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            item_info = models.ItemInformation.objects.get(item_name=resource.project)
+            #item_info = models.ItemInformation.objects.get(item_name=resource.project)
             approval = models.Approval.objects.get(approval_id=approval_id)
         except Exception as e:
             Log.logger.error(str(e))
@@ -530,7 +530,7 @@ class CapacityReservation(Resource):
         data['mysql_network_id'] = resource.mysql_network_id
         data['redis_network_id'] = resource.redis_network_id
         data['mongodb_network_id'] = resource.mongodb_network_id
-        data['cmdb_repo_id'] = item_info.item_id
+        data['cmdb_repo_id'] = resource.cmdb_p_code
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
         data['set_flag'] = approval.capacity_status

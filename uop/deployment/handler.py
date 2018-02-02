@@ -150,6 +150,8 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
         "deploy_type": "deploy",
         "dns": [],
         "environment": environment,
+        "cloud":res_obj.cloud,
+        "resource_name":res_obj.resource_name
     }
     if appinfo:  # 判断nginx信息，没有则不推送dns配置
         for app_info in res_obj.compute_list:
