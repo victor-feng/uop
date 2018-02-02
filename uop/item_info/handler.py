@@ -46,7 +46,7 @@ def get_data_from_file(td):
     # Log.logger.info("whole_data:{},{}\n, instance_id:{}".format(whole_data, type(whole_data), instance_id))
     data = [wd for wd in whole_data if str(wd["parent_id"]) == str(instance_id)]
     data = data[0] if data else {"instance": [], "model_id": model_id + 1} #假数据中只需+1
-    data.update(property=id_property[int(model_id + 1)])
+    # data.update(property=id_property[int(model_id + 1)])
     return data
 
 

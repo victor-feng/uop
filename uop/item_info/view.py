@@ -433,7 +433,7 @@ class BusinessProject(Resource):
 
 
 class CmdbModels(Resource):
-    def get(self):
+    def post(self):
         '''
         filters 参数为空时会去cmdb2.0获取最新的实体属性信息
         非空时，会按照filters字典去匹配相应的实体
@@ -457,7 +457,7 @@ class CmdbModels(Resource):
         except Exception as exc:
             Log.logger.error("get CmdbModels error:{}".format(str(exc)))
             response = response_data(500, str(exc), "")
-        return json.dumps(response)
+        return jsonify(response)
 
     def post(self):
         pass
