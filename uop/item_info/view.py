@@ -459,8 +459,7 @@ class CmdbModels(Resource):
             response = response_data(500, str(exc), "")
         return jsonify(response)
 
-    def post(self):
-        pass
+
     pass
 
 
