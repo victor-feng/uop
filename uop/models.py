@@ -245,6 +245,7 @@ class DBIns(db.EmbeddedDocument):
     version = db.StringField(required=False)
     volume_size = db.IntField(required=False, default_value=0)
     network_id = db.StringField(required=False)
+    url = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'index': [
