@@ -32,15 +32,16 @@ class NetworksAPI(Resource):
                 name=network.name
                 vlan_id=network.vlan_id
                 sub_network = network.sub_network
-                count,total_count=get_network_used(env, sub_network, vlan_id)
-                rd_count=total_count-count
-                if rd_count > 0:
-                    network_info['name']=name
-                    network_info['vlan_id']=vlan_id
-                    network_info["total_count"]=total_count
-                    network_info["count"]=count
-                    network_info["rd_count"]=rd_count
-                    res.append(network_info)
+                if sub_network and vlan_id:
+                    count,total_count=get_network_used(env, sub_network, vlan_id)
+                    rd_count=total_count-count
+                    if rd_count > 0:
+                        network_info['name']=name
+                        network_info['vlan_id']=vlan_id
+                        network_info["total_count"]=total_count
+                        network_info["count"]=count
+                        network_info["rd_count"]=rd_count
+                        res.append(network_info)
         except Exception as e:
             err_msg = e.args
             Log.logger.error('get network info err: %s' % err_msg)
@@ -113,9 +114,12 @@ class K8sNetworkApi(Resource):
             Networks = NetWorkConfig.objects.filter(env=env)
             for net in Networks:
                 res={}
-                res["networkName"] = net.networkName
-                res["tenantName"] = net.tenantName
-                res_list.append(res)
+                networkName=net.networkName
+                tenantName= net.tenantName
+                if networkName and tenantName:
+                    res["networkName"] = networkName
+                    res["tenantName"] = tenantName
+                    res_list.append(res)
             data["res_list"] = res_list
             code = 200
             msg = "Get k8s network info success"
