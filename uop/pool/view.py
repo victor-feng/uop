@@ -113,6 +113,7 @@ class K8sNetworkApi(Resource):
             url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
             Log.logger.info("----------------------url--------%s",url)
             result = requests.get(url,headers=headers)
+            Log.logger.info("------------------res to json--------------%s" % result.json())
             code=result.json().get('code')
             if code == 200:
                 result_list= result.json().get('result')['data']['res_list']
