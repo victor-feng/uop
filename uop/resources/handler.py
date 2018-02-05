@@ -192,7 +192,7 @@ def to_unicode(value):
         raise ExcelException(err_msg)
 
 
-def deal_myresource_to_excel(data,field_list):
+def deal_myresource_to_excel(data, field_list):
     try:
         excel_name="myresource_" + str(uuid.uuid1()) +'.xlsx'
         download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
@@ -211,7 +211,7 @@ def deal_myresource_to_excel(data,field_list):
         if len(field_list) == 0:
             field_list=["resource_type","resource_name","business_name","env","project_name","create_date","resource_ip","resource_config","resource_status","update_time","domain","module_name"]
         for field in field_list:
-            head_cols.append(field_dict[field])
+            head_cols.append(field_dict.get(field))
         res_list=deal_data(data, field_list)
         Log.logger.error("res_list:{}".format(res_list))
         for i in range(0,len(head_cols)):
