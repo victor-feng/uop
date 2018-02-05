@@ -55,7 +55,7 @@ class Configure(Resource):
                 envs.append(dict(id=env.id,
                                  name=env.name,
                                  ip=env.ip))
-        elif category == 'network':
+        elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
                 envs.append(dict(id=net.id,
@@ -117,7 +117,7 @@ class Configure(Resource):
                                       ip=ip,
                                       name=name,
                                       id=id).save()
-        elif category == 'network':
+        elif category in ['network','k8s_network']:
             ret = NetWorkConfig(env=env,
                                 name=name,
                                 sub_network=sub_network,
@@ -177,7 +177,7 @@ class Configure(Resource):
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
             ret.update(name=name, ip=ip)
-        elif category == 'network':
+        elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName)
         else:
@@ -208,7 +208,7 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(id=id)
-        elif category == 'network':
+        elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
