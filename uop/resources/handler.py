@@ -160,9 +160,8 @@ def get_from_cmdb2(args, filters, download=False):
         return  [] if download else jsonify(response)
 
 
-
 def parse_data_uop(data, filters):
-
+    data = [dict({k.lower(): v for k, v in ol.items()},filters) for ol in data]
     return data
 
 
