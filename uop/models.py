@@ -473,8 +473,10 @@ class NetWorkConfig(db.Document):
     name = db.StringField()
     env = db.StringField()
     created_time = db.DateTimeField(default=datetime.now())
-    sub_network = db.StringField(default='') 
-    vlan_id = db.StringField(default='') 
+    sub_network = db.StringField(default='')
+    vlan_id = db.StringField(default='',)
+    networkName = db.StringField(default='',)
+    tenantName = db.StringField(default='',)
     is_deleted = db.IntField(required=False, default=0)
 
     meta = {

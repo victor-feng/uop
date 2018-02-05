@@ -100,6 +100,7 @@ class StatisticAPI(Resource):
             return res, 200
 
 class K8sNetworkApi(Resource):
+
     # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
@@ -109,16 +110,12 @@ class K8sNetworkApi(Resource):
         data={}
         res_list=[]
         try:
-            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
-            result = requests.get(url)
-            code=result.json().get('code')
-            if code == 200:
-                result_list= result.json().get('result')['data']['res_list']
-                for r in result_list:
-                    res={}
-                    res["networkName"] = r.get("networkName")
-                    res["tenantName"] = r.get("tenantName")
-                    res_list.append(res)
+            Networks = NetWorkConfig.objects.filter(env=env)
+            for net in Networks:
+                res={}
+                res["networkName"] = net.networkName
+                res["tenantName"] = net.tenantName
+                res_list.append(res)
             data["res_list"] = res_list
             code = 200
             msg = "Get k8s network info success"
@@ -143,4 +140,4 @@ class K8sNetworkApi(Resource):
 
 pool_api.add_resource(StatisticAPI, '/statistics')
 pool_api.add_resource(NetworksAPI, '/networks')
-pool_api.add_resource(K8sNetworkApi, '/k8s/networks')
+pool_api.add_resource(K8sNetworkApi, '/k8s/network')
