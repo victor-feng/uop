@@ -37,7 +37,8 @@ status_dict={
     "shutoff":u"关机",
     "failed":u"虚机不存在",
     "rebuild":u"部署中",
-    '':u''
+    '':u'',
+    "ok":u"运行中",
 }
 
 field_dict={

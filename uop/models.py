@@ -38,6 +38,7 @@ class ModelCache(db.Document):
         ]
     }
 
+
 class Token(db.Document):
     token = db.StringField()
     uid = db.IntField()
