@@ -12,6 +12,7 @@ class ViewCache(db.Document):
     view_id = db.StringField(required=True)
     relation = db.StringField(default="")
     entity = db.StringField(default="")
+
     cache_date = db.DateTimeField()
     meta = {
         'indexes': [
@@ -23,6 +24,19 @@ class ViewCache(db.Document):
         ]
     }
 
+
+class ModelCache(db.Document):
+    entity = db.StringField(default="")
+    cache_date = db.DateTimeField()
+    meta = {
+        'indexes': [
+            'entity',
+            {
+                'fields': ['cache_date'],
+                'expireAfterSeconds': 60 * 60 * 24
+            }
+        ]
+    }
 
 class Token(db.Document):
     token = db.StringField()

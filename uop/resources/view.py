@@ -1139,6 +1139,9 @@ class GetMyResourcesInfo(Resource):
         parser.add_argument('mysqlandmongo', type=str, default='', location='json')
         parser.add_argument('cache', type=str, default='', location='json')
         parser.add_argument('resource_name', type=str, default='', location='json')
+        parser.add_argument('module_name', type=str, default='', location='json')
+        parser.add_argument('business_name', type=str, default='', location='json')
+        parser.add_argument('project_name', type=str, default='', location='json')
         parser.add_argument('item_name', type=str, default='', location='json')
         parser.add_argument('start_time', type=str, default='', location='json')
         parser.add_argument('end_time', type=str, default='', location='json')
@@ -1173,7 +1176,10 @@ class GetMyResourcesInfo(Resource):
                 "user": args.user_id,
                 "page_num": args.page_num,
                 "page_count": args.page_count,
-                "env": args.env
+                "env": args.env,
+                "project_name":args.project_name,
+                "module_name":args.module_name,
+                "business_name":args.business_name,
             }
             data = get_from_cmdb2(params, filters, download=True)
         else:

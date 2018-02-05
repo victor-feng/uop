@@ -9,7 +9,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb, Token
+from uop.models import Cmdb, Token, ModelCache
 from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
 
@@ -151,8 +151,9 @@ def push_entity_to_file(data):
                     })
                 else:
                     processs_chidren_final(entity_list, dc.get("children"))
-                    # with open(curdir + "/.entity.txt", "w") as fp:
-                    #     json.dump({"entity": entity_list}, fp) # 后期CMDB2.0稳定后，考虑加入文件缓存，或redis
+        model = ModelCache(entity=json.dumps(entity_list),
+                         cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
+        model.save()
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
     # Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
@@ -179,13 +180,7 @@ def get_entity_from_file(data):
     sort_key = ["Person", "department", "yewu", "Module", "project"]
     sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
     assert(isinstance(filters, dict))
-    # if not os.path.exists(curdir + "/.entity.txt"):
-    #     whole_entity = get_entity()
-    # else:
-    #     with open(curdir + "/.entity.txt", "rb") as fp:
-    #         whole_entity = json.load(fp)["entity"]
-    whole_entity = get_entity(data)["entity"] # CMDB2.0模型不稳定，暂时不使用文件缓存后其他缓存
-    # Log.logger.info("get entity info from CMDB2.0: {}".format(len(whole_entity)))
+    whole_entity = get_entity(data)["entity"]
     compare_entity = map(lambda  x:{"id": x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, whole_entity)
     single_entity = filter(lambda x: x["id"] in filters.values(), compare_entity)
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
@@ -341,13 +336,20 @@ def get_entity(data):
     data_str = json.dumps(req_data)
     entity_info = {}
     try:
-        ret = requests.post(url, data=data_str, timeout=60).json()
-        if ret["code"] != 0:
-            req_data["uid"], req_data["code"] = get_uid_token(True)
-            data_str = json.dumps(req_data)
+        modules = ModelCache.objects.all()
+        entity_info = {
+            "entity": []
+        }
+        if modules:
+            for m in modules:
+                entity_info["entity"] = json.loads(m.entity)
+        else:
             ret = requests.post(url, data=data_str, timeout=60).json()
-        # Log.logger.info("get entity info from CMDB2.0: {}".format(ret))
-        entity_info = push_entity_to_file(ret.get("data"))
+            if ret["code"] != 0:
+                req_data["uid"], req_data["code"] = get_uid_token(True)
+                data_str = json.dumps(req_data)
+                ret = requests.post(url, data=data_str, timeout=60).json()
+            entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
     return entity_info

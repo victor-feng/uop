@@ -134,7 +134,7 @@ def get_from_cmdb2(args, filters, download=False):
         if ret["code"] != 0:
             response["code"] = ret["code"]
             response["result"]["msg"] = ret["msg"]
-        Log.logger.info(u"部门：{}".format(filters["dep"]))
+        # Log.logger.info(u"部门：{}".format(filters["dep"]))
         resources = ResourceModel.objects.filter(department=filters["dep"], env=filters["env"])
         cmdb2_resource_id_list = []
         for res in resources:
@@ -143,7 +143,7 @@ def get_from_cmdb2(args, filters, download=False):
         data = [r for r in ret["data"] if str(r.get("id")) in cmdb2_resource_id_list] if filters["dep"] != "admin" else ret["data"]
         # Log.logger.info("cmdb2_resource_id_list:{}， data:{}, ret:{}".format(cmdb2_resource_id_list, data, ret))
         if download:
-            return parse_data_uop(data)
+            return parse_data_uop(data, filters)
         object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
         response["result"]["res"]["object_list"] = [{k.lower(): v for k, v in ol.items()} for ol in object_list]
         response["result"]["res"]["total_page"] = total_page
@@ -153,7 +153,8 @@ def get_from_cmdb2(args, filters, download=False):
     return jsonify(response)
 
 
-def parse_data_uop(data):
+def parse_data_uop(data, filters):
+
     return data
 
 
@@ -201,7 +202,7 @@ def deal_myresource_to_excel(data,field_list):
             field_list=["resource_type","resource_name","business_name","env","project_name","create_date","resource_ip","resource_config","resource_status","update_time","domain","module_name"]
         for field in field_list:
             head_cols.append(field_dict[field])
-        res_list=deal_data(data,field_list)
+        res_list=deal_data(data, field_list)
         for i in range(0,len(head_cols)):
             h_col = to_unicode(head_cols[i])
             worksheetResource.write(0,i,h_col,head)
