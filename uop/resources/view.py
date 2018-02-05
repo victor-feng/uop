@@ -1181,7 +1181,7 @@ class GetMyResourcesInfo(Resource):
                 "module_name":args.module_name,
                 "business_name":args.business_name,
             }
-            data = get_from_cmdb2(params, filters, download=True)
+            data = get_from_cmdb2(params, filters, True)
         else:
             url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
                 resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
