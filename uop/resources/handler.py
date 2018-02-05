@@ -145,10 +145,11 @@ def get_from_cmdb2(args, filters, download=False):
                 cmdb2_resource_id_list.append(str(id))
         data = [r for r in ret["data"] if str(r.get("id")) in cmdb2_resource_id_list] if filters["dep"] != "admin" else ret["data"]
         # Log.logger.info("cmdb2_resource_id_list:{}， data:{}, ret:{}".format(cmdb2_resource_id_list, data, ret))
-        if download:
+        if download == True:
             Log.logger.info("parse_data_uop:{}".format(data))
             return parse_data_uop(data, filters)
         else:
+            Log.logger.info("download:{}".format(download))
             object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
             response["result"]["res"]["object_list"] = [{k.lower(): v for k, v in ol.items()} for ol in object_list]
             response["result"]["res"]["total_page"] = total_page
