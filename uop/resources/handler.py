@@ -200,6 +200,7 @@ def deal_myresource_to_excel(data,field_list):
              'text_wrap': True, 'valign': 'vcenter'})
         body = workbook.add_format({'border': 1, 'align': 'center', 'font_size': 10, 'font_name': u'微软雅黑'})
         head_cols=[]
+        Log.logger.info("deal_myresource_to_excel:{}".format(data))
         if len(field_list) == 0:
             field_list=["resource_type","resource_name","business_name","env","project_name","create_date","resource_ip","resource_config","resource_status","update_time","domain","module_name"]
         for field in field_list:
