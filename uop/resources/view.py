@@ -689,7 +689,7 @@ class ResourceDetail(Resource):
                         "version": db_res.version,
                         "volume_size": db_res.volume_size,
                         "network_id": db_res.network_id,
-                        "url": db_res.url,
+                        "image_id": db_res.image_id,
                     }
                 )
         if compute_list:
