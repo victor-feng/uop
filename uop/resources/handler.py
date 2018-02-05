@@ -130,6 +130,7 @@ def get_from_cmdb2(args, filters, download=False):
             }
         }
     }
+    Log.logger.info("download:{}".format(download))
     try:
         Log.logger.info("args:{}".format( args))
         ret = requests.post(url, data=json.dumps(args), timeout=60).json()
