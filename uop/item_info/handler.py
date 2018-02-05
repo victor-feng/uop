@@ -152,7 +152,7 @@ def push_entity_to_file(data):
                 else:
                     processs_chidren_final(entity_list, dc.get("children"))
         model = ModelCache(entity=json.dumps(entity_list),
-                         cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
+                         cache_date=TimeToolkit.local2utctimestamp(datetime.now()))
         model.save()
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
