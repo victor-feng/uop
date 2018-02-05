@@ -156,7 +156,8 @@ def get_from_cmdb2(args, filters, download=False):
     except Exception as exc:
         response["code"] = 500
         response["result"]["msg"] = str(exc)
-        return jsonify(response)
+        Log.logger.info("get_from_cmdb2 error:{}".format(str(exc)))
+        return  [] if download else jsonify(response)
 
 
 
