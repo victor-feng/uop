@@ -145,7 +145,7 @@ def get_from_cmdb2(args, filters, download=False):
                 cmdb2_resource_id_list.append(str(id))
         data = [r for r in ret["data"] if str(r.get("id")) in cmdb2_resource_id_list] if filters["dep"] != "admin" else ret["data"]
         if download:
-            Log.logger.error("parse_data_uop:{}".format(data))
+            # Log.logger.error("parse_data_uop:{}".format(data))
             return parse_data_uop(data, filters)
         else:
             Log.logger.error("download:{}".format(download))
@@ -223,6 +223,7 @@ def deal_myresource_to_excel(data,field_list):
         return "success",excel_name
     except Exception as e:
         err_msg= "deal my resource to excel error: %s" % str(e)
+        Log.logger.error("deal_myresource_to_excel:{}".format(str(e)))
         return  err_msg,excel_name
 
 
@@ -260,6 +261,7 @@ def deal_data(data,field_list):
         return res_list
     except Exception as e:
         err_msg= "deal my resource data error: %s" % str(e)
+        Log.logger.error("deal_data:{}".format(str(e)))
         raise ExcelException(err_msg)
 
 
