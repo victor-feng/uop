@@ -353,7 +353,7 @@ def get_entity(data):
     return entity_info
 
 
-#插入子图
+# 插入子图
 def subgrath_data(args):
     '''
     插入子图数据，并返回图结果
@@ -396,7 +396,7 @@ def subgrath_data(args):
     return ret
 
 
-#组装业务工程模块接口数据
+# 组装业务工程模块接口数据
 def package_data(ret, ut):
     '''
     传给前端的数据格式
