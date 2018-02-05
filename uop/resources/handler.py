@@ -213,6 +213,7 @@ def deal_myresource_to_excel(data,field_list):
         for field in field_list:
             head_cols.append(field_dict[field])
         res_list=deal_data(data, field_list)
+        Log.logger.error("res_list:{}".format(res_list))
         for i in range(0,len(head_cols)):
             h_col = to_unicode(head_cols[i])
             worksheetResource.write(0,i,h_col,head)
