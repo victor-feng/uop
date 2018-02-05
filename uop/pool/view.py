@@ -10,6 +10,7 @@ from uop.models import ConfigureEnvModel,NetWorkConfig
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from uop.permission.handler import api_permission_control
+from uop.util import response_data
 
 
 pool_api = Api(pool_blueprint, errors=pool_errors)
@@ -98,6 +99,49 @@ class StatisticAPI(Resource):
         else:
             return res, 200
 
+class K8sNetworkApi(Resource):
+    # @api_permission_control(request)
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str, location="args")
+        args = parser.parse_args()
+        env = args.env
+        headers = {'Content-Type': 'application/json'}
+        data={}
+        res_list=[]
+        try:
+            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
+            result = requests.get(url,headers=headers)
+            code=result.json().get('code')
+            if code == 200:
+                result_list= result.json().get('result')['data']['res_list']
+                for r in result_list:
+                    res={}
+                    res["networkName"] = r.get("networkName")
+                    res["tenantName"] = r.get("tenantName")
+                    res_list.append(res)
+            data["res_list"] = res_list
+            code = 200
+            msg = "Get k8s network info success"
+        except Exception as e:
+            code = 500
+            data = "Error"
+            msg = "Get k8s network info error %s" % str(e)
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
+
+
+
+
+
+
+
+
+
 
 pool_api.add_resource(StatisticAPI, '/statistics')
 pool_api.add_resource(NetworksAPI, '/networks')
+pool_api.add_resource(K8sNetworkApi, '/k8s/networks')
