@@ -106,13 +106,12 @@ class K8sNetworkApi(Resource):
         parser.add_argument('env', type=str, location="args")
         args = parser.parse_args()
         env = args.env
-        headers = {'Content-Type': 'application/json'}
         data={}
         res_list=[]
         try:
             url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
             Log.logger.info("----------------------url--------%s",url)
-            result = requests.get(url,headers=headers)
+            result = requests.get(url)
             Log.logger.info("------------------res to json--------------%s" % result.json())
             code=result.json().get('code')
             if code == 200:
