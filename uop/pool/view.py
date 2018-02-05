@@ -114,9 +114,12 @@ class K8sNetworkApi(Resource):
             Networks = NetWorkConfig.objects.filter(env=env)
             for net in Networks:
                 res={}
-                res["networkName"] = net.networkName
-                res["tenantName"] = net.tenantName
-                res_list.append(res)
+                networkName=net.networkName
+                tenantName= net.tenantName
+                if networkName and tenantName:
+                    res["networkName"] = networkName
+                    res["tenantName"] = tenantName
+                    res_list.append(res)
             data["res_list"] = res_list
             code = 200
             msg = "Get k8s network info success"
