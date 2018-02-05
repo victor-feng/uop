@@ -208,7 +208,7 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(id=id)
-        elif category == in ['network','k8s_network']:
+        elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
