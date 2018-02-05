@@ -148,13 +148,16 @@ def get_from_cmdb2(args, filters, download=False):
         if download:
             Log.logger.info("parse_data_uop:{}".format(data))
             return parse_data_uop(data, filters)
-        object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
-        response["result"]["res"]["object_list"] = [{k.lower(): v for k, v in ol.items()} for ol in object_list]
-        response["result"]["res"]["total_page"] = total_page
+        else:
+            object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
+            response["result"]["res"]["object_list"] = [{k.lower(): v for k, v in ol.items()} for ol in object_list]
+            response["result"]["res"]["total_page"] = total_page
+            return jsonify(response)
     except Exception as exc:
         response["code"] = 500
         response["result"]["msg"] = str(exc)
-    return jsonify(response)
+        return jsonify(response)
+
 
 
 def parse_data_uop(data, filters):
