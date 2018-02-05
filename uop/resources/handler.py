@@ -52,6 +52,7 @@ field_dict={
 	"create_date":u"创建日期",
     "update_time":u"修改日期",
 	"resource_ip":u"IP",
+    "ip":u"IP",
 	"resource_config":u"配置",
 	"resource_status":u"状态",
 }
@@ -220,6 +221,7 @@ def deal_myresource_to_excel(data,field_list):
 
 def deal_data(data,field_list):
     res_list=[]
+    Log.logger.info("deal_data:{}".format(data))
     try:
         for d in data:
             res=[]
