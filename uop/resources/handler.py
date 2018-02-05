@@ -188,6 +188,7 @@ def to_unicode(value):
         return value
     except Exception,e:
         err_msg='execute to_unicode error: %s' % str(e)
+        Log.logger.error("to_unicode:{}".format(str(e)))
         raise ExcelException(err_msg)
 
 
