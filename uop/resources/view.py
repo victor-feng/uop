@@ -1159,6 +1159,7 @@ class GetMyResourcesInfo(Resource):
         resource_cache = args.cache
         resource_type = resource_database or resource_cache or resource_type
         if APP_ENV == "development":
+            uid, token = get_uid_token()
             params = {
                 "resource_type": resource_type,
                 "start_time": args.start_time,
@@ -1168,6 +1169,8 @@ class GetMyResourcesInfo(Resource):
                 'item_name': args.project_id,
                 "resource_name": args.resource_name,
                 'ip': args.ip,
+                "uid": uid,
+                "token": token,
                 # "env": env,
                 "resource_status": args.resource_status,
             }
