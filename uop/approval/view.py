@@ -254,6 +254,7 @@ class Reservation(Resource):
         data['mongodb_network_id'] = resource.mongodb_network_id
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
+        data['syswin_project'] = 'uop'
         # data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
@@ -374,6 +375,7 @@ class ReservationAPI(Resource):
         data['mongodb_network_id'] = resource.mongodb_network_id
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
+        data['syswin_project'] = 'uop'
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
@@ -583,6 +585,7 @@ class CapacityReservation(Resource):
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
         data['set_flag'] = approval.capacity_status
+        data['syswin_project'] = 'uop'
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         number = 0
