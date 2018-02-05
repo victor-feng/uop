@@ -1165,7 +1165,7 @@ class GetMyResourcesInfo(Resource):
                 "start_time": args.start_time,
                 "end_time": args.end_time,
                 "page_num": -1,  # 获取所有数据
-                'page_count': args.page_count,
+                'page_count': args.page_count if args.page_count else 10,
                 'item_name': args.project_id,
                 "resource_name": args.resource_name,
                 'ip': args.ip,
@@ -1177,8 +1177,8 @@ class GetMyResourcesInfo(Resource):
             filters = {
                 "dep": args.department,
                 "user": args.user_id,
-                "page_num": args.page_num,
-                "page_count": args.page_count,
+                "page_num": args.page_num if args.page_num else -1,
+                "page_count": args.page_count if args.page_count else 10,
                 "env": args.env,
                 "project_name":args.project_name,
                 "module_name":args.module_name,
