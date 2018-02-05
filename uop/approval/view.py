@@ -13,7 +13,6 @@ from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
-from uop.deployment.handler import deal_disconf_info
 from uop.permission.handler import api_permission_control
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -89,19 +88,34 @@ class ApprovalInfo(Resource):
             parser.add_argument('mysql_network_id', type=str)
             parser.add_argument('redis_network_id', type=str)
             parser.add_argument('mongodb_network_id', type=str)
+            parser.add_argument('networkName', type=str)
+            parser.add_argument('tenantName', type=str)
             args = parser.parse_args()
+
+            docker_network_id = args.docker_network_id
+            mysql_network_id = args.mysql_network_id
+            redis_network_id = args.redis_network_id
+            mongodb_network_id = args.mongodb_network_id
+            networkName = args.networkName
+            tenantName = args.tenantName
+            network_id_dict={
+                "docker":docker_network_id,
+                "mysql":mysql_network_id,
+                "redis":redis_network_id,
+                "mongodb":mongodb_network_id
+            }
 
             approvals = models.Approval.objects.filter(capacity_status="res",resource_id=res_id).order_by("-create_date")
             resource = models.ResourceModel.objects.get(res_id=res_id)
+            resource = resource.resource_type
+            resource_list = resource.resource_list
+            compute_list = resource.compute_list
             if approvals:
                 approval=approvals[0]
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
-                docker_network_id = args.docker_network_id
-                mysql_network_id = args.mysql_network_id
-                redis_network_id = args.redis_network_id
-                mongodb_network_id = args.mongodb_network_id
+
                 if args.agree:
                     approval.approval_status = "success"
                     resource.approval_status = "success"
@@ -118,6 +132,17 @@ class ApprovalInfo(Resource):
                     resource.redis_network_id = redis_network_id.strip()
                 if mongodb_network_id:
                     resource.mongodb_network_id = mongodb_network_id.strip()
+
+                if compute_list:
+                    for com in compute_list:
+                        com.network_id = docker_network_id
+                        com.networkName = networkName
+                        com.tenantName = tenantName
+                        com.save()
+                if resource_list:
+                    for res in resource_list:
+                        res.network_id = network_id_dict[res.ins_type]
+                        res.save()
                 resource.save()
                 code = 200
             else:
@@ -226,6 +251,9 @@ class Reservation(Resource):
         data['mysql_network_id'] = resource.mysql_network_id
         data['redis_network_id'] = resource.redis_network_id
         data['mongodb_network_id'] = resource.mongodb_network_id
+        data['mongodb_network_id'] = resource.mongodb_network_id
+        data['cloud'] = resource.cloud
+        data['resource_type'] = resource.resource_type
         # data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
@@ -242,7 +270,9 @@ class Reservation(Resource):
                         "disk": db_res.disk,
                         "quantity": db_res.quantity,
                         "version": db_res.version,
-                        "volume_size": db_res.volume_size
+                        "volume_size": db_res.volume_size,
+                        "image_id": db_res.image_id,
+                        "network_id": db_res.network_id,
                     }
                 )
             data['resource_list'] = res
@@ -262,6 +292,10 @@ class Reservation(Resource):
                         "port": db_com.port,
                         "domain_ip": db_com.domain_ip,
                         "meta": meta,
+                        "health_check": db_com.health_check,
+                        "network_id": db_com.network_id,
+                        "networkName": db_com.networkName,
+                        "tenantName": db_com.tenantName,
                     }
                 )
             data['compute_list'] = com
@@ -338,6 +372,8 @@ class ReservationAPI(Resource):
         data['mysql_network_id'] = resource.mysql_network_id
         data['redis_network_id'] = resource.redis_network_id
         data['mongodb_network_id'] = resource.mongodb_network_id
+        data['cloud'] = resource.cloud
+        data['resource_type'] = resource.resource_type
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
@@ -353,7 +389,9 @@ class ReservationAPI(Resource):
                         "disk": db_res.disk,
                         "quantity": db_res.quantity,
                         "version": db_res.version,
-                        "volume_size": db_res.volume_size
+                        "volume_size": db_res.volume_size,
+                        "image_id": db_res.image_id,
+                        "network_id": db_res.network_id,
                     }
                 )
             data['resource_list'] = res
@@ -371,6 +409,10 @@ class ReservationAPI(Resource):
                         "quantity": db_com.quantity,
                         "port": db_com.port,
                         "meta": meta,
+                        "health_check": db_com.health_check,
+                        "network_id": db_com.network_id,
+                        "networkName": db_com.networkName,
+                        "tenantName": db_com.tenantName,
                     }
                 )
             data['compute_list'] = com
@@ -434,8 +476,15 @@ class CapacityInfoAPI(Resource):
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.approve_suggestion
                 docker_network_id = args.docker_network_id
+                #更新nova docker 的network_id
                 resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
                 # resource.deploy_name = deploy_name
+                compute_list = resource.compute_list
+                if compute_list:
+                    for com in compute_list:
+                        com.network_id = docker_network_id
+                        com.save()
+                resource.save()
                 if args.agree:
                     approval.approval_status = "%s_success" % (approval.capacity_status)
                     compute_list = resource.compute_list
@@ -550,7 +599,9 @@ class CapacityReservation(Resource):
                         "disk": db_res.disk,
                         "quantity": 0,
                         "version": db_res.version,
-                        "volume_size": db_res.volume_size
+                        "volume_size": db_res.volume_size,
+                        "image_id": db_res.image_id,
+                        "network_id": db_res.network_id,
                     }
                 )
             data['resource_list'] = res
@@ -579,6 +630,10 @@ class CapacityReservation(Resource):
                                 "port": db_com.port,
                                 "domain_ip": db_com.domain_ip,
                                 "meta": meta,
+                                "health_check": db_com.health_check,
+                                "network_id": db_com.network_id,
+                                "networkName": db_com.networkName,
+                                "tenantName": db_com.tenantName,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
@@ -773,7 +828,6 @@ class RollBackReservation(Resource):
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deployment = models.Deployment.objects.get(deploy_id=deploy_id)
-            disconf_server_info=deal_disconf_info(deployment)
             resource.deploy_name = deploy_name
             env = resource.env
             res_compute_list = resource.compute_list

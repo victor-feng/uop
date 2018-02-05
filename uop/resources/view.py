@@ -105,8 +105,10 @@ class ResourceApplication(Resource):
             quantity = resource.get('quantity')
             version = resource.get('version')
             volume_size = resource.get('volume_size', 0)
+            network_id = resource.get('network_id')
+            image_id = resource.get('image_id')
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version, volume_size=volume_size)
+                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
             resource_application.resource_list.append(db_ins)
 
         ins_name_list = []
@@ -124,6 +126,9 @@ class ResourceApplication(Resource):
                 port = compute.get('port')
                 meta_str = compute.get('meta')
                 health_check=compute.get('health_check',0)
+                network_id = compute.get('network_id')
+                networkName = compute.get('networkName')
+                tenantName = compute.get('tenantName')
                 try:
                     meta = json.dumps(meta_str)
                 except Exception as e:
@@ -137,7 +142,8 @@ class ResourceApplication(Resource):
                     }
                     return res, code
                 compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
-                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check)
+                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
+                                         network_id=network_id,networkName=networkName,tenantName=tenantName)
                 resource_application.compute_list.append(compute_ins)
 
         if ins_name_list:
@@ -524,9 +530,12 @@ class ResourceApplication(Resource):
                     port = compute.get('port')
                     meta_str = compute.get('meta')
                     health_check = compute.get('health_check', 0)
+                    network_id = compute.get('network_id')
+                    networkName = compute.get('networkName')
+                    tenantName = compute.get('tenantName')
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
-                                             health_check=health_check)
+                                             health_check=health_check,network_id=network_id,networkName=networkName,tenantName=tenantName)
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
@@ -538,8 +547,10 @@ class ResourceApplication(Resource):
                     quantity = res.get('quantity')
                     version = res.get('version')
                     volume_size = res.get('volume_size', 0)
+                    network_id = resource.get('network_id')
+                    image_id = resource.get('image_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size)
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
                     resource.resource_list.append(db_ins)
                 resource.save()
             else:
@@ -676,7 +687,9 @@ class ResourceDetail(Resource):
                         "disk": db_res.disk,
                         "quantity": db_res.quantity,
                         "version": db_res.version,
-                        "volume_size": db_res.volume_size
+                        "volume_size": db_res.volume_size,
+                        "network_id": db_res.network_id,
+                        "url": db_res.url,
                     }
                 )
         if compute_list:
@@ -694,6 +707,10 @@ class ResourceDetail(Resource):
                         "port": db_com.port,
                         "meta": db_com.docker_meta,
                         "health_check": db_com.health_check,
+                        "network_id": db_com.network_id,
+                        "networkName": db_com.networkName,
+                        "tenantName": db_com.tenantName,
+
                     }
                 )
         result['resource_list'] = res
@@ -808,8 +825,10 @@ class ResourceDetail(Resource):
             quantity = resource.get('quantity')
             version = resource.get('version')
             volume_size = resource.get('volume_size', 0)
+            network_id = resource.get('network_id')
+            image_id = resource.get('image_id')
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version, volume_size=volume_size)
+                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
             resource_application.resource_list.append(db_ins)
 
         for compute in compute_list:
@@ -821,8 +840,14 @@ class ResourceDetail(Resource):
             url = compute.get('url')
             quantity = compute.get('quantity')
             port = compute.get('port')
+            meta_str = compute.get('meta')
+            health_check = compute.get('health_check', 0)
+            network_id = compute.get('network_id')
+            networkName = compute.get('networkName')
+            tenantName = compute.get('tenantName')
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
-                                     quantity=quantity, port=port)
+                                     quantity=quantity, port=port,docker_meta=meta_str,
+                                     health_check=health_check,network_id=network_id,networkName=networkName,tenantName=tenantName)
             resource_application.compute_list.append(compute_ins)
 
         try:
