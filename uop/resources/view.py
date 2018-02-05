@@ -1155,13 +1155,35 @@ class GetMyResourcesInfo(Resource):
         resource_database = args.mysqlandmongo
         resource_cache = args.cache
         resource_type = resource_database or resource_cache or resource_type
-        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-            resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
-            args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
-        ret = requests.get(url)
-        result = ret.json().get('result', {})
-        res = result.get('res', {})
-        data = res.get("object_list", [])
+        if APP_ENV == "development":
+            params = {
+                "resource_type": resource_type,
+                "start_time": args.start_time,
+                "end_time": args.end_time,
+                "page_num": -1,  # 获取所有数据
+                'page_count': args.page_count,
+                'item_name': args.project_id,
+                "resource_name": args.resource_name,
+                'ip': args.ip,
+                # "env": env,
+                "resource_status": args.resource_status,
+            }
+            filters = {
+                "dep": args.department,
+                "user": args.user_id,
+                "page_num": args.page_num,
+                "page_count": args.page_count,
+                "env": args.env
+            }
+            data = get_from_cmdb2(params, filters, download=True)
+        else:
+            url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
+                resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
+                args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
+            ret = requests.get(url)
+            result = ret.json().get('result', {})
+            res = result.get('res', {})
+            data = res.get("object_list", [])
         msg, excel_name = deal_myresource_to_excel(data, field_list)
         if msg == "success":
             download_dir = os.path.join(UPLOAD_FOLDER, 'excel')

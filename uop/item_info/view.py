@@ -358,7 +358,7 @@ class BusinessProject(Resource):
         Log.logger.info("the request data:{}".format(args))
         try:
             response = Aquery(args)
-            Log.logger.info(u"A视图搜素结果format_data: {}".format(response))
+            # Log.logger.info(u"A视图搜素结果format_data: {}".format(response))
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)

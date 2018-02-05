@@ -42,10 +42,14 @@ status_dict={
 
 field_dict={
     "resource_type":u"实例类型",
-	"resource_name":u"部署实例名称",
+	"resource_name":u"资源名称",
 	"env":u"所属环境",
-	"item_name":u"所属部署单元",
+	"project_name":u"所属工程",
+    "module_name":u"所属模块",
+    "business_name":u"所属业务",
+    "domain":u"域名",
 	"create_date":u"创建日期",
+    "update_time":u"修改日期",
 	"resource_ip":u"IP",
 	"resource_config":u"配置",
 	"resource_status":u"状态",
@@ -111,7 +115,7 @@ def pageinit(items, offset, limit):
     return page_contents, total_pages
 
 
-def get_from_cmdb2(args, filters):
+def get_from_cmdb2(args, filters, download=False):
     url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
     response = {
         "code": 2002,
@@ -138,6 +142,8 @@ def get_from_cmdb2(args, filters):
                 cmdb2_resource_id_list.append(str(id))
         data = [r for r in ret["data"] if str(r.get("id")) in cmdb2_resource_id_list] if filters["dep"] != "admin" else ret["data"]
         # Log.logger.info("cmdb2_resource_id_list:{}， data:{}, ret:{}".format(cmdb2_resource_id_list, data, ret))
+        if download:
+            return parse_data_uop(data)
         object_list, total_page = pageinit(data, int(filters["page_num"]), int(filters["page_count"]))
         response["result"]["res"]["object_list"] = [{k.lower(): v for k, v in ol.items()} for ol in object_list]
         response["result"]["res"]["total_page"] = total_page
@@ -145,6 +151,10 @@ def get_from_cmdb2(args, filters):
         response["code"] = 500
         response["result"]["msg"] = str(exc)
     return jsonify(response)
+
+
+def parse_data_uop(data):
+    return data
 
 
 def to_unicode(value):
@@ -188,7 +198,7 @@ def deal_myresource_to_excel(data,field_list):
         body = workbook.add_format({'border': 1, 'align': 'center', 'font_size': 10, 'font_name': u'微软雅黑'})
         head_cols=[]
         if len(field_list) == 0:
-            field_list=["resource_type","resource_name","env","item_name","create_date","resource_ip","resource_config","resource_status"]
+            field_list=["resource_type","resource_name","business_name","env","project_name","create_date","resource_ip","resource_config","resource_status","update_time","domain","module_name"]
         for field in field_list:
             head_cols.append(field_dict[field])
         res_list=deal_data(data,field_list)
