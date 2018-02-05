@@ -236,16 +236,16 @@ def deal_data(data,field_list):
             res=[]
             for field in field_list:
                 if field == 'resource_config':
-                    resource_config=d.get('resource_config',[
+                    resource_config = d.get('resource_config') if d.get('resource_config') else [
                                     {
                                         "name": "CPU",
-                                        "value": "2\u6838"
+                                        "value": ""
                                     },
                                     {
                                         "name": "\u5185\u5b58",
-                                        "value": "2GB"
+                                        "value": ""
                                     }
-                                ])
+                                ]
                     cpu_name=resource_config[0].get('name')
                     cpu_value = resource_config[0].get('value').split('\\')[0] + u'核'
                     mem_name = "内存"
