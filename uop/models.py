@@ -98,11 +98,11 @@ class Statusvm(db.DynamicDocument):
     def created_status(cls, **kwargs):
         params = {}
         for k, v in kwargs.items():
-            if k == "create_time":
+            if k in ["create_time","update_time"]:
                 if v:
-                    v = datetime.datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
+                    v = datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
                 else:
-                    v = datetime.datetime.now()
+                    v = datetime.now()
             params.update({k: v})
         try:
             c = Statusvm(**params)
