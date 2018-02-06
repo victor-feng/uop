@@ -103,6 +103,7 @@ class Statusvm(db.DynamicDocument):
                     v = datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
                 else:
                     v = datetime.now()
+                params.update({"update_time": v})
             params.update({k: v})
         try:
             c = Statusvm(**params)
