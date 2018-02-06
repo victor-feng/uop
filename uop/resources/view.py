@@ -423,7 +423,8 @@ class ResourceApplication(Resource):
                     "cloud":resources.cloud,
                     "os_ins_ip_list": os_inst_ip_list,
                     "vid_list":resources.vid_list,
-                    "set_flag": 'res'
+                    "set_flag": 'res',
+                    'syswin_project':'uop'
                 }
                 env_ = get_CRP_url(resources.env)
                 crp_url = '%s%s' % (env_, 'api/resource/deletes')
