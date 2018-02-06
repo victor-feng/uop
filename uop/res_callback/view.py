@@ -524,6 +524,37 @@ class ResourceProviderCallBack(Resource):
                             ips.append(ip)
                         j.ips = ips
                         j.quantity = len(ips)
+                        # 往cmdb写入数据
+            property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                          request_data)
+            Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+            rpt = ResourceProviderTransitions(property_mappers_list)
+            rpt.start()
+            if rpt.state == "stop":
+                Log.logger.debug("完成停止")
+            else:
+                Log.logger.debug(rpt.state)
+            if is_write_to_cmdb is True:
+                Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+                if set_flag == "increase":
+                    CMDB_URL = current_app.config['CMDB_URL']
+                    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                    old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                    app_cluster_name = ""
+                    new_pcode = ""
+                    for itemid, pcode in rpt.pcode_mapper.items():
+                        if u"应用集群" in itemid:
+                            app_cluster_name = itemid[:-4]
+                            new_pcode = pcode
+                            break
+                    cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode,
+                                "app_cluster_name": app_cluster_name}
+                    Log.logger.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
+                    data = json.dumps(cmdb_req)
+                    ret = requests.post(CMDB_STATUS_URL, data=data)
+                    Log.logger.info("CMDB return:{}".format(ret))
+                else:
+                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
         os_ids = []
         os_ip_list = []
         os_ins_list = resource.os_ins_list
@@ -627,38 +658,6 @@ class ResourceProviderCallBack(Resource):
         status_record.save()
         resource.reservation_status = status_record.status
         resource.save()
-        #往cmdb写入数据
-        property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                                                      request_data)
-        Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
-
-        rpt = ResourceProviderTransitions(property_mappers_list)
-        rpt.start()
-        if rpt.state == "stop":
-            Log.logger.debug("完成停止")
-        else:
-            Log.logger.debug(rpt.state)
-
-        if is_write_to_cmdb is True:
-            Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-            if set_flag == "increase":
-                CMDB_URL = current_app.config['CMDB_URL']
-                CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                app_cluster_name = ""
-                new_pcode = ""
-                for itemid, pcode in rpt.pcode_mapper.items():
-                    if u"应用集群" in itemid:
-                        app_cluster_name = itemid[:-4]
-                        new_pcode = pcode
-                        break
-                cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode, "app_cluster_name": app_cluster_name}
-                Log.logger.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
-                data = json.dumps(cmdb_req)
-                ret = requests.post(CMDB_STATUS_URL, data=data)
-                Log.logger.info("CMDB return:{}".format(ret))
-            else:
-                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
 
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
         if set_flag == "increase" and status == 'ok':
