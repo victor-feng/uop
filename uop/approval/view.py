@@ -138,8 +138,8 @@ class ApprovalInfo(Resource):
                         com.networkName = networkName
                         com.tenantName = tenantName
                 if resource_list:
-                    for res in resource_list:
-                        res.network_id = network_id_dict.get(res.ins_type)
+                    for resource in resource_list:
+                        resource.network_id = network_id_dict.get(resource.ins_type)
                 resource.save()
                 code = 200
             else:
