@@ -1026,25 +1026,26 @@ class GetDBInfo(Resource):
 class GetMyResourcesInfo(Resource):
     # @api_permission_control(request)
     def get(self):
-        user_id = request.args.get('user_id', "")
-        resource_type = request.args.get('resource_type', "")
-        resource_database = request.args.get('mysqlandmongo', "")
-        resource_cache = request.args.get('cache', "")
-        resource_type = resource_database or resource_cache or resource_type
-        resource_name = request.args.get('resource_name', "")
-        project_name = request.args.get('project_name', "")
-        item_name = request.args.get('item_name', "")
-        module_name = request.args.get('module_name', "")
-        business_name = request.args.get('business_name', "")
-        project_id = request.args.get('project_id', "")
-        start_time = request.args.get('start_time', "")
-        end_time = request.args.get('end_time', "")
-        resource_status = request.args.get('resource_status', "")
-        page_num = request.args.get('page_num')
-        env = request.args.get('env', "")
-        department = request.args.get('department', "")
-        page_count = request.args.get('page_count')
-        ip = request.args.get('ip', "")
+        class args(object):
+            user_id = request.args.get('user_id', "")
+            resource_type = request.args.get('resource_type', "")
+            resource_database = request.args.get('mysqlandmongo', "")
+            resource_cache = request.args.get('cache', "")
+            resource_type = resource_database or resource_cache or resource_type
+            resource_name = request.args.get('resource_name', "")
+            project_name = request.args.get('project_name', "")
+            item_name = request.args.get('item_name', "")
+            module_name = request.args.get('module_name', "")
+            business_name = request.args.get('business_name', "")
+            project_id = request.args.get('project_id', "")
+            start_time = request.args.get('start_time', "")
+            end_time = request.args.get('end_time', "")
+            resource_status = request.args.get('resource_status', "")
+            page_num = request.args.get('page_num')
+            env = request.args.get('env', "")
+            department = request.args.get('department', "")
+            page_count = request.args.get('page_count')
+            ip = request.args.get('ip', "")
         result_list = []
         if APP_ENV == "development":
             # uid, token = get_uid_token()
@@ -1070,12 +1071,10 @@ class GetMyResourcesInfo(Resource):
             #     "env": env
             # }
             # return get_from_cmdb2(params, filters)
-            class args(object):
-                resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip = resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip
             return get_from_uop(args)
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-            resource_type, resource_name, item_name, start_time, end_time,
-            resource_status, page_num, page_count, env, user_id, department, ip)
+            args.resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
+            args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
         ret = requests.get(url)
         # Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
