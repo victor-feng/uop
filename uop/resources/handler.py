@@ -185,7 +185,7 @@ def get_from_uop(args):
                 query['os_type'] = "redis"
         else:
             if resource_type:
-                query['os_type'] = resource_type
+                query['os_type'] = str(resource_type)
         # if env:
         #     query['env'] = env
         # if resource_name:
