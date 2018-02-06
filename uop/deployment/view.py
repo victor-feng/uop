@@ -234,11 +234,6 @@ class DeploymentListAPI(Resource):
 
         def admin_approve_allow(args):
             dep_id = args.dep_id
-            # 修改deploy_result状态为部署中
-            deploy_obj = Deployment.objects.get(deploy_id=dep_id)
-            deploy_obj.deploy_result = 'deploying'
-            deploy_obj.approve_suggestion = args.approve_suggestion
-            deploy_obj.save()
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
             resource = ResourceModel.objects.get(res_id=args.resource_id)
             resource.deploy_name = args.deploy_name
@@ -285,6 +280,9 @@ class DeploymentListAPI(Resource):
                     message = 'deploy_fail'
             else:
                 raise Exception(err_msg)
+            # 修改deploy_result状态为部署中
+            deploy_obj.deploy_result = 'deploying'
+            deploy_obj.approve_suggestion = args.approve_suggestion
             deploy_obj.save()
             return message
 
