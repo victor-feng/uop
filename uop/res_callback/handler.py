@@ -197,7 +197,7 @@ def filter_status_data(p_code):
             meta["ip"] = oi.ip
             meta["os_type"] = oi.os_type
             meta["status"] = "active"
-            # data["vm_status"].append(meta)
+            data["vm_status"].append(meta)
             Statusvm.created_status(**meta)
     return data
 
