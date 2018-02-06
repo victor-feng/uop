@@ -219,7 +219,9 @@ def get_from_uop(args):
             tmp_result['create_date'] = datetime.datetime.strftime(pi.create_time, '%Y-%m-%d %H:%M:%S')
             tmp_result['update_time'] = datetime.datetime.strftime(pi.update_time, '%Y-%m-%d %H:%M:%S')
             tmp_result['resource_name'] = pi.resource_name
-            tmp_result['item_name'] = pi.item_name
+            tmp_result['business_name'] = pi.business_name
+            tmp_result['module_name'] = pi.module_name
+            tmp_result['project_name'] = pi.project_name
             tmp_result['resource_status'] = pi.status
             tmp_result['env'] = pi.env
             result_list.append(tmp_result)
