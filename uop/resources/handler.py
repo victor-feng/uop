@@ -204,16 +204,8 @@ def get_from_uop(args):
             query["create_time__lte"] = end_time
         Log.logger.info("query:{}".format(query))
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
-        if not resources:
-            page_info = []
-            total_page = 0
-        else:
-            if page_num and page_count:
-                page_info, total_page = pageinit(resources, int(page_num), int(page_count))
-            else:
-                page_info = resources
-                total_page = len(resources)
-        for pi in page_info:
+
+        for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
@@ -231,9 +223,15 @@ def get_from_uop(args):
             tmp_result['resource_status'] = pi.status
             tmp_result['env'] = pi.env
             result_list.append(tmp_result)
+
+        if page_num and page_count:
+            page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
+        else:
+            page_info = result_list
+            total_page = len(result_list)
         content = {
             "total_page": total_page,
-            "object_list": result_list,
+            "object_list": page_info,
             "current_page": page_num
         }
         res = response_data(200, "success", content)
