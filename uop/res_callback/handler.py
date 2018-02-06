@@ -164,6 +164,10 @@ def get_resources_all_pcode():
 
 
 def filter_status_data(p_code):
+    data = {
+        "vm_status":[]
+    }
+    # Log.logger.info("filter_status_data.p_code:{}".format(p_code))
     res = ResourceModel.objects.filter(cmdb_p_code=p_code)
     for r in res:
         osid_ip_list = r.os_ins_ip_list
@@ -193,7 +197,9 @@ def filter_status_data(p_code):
             meta["ip"] = oi.ip
             meta["os_type"] = oi.os_type
             meta["status"] = "active"
+            # data["vm_status"].append(meta)
             Statusvm.created_status(**meta)
+    return data
 
 
 @async
@@ -201,8 +207,13 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
-    filter_status_data(p_code)
-
+    data = filter_status_data(p_code)
+    # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
+    try:
+        ret = requests.post(url, data=json.dumps(data)).json()
+        # Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
+    except Exception as exc:
+        Log.logger.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
 
 
 @async

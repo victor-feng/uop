@@ -176,10 +176,6 @@ def get_from_uop(args):
         attach_key(project_name, query, "project_name__contains", project_name)
         attach_key(status, query, "status", status)
         attach_key(ip, query, "ip", ip)
-        # if user_id and user_id != "admin":
-        #     query['user_id'] = user_id
-        # if department:
-        #     query['department'] = department
         if resource_type in ["mysqlandmongo", "cache"]:
             if resource_type == "mysqlandmongo":
                 query['os_type__in'] = ["mysql", "mongodb"]
@@ -188,16 +184,6 @@ def get_from_uop(args):
         else:
             if resource_type:
                 query['os_type'] = str(resource_type)
-        # if env:
-        #     query['env'] = env
-        # if resource_name:
-        #     query['resource_name__contains'] = resource_name
-        # if item_name:
-        #     query['item_name__contains'] = item_name
-        # if status:
-        #     query['status'] = status
-        # if ip:
-        #     query["ip"] = ip
         if start_time:
             start_time = datetime.datetime.strptime(str(start_time), "%Y-%m-%dT%H:%M:%S.000Z")
             query["create_time__gte"] = start_time
