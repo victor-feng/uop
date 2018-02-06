@@ -1071,8 +1071,7 @@ class GetMyResourcesInfo(Resource):
             # }
             # return get_from_cmdb2(params, filters)
             class args(object):
-                resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip = \
-                    resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip
+                resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip = resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip
             return get_from_uop(args)
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
             resource_type, resource_name, item_name, start_time, end_time,
