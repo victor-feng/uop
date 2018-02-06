@@ -165,15 +165,15 @@ def get_from_uop(args):
         args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
     try:
-        attach_key = lambda v, query, key, filter: query.update({key:str(v)}) if filter else ""
+        attach_key = lambda v, query, key, filter: query.update({key:v}) if filter else ""
 
         attach_key(department, query, "department", department)
         attach_key(user_id, query, "user_id", user_id and user_id != "admin")
         attach_key(env, query, "env", env)
-        attach_key(resource_name.decode(encoding="utf8"), query, "resource_name__contains", resource_name)
-        attach_key(business_name.decode(encoding="utf8"), query, "business_name__contains", business_name)
-        attach_key(module_name.decode(encoding="utf8"), query, "module_name__contains", module_name)
-        attach_key(project_name.decode(encoding="utf8"), query, "project_name__contains", project_name)
+        attach_key(resource_name.decode(encoding="utf-8"), query, "resource_name__contains", resource_name)
+        attach_key(business_name.decode(encoding="utf-8"), query, "business_name__contains", business_name)
+        attach_key(module_name.decode(encoding="utf-8"), query, "module_name__contains", module_name)
+        attach_key(project_name.decode(encoding="utf-8"), query, "project_name__contains", project_name)
         attach_key(status, query, "status", status)
         attach_key(ip, query, "ip", ip)
         if resource_type in ["mysqlandmongo", "cache"]:
