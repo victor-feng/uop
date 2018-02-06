@@ -161,8 +161,8 @@ def get_from_cmdb2(args, filters, download=False):
 
 
 def get_from_uop(args):
-    resource_type, resource_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = \
-        args.resource_type, args.resource_name, args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
+    resource_type, resource_name, module_name,business_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = \
+        args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
     try:
         attach_key = lambda v, query, key, filter: query.update({key:str(v)}) if filter else ""
@@ -171,6 +171,8 @@ def get_from_uop(args):
         attach_key(user_id, query, "user_id", user_id and user_id != "admin")
         attach_key(env, query, "env", env)
         attach_key(resource_name, query, "resource_name__contains", resource_name)
+        attach_key(business_name, query, "business_name__contains", business_name)
+        attach_key(module_name, query, "module_name__contains", module_name)
         attach_key(project_name, query, "project_name__contains", project_name)
         attach_key(status, query, "status", status)
         attach_key(ip, query, "ip", ip)
