@@ -137,11 +137,9 @@ class ApprovalInfo(Resource):
                         com.network_id = docker_network_id
                         com.networkName = networkName
                         com.tenantName = tenantName
-                        com.save()
                 if resource_list:
                     for res in resource_list:
                         res.network_id = network_id_dict.get(res.ins_type)
-                        res.save()
                 resource.save()
                 code = 200
             else:
