@@ -24,7 +24,7 @@ from uop.util import get_CRP_url, response_data
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -1031,7 +1031,10 @@ class GetMyResourcesInfo(Resource):
         resource_cache = request.args.get('cache', "")
         resource_type = resource_database or resource_cache or resource_type
         resource_name = request.args.get('resource_name', "")
+        project_name = request.args.get('project_name', "")
         item_name = request.args.get('item_name', "")
+        module_name = request.args.get('module_name', "")
+        business_name = request.args.get('business_name', "")
         project_id = request.args.get('project_id', "")
         start_time = request.args.get('start_time', "")
         end_time = request.args.get('end_time', "")
@@ -1042,30 +1045,34 @@ class GetMyResourcesInfo(Resource):
         page_count = request.args.get('page_count')
         ip = request.args.get('ip', "")
         result_list = []
-        uid, token = get_uid_token()
-        params = {
-            "resource_type": resource_type,
-            "start_time": start_time,
-            "end_time":  end_time,
-            "page_num": -1, # 获取所有数据
-            'page_count': page_count,
-            'item_name':  project_id,
-            "resource_name": resource_name,
-            'ip': ip,
-            # "env": env,
-            "resource_status": resource_status,
-            "uid": uid,
-            "token": token
-        }
-        filters = {
-            "dep": department,
-            "user": user_id,
-            "page_num": page_num,
-            "page_count":page_count,
-            "env": env
-        }
         if APP_ENV == "development":
-            return get_from_cmdb2(params, filters)
+            # uid, token = get_uid_token()
+            # params = {
+            #     "resource_type": resource_type,
+            #     "start_time": start_time,
+            #     "end_time": end_time,
+            #     "page_num": -1,  # 获取所有数据
+            #     'page_count': page_count,
+            #     'item_name': project_id,
+            #     "resource_name": resource_name,
+            #     'ip': ip,
+            #     # "env": env,
+            #     "resource_status": resource_status,
+            #     "uid": uid,
+            #     "token": token
+            # }
+            # filters = {
+            #     "dep": department,
+            #     "user": user_id,
+            #     "page_num": page_num,
+            #     "page_count": page_count,
+            #     "env": env
+            # }
+            # return get_from_cmdb2(params, filters)
+            class args(object):
+                resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip = \
+                    resource_type, resource_name, business_name,module_name,project_name, start_time, end_time, resource_status, page_num, page_count, env, user_id, department, ip
+            return get_from_uop(request.args)
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
             resource_type, resource_name, item_name, start_time, end_time,
             resource_status, page_num, page_count, env, user_id, department, ip)

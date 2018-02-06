@@ -9,9 +9,9 @@ import time
 import random
 import datetime
 from uop.log import Log
-from uop.util import async
+from uop.util import async, response_data
 from config import APP_ENV, configs
-from uop.models import ResourceModel
+from uop.models import ResourceModel, Statusvm
 from uop.item_info.handler import delete_instance
 from flask import jsonify
 import  xlsxwriter
@@ -160,6 +160,90 @@ def get_from_cmdb2(args, filters, download=False):
         return  [] if download else jsonify(response)
 
 
+def get_from_uop(args):
+    resource_type, resource_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = args.resource_type, args.resource_name, args.project_name, args.start_time, args.end_time,
+    args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
+    query, result_list = {}, []
+    try:
+        attach_key = lambda v, query, key, filter: query.update(key=v) if filter else ""
+
+        attach_key(department, query, "department", department)
+        attach_key(user_id, query, "user_id", user_id and user_id != "admin")
+        attach_key(env, query, "env", env)
+        attach_key(resource_name, query, "resource_name__contains", resource_name)
+        attach_key(project_name, query, "project_name__contains", project_name)
+        attach_key(status, query, "status", status)
+        attach_key(ip, query, "ip", ip)
+        # if user_id and user_id != "admin":
+        #     query['user_id'] = user_id
+        # if department:
+        #     query['department'] = department
+        if resource_type in ["mysqlandmongo", "cache"]:
+            if resource_type == "mysqlandmongo":
+                query['os_type__in'] = ["mysql", "mongodb"]
+            else:
+                query['os_type'] = "redis"
+        else:
+            if resource_type:
+                query['os_type'] = resource_type
+        # if env:
+        #     query['env'] = env
+        # if resource_name:
+        #     query['resource_name__contains'] = resource_name
+        # if item_name:
+        #     query['item_name__contains'] = item_name
+        # if status:
+        #     query['status'] = status
+        # if ip:
+        #     query["ip"] = ip
+        if start_time:
+            start_time = datetime.datetime.strptime(str(start_time), "%Y-%m-%dT%H:%M:%S.000Z")
+            query["create_time__gte"] = start_time
+        if end_time:
+            end_time = datetime.datetime.strptime(str(end_time), "%Y-%m-%dT%H:%M:%S.000Z")
+            query["create_time__lte"] = end_time
+        Log.logger.info("query:{}".format(query))
+        resources = Statusvm.objects.filter(**query).order_by('-create_time')
+        if not resources:
+            page_info = []
+            total_page = 0
+        else:
+            if page_num and page_count:
+                page_info, total_page = pageinit(resources, int(page_num), int(page_count))
+            else:
+                page_info = resources
+                total_page = len(resources)
+        for pi in page_info:
+            tmp_result = {}
+            tmp_result['resource_ip'] = pi.ip
+            tmp_result['osid'] = pi.osid
+            tmp_result['domain'] = pi.domain
+            tmp_result['domain_ip'] = pi.domain_ip
+            tmp_result['resource_type'] = pi.os_type
+            tmp_result['resource_config'] = [
+                {'name': 'CPU', 'value': str(pi.cpu) + u'核'},
+                {'name': u'内存', 'value': str(pi.mem) + 'GB'},
+            ]
+            tmp_result['create_date'] = datetime.datetime.strftime(pi.create_time, '%Y-%m-%d %H:%M:%S')
+            tmp_result['update_time'] = datetime.datetime.strftime(pi.update_time, '%Y-%m-%d %H:%M:%S')
+            tmp_result['resource_name'] = pi.resource_name
+            tmp_result['item_name'] = pi.item_name
+            tmp_result['resource_status'] = pi.status
+            tmp_result['env'] = pi.env
+            result_list.append(tmp_result)
+        content = {
+            "total_page": total_page,
+            "object_list": result_list,
+            "current_page": page_num
+        }
+        res = response_data(200, "success", content)
+    except Exception as exc:
+        code = 500
+        Log.logger.error("Statusflush error:{}".format(exc))
+        res = response_data(code, str(exc), "")
+    return res
+
+
 def parse_data_uop(data, filters):
     data = [dict({k.lower(): v for k, v in ol.items()},**filters) for ol in data]
     return data
@@ -206,13 +290,13 @@ def deal_myresource_to_excel(data, field_list):
              'text_wrap': True, 'valign': 'vcenter'})
         body = workbook.add_format({'border': 1, 'align': 'center', 'font_size': 10, 'font_name': u'微软雅黑'})
         head_cols=[]
-        Log.logger.info("deal_myresource_to_excel:{}".format(data))
+        # Log.logger.info("deal_myresource_to_excel:{}".format(data))
         if len(field_list) == 0:
             field_list=["resource_type","resource_name","business_name","env","project_name","create_date","resource_ip","resource_config","resource_status","update_time","domain","module_name"]
         for field in field_list:
             head_cols.append(field_dict.get(field))
         res_list=deal_data(data, field_list)
-        Log.logger.error("res_list:{}".format(res_list))
+        # Log.logger.error("res_list:{}".format(res_list))
         for i in range(0,len(head_cols)):
             h_col = to_unicode(head_cols[i])
             worksheetResource.write(0,i,h_col,head)

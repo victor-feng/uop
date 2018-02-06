@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from flask_mongoengine import MongoEngine
 db = MongoEngine()
-
-
 
 
 
@@ -58,6 +57,63 @@ class Cmdb(db.Document):
     username = db.StringField()
     password = db.StringField()
 
+
+class Statusvm(db.DynamicDocument):
+    """
+    虚拟机状态表
+    """
+    resource_name = db.StringField(required=True)
+    resource_id = db.StringField(required=True)
+
+    business_name = db.StringField(required=True)
+    module_name = db.StringField(required=True)
+    project_name = db.StringField(required=True)
+    project_id = db.StringField(required=True)
+
+    cpu = db.StringField(required=False)
+    env = db.StringField(required=True)
+    mem = db.StringField(required=False)
+    osid = db.StringField(required=True)
+    ip = db.StringField(required=False)
+    os_type = db.StringField(required=False)
+    user_id = db.StringField(required=False)
+    status = db.StringField(required=True)
+    create_time = db.DateTimeField(required=False)
+    update_time = db.DateTimeField(required=False)
+    domain = db.StringField(required=False)
+    domain_ip = db.StringField(required=False)
+    department = db.StringField(required=False)
+
+    meta = {
+            'collection': 'status_vm',
+            'indexes': [
+                {
+                    'fields': ['osid'],
+                    'unique': True,
+                }
+            ],
+            }
+
+    @classmethod
+    def created_status(cls, **kwargs):
+        params = {}
+        for k, v in kwargs.items():
+            if k == "create_time":
+                if v:
+                    v = datetime.datetime.strptime(v, '%Y-%m-%d %H:%M:%S')
+                else:
+                    v = datetime.datetime.now()
+            params.update({k: v})
+        try:
+            c = Statusvm(**params)
+            c.save()
+        except Exception as e:
+            code = 500
+            logging.error("created_status error:{}".format(str(e)))
+            return False
+        return True
+
+
 class PermissionList(db.Document):
     perm_id= db.StringField(required=True, max_length=50,unique=True)
     name = db.StringField(required=True, max_length=50, unique=True,unique_with='role')
@@ -108,6 +164,7 @@ class UserInfo(db.Document):
                 'unique': True,
                 }]
             }
+
 
 class RoleInfo(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)

@@ -5,7 +5,7 @@ import copy
 import requests
 import datetime
 import time
-from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache
+from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
@@ -164,13 +164,10 @@ def get_resources_all_pcode():
 
 
 def filter_status_data(p_code):
-    data = {
-        "vm_status":[]
-    }
-    # Log.logger.info("filter_status_data.p_code:{}".format(p_code))
     res = ResourceModel.objects.filter(cmdb_p_code=p_code)
     for r in res:
         osid_ip_list = r.os_ins_ip_list
+        compute_list = r.compute_list
         # Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
         for oi in osid_ip_list:
             meta = {}
@@ -178,7 +175,12 @@ def filter_status_data(p_code):
             meta["user_id"] = r.user_id
             meta["resource_name"] = r.resource_name
             meta["department"] = r.department
-            meta["item_name"] = r.project
+            meta["project_name"] = r.project_name
+            meta["module_name"] = r.module_name
+            meta["business_name"] = r.business_name
+            meta["project_id"] = r.project_id
+            if compute_list:
+                meta["domain"] = compute_list[0].domain
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
             try:
                 meta["cpu"] = str(oi.cpu)
@@ -191,8 +193,7 @@ def filter_status_data(p_code):
             meta["ip"] = oi.ip
             meta["os_type"] = oi.os_type
             meta["status"] = "active"
-            data["vm_status"].append(meta)
-    return data
+            Statusvm.created_status(**meta)
 
 
 @async
@@ -200,13 +201,8 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
-    data = filter_status_data(p_code)
-    # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
-    try:
-        ret = requests.post(url, data=json.dumps(data)).json()
-        # Log.logger.info("push CMDB vm and docker status result is:{}".format(ret))
-    except Exception as exc:
-        Log.logger.error("push_vm_docker_status_to_cmdb pcode is error:{}".format(exc))
+    filter_status_data(p_code)
+
 
 
 @async
