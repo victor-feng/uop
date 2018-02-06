@@ -107,7 +107,6 @@ class ApprovalInfo(Resource):
 
             approvals = models.Approval.objects.filter(capacity_status="res",resource_id=res_id).order_by("-create_date")
             resource = models.ResourceModel.objects.get(res_id=res_id)
-            resource = resource.resource_type
             resource_list = resource.resource_list
             compute_list = resource.compute_list
             if approvals:
