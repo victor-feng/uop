@@ -165,7 +165,7 @@ def get_from_uop(args):
         args.resource_type, args.resource_name, args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
     try:
-        attach_key = lambda v, query, key, filter: query.update({key:v}) if filter else ""
+        attach_key = lambda v, query, key, filter: query.update({key:str(v)}) if filter else ""
 
         attach_key(department, query, "department", department)
         attach_key(user_id, query, "user_id", user_id and user_id != "admin")
@@ -239,7 +239,7 @@ def get_from_uop(args):
         res = response_data(200, "success", content)
     except Exception as exc:
         code = 500
-        Log.logger.error("Statusflush error:{}".format(exc))
+        Log.logger.error("Statusflush error:{}".format(str(exc)))
         res = response_data(code, str(exc), "")
     return res
 
