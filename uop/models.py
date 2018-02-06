@@ -331,10 +331,10 @@ class DBIns(db.EmbeddedDocument):
         }
 
 class OS_ip_dic(db.EmbeddedDocument):
-    ip=db.StringField(required=True)
+    ip=db.StringField(required=False)
     os_ins_id = db.StringField(requirquired=False)
     os_vol_id = db.StringField(requirquired=False)
-    os_type = db.StringField(required=True)
+    os_type = db.StringField(required=False)
     cpu = db.StringField(required=False)
     mem = db.StringField(required=False)
     meta = {
