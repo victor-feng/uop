@@ -140,7 +140,7 @@ class ApprovalInfo(Resource):
                         com.save()
                 if resource_list:
                     for res in resource_list:
-                        res.network_id = network_id_dict[res.ins_type]
+                        res.network_id = network_id_dict.get(res.ins_type)
                         res.save()
                 resource.save()
                 code = 200
