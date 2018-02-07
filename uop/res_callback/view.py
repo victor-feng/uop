@@ -668,7 +668,7 @@ class ResourceProviderCallBack(Resource):
         resource.reservation_status = status_record.status
         resource.save()
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
-        if set_flag  == "increase" and status == 'ok' and cloud == '2':
+        if set_flag  == "increase" and status == 'ok' and cloud != '2':
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             deploy_nginx_to_crp(resource_id, url, set_flag)
