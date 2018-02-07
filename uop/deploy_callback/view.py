@@ -85,7 +85,7 @@ class DeployCallback(Resource):
         status_record.created_time = datetime.datetime.now()
         if cloud == "2":
             if dep.deploy_result == "success":
-                dep.deploy_result == "%_success" % deploy_type
+                dep.deploy_result == "%s_success" % deploy_type
                 status_record.unique_flag = unique_flag
                 status_record.msg = "应用集群%s成功" % deploy_type_dict[deploy_type]
             else:
