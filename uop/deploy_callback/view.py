@@ -63,6 +63,7 @@ class DeployCallback(Resource):
             parser.add_argument('unique_flag', type=str)
             parser.add_argument('cloud', type=str)
             args = parser.parse_args()
+            Log.logger.info("args parser info:{}".format(args))
         except Exception as e:
             Log.logger.error("###parser error:{}".format(e.args))
             return
