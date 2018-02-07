@@ -93,6 +93,8 @@ class DeployCallback(Resource):
                 dep.deploy_result == "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
                 status_record.msg ="应用集群%s失败" % deploy_type_dict[deploy_type]
+            status_record.save()
+            dep.save()
         else:
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_docker_success" % deploy_type
@@ -121,7 +123,7 @@ class DeployCallback(Resource):
                 dep.deploy_result = "%s_fail" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
                                      "%s_fail" % deploy_type, "res")
-        dep.save()
+            dep.save()
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
