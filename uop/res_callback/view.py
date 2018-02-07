@@ -193,6 +193,13 @@ mapping_type_status = {
     'app_cluster' : 'docker',
 }
 
+mapping_scale_info = {
+    'increase' : '扩容',
+    'reduce' : '缩容',
+}
+
+
+
 class ResourceProviderTransitions(object):
     # Define some states.
     states = ['init', 'stop',
@@ -536,7 +543,7 @@ class ResourceProviderCallBack(Resource):
                 Log.logger.debug(rpt.state)
         if is_write_to_cmdb is True:
             Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-            if set_flag == "increase":
+            if set_flag in ["increase","reduce"]:
                 CMDB_URL = current_app.config['CMDB_URL']
                 CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
                 old_pcode = copy.deepcopy(resource.cmdb_p_code)
@@ -549,7 +556,7 @@ class ResourceProviderCallBack(Resource):
                         break
                 cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode,
                             "app_cluster_name": app_cluster_name}
-                Log.logger.info("increase to CMDB cmdb_req:{}".format(cmdb_req))
+                Log.logger.info("increase or reduce to CMDB cmdb_req:{}".format(cmdb_req))
                 data = json.dumps(cmdb_req)
                 ret = requests.post(CMDB_STATUS_URL, data=data)
                 Log.logger.info("CMDB return:{}".format(ret))
@@ -622,19 +629,21 @@ class ResourceProviderCallBack(Resource):
                 if set_flag == "res":
                     status_record.status = "set_success"
                     status_record.msg = "应用集群创建成功"
-                if set_flag == "increase":
-                    status_record.status = "increase_success"
-                    status_record.msg = "应用集群扩缩容成功"
+                if set_flag in ["increase","reduce"]:
+                    status_record.status = "%s_success" % set_flag
+                    status_record.msg = "应用集群%s成功" % mapping_scale_info[set_flag]
                     status_record.deploy_id = deploy_id
+                    dep.deploy_result = "%s_fail" % set_flag
+                    dep.save()
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
                     status_record.msg = "应用集群创建失败,错误日志为: %s" % error_msg
-                elif set_flag == "increase":
-                    status_record.status = "increase_fail"
-                    status_record.msg = "应用集群扩缩容失败,错误日志为: %s" % error_msg
+                elif set_flag in ["increase","reduce"]:
+                    status_record.status = "%s_fail" % set_flag
+                    status_record.msg = "应用集群%s失败,错误日志为: %s" % (mapping_scale_info[set_flag],error_msg)
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "increase_fail"
+                    dep.deploy_result = "%s_fail" % set_flag
                     dep.save()
         else:
             if status == 'ok':
@@ -659,7 +668,7 @@ class ResourceProviderCallBack(Resource):
         resource.reservation_status = status_record.status
         resource.save()
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
-        if set_flag == "increase" and status == 'ok':
+        if set_flag  == "increase" and status == 'ok' and cloud == '2':
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             deploy_nginx_to_crp(resource_id, url, set_flag)
