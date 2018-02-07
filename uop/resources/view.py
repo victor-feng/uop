@@ -549,8 +549,8 @@ class ResourceApplication(Resource):
                     quantity = res.get('quantity')
                     version = res.get('version')
                     volume_size = res.get('volume_size', 0)
-                    network_id = resource.get('network_id')
-                    image_id = resource.get('image_id')
+                    network_id = res.get('network_id')
+                    image_id = res.get('image_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
                     resource.resource_list.append(db_ins)
