@@ -266,7 +266,7 @@ def crp_data_cmdb(args):
     ret = []
     try:
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
-        ret = requests.post(url, data=data_str, timeout=60).json()
+        ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
             save_resource_id(ret["data"]["instance"], resource)
         else:
@@ -496,7 +496,7 @@ def get_relations(view_id):
         }
         data_str = json.dumps(data)
         try:
-            ret = requests.post(url, data=data_str, timeout=60).json()
+            ret = requests.post(url, data=data_str, timeout=5).json()
             if ret["code"] == 0:
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息
                 entity = ret["data"][0]["entity"]  # 获取视图实体信息
@@ -505,7 +505,7 @@ def get_relations(view_id):
             elif ret["code"] == 121:
                 data["uid"], data["token"] = get_uid_token(True)
                 data_str = json.dumps(data)
-                ret = requests.post(url, data=data_str, timeout=60).json()
+                ret = requests.post(url, data=data_str, timeout=5).json()
                 relations = ret["data"][0]["relation"]  # 获取视图关系实体信息,
                 entity = ret["data"][0]["entity"]  # 获取视图实体信息
                 view = ViewCache(view_id=view_id, relation=json.dumps(relations), entity=json.dumps(entity), cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))

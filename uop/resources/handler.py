@@ -133,7 +133,7 @@ def get_from_cmdb2(args, filters, download=False):
     Log.logger.info("download:{}".format(download))
     try:
         Log.logger.info("args:{}".format( args))
-        ret = requests.post(url, data=json.dumps(args), timeout=60).json()
+        ret = requests.post(url, data=json.dumps(args), timeout=5).json()
         if ret["code"] != 0:
             response["code"] = ret["code"]
             response["result"]["msg"] = ret["msg"]
