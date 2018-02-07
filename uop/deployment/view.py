@@ -236,6 +236,7 @@ class DeploymentListAPI(Resource):
             dep_id = args.dep_id
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
             resource = ResourceModel.objects.get(res_id=args.resource_id)
+            cloud = resource.cloud
             resource.deploy_name = args.deploy_name
             resource.save()
             # disconf配置
@@ -258,15 +259,18 @@ class DeploymentListAPI(Resource):
             # 将computer信息如IP，更新到数据库
             deploy_obj.app_image = str(args.app_image)
             deploy_obj.save()
-            resource = ResourceModel.objects.get(res_id=args.resource_id)
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
-
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
             ##推送到crp
             deploy_obj.approve_status = 'success'
-            err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+            if cloud == 2:
+                resource_info={}
+                err_msg = None
+                appinfo=[]
+            else:
+                err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
             message = 'approve_allow success'
             if not err_msg:
                 err_msg, result = deploy_to_crp(deploy_obj,
@@ -274,7 +278,7 @@ class DeploymentListAPI(Resource):
                                                 resource_info,
                                                 args.resource_name,
                                                 args.database_password,
-                                                appinfo, disconf_server_info)
+                                                appinfo, disconf_server_info,cloud)
                 if err_msg:
                     deploy_obj.deploy_result = 'deploy_fail'
                     message = 'deploy_fail'

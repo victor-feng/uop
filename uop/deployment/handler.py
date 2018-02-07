@@ -141,7 +141,7 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, environment, resource_info, resource_name, database_password, appinfo,
-                  disconf_server_info):
+                  disconf_server_info,cloud):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
@@ -153,58 +153,74 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
         "cloud":res_obj.cloud,
         "resource_name":res_obj.resource_name
     }
-    if appinfo:  # 判断nginx信息，没有则不推送dns配置
-        for app_info in res_obj.compute_list:
-            dns_info = {'domain': app_info.domain,
-                        'domain_ip': app_info.domain_ip
-                        }
-            data['dns'].append(dns_info)
-
-    if resource_info.get('mysql_cluster'):
-        data['mysql'] = {
-            "ip": resource_info['mysql_cluster']['wvip'],
-            "port": resource_info['mysql_cluster']['port'],
-            "database_user": resource_name,
-            "database_password": database_password,
-            "mysql_user": resource_info['mysql_cluster']['user'],
-            "mysql_password": resource_info['mysql_cluster']['password'],
-            "database": "mysql",
-        }
-    if resource_info.get('mongodb_cluster'):
-        data['mongodb'] = {
-            "vip1": resource_info['mongodb_cluster']['vip1'],
-            "vip2": resource_info['mongodb_cluster']['vip2'],
-            "vip3": resource_info['mongodb_cluster']['vip3'],
-            "vip": resource_info['mongodb_instance']['vip'],
-            "port": resource_info['mongodb_cluster']['port'],
-            # TODO test data
-            "db_username": resource_name,
-            "db_password": database_password,
-            # "db_username": 'victor',
-            # "db_password": '123456',
-            "mongodb_username": resource_info['mongodb_cluster']['user'],
-            "mongodb_password": resource_info['mongodb_cluster']['password'],
-            "database": "mongodb",
-        }
-    if resource_info.get('docker'):
-        # data['docker'] = {
-        #     "image_url": deploy_item.app_image,
-        #     "ip": resource_info['docker']['ip_address']
-        # }
-        docker_list = []
-        for obj in res_obj.compute_list:
+    if cloud == '2':
+        compute_list = res_obj.compute_list
+        for compute in compute_list:
+            docker_list = []
             try:
                 docker_list.append(
                     {
-                        'url': obj.url,
-                        'ins_name': obj.ins_name,
-                        'ip': obj.ips,
-                        'health_check':obj.health_check
+                        'url': compute.url,
+                        'ins_name': compute.ins_name,
+                        'ip': compute.ips,
+                        'health_check':compute.health_check
                     }
                 )
             except AttributeError as e:
                 Log.logger.error(str(e))
         data['docker'] = docker_list
+    else:
+        if appinfo:  # 判断nginx信息，没有则不推送dns配置
+            for app_info in res_obj.compute_list:
+                dns_info = {'domain': app_info.domain,
+                            'domain_ip': app_info.domain_ip
+                            }
+                data['dns'].append(dns_info)
+        if resource_info.get('mysql_cluster'):
+            data['mysql'] = {
+                "ip": resource_info['mysql_cluster']['wvip'],
+                "port": resource_info['mysql_cluster']['port'],
+                "database_user": resource_name,
+                "database_password": database_password,
+                "mysql_user": resource_info['mysql_cluster']['user'],
+                "mysql_password": resource_info['mysql_cluster']['password'],
+                "database": "mysql",
+            }
+        if resource_info.get('mongodb_cluster'):
+            data['mongodb'] = {
+                "vip1": resource_info['mongodb_cluster']['vip1'],
+                "vip2": resource_info['mongodb_cluster']['vip2'],
+                "vip3": resource_info['mongodb_cluster']['vip3'],
+                "vip": resource_info['mongodb_instance']['vip'],
+                "port": resource_info['mongodb_cluster']['port'],
+                # TODO test data
+                "db_username": resource_name,
+                "db_password": database_password,
+                # "db_username": 'victor',
+                # "db_password": '123456',
+                "mongodb_username": resource_info['mongodb_cluster']['user'],
+                "mongodb_password": resource_info['mongodb_cluster']['password'],
+                "database": "mongodb",
+            }
+        if resource_info.get('docker'):
+            # data['docker'] = {
+            #     "image_url": deploy_item.app_image,
+            #     "ip": resource_info['docker']['ip_address']
+            # }
+            docker_list = []
+            for obj in res_obj.compute_list:
+                try:
+                    docker_list.append(
+                        {
+                            'url': obj.url,
+                            'ins_name': obj.ins_name,
+                            'ip': obj.ips,
+                            'health_check':obj.health_check
+                        }
+                    )
+                except AttributeError as e:
+                    Log.logger.error(str(e))
+            data['docker'] = docker_list
 
     err_msg = None
     result = None
