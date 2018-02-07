@@ -165,7 +165,8 @@ class DeploymentListAPI(Resource):
                     'database_password': deployment.database_password,
                     'is_deleted': deployment.is_deleted,
                     'is_rollback': deployment.is_rollback,
-                    'approve_suggestion': deployment.approve_suggestion
+                    'approve_suggestion': deployment.approve_suggestion,
+                    'resource_type': resource.resource_type
                 })
                 res["deployments"]=deployments
         except Exception as e:
