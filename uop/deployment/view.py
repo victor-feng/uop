@@ -130,7 +130,9 @@ class DeploymentListAPI(Resource):
                         app["is_nginx"] = 0
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
                 project_name, business_name, module_name = "" , "", ""
+                resource_type=""
                 if resource:
+                    resource_type = resource.resource_type
                     for r in resource:
                         project_name = r.project_name
                         business_name = r.business_name
@@ -166,7 +168,7 @@ class DeploymentListAPI(Resource):
                     'is_deleted': deployment.is_deleted,
                     'is_rollback': deployment.is_rollback,
                     'approve_suggestion': deployment.approve_suggestion,
-                    'resource_type': resource.resource_type
+                    'resource_type': resource_type
                 })
                 res["deployments"]=deployments
         except Exception as e:
