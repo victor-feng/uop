@@ -633,7 +633,7 @@ class ResourceProviderCallBack(Resource):
                     status_record.status = "%s_success" % set_flag
                     status_record.msg = "应用集群%s成功" % mapping_scale_info[set_flag]
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "%s_fail" % set_flag
+                    dep.deploy_result = "%s_success" % set_flag
                     dep.save()
             else:
                 if set_flag == "res":
