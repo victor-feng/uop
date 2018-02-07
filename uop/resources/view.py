@@ -503,8 +503,9 @@ class ResourceApplication(Resource):
         cloud = args.cloud
         resource_type = args.resource_type
         try:
-            resource = ResourceModel.objects.get(res_id=res_id)
-            if resource:
+            resources = ResourceModel.objects.filter(res_id=res_id)
+            if resources:
+                resource=resources[0]
                 resource.resource_name=resource_name
                 resource.project=project
                 resource.project_id=project_id
