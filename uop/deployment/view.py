@@ -131,14 +131,11 @@ class DeploymentListAPI(Resource):
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
                 resource_type, project_name, business_name, module_name = "" , "", "",""
                 if resource:
-                    try:
-                        resource_type = resource.resource_type
-                    except Exception as e:
-                        resource_type = ""
                     for r in resource:
                         project_name = r.project_name
                         business_name = r.business_name
                         module_name = r.module_name
+                        resource_type = r.resource_type
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
