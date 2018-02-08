@@ -131,7 +131,10 @@ class DeploymentListAPI(Resource):
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
                 resource_type, project_name, business_name, module_name = "" , "", "",""
                 if resource:
-                    resource_type = resource.resource_type
+                    try:
+                        resource_type = resource.resource_type
+                    except Exception as e:
+                        resource_type = ""
                     for r in resource:
                         project_name = r.project_name
                         business_name = r.business_name
