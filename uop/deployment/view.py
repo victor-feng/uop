@@ -1107,7 +1107,7 @@ class RollBackAPI(Resource):
             approval_id = str(uuid.uuid1())
             approval_status = "rollbacking"
             # 更新要回滚的deploy记录
-            old_deployment = Deployment.objects.get(deploy_name=deploy_name,res_id=res_id)
+            old_deployment = Deployment.objects.get(deploy_name=deploy_name,resource_id=res_id)
             deploy_id = approval_id
             create_date = datetime.datetime.now()
             # 状态为回滚未审批
