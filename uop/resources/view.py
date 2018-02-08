@@ -503,9 +503,8 @@ class ResourceApplication(Resource):
         cloud = args.cloud
         resource_type = args.resource_type
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id)
-            if resources:
-                resource=resources[0]
+            resource = ResourceModel.objects.get(res_id=res_id)
+            if resource:
                 resource.resource_name=resource_name
                 resource.project=project
                 resource.project_id=project_id
@@ -549,8 +548,8 @@ class ResourceApplication(Resource):
                     quantity = res.get('quantity')
                     version = res.get('version')
                     volume_size = res.get('volume_size', 0)
-                    network_id = res.get('network_id')
-                    image_id = res.get('image_id')
+                    network_id = resource.get('network_id')
+                    image_id = resource.get('image_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
                     resource.resource_list.append(db_ins)
@@ -596,7 +595,7 @@ class App(Resource):
         # args.self_model_id = ENTITY["project"]
         # instances = Aquery(args)["instance"] # 工程下所有的tomcat实例
         data = []
-        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department) # 本部门的工程实例
+        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id)# 本部门的工程实例
         if resources:
             data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status} for res in resources]
         response = response_data(200, "success", data)
