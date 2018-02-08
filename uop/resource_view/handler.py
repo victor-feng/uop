@@ -18,6 +18,7 @@ __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
 ]
 
+
 def response_data_not_found():
 
     res = {

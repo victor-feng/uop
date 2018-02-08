@@ -218,9 +218,9 @@ def get_from_uop(args):
             page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
         else:
             page_info = result_list
-            total_page = len(result_list)
+        total_page = len(result_list)
         content = {
-            "total_page": total_page,
+            "total_count": total_page,
             "object_list": page_info,
             "current_page": page_num
         }
