@@ -129,8 +129,7 @@ class DeploymentListAPI(Resource):
                     elif ins_id not in domain_info:
                         app["is_nginx"] = 0
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
-                project_name, business_name, module_name = "" , "", ""
-                resource_type=""
+                resource_type, project_name, business_name, module_name = "" , "", "",""
                 if resource:
                     resource_type = resource.resource_type
                     for r in resource:
