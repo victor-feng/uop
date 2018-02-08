@@ -510,6 +510,7 @@ class ResourceProviderCallBack(Resource):
         status = request_data.get('status')
         error_msg = request_data.get('error_msg')
         set_flag = request_data.get('set_flag')
+        resource_type = request_data.get('resource_type')
         resource = ResourceModel.objects.get(res_id=resource_id)
         env = resource.env
         cloud = resource.cloud
@@ -626,10 +627,13 @@ class ResourceProviderCallBack(Resource):
         status_record.created_time = datetime.datetime.now()
         if cloud == "2":
             if status == 'ok':
-                if set_flag == "res":
+                if set_flag == "res" and resource_type == "app":
                     status_record.status = "set_success"
                     status_record.msg = "应用集群创建成功"
-                if set_flag in ["increase","reduce"]:
+                if set_flag == "res" and resource_type != "app":
+                    status_record.status = "set_success"
+                    status_record.msg = "预留成功"
+                if set_flag in ["increase","reduce"] and resource_type == "app":
                     status_record.status = "%s_success" % set_flag
                     status_record.msg = "应用集群%s成功" % mapping_scale_info[set_flag]
                     status_record.deploy_id = deploy_id
