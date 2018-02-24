@@ -165,7 +165,7 @@ def get_from_uop(args):
         args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
     try:
-        attach_key = lambda v, query, key, filter: query.update({key:v}) if filter else ""
+        attach_key = lambda v, query, key, filter: query.update({key: v}) if filter else ""
 
         attach_key(department, query, "department", department)
         attach_key(user_id, query, "user_id", user_id and user_id != "admin")
@@ -230,6 +230,16 @@ def get_from_uop(args):
         Log.logger.error("Statusflush error:{}".format(str(exc)))
         res = response_data(code, str(exc), "")
     return res
+
+@async
+def delete_uop(res_id):
+    res = Statusvm.objects.filter(resource_id=res_id)
+    try:
+        if res:
+            for r in res:
+                r.delete()
+    except Exception as exc:
+        Log.logger.error("Delete resource error:{}".format(str(exc)))
 
 
 def parse_data_uop(data, filters):
@@ -337,7 +347,7 @@ def deal_data(data,field_list):
         Log.logger.error("deal_data:{}".format(str(e)))
         raise ExcelException(err_msg)
 
-
+@async
 def delete_cmdb1(code):
     cmdb_url = '%s%s%s' % (CMDB_URL, 'cmdb/api/repores_delete/', code)
     requests.delete(cmdb_url)
