@@ -62,6 +62,7 @@ class DeployCallback(Resource):
             parser.add_argument('deploy_type', type=str)
             parser.add_argument('unique_flag', type=str)
             parser.add_argument('cloud', type=str)
+            parser.add_argument('deploy_name', type=str)
             args = parser.parse_args()
             Log.logger.info("args parser info:{}".format(args))
         except Exception as e:
@@ -77,6 +78,7 @@ class DeployCallback(Resource):
         deploy_type = args.deploy_type
         unique_flag = args.unique_flag
         cloud = args.cloud
+        deploy_name=args.deploy_name
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -124,6 +126,11 @@ class DeployCallback(Resource):
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
                                      "%s_fail" % deploy_type, "res")
             dep.save()
+            #如果回滚成功，修改部署版本
+            if args.result ==  "success" and deploy_type == "rollback":
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.deploy_name = deploy_name
+                resource.save()
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息

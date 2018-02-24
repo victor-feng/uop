@@ -827,7 +827,6 @@ class RollBackReservation(Resource):
         data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            resource.deploy_name = deploy_name
             env = resource.env
             cloud = resource.cloud
             resource_name=resource.resource_name
@@ -864,6 +863,7 @@ class RollBackReservation(Resource):
             data["deploy_type"] = "rollback"
             data["cloud"] = cloud
             data["resource_name"] = resource_name
+            data["deploy_name"] = deploy_name
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             headers = {
