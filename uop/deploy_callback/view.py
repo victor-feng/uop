@@ -127,10 +127,10 @@ class DeployCallback(Resource):
                                      "%s_fail" % deploy_type, "res")
             dep.save()
             #如果回滚成功，修改部署版本
-            if args.result == "success" and deploy_type == "rollback":
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource.deploy_name = deploy_name
-                resource.save()
+        if args.result == "success" and deploy_type == "rollback":
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.deploy_name = deploy_name
+            resource.save()
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
