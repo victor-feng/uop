@@ -726,11 +726,6 @@ class RollBackInfoAPI(Resource):
                     deployment.approve_status = "rollback_success"
                     # 审批通过状态改为回滚中
                     deployment.deploy_result = "rollbacking"
-                    # 管理员审批通过后修改resource表deploy_name,更新当前版本
-                    deploy_name = deployment.deploy_name
-                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
-                    resource.deploy_name = deploy_name
-                    resource.save()
                 else:
                     approval.approval_status = "rollback_fail"
                     deployment.approve_status = "rollback_fail"
