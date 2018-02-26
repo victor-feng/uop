@@ -46,6 +46,8 @@ class ResourceApplication(Resource):
         parser.add_argument('resource_info_list', type=list, location='json')
         args = parser.parse_args()
         resource_info_list = args.resource_info_list
+        res_id_list=[]
+        resource_name_list=[]
         for info in resource_info_list:
             resource_name = info.get("resource_name","")
             project_name = info.get("project_name","")
@@ -69,6 +71,8 @@ class ResourceApplication(Resource):
             compute_list = info.get("compute_list",[])
             cloud = info.get("cloud","")
             resource_type = info.get("resource_type","")
+            res_id_list.append(res_id)
+            resource_name_list.append(resource_name)
             resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                                  department_id=department_id, res_id=res_id, project_id=project_id,
                                                  cmdb2_project_id=cmdb2_project_id,
@@ -113,6 +117,9 @@ class ResourceApplication(Resource):
                     network_id = compute.get('network_id')
                     networkName = compute.get('networkName')
                     tenantName = compute.get('tenantName')
+                    host_env = compute.get("host_env")
+                    language_env= compute.get("language_env")
+                    deploy_source = compute.get("deploy_source")
                     try:
                         meta = json.dumps(meta_str)
                     except Exception as e:
@@ -127,7 +134,8 @@ class ResourceApplication(Resource):
                         return res, code
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
-                                             network_id=network_id,networkName=networkName,tenantName=tenantName)
+                                             network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
+                                             ,language_env=language_env,deploy_source=deploy_source)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -183,8 +191,8 @@ class ResourceApplication(Resource):
             'result': {
                 'res': 'success',
                 'msg': 'Create resource application success.',
-                'res_id': res_id,
-                'res_name': resource_name
+                'res_id': res_id_list,
+                'res_name': resource_name_list
             }
         }
 
@@ -519,9 +527,14 @@ class ResourceApplication(Resource):
                     network_id = compute.get('network_id')
                     networkName = compute.get('networkName')
                     tenantName = compute.get('tenantName')
+                    host_env = compute.get("host_env")
+                    language_env = compute.get("language_env")
+                    deploy_source = compute.get("deploy_source")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
-                                             health_check=health_check,network_id=network_id,networkName=networkName,tenantName=tenantName)
+                                             health_check=health_check,network_id=network_id,networkName=networkName,
+                                             tenantName=tenantName,host_env=host_env
+                                             ,language_env=language_env,deploy_source=deploy_source)
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
@@ -696,6 +709,9 @@ class ResourceDetail(Resource):
                         "network_id": db_com.network_id,
                         "networkName": db_com.networkName,
                         "tenantName": db_com.tenantName,
+                        "host_env":db_com.host_env,
+                        "language_env":db_com.language_env,
+                        "deploy_source":db_com.deploy_source,
 
                     }
                 )
@@ -831,9 +847,13 @@ class ResourceDetail(Resource):
             network_id = compute.get('network_id')
             networkName = compute.get('networkName')
             tenantName = compute.get('tenantName')
+            host_env = compute.get("host_env")
+            language_env = compute.get("language_env")
+            deploy_source = compute.get("deploy_source")
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
                                      quantity=quantity, port=port,docker_meta=meta_str,
-                                     health_check=health_check,network_id=network_id,networkName=networkName,tenantName=tenantName)
+                                     health_check=health_check,network_id=network_id,networkName=networkName,
+                                     tenantName=tenantName,host_env=host_env,language_env=language_env,deploy_source=deploy_source)
             resource_application.compute_list.append(compute_ins)
 
         try:
