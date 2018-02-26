@@ -275,6 +275,9 @@ class ComputeIns(db.EmbeddedDocument):
     network_id = db.StringField(required=False)
     networkName = db.StringField(required=False)
     tenantName = db.StringField(required=False)
+    host_env = db.StringField(required=False)  # 宿主机环境 docker，kvm，physical_server
+    language_env = db.StringField(required=False)  # 语言环境，python，java，php
+    deploy_source = db.StringField(required=False)  # 部署来源，image，war，git
 
     meta = {
         'collection': 'compute_ins',
@@ -387,7 +390,8 @@ class ResourceModel(db.DynamicDocument):
     redis_network_id = db.StringField(required=False)
     mongodb_network_id = db.StringField(required=False)
     cloud = db.StringField(required=False) #1 = cloud1.0 ,2=cloud2.0
-    resource_type = db.StringField(required=False) #资源的类型是应用app，还是中间件middleware
+    resource_type = db.StringField(required=False) #资源的类型是应用app，数据库 database
+
 
 
     meta = {

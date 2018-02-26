@@ -43,124 +43,96 @@ class ResourceApplication(Resource):
     @classmethod
     def post(cls):
         parser = reqparse.RequestParser()
-        parser.add_argument('resource_name', type=str)
-        parser.add_argument('project_name', type=str)
-        parser.add_argument('module_name', type=str)
-        parser.add_argument('business_name', type=str)
-        parser.add_argument('cmdb2_project_id', type=str)
-
-        parser.add_argument('project', type=str)
-        parser.add_argument('project_id', type=str)
-        parser.add_argument('department', type=str)
-        parser.add_argument('user_name', type=str)
-        parser.add_argument('user_id', type=str)
-        parser.add_argument('env', type=str)
-        parser.add_argument('formStatus', type=str)
-        parser.add_argument('approval_status', type=str)
-        parser.add_argument('resource_list', type=list, location='json')
-        parser.add_argument('compute_list', type=list, location='json')
-        parser.add_argument('cloud', type=str)
-        parser.add_argument('resource_type', type=str)
+        parser.add_argument('resource_info_list', type=list, location='json')
         args = parser.parse_args()
+        resource_info_list = args.resource_info_list
+        for info in resource_info_list:
+            resource_name = info.get("resource_name","")
+            project_name = info.get("project_name","")
+            module_name = info.get("module_name","")
+            business_name = info.get("business_name","")
+            cmdb2_project_id = info.get("cmdb2_project_id","")
 
-        resource_name = args.resource_name
-        project_name = args.project_name
-        module_name = args.module_name
-        business_name = args.business_name
-        cmdb2_project_id = args.cmdb2_project_id
+            project = info.get("project","")
+            project_id = info.get("project_id","")
 
-        project = args.project
-        project_id = args.project_id
-
-        department = args.department
-        department_id = '1'
-        res_id = str(uuid.uuid1())
-        user_name = args.user_name
-        user_id = args.user_id
-        env = args.env
-        created_date = datetime.datetime.now()
-        application_status = args.formStatus
-        approval_status = "unsubmit"
-        resource_list = args.resource_list
-        compute_list = args.compute_list
-        cloud = args.cloud
-        resource_type = args.resource_type
-        resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
-                                             department_id=department_id, res_id=res_id, project_id=project_id,
-                                             cmdb2_project_id=cmdb2_project_id,
-                                             project_name=project_name,
-                                             module_name=module_name,
-                                             business_name=business_name,
-                                             user_name=user_name, user_id=user_id,env=env,
-                                             application_status=application_status, approval_status=approval_status,
-                                             reservation_status="unreserved", created_date=created_date,
-                                             cloud = cloud,resource_type = resource_type)
-        for resource in resource_list:
-            ins_name = resource.get('res_name', '未知名称')
-            ins_id = str(uuid.uuid1())
-            ins_type = resource.get('res_type')
-            cpu = resource.get('cpu')
-            mem = resource.get('mem')
-            disk = resource.get('disk')
-            quantity = resource.get('quantity')
-            version = resource.get('version')
-            volume_size = resource.get('volume_size', 0)
-            network_id = resource.get('network_id')
-            image_id = resource.get('image_id')
-            db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
-            resource_application.resource_list.append(db_ins)
-
-        ins_name_list = []
-        if compute_list:
-            for compute in compute_list:
-                ins_name = compute.get('ins_name')
-                ins_name_list.append(ins_name)
+            department = info.get("department","")
+            department_id = '1'
+            res_id = str(uuid.uuid1())
+            user_name = info.get("user_name","")
+            user_id = info.get("user_id","")
+            env = info.get("env","")
+            created_date = datetime.datetime.now()
+            application_status = info.get("formStatus","")
+            approval_status = "unsubmit"
+            resource_list = info.get("resource_list",[])
+            compute_list = info.get("compute_list",[])
+            cloud = info.get("cloud","")
+            resource_type = info.get("resource_type","")
+            resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
+                                                 department_id=department_id, res_id=res_id, project_id=project_id,
+                                                 cmdb2_project_id=cmdb2_project_id,
+                                                 project_name=project_name,
+                                                 module_name=module_name,
+                                                 business_name=business_name,
+                                                 user_name=user_name, user_id=user_id,env=env,
+                                                 application_status=application_status, approval_status=approval_status,
+                                                 reservation_status="unreserved", created_date=created_date,
+                                                 cloud = cloud,resource_type = resource_type)
+            for resource in resource_list:
+                ins_name = resource.get('res_name', '未知名称')
                 ins_id = str(uuid.uuid1())
-                cpu = compute.get('cpu')
-                mem = compute.get('mem')
-                url = compute.get('url')
-                domain = compute.get('domain')
-                domain_ip = compute.get('domain_ip')
-                quantity = compute.get('quantity')
-                port = compute.get('port')
-                meta_str = compute.get('meta')
-                health_check=compute.get('health_check',0)
-                network_id = compute.get('network_id')
-                networkName = compute.get('networkName')
-                tenantName = compute.get('tenantName')
-                try:
-                    meta = json.dumps(meta_str)
-                except Exception as e:
-                    code = 500
-                    res = {
-                        'code': code,
-                        'result': {
-                            'res': 'fail',
-                            'msg': 'meta is not JSON object!'
-                        }
-                    }
-                    return res, code
-                compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
-                                         domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
-                                         network_id=network_id,networkName=networkName,tenantName=tenantName)
-                resource_application.compute_list.append(compute_ins)
+                ins_type = resource.get('res_type')
+                cpu = resource.get('cpu')
+                mem = resource.get('mem')
+                disk = resource.get('disk')
+                quantity = resource.get('quantity')
+                version = resource.get('version')
+                volume_size = resource.get('volume_size', 0)
+                network_id = resource.get('network_id')
+                image_id = resource.get('image_id')
+                db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
+                               quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
+                resource_application.resource_list.append(db_ins)
 
-        if ins_name_list:
-            ins_name_list2 = list(set(ins_name_list))
-            if len(ins_name_list) != len(ins_name_list2):
-                code = 200
-                res = {
-                    'code': code,
-                    'result': {
-                        'res': 'fail',
-                        'msg': '集群名称重复'
-                    }
-                }
-                return res, code
-        try:
-            for insname in ins_name_list:
-                if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(env=env).count() > 0:
+            ins_name_list = []
+            if compute_list:
+                for compute in compute_list:
+                    ins_name = compute.get('ins_name')
+                    ins_name_list.append(ins_name)
+                    ins_id = str(uuid.uuid1())
+                    cpu = compute.get('cpu')
+                    mem = compute.get('mem')
+                    url = compute.get('url')
+                    domain = compute.get('domain')
+                    domain_ip = compute.get('domain_ip')
+                    quantity = compute.get('quantity')
+                    port = compute.get('port')
+                    meta_str = compute.get('meta')
+                    health_check=compute.get('health_check',0)
+                    network_id = compute.get('network_id')
+                    networkName = compute.get('networkName')
+                    tenantName = compute.get('tenantName')
+                    try:
+                        meta = json.dumps(meta_str)
+                    except Exception as e:
+                        code = 500
+                        res = {
+                            'code': code,
+                            'result': {
+                                'res': 'fail',
+                                'msg': 'meta is not JSON object!'
+                            }
+                        }
+                        return res, code
+                    compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
+                                             domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
+                                             network_id=network_id,networkName=networkName,tenantName=tenantName)
+                    resource_application.compute_list.append(compute_ins)
+
+            if ins_name_list:
+                ins_name_list2 = list(set(ins_name_list))
+                if len(ins_name_list) != len(ins_name_list2):
                     code = 200
                     res = {
                         'code': code,
@@ -170,29 +142,41 @@ class ResourceApplication(Resource):
                         }
                     }
                     return res, code
-        except Exception as e:
-            code = 500
-            res = {
-                'code': code,
-                'result': {
-                    'res': 'fail',
-                    'msg': 'Query DB error.'
+            try:
+                for insname in ins_name_list:
+                    if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(env=env).count() > 0:
+                        code = 200
+                        res = {
+                            'code': code,
+                            'result': {
+                                'res': 'fail',
+                                'msg': '集群名称重复'
+                            }
+                        }
+                        return res, code
+            except Exception as e:
+                code = 500
+                res = {
+                    'code': code,
+                    'result': {
+                        'res': 'fail',
+                        'msg': 'Query DB error.'
+                    }
                 }
-            }
-            return res, code
+                return res, code
 
-        try:
-            resource_application.save()
-        except Exception as e:
-            code = 200
-            res = {
-                "code": code,
-                "result": {
-                    'res': 'fail',
-                    'msg': 'Create resource application fail. ' + e.message
+            try:
+                resource_application.save()
+            except Exception as e:
+                code = 200
+                res = {
+                    "code": code,
+                    "result": {
+                        'res': 'fail',
+                        'msg': 'Create resource application fail. ' + e.message
+                    }
                 }
-            }
-            return res, code
+                return res, code
 
         res = {
             'code': 200,
