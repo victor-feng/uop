@@ -6,7 +6,7 @@ import json
 import requests
 from models import db
 from uop.util import get_CRP_url
-from uop.models import ResourceModel, Deployment, Cmdb, ViewCache
+from uop.models import ResourceModel, Deployment, Cmdb, ViewCache, Statusvm
 from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
@@ -137,6 +137,13 @@ def flush_crp_to_cmdb():
                 # Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if osid_status:
+                for os in osid_status:
+                    for k, v in os.items():
+                        vm = Statusvm.objects.filter(osid=str(k))
+                        if vm:
+                            for v in vm:
+                                v.status = v
+                                v.save()
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
@@ -155,6 +162,7 @@ def flush_crp_to_cmdb_by_osid(osid, env):
         cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
         ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
         Log.logger.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))
+
 
 
 # B类视图list，获取已经定义的关系列表
