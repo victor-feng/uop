@@ -83,21 +83,22 @@ class ResourceApplication(Resource):
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
                                                  cloud = cloud,resource_type = resource_type)
-            for resource in resource_list:
-                ins_name = resource.get('res_name', '未知名称')
-                ins_id = str(uuid.uuid1())
-                ins_type = resource.get('res_type')
-                cpu = resource.get('cpu')
-                mem = resource.get('mem')
-                disk = resource.get('disk')
-                quantity = resource.get('quantity')
-                version = resource.get('version')
-                volume_size = resource.get('volume_size', 0)
-                network_id = resource.get('network_id')
-                image_id = resource.get('image_id')
-                db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                               quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
-                resource_application.resource_list.append(db_ins)
+            if compute_list:
+                for resource in resource_list:
+                    ins_name = resource.get('res_name', '未知名称')
+                    ins_id = str(uuid.uuid1())
+                    ins_type = resource.get('res_type')
+                    cpu = resource.get('cpu')
+                    mem = resource.get('mem')
+                    disk = resource.get('disk')
+                    quantity = resource.get('quantity')
+                    version = resource.get('version')
+                    volume_size = resource.get('volume_size', 0)
+                    network_id = resource.get('network_id')
+                    image_id = resource.get('image_id')
+                    db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
+                    resource_application.resource_list.append(db_ins)
 
             ins_name_list = []
             if compute_list:
