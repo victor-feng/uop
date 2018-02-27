@@ -65,6 +65,10 @@ class DevelopmentConfig(BaseConfig):
     }
 
     UPLOAD_FOLDER = "/data/"
+    #jenkins 相关
+    jenkins_server_url = "http://172.28.38.215:8080/"
+    jenkins_username = "crm_test1"
+    jenkins_password = "syswin#"
 
 configs = {
     'development': DevelopmentConfig,

@@ -26,6 +26,7 @@ os.system('ln -s conf/config.py  config.py')
 from config import APP_ENV
 from uop import create_app
 from uop.log import logger_setting
+from uop.jenkins_api import jenkins_setting
 
 def main():
     if options.mode.lower() == "debug":
@@ -36,7 +37,12 @@ def main():
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(options.port)
     logging.warn("[UOP] UOP is running on: localhost:%d", options.port)
-
+    #jenkins
+    jenkins_server_url = app.config['jenkins_server_url']
+    jenkins_username = app.config["jenkins_username"]
+    jenkins_password = app.config["jenkins_password"]
+    if jenkins_server_url and jenkins_username and jenkins_password:
+        jenkins_setting(jenkins_server_url, jenkins_username, jenkins_password)
     # set app log
     logger = logger_setting(app)
     fm = tornado.log.LogFormatter(

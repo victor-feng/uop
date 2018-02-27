@@ -674,8 +674,8 @@ class ResourceDetail(Resource):
 
         resource_list = resource.resource_list
         compute_list = resource.compute_list
+        res = []
         if resource_list:
-            res = []
             for db_res in resource_list:
                 res.append(
                     {
@@ -692,8 +692,8 @@ class ResourceDetail(Resource):
                         "image_id": db_res.image_id,
                     }
                 )
+        com = []
         if compute_list:
-            com = []
             for db_com in compute_list:
                 com.append(
                     {
