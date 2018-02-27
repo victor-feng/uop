@@ -46,9 +46,9 @@ class ResourceApplication(Resource):
         parser.add_argument('resource_info_list', type=list, location='json')
         args = parser.parse_args()
         resource_info_list = args.resource_info_list
-        res_id_list=[]
-        resource_name_list=[]
+        res_info_list=[]
         for info in resource_info_list:
+            res_info_dict={}
             resource_name = info.get("resource_name","")
             project_name = info.get("project_name","")
             module_name = info.get("module_name","")
@@ -71,8 +71,9 @@ class ResourceApplication(Resource):
             compute_list = info.get("compute_list")
             cloud = info.get("cloud","")
             resource_type = info.get("resource_type","")
-            res_id_list.append(res_id)
-            resource_name_list.append(resource_name)
+            res_info_dict["resource_id"] = res_id
+            res_info_dict["resource_name"] = resource_name
+            res_info_dict["project_id"] = project_id
             resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                                  department_id=department_id, res_id=res_id, project_id=project_id,
                                                  cmdb2_project_id=cmdb2_project_id,
@@ -187,13 +188,13 @@ class ResourceApplication(Resource):
                 }
                 return res, code
 
+        res_info_list.append(res_info_dict)
         res = {
             'code': 200,
             'result': {
                 'res': 'success',
                 'msg': 'Create resource application success.',
-                'res_id': res_id_list,
-                'res_name': resource_name_list
+                'res_info_list': res_info_list,
             }
         }
 
