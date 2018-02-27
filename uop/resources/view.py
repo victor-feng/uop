@@ -74,6 +74,7 @@ class ResourceApplication(Resource):
             res_info_dict["resource_id"] = res_id
             res_info_dict["resource_name"] = resource_name
             res_info_dict["project_id"] = cmdb2_project_id
+            res_info_list.append(res_info_dict)
             resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                                  department_id=department_id, res_id=res_id, project_id=project_id,
                                                  cmdb2_project_id=cmdb2_project_id,
@@ -188,7 +189,6 @@ class ResourceApplication(Resource):
                 }
                 return res, code
 
-        res_info_list.append(res_info_dict)
         res = {
             'code': 200,
             'result': {
