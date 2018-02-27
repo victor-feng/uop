@@ -73,7 +73,7 @@ class ResourceApplication(Resource):
             resource_type = info.get("resource_type","")
             res_info_dict["resource_id"] = res_id
             res_info_dict["resource_name"] = resource_name
-            res_info_dict["project_id"] = project_id
+            res_info_dict["project_id"] = cmdb2_project_id
             resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                                  department_id=department_id, res_id=res_id, project_id=project_id,
                                                  cmdb2_project_id=cmdb2_project_id,
