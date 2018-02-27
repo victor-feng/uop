@@ -38,9 +38,9 @@ def main():
     http_server.listen(options.port)
     logging.warn("[UOP] UOP is running on: localhost:%d", options.port)
     #jenkins
-    jenkins_server_url = app.config['jenkins_server_url']
-    jenkins_username = app.config["jenkins_username"]
-    jenkins_password = app.config["jenkins_password"]
+    jenkins_server_url = app.config['JENKINS_SERVER_URL']
+    jenkins_username = app.config["JENKINS_USERNAME"]
+    jenkins_password = app.config["JENKINS_PASSWORD"]
     if jenkins_server_url and jenkins_username and jenkins_password:
         jenkins_setting(jenkins_server_url, jenkins_username, jenkins_password)
     # set app log
