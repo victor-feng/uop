@@ -67,8 +67,8 @@ class ResourceApplication(Resource):
             created_date = datetime.datetime.now()
             application_status = info.get("formStatus","")
             approval_status = "unsubmit"
-            resource_list = info.get("resource_list",[])
-            compute_list = info.get("compute_list",[])
+            resource_list = info.get("resource_list")
+            compute_list = info.get("compute_list")
             cloud = info.get("cloud","")
             resource_type = info.get("resource_type","")
             res_id_list.append(res_id)
@@ -83,7 +83,7 @@ class ResourceApplication(Resource):
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
                                                  cloud = cloud,resource_type = resource_type)
-            if compute_list:
+            if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
                     ins_id = str(uuid.uuid1())
