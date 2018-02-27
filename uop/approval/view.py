@@ -30,31 +30,35 @@ class ApprovalList(Resource):
         msg = {}
         try:
             parser = reqparse.RequestParser()
+
             parser.add_argument('resource_id', type=str)
             parser.add_argument('project_id', type=str)
             parser.add_argument('department', type=str)
             parser.add_argument('user_id', type=str)
+            parser.add_argument('approval_info_list', type=list,location ="json")
             args = parser.parse_args()
 
-            approval_id = str(uuid.uuid1())
-            resource_id = args.resource_id
-            project_id = args.project_id
-            department = args.department
-            user_id = args.user_id
-            create_date = datetime.datetime.now()
-            # approve_uid
-            # approve_date
-            # annotations
-            approval_status = "processing"
-            models.Approval(approval_id=approval_id, resource_id=resource_id,
-                            project_id=project_id, department=department,
-                            user_id=user_id, create_date=create_date,
-                            approval_status=approval_status).save()
+            approval_info_list = args.approval_info_list
+            for info in approval_info_list:
+                approval_id = str(uuid.uuid1())
+                resource_id = info.get("resource_id","")
+                project_id = info.get("project_id","")
+                department = info.get("department","")
+                user_id = info.get("user_id","")
+                create_date = datetime.datetime.now()
+                # approve_uid
+                # approve_date
+                # annotations
+                approval_status = "processing"
+                models.Approval(approval_id=approval_id, resource_id=resource_id,
+                                project_id=project_id, department=department,
+                                user_id=user_id, create_date=create_date,
+                                approval_status=approval_status).save()
 
-            resource = models.ResourceModel.objects.get(res_id=resource_id)
-            resource.approval_status = "processing"
-            resource.save()
-            code = 200
+                resource = models.ResourceModel.objects.get(res_id=resource_id)
+                resource.approval_status = "processing"
+                resource.save()
+                code = 200
         except Exception as e:
             Log.logger.exception("[UOP] ApprovalList failed, Exception: %s", e.args)
             code = 500
