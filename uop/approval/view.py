@@ -298,6 +298,7 @@ class Reservation(Resource):
                         "network_id": db_com.network_id,
                         "networkName": db_com.networkName,
                         "tenantName": db_com.tenantName,
+                        "instance_type":db_com.host_env
                     }
                 )
             data['compute_list'] = com
@@ -416,6 +417,7 @@ class ReservationAPI(Resource):
                         "network_id": db_com.network_id,
                         "networkName": db_com.networkName,
                         "tenantName": db_com.tenantName,
+                        "instance_type":db_com.host_env,
                     }
                 )
             data['compute_list'] = com
@@ -638,6 +640,7 @@ class CapacityReservation(Resource):
                                 "network_id": db_com.network_id,
                                 "networkName": db_com.networkName,
                                 "tenantName": db_com.tenantName,
+                                "instance_type":db_com.host_env,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

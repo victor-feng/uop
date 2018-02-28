@@ -855,7 +855,8 @@ class ResourceDetail(Resource):
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
                                      quantity=quantity, port=port,docker_meta=meta_str,
                                      health_check=health_check,network_id=network_id,networkName=networkName,
-                                     tenantName=tenantName,host_env=host_env,language_env=language_env,deploy_source=deploy_source)
+                                     tenantName=tenantName,host_env=host_env,language_env=language_env,
+                                     deploy_source=deploy_source)
             resource_application.compute_list.append(compute_ins)
 
         try:

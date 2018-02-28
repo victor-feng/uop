@@ -279,6 +279,7 @@ class ComputeIns(db.EmbeddedDocument):
     language_env = db.StringField(required=False)  # 语言环境，python，java，php
     deploy_source = db.StringField(required=False)  # 部署来源，image，war，git
 
+
     meta = {
         'collection': 'compute_ins',
         'index': [
