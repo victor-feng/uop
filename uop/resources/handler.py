@@ -196,8 +196,8 @@ def get_from_uop(args):
             res = ResourceModel.objects.filter(res_id=res_id)
             if res:
                 for r in res:
-                    return r.cloud if r.cloud else 0
-            return 0
+                    return r.cloud if r.cloud else 1
+            return 1
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
