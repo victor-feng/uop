@@ -192,7 +192,12 @@ def get_from_uop(args):
             query["create_time__lte"] = end_time
         Log.logger.info("query:{}".format(query))
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
-
+        def get_cloud(res_id):
+            res = ResourceModel.objects.filter(res_id=res_id)
+            if res:
+                for r in res:
+                    return r.cloud if r.cloud else 0
+            return 0
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
@@ -212,6 +217,7 @@ def get_from_uop(args):
             tmp_result['project_name'] = pi.project_name
             tmp_result['resource_status'] = pi.status
             tmp_result['env'] = pi.env
+            tmp_result['cloud'] = get_cloud(pi.resource_id)
             result_list.append(tmp_result)
 
         if page_num and page_count:
