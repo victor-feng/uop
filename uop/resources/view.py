@@ -50,20 +50,21 @@ class ResourceApplication(Resource):
         try:
             res_exist_list=[]
             for info in resource_info_list:
+                res_exist_dict={}
                 project_name = info.get("project_name", "")
                 resource_type = info.get("resource_type", "")
                 res_count = ResourceModel.objects.filter(project_name=project_name,resource_type=resource_type).count()
                 if res_count > 0:
-                    msg = u"工程%s已经存在类型为%s的资源" %(project_name,resource_type)
-                    res_exist_list.append(msg)
+                    res_exist_dict["project_name"] = project_name
+                    res_exist_dict["resource_type"] = resource_type
+                    res_exist_list.append(res_exist_dict)
             if len(res_exist_list) > 0:
-                exist_msg = ",".join(res_exist_list)
                 code = 200
                 res = {
                     'code': code,
                     'result': {
-                        'res': 'fail',
-                        'msg': exist_msg
+                        'msg': 'Uop resource is existed',
+                        'res': res_exist_list
                     }
                 }
                 return res, code
