@@ -47,6 +47,37 @@ class ResourceApplication(Resource):
         args = parser.parse_args()
         resource_info_list = args.resource_info_list
         res_info_list=[]
+        try:
+            res_exist_list=[]
+            for info in resource_info_list:
+                project_name = info.get("project_name", "")
+                resource_type = info.get("resource_type", "")
+                res_count = ResourceModel.objects.filter(project_name=project_name,resource_type=resource_type).count()
+                if res_count > 0:
+                    msg = u"工程%s已经存在类型为%s的资源" %(project_name,resource_type)
+                    res_exist_list.append(msg)
+            if len(res_exist_list) > 0:
+                exist_msg = ",".join(res_exist_list)
+                code = 200
+                res = {
+                    'code': code,
+                    'result': {
+                        'res': 'fail',
+                        'msg': exist_msg
+                    }
+                }
+                return res, code
+        except Exception as e:
+            code = 400
+            err_msg = str(e)
+            res = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg':err_msg
+                }
+            }
+            return res, code
         for info in resource_info_list:
             res_info_dict={}
             resource_name = info.get("resource_name","")
