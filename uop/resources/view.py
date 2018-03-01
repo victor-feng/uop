@@ -64,7 +64,8 @@ class ResourceApplication(Resource):
                     'code': code,
                     'result': {
                         'msg': 'Uop resource is existed',
-                        'res': res_exist_list
+                        'res': 'fail',
+                        'res_exist_list':res_exist_list
                     }
                 }
                 return res, code
