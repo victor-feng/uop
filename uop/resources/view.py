@@ -502,6 +502,10 @@ class ResourceApplication(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('res_id', type=str)
         parser.add_argument('resource_name', type=str)
+        parser.add_argument('project_name', type=str)
+        parser.add_argument('module_name', type=str)
+        parser.add_argument('business_name', type=str)
+        parser.add_argument('cmdb2_project_id', type=str)
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('department', type=str)
@@ -530,6 +534,10 @@ class ResourceApplication(Resource):
         resource_list = args.resource_list
         cloud = args.cloud
         resource_type = args.resource_type
+        project_name = args.project_name
+        module_name = args.module_name
+        business_name = args.business_name
+        cmdb2_project_id = args.cmdb2_project_id
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
@@ -547,6 +555,10 @@ class ResourceApplication(Resource):
                 resource.resource_list = []
                 resource.resource_type = resource_type
                 resource.cloud = cloud
+                resource.project_name = project_name
+                resource.module_name = module_name
+                resource.business_name = business_name
+                resource.cmdb2_project_id = cmdb2_project_id
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
                     ins_id = str(uuid.uuid1())
@@ -582,8 +594,8 @@ class ResourceApplication(Resource):
                     quantity = res.get('quantity')
                     version = res.get('version')
                     volume_size = res.get('volume_size', 0)
-                    network_id = resource.get('network_id')
-                    image_id = resource.get('image_id')
+                    network_id = res.get('network_id')
+                    image_id = res.get('image_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
                     resource.resource_list.append(db_ins)
