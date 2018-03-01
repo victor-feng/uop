@@ -123,22 +123,24 @@ class ResourceApplication(Resource):
                     host_env = compute.get("host_env")
                     language_env= compute.get("language_env")
                     deploy_source = compute.get("deploy_source")
+                    database_config = compute.get("database_config")
                     try:
                         meta = json.dumps(meta_str)
+                        database_config = json.dumps(database_config)
                     except Exception as e:
                         code = 500
                         res = {
                             'code': code,
                             'result': {
                                 'res': 'fail',
-                                'msg': 'meta is not JSON object!'
+                                'msg': 'meta or database_config is not JSON object!'
                             }
                         }
                         return res, code
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
-                                             ,language_env=language_env,deploy_source=deploy_source)
+                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -532,11 +534,12 @@ class ResourceApplication(Resource):
                     host_env = compute.get("host_env")
                     language_env = compute.get("language_env")
                     deploy_source = compute.get("deploy_source")
+                    database_config = compute.get("database_config")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                              health_check=health_check,network_id=network_id,networkName=networkName,
                                              tenantName=tenantName,host_env=host_env
-                                             ,language_env=language_env,deploy_source=deploy_source)
+                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config)
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
@@ -714,7 +717,7 @@ class ResourceDetail(Resource):
                         "host_env":db_com.host_env,
                         "language_env":db_com.language_env,
                         "deploy_source":db_com.deploy_source,
-
+                        "database_config":db_com.database_config
                     }
                 )
         result['resource_list'] = res
@@ -852,11 +855,12 @@ class ResourceDetail(Resource):
             host_env = compute.get("host_env")
             language_env = compute.get("language_env")
             deploy_source = compute.get("deploy_source")
+            database_config = compute.get("database_config")
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
                                      quantity=quantity, port=port,docker_meta=meta_str,
                                      health_check=health_check,network_id=network_id,networkName=networkName,
                                      tenantName=tenantName,host_env=host_env,language_env=language_env,
-                                     deploy_source=deploy_source)
+                                     deploy_source=deploy_source,database_config=database_config)
             resource_application.compute_list.append(compute_ins)
 
         try:

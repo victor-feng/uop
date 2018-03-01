@@ -278,6 +278,7 @@ class ComputeIns(db.EmbeddedDocument):
     host_env = db.StringField(required=False)  # 宿主机环境 docker，kvm，physical_server
     language_env = db.StringField(required=False)  # 语言环境，python，java，php
     deploy_source = db.StringField(required=False)  # 部署来源，image，war，git
+    database_config = db.StringField(required=False) # java tomcat 数据库配置
 
 
     meta = {
