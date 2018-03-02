@@ -53,7 +53,8 @@ class ResourceApplication(Resource):
                 res_exist_dict={}
                 project_name = info.get("project_name", "")
                 resource_type = info.get("resource_type", "")
-                res_count = ResourceModel.objects.filter(project_name=project_name,resource_type=resource_type).count()
+                res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type,
+                                                         approval_status__in=["success", "failed", "revoke"]).count()
                 if res_count > 0:
                     res_exist_dict["project_name"] = project_name
                     res_exist_dict["resource_type"] = resource_type
