@@ -163,7 +163,12 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
                         'url': compute.url,
                         'ins_name': compute.ins_name,
                         'ip': compute.ips,
-                        'health_check':compute.health_check
+                        'health_check':compute.health_check,
+                        'host_env':compute.host_env,
+                        'language_env':compute.language_env,
+                        'deploy_source':compute.deploy_source,
+                        'database_config':compute.database_config
+
                     }
                 )
             except AttributeError as e:
@@ -215,7 +220,11 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
                             'url': obj.url,
                             'ins_name': obj.ins_name,
                             'ip': obj.ips,
-                            'health_check':obj.health_check
+                            'health_check':obj.health_check,
+                            'host_env': obj.host_env,
+                            'language_env': obj.language_env,
+                            'deploy_source': obj.deploy_source,
+                            'database_config': obj.database_config
                         }
                     )
                 except AttributeError as e:
@@ -368,7 +377,8 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  url=match_one["url"], domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
-                                 network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName)
+                                 network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
+                                 host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=o.database_config)
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:

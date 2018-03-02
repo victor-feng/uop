@@ -855,7 +855,11 @@ class RollBackReservation(Resource):
                         'url': compute.get("url"),
                         'ins_name': compute.get("ins_name"),
                         'ip': compute.get("ips"),
-                        'health_check': compute.get("health_check",0)
+                        'health_check': compute.get("health_check",0),
+                        'host_env': compute.get("host_env"),
+                        'language_env': compute.get("language_env"),
+                        'deploy_source': compute.get("deploy_source"),
+                        'database_config': compute.get("database_config")
                     }
                 )
             data["appinfo"] = appinfo
