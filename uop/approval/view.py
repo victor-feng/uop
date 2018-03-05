@@ -672,7 +672,7 @@ class CapacityReservation(Resource):
                         os_inst_id = os_ip_dict["os_ins_id"]
                         os_inst_id_list.append(os_inst_id)
                     crp_data = {
-                        "resources_id": resource.res_id,
+                        "resource_id": resource.res_id,
                         "os_ins_ip_list": reduce_list,
                         "set_flag": 'reduce'
                     }

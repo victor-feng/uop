@@ -424,7 +424,7 @@ class ResourceApplication(Resource):
                         disconfs.append(eval(dis_))
                     crp_data = {
                         "disconf_list": disconfs,
-                        "resources_id": res_id,
+                        "resource_id": res_id,
                         "domain_list": [],
                         "set_flag": 'res'
                     }
@@ -446,7 +446,7 @@ class ResourceApplication(Resource):
                     os_ip_dict["os_vol_id"] = os_ip["os_vol_id"]
                     os_inst_ip_list.append(os_ip_dict)
                 crp_data = {
-                    "resources_id": resources.res_id,
+                    "resource_id": resources.res_id,
                     "resource_name":resources.resource_name,
                     "resource_type": resources.resource_type,
                     "cloud":resources.cloud,
@@ -1152,6 +1152,7 @@ class GetMyResourcesInfo(Resource):
         operation = request.json.get('operation', "")
         resource_name = request.json.get('resource_name', "")
         cloud = request.json.get('cloud', "2")
+        resource_type = request.json.get('resource_type', "2")
         Log.logger.info(
             "get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env,
                                                                                               operation))
@@ -1170,7 +1171,8 @@ class GetMyResourcesInfo(Resource):
             "vm_uuid": osid,
             "operation": operation,
             "cloud":cloud,
-            "resource_name":resource_name
+            "resource_name":resource_name,
+            "resource_type":resource_type
         }
         Log.logger.info("URL is:{}".format(manager_url) )
         headers = {'Content-Type': 'application/json'}
