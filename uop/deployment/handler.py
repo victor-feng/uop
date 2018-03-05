@@ -151,7 +151,8 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
         "dns": [],
         "environment": environment,
         "cloud":res_obj.cloud,
-        "resource_name":res_obj.resource_name
+        "resource_name":res_obj.resource_name,
+        "project_name": res_obj.project_name
     }
     if cloud == '2':
         compute_list = res_obj.compute_list

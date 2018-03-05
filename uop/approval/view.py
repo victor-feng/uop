@@ -836,6 +836,7 @@ class RollBackReservation(Resource):
             cloud = resource.cloud
             resource_name=resource.resource_name
             res_compute_list = resource.compute_list
+            project_name = resource.project_name
             for res_compute in res_compute_list:
                 for compute in compute_list:
                     if res_compute["ins_id"] == compute["ins_id"]:
@@ -873,6 +874,7 @@ class RollBackReservation(Resource):
             data["cloud"] = cloud
             data["resource_name"] = resource_name
             data["deploy_name"] = deploy_name
+            data["project_name"] = project_name
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             headers = {
