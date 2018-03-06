@@ -242,6 +242,7 @@ class ResourceApplication(Resource):
         parser.add_argument('user_id', type=str, location='args')
         parser.add_argument('resource_name', type=str, location='args')
         parser.add_argument('project', type=str, location='args')
+        parser.add_argument('project_name', type=str, location='args')
         parser.add_argument('start_time', type=str, location='args')
         parser.add_argument('end_time', type=str, location='args')
         parser.add_argument('agg_by', type=str, location='args')
@@ -288,6 +289,8 @@ class ResourceApplication(Resource):
             condition["cloud"]=args.cloud
         if args.resource_type:
             condition["resource_type"]=args.resource_type
+        if args.project_name:
+            condition["project_name"] = args.project_name
 
         if agg_by:
             pipeline = []
