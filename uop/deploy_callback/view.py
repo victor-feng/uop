@@ -90,11 +90,11 @@ class DeployCallback(Resource):
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_success" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg = "应用集群%s成功" % deploy_type_dict[deploy_type]
+                status_record.msg = "%s应用集群%s成功" % (res_type,deploy_type_dict[deploy_type])
             else:
                 dep.deploy_result = "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg ="应用集群%s失败,错误日志为%s" % (deploy_type_dict[deploy_type],msg)
+                status_record.msg ="%s应用集群%s失败,错误日志为%s" % (res_type,deploy_type_dict[deploy_type],msg)
             status_record.save()
             dep.save()
         else:
