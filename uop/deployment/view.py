@@ -39,6 +39,8 @@ class DeploymentListAPI(Resource):
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('department', type=str, location='args')
+        parser.add_argument('resource_type', type=str, location='args')
+        parser.add_argument('module_name', type=str, location='args')
 
         args = parser.parse_args()
         condition = {}
@@ -68,6 +70,10 @@ class DeploymentListAPI(Resource):
             condition['approve_status'] = args.approve_status
         if args.department:
             condition["department"]=args.department
+        if args.resource_type:
+            condition["resource_type"]=args.resource_type
+        if args.module_name:
+            condition["module_name"]=args.module_name
         if args.resource_id:
             resource_id = args.resource_id
             condition['resource_id'] = resource_id
