@@ -242,6 +242,10 @@ class Deployment(db.Document):
     capacity_info = db.StringField(required=False, default="{}")
     department = db.StringField()
 
+    module_name = db.StringField(required=False)
+    business_name = db.StringField(required=False)
+    resource_type = db.StringField(required=False)  # 资源的类型是应用app，数据库 database
+
     meta = {
         'collection': 'deployment',
         'index': [

@@ -229,6 +229,9 @@ class DeploymentListAPI(Resource):
         parser.add_argument('disconf', type=list, location='json')
         parser.add_argument('database_password', type=str, location='json')
         parser.add_argument('department', type=str, location='json')
+        parser.add_argument('resource_type', type=str, location='json')
+        parser.add_argument('module_name', type=str, location='json')
+        parser.add_argument('business_name', type=str, location='json')
 
         args = parser.parse_args()
         action = args.action
@@ -347,6 +350,9 @@ class DeploymentListAPI(Resource):
                 database_password=args.database_password,
                 deploy_type=deploy_type,
                 department=args.department,
+                business_name=args.business_name,
+                module_name=args.module_name,
+                resource_type = args.resource_type
             )
 
             for instance_info in args.disconf:
