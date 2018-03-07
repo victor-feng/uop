@@ -160,19 +160,6 @@ class ResourceApplication(Resource):
                     language_env= compute.get("language_env")
                     deploy_source = compute.get("deploy_source")
                     database_config = compute.get("database_config")
-                    try:
-                        meta = json.dumps(meta_str)
-                        database_config = json.dumps(database_config)
-                    except Exception as e:
-                        code = 500
-                        res = {
-                            'code': code,
-                            'result': {
-                                'res': 'fail',
-                                'msg': 'meta or database_config is not JSON object!'
-                            }
-                        }
-                        return res, code
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
