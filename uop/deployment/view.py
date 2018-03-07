@@ -248,6 +248,7 @@ class DeploymentListAPI(Resource):
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
             resource = ResourceModel.objects.get(res_id=args.resource_id)
             cloud = resource.cloud
+            resource_type = resource.resource_type
             resource.deploy_name = args.deploy_name
             resource.save()
             # disconf配置
@@ -279,7 +280,8 @@ class DeploymentListAPI(Resource):
             if cloud == 2:
                 resource_info={}
                 err_msg = None
-                appinfo=[]
+                if resource_type == "app":
+                    appinfo=[]
             else:
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
             message = 'approve_allow success'
