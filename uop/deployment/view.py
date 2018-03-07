@@ -922,6 +922,9 @@ class CapacityAPI(Resource):
                                 capacity_info=capacity_info_str,
                                 deploy_type=deploy_type,
                                 department=args.department,
+                                business_name=old_deployment.business_name,
+                                module_name=old_deployment.module_name,
+                                resource_type=old_deployment.resource_type,
                             )
                             deploy_item.save()
                         Approval(approval_id=approval_id, resource_id=res_id, deploy_id=approval_id,
@@ -1161,6 +1164,9 @@ class RollBackAPI(Resource):
                 disconf_list=old_deployment.disconf_list,
                 deploy_type=deploy_type,
                 department = department,
+                business_name=old_deployment.business_name,
+                module_name=old_deployment.module_name,
+                resource_type=old_deployment.resource_type,
             )
             deploy_item.save()
 
