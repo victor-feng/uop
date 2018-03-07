@@ -53,7 +53,10 @@ class ResourceApplication(Resource):
                 res_exist_dict={}
                 project_name = info.get("project_name", "")
                 resource_type = info.get("resource_type", "")
-                res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type).count()
+                business_name = info.get("business_name","")
+                module_name = info.get("module_name","")
+                res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type,
+                                                         business_name=business_name, module_name=module_name).count()
                 if res_count > 0:
                     res_exist_dict["project_name"] = project_name
                     res_exist_dict["resource_type"] = resource_type
