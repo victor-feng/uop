@@ -393,8 +393,9 @@ def get_counts():
     try:
         Log.logger.info("get_counts from CMDB2 data:{}".format(data))
         ret = requests.post(url, data=json.dumps(data), timeout=5).json()
-        if ret.code == 0:
-            dd = [dict(ins, entity=[k for k,v in ENTITY.items() if v == str(ins["id"])][0])  for ins in ret["result"]["data"]]
+        if ret["code"] == 0:
+            dd = [dict(ins, entity=[k for k, v in ENTITY.items() if v == str(ins["id"])][0])
+                  for ins in ret["result"]["data"]]
         else:
             dd = ret
         response = response_data(200, "success", dd)
