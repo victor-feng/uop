@@ -653,7 +653,8 @@ class CapacityReservation(Resource):
         headers = {'Content-Type': 'application/json'}
         try:
             cloud = resource.cloud
-            if cloud == '2':
+            resource_type = resource.resource_type
+            if cloud == '2' and resource_type == "app":
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
             else:
