@@ -198,6 +198,10 @@ mapping_scale_info = {
     'reduce' : '缩容',
 }
 
+mapping_msg_info = {
+    'app' : '容器云应用集群',
+    'kvm' : '虚拟化云资源',
+}
 
 
 class ResourceProviderTransitions(object):
@@ -633,25 +637,22 @@ class ResourceProviderCallBack(Resource):
         status_record.created_time = datetime.datetime.now()
         if cloud == "2":
             if status == 'ok':
-                if set_flag == "res" and resource_type == "app":
+                if set_flag == "res":
                     status_record.status = "set_success"
-                    status_record.msg = "应用集群创建成功"
-                if set_flag == "res" and resource_type != "app":
-                    status_record.status = "set_success"
-                    status_record.msg = "预留成功"
+                    status_record.msg = "%s创建成功" % mapping_msg_info[resource_type]
                 if set_flag in ["increase","reduce"] and resource_type == "app":
                     status_record.status = "%s_success" % set_flag
-                    status_record.msg = "应用集群%s成功" % mapping_scale_info[set_flag]
+                    status_record.msg = "%s%s成功" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag])
                     status_record.deploy_id = deploy_id
                     dep.deploy_result = "%s_success" % set_flag
                     dep.save()
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
-                    status_record.msg = "应用集群创建失败,错误日志为: %s" % error_msg
+                    status_record.msg = "%s创建失败,错误日志为: %s" % (mapping_msg_info[resource_type],error_msg)
                 elif set_flag in ["increase","reduce"]:
                     status_record.status = "%s_fail" % set_flag
-                    status_record.msg = "应用集群%s失败,错误日志为: %s" % (mapping_scale_info[set_flag],error_msg)
+                    status_record.msg = "%s%s失败,错误日志为: %s" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag],error_msg)
                     status_record.deploy_id = deploy_id
                     dep.deploy_result = "%s_fail" % set_flag
                     dep.save()
