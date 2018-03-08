@@ -12,7 +12,7 @@ from uop.log import Log
 from uop.util import async, response_data
 from config import APP_ENV, configs
 from uop.models import ResourceModel, Statusvm
-from uop.item_info.handler import delete_instance
+from uop.item_info.handler import delete_instance, get_uid_token
 from flask import jsonify
 import  xlsxwriter
 import uuid
@@ -25,7 +25,7 @@ CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CRP_URL = configs[APP_ENV].CRP_URL
 UPLOAD_FOLDER=configs[APP_ENV].UPLOAD_FOLDER
-
+ENTITY  = configs[APP_ENV].CMDB2_ENTITY
 
 __all__ = [
     "make_random_database_password", "_match_condition_generator",
@@ -371,3 +371,35 @@ def delete_cmdb2(res_id):
         delete_list = instance_list
     ret = delete_instance(args)
     Log.logger.info("testdeltecmdb:{}".format(ret))
+
+
+def get_counts():
+    url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
+    uid, token = get_uid_token()
+    data = {
+        {
+            "uid": uid,
+            "token": token,
+            "sign": "",
+            "data": [{
+                "id": id,
+                "parameters": [{
+                    "code": "",
+                    "condition": "",
+                    "value": ""
+                } ]
+            }for id in ENTITY.values()]
+        }
+    }
+    try:
+        Log.logger.info("get_counts from CMDB2 data:{}".format(data))
+        ret = requests.post(url, data=json.dumps(data), timeout=5).json()
+        if ret.code == 0:
+            dd = [dict(ins, entity=[k for k,v in ENTITY.items() if v == str(ins["id"])][0])  for ins in ret["result"]["data"]]
+        else:
+            dd = ret
+        response = response_data(200, "success", dd)
+    except Exception as exc:
+        Log.logger.error("get_counts from CMDB2 error:{}".format(exc))
+        response = response_data(500, "fail", exc)
+    return response

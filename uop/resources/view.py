@@ -24,7 +24,7 @@ from uop.util import get_CRP_url, response_data
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop, delete_uop
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop, delete_uop, get_counts
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -1326,6 +1326,11 @@ class testdeltecmdb(Resource):
         return "success"
 
 
+class Statistic(Resource):
+    def get(self):
+        response = get_counts()
+        return response
+
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(App, '/app/')
@@ -1334,3 +1339,4 @@ resources_api.add_resource(GetDBInfo, '/get_dbinfo/<string:res_id>/')
 resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
 resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
 resources_api.add_resource(testdeltecmdb, '/testdeltecmdb/')
+resources_api.add_resource(testdeltecmdb, '/statistic/')
