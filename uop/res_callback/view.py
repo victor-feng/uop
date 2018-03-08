@@ -884,7 +884,7 @@ class ResourceDeleteCallBack(Resource):
     def post(self):
         code = 200
         request_data = json.loads(request.data)
-        resource_id = request_data.get('resources_id')
+        resource_id = request_data.get('resource_id')
         os_inst_id = request_data.get('os_inst_id')
         unique_flag = request_data.get('unique_flag')
         del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
