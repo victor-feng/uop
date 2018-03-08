@@ -263,7 +263,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("URL args is " + url)
-        if cloud == 2:
+        if cloud == '2':
             result = requests.post(url=url, headers=headers, data=data_str)
         else:
             result = requests.put(url=url, headers=headers, data=data_str)

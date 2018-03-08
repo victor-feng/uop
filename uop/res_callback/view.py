@@ -673,9 +673,12 @@ class ResourceProviderCallBack(Resource):
         resource.save()
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
         if set_flag  == "increase" and status == 'ok':
-            CPR_URL = get_CRP_url(env)
-            url = CPR_URL + "api/deploy/deploys"
-            deploy_to_crp(resource_id, url, set_flag, cloud)
+            if cloud == '2' and resource_type == "app":
+                pass
+            else:
+                CPR_URL = get_CRP_url(env)
+                url = CPR_URL + "api/deploy/deploys"
+                deploy_to_crp(resource_id, url, set_flag, cloud)
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
