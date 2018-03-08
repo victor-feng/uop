@@ -931,19 +931,19 @@ class ResourceDeleteCallBack(Resource):
                 resource.os_ins_list=new_os_ins_list
                 resource.os_ins_ip_list=new_os_ins_ip_list
                 resource.save()
-                msg = "删除docker %s 成功" % os_inst_ip_dict[os_inst_id]
+                msg = "删除资源 %s 成功" % os_inst_ip_dict[os_inst_id]
                 s_type = "docker"
                 status = "docker_reduce_success"
                 create_status_record(resource_id, deploy_id, s_type,msg,status, set_flag, unique_flag)
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
-                    create_status_record(resource_id, deploy_id, "reduce", "docker缩容成功", "reduce_success",set_flag)
-                    # 要缩容的docker都删除完成,开始修改nginx的配置
+                    create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
+                    # 要缩容的资源都删除完成,开始删除nginx配置
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
                     deploy_to_crp(resource_id,url,set_flag,cloud)
-                    #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
+                    #要缩容的资源都删除完成,开始调用cmdb接口删除对应数据
                     data={}
                     ip_list=[]
                     osid_list=[]
