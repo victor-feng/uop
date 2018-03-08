@@ -199,8 +199,8 @@ mapping_scale_info = {
 }
 
 mapping_msg_info = {
-    'app' : '容器云应用集群',
-    'kvm' : '虚拟化云资源',
+    'app' : '应用集群',
+    'kvm' : 'kvm资源',
 }
 
 
