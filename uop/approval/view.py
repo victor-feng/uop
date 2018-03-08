@@ -593,6 +593,7 @@ class CapacityReservation(Resource):
         data['syswin_project'] = 'uop'
         resource_list = resource.resource_list
         compute_list = resource.compute_list
+        resource_type = resource.resource_type
         number = 0
         if resource_list:
             res = []
@@ -622,7 +623,7 @@ class CapacityReservation(Resource):
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
-                        if resource.cloud == "2":
+                        if resource.cloud == "2" and resource_type == "app":
                             number = capacity_.end_number
                         else:
                             number = abs(capacity_.begin_number - capacity_.end_number)
@@ -653,7 +654,6 @@ class CapacityReservation(Resource):
         headers = {'Content-Type': 'application/json'}
         try:
             cloud = resource.cloud
-            resource_type = resource.resource_type
             if cloud == '2' and resource_type == "app":
                 CPR_URL = get_CRP_url(data['env'])
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
