@@ -876,6 +876,7 @@ class RollBackReservation(Resource):
             data["resource_name"] = resource_name
             data["deploy_name"] = deploy_name
             data["project_name"] = project_name
+            data["environment"] = env
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
             headers = {

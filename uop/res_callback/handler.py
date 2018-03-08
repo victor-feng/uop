@@ -224,6 +224,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         resource_name = resource.resource_name
         deploy_name = resource.deploy_name
         project_name = resource.project_name
+        env = resource.env
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
         deploy_id = dep.deploy_id
@@ -260,6 +261,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         data["resource_name"] = resource_name
         data["deploy_name"] = deploy_name
         data["project_name"] = project_name
+        data["environment"] = env
         headers = {'Content-Type': 'application/json',}
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
