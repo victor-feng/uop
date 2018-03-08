@@ -20,6 +20,8 @@ deploy_cb_api = Api(deploy_cb_blueprint, errors=deploy_cb_errors)
 deploy_type_dict = {
     "deploy": "部署",
     "rollback": "回滚",
+    "increase": "扩容",
+    "reduce": "缩容"
 }
 
 
