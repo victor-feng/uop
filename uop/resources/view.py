@@ -247,6 +247,7 @@ class ResourceApplication(Resource):
         parser.add_argument('department', type=str, location='args')
         parser.add_argument('cloud', type=str, location='args')
         parser.add_argument('resource_type', type=str, location='args')
+        parser.add_argument('module_name', type=str, location='args')
 
         args = parser.parse_args()
         agg_by = args.agg_by
@@ -281,6 +282,8 @@ class ResourceApplication(Resource):
             condition["resource_type"]=args.resource_type
         if args.project_name:
             condition["project_name"] = args.project_name
+        if args.module_name:
+            condition["module_name"] = args.module_name
 
         if agg_by:
             pipeline = []

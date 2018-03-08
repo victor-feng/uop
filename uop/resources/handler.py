@@ -87,6 +87,8 @@ def _match_condition_generator(args):
             match_cond["department"]=args.department
         if args.project_name:
             match_cond["project_name"] = args.project_name
+        if args.module_name:
+            match_cond["module_name"] = args.module_name
         if args.start_time and args.end_time:
             created_date_dict = dict()
             created_date_dict['$gte'] = datetime.datetime.strptime(args.start_time, "%Y-%m-%d %H:%M:%S")
