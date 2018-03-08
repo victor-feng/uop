@@ -376,8 +376,7 @@ def delete_cmdb2(res_id):
 def get_counts():
     url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
     uid, token = get_uid_token()
-    data = {
-        {
+    data ={
             "uid": uid,
             "token": token,
             "sign": "",
@@ -387,10 +386,10 @@ def get_counts():
                     "code": "",
                     "condition": "",
                     "value": ""
-                } ]
+                }]
             }for id in ENTITY.values()]
-        }
     }
+
     try:
         Log.logger.info("get_counts from CMDB2 data:{}".format(data))
         ret = requests.post(url, data=json.dumps(data), timeout=5).json()
