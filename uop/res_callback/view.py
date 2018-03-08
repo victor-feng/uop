@@ -567,10 +567,16 @@ class ResourceProviderCallBack(Resource):
         os_ip_list = []
         os_ins_list = resource.os_ins_list
         os_ins_ip_list = resource.os_ins_ip_list
-        if os_ins_list and cloud != "2":
-            os_ids = os_ins_list
-        if os_ins_ip_list and cloud !="2":
-            os_ip_list = os_ins_ip_list
+        if os_ins_list:
+            if cloud == "2" and resource_type == "app":
+                os_ids = []
+            else:
+                os_ids = os_ins_list
+        if os_ins_ip_list:
+            if cloud == "2" and resource_type == "app":
+                os_ip_list=[]
+            else:
+                os_ip_list = os_ins_ip_list
         container = request_data.get('container')
         for _container in container:
             instances = _container.get('instance')
