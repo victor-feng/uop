@@ -374,7 +374,7 @@ def delete_cmdb2(res_id):
 
 
 def get_counts():
-    url = CMDB2_URL + "cmdb/openapi/resourcs/list/"
+    url = CMDB2_URL + "cmdb/openapi/entity/statistic/"
     uid, token = get_uid_token()
     data ={
             "uid": uid,
