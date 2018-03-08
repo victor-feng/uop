@@ -644,10 +644,10 @@ class ResourceProviderCallBack(Resource):
                     if resource_type == "app":
                         status_record.status = "%s_success" % set_flag
                         status_record.msg = "%s%s成功" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag])
+                        dep.deploy_result = "%s_success" % set_flag
                     else:
                         status_record.msg = "%s%s成功,开始部署应用" % (mapping_msg_info[resource_type], mapping_scale_info[set_flag])
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "%s_success" % set_flag
                     dep.save()
             else:
                 if set_flag == "res":
