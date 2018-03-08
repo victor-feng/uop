@@ -640,9 +640,12 @@ class ResourceProviderCallBack(Resource):
                 if set_flag == "res":
                     status_record.status = "set_success"
                     status_record.msg = "%s创建成功" % mapping_msg_info[resource_type]
-                if set_flag in ["increase","reduce"] and resource_type == "app":
-                    status_record.status = "%s_success" % set_flag
-                    status_record.msg = "%s%s成功" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag])
+                if set_flag in ["increase","reduce"]:
+                    if resource_type == "app":
+                        status_record.status = "%s_success" % set_flag
+                        status_record.msg = "%s%s成功" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag])
+                    else:
+                        status_record.msg = "%s%s成功,开始部署应用" % (mapping_msg_info[resource_type], mapping_scale_info[set_flag])
                     status_record.deploy_id = deploy_id
                     dep.deploy_result = "%s_success" % set_flag
                     dep.save()

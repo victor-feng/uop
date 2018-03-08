@@ -236,14 +236,15 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         for compute in compute_list:
             docker_list.append(
                 {
-                    'url': compute.get("url"),
-                    'ins_name': compute.get("ins_name"),
-                    'ip': compute.get("ips"),
-                    'health_check': compute.get("health_check", 0),
-                    'host_env': compute.get("host_env"),
-                    'language_env': compute.get("language_env"),
-                    'deploy_source': compute.get("deploy_source"),
-                    'database_config': compute.get("database_config")
+                    'url': compute.url,
+                    'ins_name': compute.ins_name,
+                    'ip': compute.ips,
+                    'health_check': compute.health_check,
+                    'host_env': compute.host_env,
+                    'language_env': compute.language_env,
+                    'deploy_source': compute.deploy_source,
+                    'database_config': compute.database_config
+
                 }
             )
         data["deploy_id"] = deploy_id
@@ -254,7 +255,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         data["mongodb"] = []
         data["dns"] = []
         data["disconf_server_info"] = []
-        data["deploy_type"] = "rollback"
+        data["deploy_type"] = set_flag
         data["cloud"] = cloud
         data["resource_name"] = resource_name
         data["deploy_name"] = deploy_name
