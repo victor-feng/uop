@@ -594,6 +594,7 @@ class CapacityReservation(Resource):
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         resource_type = resource.resource_type
+        resource_name = resource.resource_name
         number = 0
         if resource_list:
             res = []
@@ -674,8 +675,12 @@ class CapacityReservation(Resource):
                         os_inst_id_list.append(os_inst_id)
                     crp_data = {
                         "resource_id": resource.res_id,
+                        "resource_name": resource_name,
                         "os_ins_ip_list": reduce_list,
-                        "set_flag": 'reduce'
+                        "resource_type": resource_type,
+                        "cloud": cloud,
+                        "set_flag": 'reduce',
+                        'syswin_project': 'uop'
                     }
                     env_ = get_CRP_url(resource.env)
                     crp_url = '%s%s' % (env_, 'api/resource/deletes')
