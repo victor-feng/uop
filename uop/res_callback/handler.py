@@ -21,7 +21,7 @@ __all__ = [
     "transition_state_logger", "transit_request_data",
     "transit_repo_items", "do_transit_repo_items",
     "get_resources_all_pcode", "filter_status_data",
-    "push_vm_docker_status_to_cmdb", "deploy_nginx_to_crp",
+    "push_vm_docker_status_to_cmdb", "deploy_to_crp",
     "crp_data_cmdb", "format_data_cmdb", "get_relations"
 ]
 
@@ -217,9 +217,13 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
 
 
 @async
-def deploy_nginx_to_crp(resource_id,url,set_flag):
+def deploy_to_crp(resource_id,url,set_flag,cloud):
     try:
         resource = ResourceModel.objects.get(res_id=resource_id)
+        compute_list = resource.compute_list
+        resource_name = resource.resource_name
+        deploy_name = resource.deploy_name
+        project_name = resource.project_name
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
         deploy_id = dep.deploy_id
@@ -228,14 +232,41 @@ def deploy_nginx_to_crp(resource_id,url,set_flag):
         appinfo = attach_domain_ip(app_image, resource,None)
         Log.logger.debug(appinfo)
         data = {}
+        docker_list=[]
+        for compute in compute_list:
+            docker_list.append(
+                {
+                    'url': compute.get("url"),
+                    'ins_name': compute.get("ins_name"),
+                    'ip': compute.get("ips"),
+                    'health_check': compute.get("health_check", 0),
+                    'host_env': compute.get("host_env"),
+                    'language_env': compute.get("language_env"),
+                    'deploy_source': compute.get("deploy_source"),
+                    'database_config': compute.get("database_config")
+                }
+            )
         data["deploy_id"] = deploy_id
         data["set_flag"] = set_flag
         data["appinfo"] = appinfo
+        data['docker'] = docker_list
+        data["mysql"] = []
+        data["mongodb"] = []
+        data["dns"] = []
+        data["disconf_server_info"] = []
+        data["deploy_type"] = "rollback"
+        data["cloud"] = cloud
+        data["resource_name"] = resource_name
+        data["deploy_name"] = deploy_name
+        data["project_name"] = project_name
         headers = {'Content-Type': 'application/json',}
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("URL args is " + url)
-        result = requests.put(url=url, headers=headers, data=data_str)
+        if cloud == 2:
+            result = requests.post(url=url, headers=headers, data=data_str)
+        else:
+            result = requests.put(url=url, headers=headers, data=data_str)
         Log.logger.debug(result)
     except Exception as e:
         Log.logger.error("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)

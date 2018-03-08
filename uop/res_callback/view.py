@@ -672,10 +672,10 @@ class ResourceProviderCallBack(Resource):
         resource.reservation_status = status_record.status
         resource.save()
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
-        if set_flag  == "increase" and status == 'ok' and cloud != '2':
+        if set_flag  == "increase" and status == 'ok':
             CPR_URL = get_CRP_url(env)
             url = CPR_URL + "api/deploy/deploys"
-            deploy_nginx_to_crp(resource_id, url, set_flag)
+            deploy_to_crp(resource_id, url, set_flag, cloud)
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
@@ -886,6 +886,7 @@ class ResourceDeleteCallBack(Resource):
                 dep = deps[0]
                 deploy_id = dep.deploy_id
                 env = resource.env
+                cloud = resource.cloud
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
@@ -928,7 +929,7 @@ class ResourceDeleteCallBack(Resource):
                     # 要缩容的docker都删除完成,开始修改nginx的配置
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
-                    deploy_nginx_to_crp(resource_id,url,set_flag)
+                    deploy_to_crp(resource_id,url,set_flag,cloud)
                     #要缩容的docker都删除完成,开始调用cmdb接口删除对应数据
                     data={}
                     ip_list=[]
