@@ -519,6 +519,7 @@ class ResourceProviderCallBack(Resource):
         env = resource.env
         cloud = resource.cloud
         is_write_to_cmdb = False
+        increase_ips=[]
         # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
         if status == "ok":
             is_write_to_cmdb = True
@@ -534,6 +535,7 @@ class ResourceProviderCallBack(Resource):
                         for ins in i.get('instance'):
                             ip = ins.get('ip')
                             ips.append(ip)
+                            increase_ips.append(ip)
                         j.ips = ips
                         j.quantity = len(ips)
                         # 往cmdb写入数据
@@ -688,7 +690,7 @@ class ResourceProviderCallBack(Resource):
             else:
                 CPR_URL = get_CRP_url(env)
                 url = CPR_URL + "api/deploy/deploys"
-                deploy_to_crp(resource_id, url, set_flag, cloud)
+                deploy_to_crp(resource_id, url, set_flag, cloud,increase_ips)
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)

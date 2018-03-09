@@ -217,7 +217,7 @@ def push_vm_docker_status_to_cmdb(url, p_code=None):
 
 
 @async
-def deploy_to_crp(resource_id,url,set_flag,cloud):
+def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
     try:
         resource = ResourceModel.objects.get(res_id=resource_id)
         compute_list = resource.compute_list
@@ -235,11 +235,14 @@ def deploy_to_crp(resource_id,url,set_flag,cloud):
         data = {}
         docker_list=[]
         for compute in compute_list:
+            ips = compute.ips
+            if increase_ips:
+                ips=increase_ips
             docker_list.append(
                 {
                     'url': compute.url,
                     'ins_name': compute.ins_name,
-                    'ip': compute.ips,
+                    'ip': ips,
                     'health_check': compute.health_check,
                     'host_env': compute.host_env,
                     'language_env': compute.language_env,
