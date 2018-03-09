@@ -200,7 +200,7 @@ mapping_scale_info = {
 
 mapping_msg_info = {
     'app' : '应用集群',
-    'kvm' : 'kvm资源',
+    'kvm' : 'kvm',
 }
 
 
@@ -639,23 +639,23 @@ class ResourceProviderCallBack(Resource):
             if status == 'ok':
                 if set_flag == "res":
                     status_record.status = "set_success"
-                    status_record.msg = "%s创建成功" % mapping_msg_info[resource_type]
+                    status_record.msg = "%s资源创建成功" % mapping_msg_info.get(resource_type,resource_type)
                 if set_flag in ["increase","reduce"]:
                     if resource_type == "app":
                         status_record.status = "%s_success" % set_flag
-                        status_record.msg = "%s%s成功" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag])
+                        status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info[set_flag])
                         dep.deploy_result = "%s_success" % set_flag
                     else:
-                        status_record.msg = "%s%s成功,开始部署应用" % (mapping_msg_info[resource_type], mapping_scale_info[set_flag])
+                        status_record.msg = "%s资源%s成功,开始部署应用" % (mapping_msg_info.get(resource_type,resource_type), mapping_scale_info[set_flag])
                     status_record.deploy_id = deploy_id
                     dep.save()
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
-                    status_record.msg = "%s创建失败,错误日志为: %s" % (mapping_msg_info[resource_type],error_msg)
+                    status_record.msg = "%s资源创建失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),error_msg)
                 elif set_flag in ["increase","reduce"]:
                     status_record.status = "%s_fail" % set_flag
-                    status_record.msg = "%s%s失败,错误日志为: %s" % (mapping_msg_info[resource_type],mapping_scale_info[set_flag],error_msg)
+                    status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info[set_flag],error_msg)
                     status_record.deploy_id = deploy_id
                     dep.deploy_result = "%s_fail" % set_flag
                     dep.save()
