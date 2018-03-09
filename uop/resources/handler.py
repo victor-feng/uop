@@ -401,8 +401,33 @@ def get_counts():
                   for ins in ret["result"]["data"]]
         else:
             dd = ret
-        response = response_data(200, "success", dd)
+        #获取部署数据库和应用数量
+        res_list,msg=get_deploy_counts()
+        if msg is not None:
+            dd.extend(res_list)
+            response = response_data(200, "success", dd)
+        else:
+            response = response_data(500, "fail", msg)
     except Exception as exc:
         Log.logger.error("get_counts from CMDB2 error:{}".format(exc))
         response = response_data(500, "fail", exc)
     return response
+
+def get_deploy_counts():
+    res_list = []
+    msg = None
+    try:
+        type_mapping={
+            "app" : ["app", "kvm"],
+            "database" : ["mysql", "redis","mongodb"],
+        }
+        for type in type_mapping:
+            data = {}
+            count = ResourceModel.objects.filter(reservation_status="set_success",resource_type__in=type_mapping[type]).count
+            data["count"] = count
+            data["entity"] = type
+            data["id"] = ""
+            res_list.append(data)
+    except Exception as e:
+        msg = str(e)
+    return res_list,msg
