@@ -403,13 +403,10 @@ def get_counts():
             dd = ret
         #获取部署数据库和应用数量
         res_list,msg=get_deploy_counts()
-        Log.logger.debug("{res_list}-------{msg}---{a}".format(res_list=res_list,msg=msg,a=type(msg)))
         if not msg :
             dd.extend(res_list)
-            Log.logger.debug("11111111111111111111")
             response = response_data(200, "success", dd)
         else:
-            Log.logger.debug("2222222222222222222222")
             response = response_data(500, "fail", msg)
     except Exception as exc:
         Log.logger.error("UOP get counts error:{}".format(exc))
