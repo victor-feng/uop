@@ -902,6 +902,7 @@ class ResourceDeleteCallBack(Resource):
                 deploy_id = dep.deploy_id
                 env = resource.env
                 cloud = resource.cloud
+                resource_type = resource.resource_type
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
@@ -934,13 +935,15 @@ class ResourceDeleteCallBack(Resource):
                 resource.os_ins_ip_list=new_os_ins_ip_list
                 resource.save()
                 msg = "删除资源 %s 成功" % os_inst_ip_dict[os_inst_id]
-                s_type = "docker"
-                status = "docker_reduce_success"
+                s_type = resource_type
+                if resource_type == "app":
+                    s_type = "docker"
+                status = "%s_reduce_success" % resource_type
                 create_status_record(resource_id, deploy_id, s_type,msg,status, set_flag, unique_flag)
                 status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
                 quantity=len(del_os_ins_ip_list)
                 if len(status_records) == quantity :
-                    create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
+                    #create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
                     # 要缩容的资源都删除完成,开始删除nginx配置
                     CPR_URL = get_CRP_url(env)
                     url = CPR_URL + "api/deploy/deploys"
