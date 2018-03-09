@@ -61,7 +61,7 @@ class ResourceApplication(Resource):
                     res_exist_dict["project_name"] = project_name
                     res_exist_dict["resource_type"] = resource_type
                     res_exist_list.append(res_exist_dict)
-            if len(res_exist_list) > 0:
+            if res_exist_list:
                 code = 200
                 res = {
                     'code': code,
