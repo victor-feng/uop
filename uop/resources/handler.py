@@ -423,7 +423,7 @@ def get_deploy_counts():
         }
         for type in type_mapping:
             data = {}
-            count = ResourceModel.objects.filter(reservation_status="set_success",resource_type__in=type_mapping[type]).count
+            count = ResourceModel.objects.filter(approval_status="success",resource_type__in=type_mapping[type]).count()
             data["count"] = count
             data["entity"] = type
             data["id"] = ""
