@@ -308,6 +308,7 @@ class Reservation(Resource):
                         "host_env":db_com.host_env,
                         "language_env":db_com.language_env,
                         "deploy_source":db_com.deploy_source,
+                        "database_config":db_com.database_config,
                     }
                 )
             data['compute_list'] = com
@@ -434,6 +435,7 @@ class ReservationAPI(Resource):
                         "host_env":db_com.host_env,
                         "language_env": db_com.language_env,
                         "deploy_source": db_com.deploy_source,
+                        "database_config": db_com.database_config,
                     }
                 )
             data['compute_list'] = com
@@ -666,6 +668,7 @@ class CapacityReservation(Resource):
                                 "host_env":db_com.host_env,
                                 "language_env": db_com.language_env,
                                 "deploy_source": db_com.deploy_source,
+                                "database_config": db_com.database_config,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
