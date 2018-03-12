@@ -196,18 +196,25 @@ def get_from_uop(args):
             query["create_time__lte"] = end_time
         Log.logger.info("query:{}".format(query))
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
-        def get_cloud(res_id):
+        def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id)
             if res:
-                for r in res:
-                    return r.cloud if r.cloud else 1
+                if not flag:
+                    for r in res:
+                        return r.cloud if r.cloud else 1
+                else:
+                    for r in res:
+                        for app in r.compute_list:
+                            return app.domain, app.domain_ip
+                    return False
             return 1
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
-            tmp_result['domain'] = pi.domain
-            tmp_result['domain_ip'] = pi.domain_ip
+            domain, domain_ip = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else pi.domain, pi.domian_ip
+            tmp_result['domain'] = domain
+            tmp_result['domain_ip'] = domain_ip
             tmp_result['resource_type'] = pi.os_type
             tmp_result['resource_config'] = [
                 {'name': 'CPU', 'value': str(pi.cpu) + u'核'},
