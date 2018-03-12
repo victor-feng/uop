@@ -65,6 +65,7 @@ class DevelopmentConfig(BaseConfig):
     }
 
     UPLOAD_FOLDER = "/data/"
+    BASE_K8S_IAMGE = "reg1.syswin.com/base/uop-base-k8s:v-1.0.1"
 configs = {
     'development': DevelopmentConfig,
 }

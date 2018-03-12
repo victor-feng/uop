@@ -13,12 +13,14 @@ from uop.approval import approval_blueprint
 from uop import models
 from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
+from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
 
 # CPR_URL = current_app.config['CRP_URL']
 # CPR_URL = configs[APP_ENV].CRP_URL
+BASE_K8S_IMAGE = configs[APP_ENV].BASE_K8S_IMAGE
 
 
 class ApprovalList(Resource):
@@ -282,13 +284,18 @@ class Reservation(Resource):
             com = []
             for db_com in compute_list:
                 meta = json.dumps(db_com.docker_meta)
+                deploy_source = db_com.deploy_source
+                host_env = db_com.host_env
+                url = db_com.url
+                if host_env == "docker" and deploy_source == "image":
+                    url = BASE_K8S_IMAGE
                 com.append(
                     {
                         "instance_name": db_com.ins_name,
                         "instance_id": db_com.ins_id,
                         "cpu": db_com.cpu,
                         "mem": db_com.mem,
-                        "image_url": db_com.url,
+                        "image_url": url,
                         "quantity": db_com.quantity,
                         "domain": db_com.domain,
                         "port": db_com.port,
@@ -300,6 +307,7 @@ class Reservation(Resource):
                         "tenantName": db_com.tenantName,
                         "host_env":db_com.host_env,
                         "language_env":db_com.language_env,
+                        "deploy_source":db_com.deploy_source,
                     }
                 )
             data['compute_list'] = com
@@ -404,13 +412,18 @@ class ReservationAPI(Resource):
             com = []
             for db_com in compute_list:
                 meta = json.dumps(db_com.docker_meta)
+                host_env = db_com.host_env
+                deploy_source = db_com.deploy_source
+                url = db_com.url
+                if host_env == "docker" and deploy_source == "image":
+                    url = BASE_K8S_IMAGE
                 com.append(
                     {
                         "instance_name": db_com.ins_name,
                         "instance_id": db_com.ins_id,
                         "cpu": db_com.cpu,
                         "mem": db_com.mem,
-                        "image_url": db_com.url,
+                        "image_url": url,
                         "quantity": db_com.quantity,
                         "port": db_com.port,
                         "meta": meta,
@@ -420,6 +433,7 @@ class ReservationAPI(Resource):
                         "tenantName": db_com.tenantName,
                         "host_env":db_com.host_env,
                         "language_env": db_com.language_env,
+                        "deploy_source": db_com.deploy_source,
                     }
                 )
             data['compute_list'] = com
@@ -621,6 +635,11 @@ class CapacityReservation(Resource):
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
                 meta = json.dumps(db_com.docker_meta) if db_com.docker_meta else ""
+                deploy_source = db_com.deploy_source
+                host_env = db_com.host_env
+                url = db_com.url
+                if host_env == "docker" and deploy_source == "image":
+                    url = BASE_K8S_IMAGE
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
@@ -634,7 +653,7 @@ class CapacityReservation(Resource):
                                 "instance_id": db_com.ins_id,
                                 "cpu": db_com.cpu,
                                 "mem": db_com.mem,
-                                "image_url": db_com.url,
+                                "image_url": url,
                                 "quantity": number,
                                 "domain": db_com.domain,
                                 "port": db_com.port,
@@ -646,6 +665,7 @@ class CapacityReservation(Resource):
                                 "tenantName": db_com.tenantName,
                                 "host_env":db_com.host_env,
                                 "language_env": db_com.language_env,
+                                "deploy_source": db_com.deploy_source,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
