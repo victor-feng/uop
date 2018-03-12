@@ -205,7 +205,6 @@ def get_from_uop(args):
                 else:
                     for r in res:
                         for app in r.compute_list:
-                            Log.logger.info("Statusflush app.domain:{}".format(app.domain))
                             return app.domain, app.domain_ip
                     return False
             return 1
@@ -243,7 +242,6 @@ def get_from_uop(args):
             "current_page": page_num
         }
         res = response_data(200, "success", content)
-        Log.logger.info("Statusflush error:{}".format(res))
     except Exception as exc:
         code = 500
         Log.logger.error("Statusflush error:{}".format(str(exc)))
