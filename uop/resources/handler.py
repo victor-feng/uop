@@ -205,6 +205,7 @@ def get_from_uop(args):
                 else:
                     for r in res:
                         for app in r.compute_list:
+                            Log.logger.info("Statusflush app.domain:{}".format(app.domain))
                             return app.domain, app.domain_ip
                     return False
             return 1
