@@ -212,7 +212,7 @@ def get_from_uop(args):
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
-            domain, domain_ip = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else pi.domain, pi.domian_ip
+            domain, domain_ip = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else pi.domain, pi.domain_ip
             tmp_result['domain'] = domain
             tmp_result['domain_ip'] = domain_ip
             tmp_result['resource_type'] = pi.os_type
