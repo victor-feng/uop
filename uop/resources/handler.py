@@ -171,7 +171,7 @@ def get_from_uop(args):
     try:
         attach_key = lambda v, query, key, filter: query.update({key: v}) if filter else ""
 
-        attach_key(department, query, "department", department)
+        attach_key(department, query, "department", str(department) != "admin")
         attach_key(user_id, query, "user_id", user_id and user_id != "admin")
         attach_key(env, query, "env", env)
         attach_key(resource_name.decode(encoding="utf-8"), query, "resource_name__contains", resource_name)
