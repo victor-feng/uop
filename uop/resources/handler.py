@@ -242,6 +242,7 @@ def get_from_uop(args):
             "current_page": page_num
         }
         res = response_data(200, "success", content)
+        Log.logger.info("Statusflush error:{}".format(res))
     except Exception as exc:
         code = 500
         Log.logger.error("Statusflush error:{}".format(str(exc)))
