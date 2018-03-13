@@ -258,6 +258,7 @@ class Reservation(Resource):
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
         data['syswin_project'] = 'uop'
+        data['project_name'] = resource.project_name
         # data['cmdb_repo_id'] = item_info.item_id
         resource_list = resource.resource_list
         compute_list = resource.compute_list
@@ -388,6 +389,7 @@ class ReservationAPI(Resource):
         data['cloud'] = resource.cloud
         data['resource_type'] = resource.resource_type
         data['syswin_project'] = 'uop'
+        data['project_name'] = resource.project_name
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         if resource_list:
@@ -607,6 +609,7 @@ class CapacityReservation(Resource):
         data['resource_type'] = resource.resource_type
         data['set_flag'] = approval.capacity_status
         data['syswin_project'] = 'uop'
+        data['project_name'] = resource.project_name
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         resource_type = resource.resource_type
