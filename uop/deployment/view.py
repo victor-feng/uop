@@ -280,7 +280,7 @@ class DeploymentListAPI(Resource):
             disconf_server_info = deal_disconf_info(deploy_obj)
             ##推送到crp
             deploy_obj.approve_status = 'success'
-            if cloud == 2:
+            if cloud == '2':
                 resource_info={}
                 err_msg = None
                 if resource_type == "app":
