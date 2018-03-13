@@ -274,7 +274,8 @@ class DeploymentListAPI(Resource):
             deploy_obj.app_image = str(args.app_image)
             deploy_obj.save()
             cmdb_url = current_app.config['CMDB_URL']
-            appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+            app_image = eval(args.app_image)
+            appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
             ##推送到crp
