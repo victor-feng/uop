@@ -284,7 +284,12 @@ class DeploymentListAPI(Resource):
                 resource_info={}
                 err_msg = None
                 if resource_type == "app":
-                    appinfo=[]
+                    n_appinfo = []
+                    for app in appinfo:
+                        app["port"] = "80"
+                        app["ips"]=["172.28.11.128"]
+                        n_appinfo.append(app)
+                    appinfo=n_appinfo
             else:
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
             message = 'approve_allow success'
