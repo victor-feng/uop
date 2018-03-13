@@ -197,7 +197,7 @@ def filter_status_data(p_code):
             meta["ip"] = oi.ip
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
-            if res.cloud == "2" and res.resource_type == "app":
+            if r.cloud == "2" and r.resource_type == "app":
                 dirty = Statusvm.objects.filter(resource_id = res.res_id)
                 if dirty:
                     for d in dirty:
