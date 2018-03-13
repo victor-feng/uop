@@ -14,7 +14,12 @@ from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
 from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip
 from uop.log import Log
+from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
+
+
+K8S_NGINX_PORT = configs[APP_ENV].K8S_NGINX_PORT
+K8S_NGINX_IPS = configs[APP_ENV].K8S_NGINX_IPS
 
 deployment_api = Api(deployment_blueprint, errors=deploy_errors)
 
@@ -284,12 +289,7 @@ class DeploymentListAPI(Resource):
                 resource_info={}
                 err_msg = None
                 if resource_type == "app":
-                    n_appinfo = []
-                    for app in appinfo:
-                        app["port"] = "80"
-                        app["ips"]=["172.28.11.128"]
-                        n_appinfo.append(app)
-                    appinfo=n_appinfo
+                    appinfo = [dict(app, port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
             else:
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
             message = 'approve_allow success'
