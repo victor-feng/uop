@@ -5,7 +5,7 @@ import json
 import datetime
 from flask import request, current_app
 from flask_restful import reqparse, Api, Resource
-from uop.models import  ResourceModel, StatusRecord,OS_ip_dic,Deployment
+from uop.models import  ResourceModel, StatusRecord,OS_ip_dic,Deployment, Statusvm
 from uop.res_callback import res_callback_blueprint
 from uop.res_callback.errors import res_callback_errors
 from uop.deploy_callback.handler import create_status_record
@@ -963,6 +963,10 @@ class ResourceDeleteCallBack(Resource):
                     data["ip_list"]=ip_list
                     data["osid_list"] = osid_list
                     data_str=json.dumps(data)
+                    dirty = Statusvm.objects.filter(osid__in=osid_list)
+                    if dirty:
+                        for d in dirty:
+                            d.delete()
                     CMDB_URL = current_app.config['CMDB_URL']
                     CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
                     headers = {'Content-Type': 'application/json', }
