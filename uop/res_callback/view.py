@@ -528,17 +528,19 @@ class ResourceProviderCallBack(Resource):
                 for j in resource.compute_list:
                     if i.get('ins_id') == j.ins_id:
                         # j.ips = [ins.get('ip') for ins in i.get('instance')]
-                        if cloud == "2" and resource_type == "app":
-                            ips=[]
-                        else:
-                            ips = j.ips
                         for ins in i.get('instance'):
                             ip = ins.get('ip')
                             ips.append(ip)
                             increase_ips.append(ip)
-                            #image_url = ins.get("image_url")
+                            image_url = ins.get("image_url")
+                            deploy_source = ins.get("deploy_source")
+                        if cloud == "2" and resource_type == "app":
+                            ips=[]
+                            if deploy_source != "image":
+                                j.url = image_url
+                        else:
+                            ips = j.ips
                         j.ips = ips
-                        #j.url = image_url
                         j.quantity = len(ips)
                         # 往cmdb写入数据
             property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
