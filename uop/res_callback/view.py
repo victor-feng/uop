@@ -535,10 +535,10 @@ class ResourceProviderCallBack(Resource):
                             ip = ins.get('ip')
                             ips.append(ip)
                             increase_ips.append(ip)
-                            image_url = ins.get("image_url")
+                            img_url = ins.get("img_url")
                             deploy_source = ins.get("deploy_source")
                         if cloud == "2" and resource_type == "app" and deploy_source != "image":
-                            j.url = image_url
+                            j.url = img_url
                         else:
                             ips = j.ips
                         j.ips = ips
