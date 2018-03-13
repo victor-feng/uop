@@ -358,7 +358,6 @@ def attach_domain_ip(compute_list, res, cmdb_url):
     os_ins_list = res.os_ins_ip_list
     appinfo = []
     cmdb_data = []
-    Log.logger.info("-----------compute_list-------------------------{compute_list}".format(compute_list=compute_list))
     try:
         for i in old_compute_list:
             tmp = [x for x in compute_list if str(x["ins_id"]) == str(i.ins_id) and x.get("domain_ip", "")]
@@ -373,8 +372,6 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                 appinfo.append(tmp)  # 将配置了nginx IP的 app传回，以便传回crp进行配置推送
         for i in xrange(0, len(old_compute_list)):  # 更新resources表中的镜像url和可能配置nginx IP信息
             match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
-            Log.logger.info(
-                "-----------match_one-------------------------{match_one}".format(match_one=match_one))
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
