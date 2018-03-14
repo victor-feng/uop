@@ -538,10 +538,13 @@ class ResourceProviderCallBack(Resource):
                             img_url = ins.get("img_url")
                             deploy_source = ins.get("deploy_source")
                             host_env = ins.get("host_env")
+                            Log.logger.debug("--------------------------ip----------------------{ip}".format(ip=ip))
                         if host_env == "docker" and deploy_source != "image":
                             j.url = img_url
                         j.ips = ips
                         j.quantity = len(ips)
+                        Log.logger.debug("--------------------------ips----------------------{ips}".format(ips=ips))
+                        Log.logger.debug("--------------------------quantity----------------------{quantity}".format(quantity=len(ips)))
                         # 往cmdb写入数据
             property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                           request_data)
