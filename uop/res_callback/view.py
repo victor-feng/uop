@@ -540,8 +540,6 @@ class ResourceProviderCallBack(Resource):
                             host_env = ins.get("host_env")
                         if host_env == "docker" and deploy_source != "image":
                             j.url = img_url
-                        else:
-                            ips = j.ips
                         j.ips = ips
                         j.quantity = len(ips)
                         # 往cmdb写入数据
