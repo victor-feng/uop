@@ -538,7 +538,7 @@ class ResourceProviderCallBack(Resource):
                             img_url = ins.get("img_url")
                             deploy_source = ins.get("deploy_source")
                             host_env = ins.get("host_env")
-                        if host_env == "docker" and deploy_source != "image":
+                        if host_env == "docker" and deploy_source != "image" and set_flag == "res":
                             j.url = img_url
                         j.ips = ips
                         j.quantity = len(ips)
