@@ -85,8 +85,8 @@ class DeployCallback(Resource):
         unique_flag = args.unique_flag
         cloud = args.cloud
         deploy_name=args.deploy_name
-        o_domain = args.domain
-        o_port = args.port
+        o_domain = args.o_domain
+        o_port = args.o_port
         domain_flag= args.domain_flag
         resource_id = dep.resource_id
         status_record = StatusRecord()
