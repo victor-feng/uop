@@ -12,7 +12,7 @@ from uop.models import  ResourceModel, DisconfIns, Deployment, Approval, Capacit
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
-from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip
+from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip,check_domain_port
 from uop.log import Log
 from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
@@ -289,6 +289,7 @@ class DeploymentListAPI(Resource):
                 resource_info={}
                 err_msg = None
                 if resource_type == "app":
+                    app_image=check_domain_port(resource, app_image)
                     appinfo = [dict(app, port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
             else:
                 err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)

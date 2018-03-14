@@ -422,7 +422,22 @@ def deal_disconf_info(deploy_obj):
                            'disconf_app_name': disconf_info.disconf_app_name,
                            }
                 disconf_server_info.append(server_info)
-        return disconf_server_info
     except Exception as e:
         Log.logger.error("deal disconf info error %s" % str(e))
-        return disconf_server_info
+    return disconf_server_info
+
+
+def check_domain_port(resource,app_image):
+    try:
+        compute_list=resource.compute_list
+        for compute in compute_list:
+            for app in app_image:
+                if compute.ins_id == app.get("ins_id"):
+                    if compute.domain != app.get("domain"):
+                        if compute.domain:
+                            app["ingress"] = "update"
+                        else:
+                            app["ingress"] = "create"
+    except Exception as e:
+        Log.logger.error("Check domain port error {e}".format(e=str(e)))
+    return app_image
