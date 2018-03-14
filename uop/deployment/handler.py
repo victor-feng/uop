@@ -379,11 +379,15 @@ def check_domain_port(resource,app_image):
         for compute in compute_list:
             for app in app_image:
                 if compute.ins_id == app.get("ins_id"):
+                    app["o_domain"] = compute.domain
+                    app["o_port"] = compute.port
                     if compute.domain != app.get("domain"):
                         if compute.domain:
                             app["ingress_flag"] = "update"
                         else:
                             app["ingress_flag"] = "create"
+                        if not app.get("domain"):
+                            app["ingress_flag"] = "delete"
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
     return app_image
