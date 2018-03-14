@@ -173,6 +173,11 @@ def filter_status_data(p_code):
         osid_ip_list = r.os_ins_ip_list
         compute_list = r.compute_list
         # Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
+        if r.cloud == "2" and r.resource_type == "app":
+            dirty = Statusvm.objects.filter(resource_id=r.res_id)
+            if dirty:
+                for d in dirty:
+                    d.delete()
         for oi in osid_ip_list:
             meta = {}
             meta["resource_id"] = r.res_id
@@ -197,11 +202,6 @@ def filter_status_data(p_code):
             meta["ip"] = oi.ip
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
-            if r.cloud == "2" and r.resource_type == "app":
-                dirty = Statusvm.objects.filter(resource_id = r.res_id)
-                if dirty:
-                    for d in dirty:
-                        d.delete()
             data["vm_status"].append(meta)
             Statusvm.created_status(**meta)
     return data
