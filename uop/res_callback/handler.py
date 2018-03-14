@@ -198,7 +198,7 @@ def filter_status_data(p_code):
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
             if r.cloud == "2" and r.resource_type == "app":
-                dirty = Statusvm.objects.filter(resource_id = res.res_id)
+                dirty = Statusvm.objects.filter(resource_id = r.res_id)
                 if dirty:
                     for d in dirty:
                         d.delete()
