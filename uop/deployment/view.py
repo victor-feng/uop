@@ -280,32 +280,24 @@ class DeploymentListAPI(Resource):
             deploy_obj.save()
             cmdb_url = current_app.config['CMDB_URL']
             app_image = args.app_image
+            #如果是k8s应用判断域名是否变化
+            if cloud == '2' and resource_type == "app":
+                app_image=check_domain_port(resource, app_image)
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
+            # 如果是k8s应用修改外层nginx信息
+            if cloud == '2' and resource_type == "app":
+                appinfo = [dict(app, port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
-            ##推送到crp
             deploy_obj.approve_status = 'success'
-            if cloud == '2':
-                resource_info={}
-                err_msg = None
-                if resource_type == "app":
-                    app_image=check_domain_port(resource, app_image)
-                    appinfo = [dict(app, port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
-            else:
-                err_msg, resource_info = get_resource_by_id(deploy_obj.resource_id)
+            resource_info = {}
             message = 'approve_allow success'
-            if not err_msg:
-                err_msg, result = deploy_to_crp(deploy_obj,
-                                                args.environment,
-                                                resource_info,
-                                                args.resource_name,
-                                                args.database_password,
-                                                appinfo, disconf_server_info,cloud)
-                if err_msg:
-                    deploy_obj.deploy_result = 'deploy_fail'
-                    message = 'deploy_fail'
-            else:
-                raise Exception(err_msg)
+            ##推送到crp
+            err_msg, result = deploy_to_crp(deploy_obj, args.environment, resource_info, args.resource_name,
+                                            args.database_password, appinfo, disconf_server_info, cloud)
+            if err_msg:
+                deploy_obj.deploy_result = 'deploy_fail'
+                message = 'deploy_fail'
             # 修改deploy_result状态为部署中
             deploy_obj.deploy_result = 'deploying'
             deploy_obj.approve_suggestion = args.approve_suggestion

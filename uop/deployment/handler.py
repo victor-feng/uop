@@ -160,78 +160,25 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
                         'domain_ip': app_info.domain_ip
                         }
             data['dns'].append(dns_info)
-    if cloud == '2':
-        compute_list = res_obj.compute_list
-        for compute in compute_list:
-            docker_list = []
-            try:
-                docker_list.append(
-                    {
-                        'url': compute.url,
-                        'ins_name': compute.ins_name,
-                        'ip': compute.ips,
-                        'health_check':compute.health_check,
-                        'host_env':compute.host_env,
-                        'language_env':compute.language_env,
-                        'deploy_source':compute.deploy_source,
-                        'database_config':compute.database_config
-
-                    }
-                )
-            except AttributeError as e:
-                Log.logger.error(str(e))
-        data['docker'] = docker_list
-    else:
-        if resource_info.get('mysql_cluster'):
-            data['mysql'] = {
-                "ip": resource_info['mysql_cluster']['wvip'],
-                "port": resource_info['mysql_cluster']['port'],
-                "database_user": resource_name,
-                "database_password": database_password,
-                "mysql_user": resource_info['mysql_cluster']['user'],
-                "mysql_password": resource_info['mysql_cluster']['password'],
-                "database": "mysql",
-            }
-        if resource_info.get('mongodb_cluster'):
-            data['mongodb'] = {
-                "vip1": resource_info['mongodb_cluster']['vip1'],
-                "vip2": resource_info['mongodb_cluster']['vip2'],
-                "vip3": resource_info['mongodb_cluster']['vip3'],
-                "vip": resource_info['mongodb_instance']['vip'],
-                "port": resource_info['mongodb_cluster']['port'],
-                # TODO test data
-                "db_username": resource_name,
-                "db_password": database_password,
-                # "db_username": 'victor',
-                # "db_password": '123456',
-                "mongodb_username": resource_info['mongodb_cluster']['user'],
-                "mongodb_password": resource_info['mongodb_cluster']['password'],
-                "database": "mongodb",
-            }
-        if resource_info.get('docker'):
-            # data['docker'] = {
-            #     "image_url": deploy_item.app_image,
-            #     "ip": resource_info['docker']['ip_address']
-            # }
-            docker_list = []
-            for obj in res_obj.compute_list:
-                try:
-                    docker_list.append(
-                        {
-                            'url': obj.url,
-                            'ins_name': obj.ins_name,
-                            'ip': obj.ips,
-                            'health_check':obj.health_check,
-                            'host_env': obj.host_env,
-                            'language_env': obj.language_env,
-                            'deploy_source': obj.deploy_source,
-                            'database_config': obj.database_config
-                        }
-                    )
-                except AttributeError as e:
-                    Log.logger.error(str(e))
-            data['docker'] = docker_list
-
+    compute_list = res_obj.compute_list
+    docker_list = []
+    for compute in compute_list:
+        try:
+            docker_list.append(
+                {
+                    'url': compute.url,
+                    'insname': compute.ins_name,
+                    'ip': compute.ips,
+                    'health_check':compute.health_check,
+                    'host_env':compute.host_env,
+                    'language_env':compute.language_env,
+                    'deploy_source':compute.deploy_source,
+                    'database_config':compute.database_config
+                }
+            )
+        except AttributeError as e:
+            Log.logger.error("Deploy to crp get docker info error {e}".format(e=str(e)))
+    data['docker'] = docker_list
     err_msg = None
     result = None
     try:
@@ -259,7 +206,7 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
                     data[type]['path_filename'] = path_filename
             elif cont.get('code') == 500:
                 return 'upload sql file failed', result
-        Log.logger.info("{}  {}".format(url, json.dumps(headers)))
+        Log.logger.debug("{}  {}".format(url, json.dumps(headers)))
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("Data args is " + str(data_str))
@@ -269,7 +216,6 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
         err_msg = rq.message.message
     except BaseException as e:
         err_msg = e.message
-
     return err_msg, result
 
 
@@ -435,9 +381,9 @@ def check_domain_port(resource,app_image):
                 if compute.ins_id == app.get("ins_id"):
                     if compute.domain != app.get("domain"):
                         if compute.domain:
-                            app["ingress"] = "update"
+                            app["ingress_flag"] = "update"
                         else:
-                            app["ingress"] = "create"
+                            app["ingress_flag"] = "create"
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
     return app_image
