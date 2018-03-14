@@ -65,6 +65,10 @@ class DeployCallback(Resource):
             parser.add_argument('unique_flag', type=str)
             parser.add_argument('cloud', type=str)
             parser.add_argument('deploy_name', type=str)
+            parser.add_argument('deploy_name', type=str)
+            parser.add_argument('o_domain', type=str)
+            parser.add_argument('o_port', type=str)
+            parser.add_argument('domain_flag', type=str)
             args = parser.parse_args()
             Log.logger.info("args parser info:{}".format(args))
         except Exception as e:
@@ -81,6 +85,9 @@ class DeployCallback(Resource):
         unique_flag = args.unique_flag
         cloud = args.cloud
         deploy_name=args.deploy_name
+        o_domain = args.domain
+        o_port = args.port
+        domain_flag= args.domain_flag
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -123,16 +130,27 @@ class DeployCallback(Resource):
                 dep.deploy_result = "%s_success" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s成功" % deploy_type_dict[deploy_type],
                                      "%s_success" % deploy_type, "res")
+                # 如果回滚成功，修改部署版本
+                if deploy_type == "rollback":
+                    resource = ResourceModel.objects.get(res_id=resource_id)
+                    resource.deploy_name = deploy_name
+                    resource.save()
             elif res_status == False and end_flag == True:
                 dep.deploy_result = "%s_fail" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
                                      "%s_fail" % deploy_type, "res")
+                #如果部署失败修改domain和port
+                resource = ResourceModel.objects.get(res_id=resource_id)
+                compute_list = resource.compute_list
+                if domain_flag == "True":
+                    for compute in compute_list:
+                        compute.domain = o_domain
+                        compute.port = o_port
+                        compute.save
+                    resource.save()
+
             dep.save()
-            #如果回滚成功，修改部署版本
-        if args.result == "success" and deploy_type == "rollback":
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            resource.deploy_name = deploy_name
-            resource.save()
+
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
