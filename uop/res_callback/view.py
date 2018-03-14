@@ -537,7 +537,8 @@ class ResourceProviderCallBack(Resource):
                             increase_ips.append(ip)
                             img_url = ins.get("img_url")
                             deploy_source = ins.get("deploy_source")
-                        if cloud == "2" and resource_type == "app" and deploy_source != "image":
+                            host_env = ins.get("host_env")
+                        if host_env == "docker" and deploy_source != "image":
                             j.url = img_url
                         else:
                             ips = j.ips
