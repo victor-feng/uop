@@ -144,7 +144,7 @@ class DeployCallback(Resource):
             resource.save()
 
         # 如果部署失败修改domain和port
-        if dep.deploy_result == "fail" and domain_flag == "True":
+        if args.result == "fail" and domain_flag == "True":
             resource = ResourceModel.objects.get(res_id=resource_id)
             compute_list = resource.compute_list
             Log.logger.debug("{o_domain}----------------{o_port}".format(o_domain=o_domain,o_port=o_port))
