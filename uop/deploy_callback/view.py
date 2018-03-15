@@ -144,15 +144,14 @@ class DeployCallback(Resource):
             resource.save()
 
         # 如果部署失败修改domain和port
-        if dep.deploy_result == "fail":
+        if dep.deploy_result == "fail" and domain_flag == "True":
             resource = ResourceModel.objects.get(res_id=resource_id)
             compute_list = resource.compute_list
-            if domain_flag == "True":
-                for compute in compute_list:
-                    compute.domain = o_domain
-                    compute.port = o_port
-                    compute.save
-                resource.save()
+            for compute in compute_list:
+                compute.domain = o_domain
+                compute.port = o_port
+                compute.save
+            resource.save()
 
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
