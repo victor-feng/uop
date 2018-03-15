@@ -283,6 +283,7 @@ class ComputeIns(db.EmbeddedDocument):
     language_env = db.StringField(required=False)  # 语言环境，python，java，php
     deploy_source = db.StringField(required=False)  # 部署来源，image，war，git
     database_config = db.StringField(required=False) # java tomcat 数据库配置
+    lb_methods = db.StringField(required=False)  #负载均衡算法,round_robin 轮询,least_conn 最少连接,ip_hash 会话保持
 
 
     meta = {

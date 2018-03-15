@@ -96,6 +96,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('mongodb_network_id', type=str)
             parser.add_argument('networkName', type=str)
             parser.add_argument('tenantName', type=str)
+            parser.add_argument('lb_methods', type=str)
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -104,6 +105,7 @@ class ApprovalInfo(Resource):
             mongodb_network_id = args.mongodb_network_id
             networkName = args.networkName
             tenantName = args.tenantName
+            lb_methods = args.lb_methods
             network_id_dict={
                 "docker":docker_network_id,
                 "mysql":mysql_network_id,
@@ -143,6 +145,7 @@ class ApprovalInfo(Resource):
                         com.network_id = docker_network_id
                         com.networkName = networkName
                         com.tenantName = tenantName
+                        com.lb_methods = lb_methods
                 if resource_list:
                     for res_obj in resource_list:
                         res_obj.network_id = network_id_dict.get(res_obj.ins_type)
@@ -310,6 +313,7 @@ class Reservation(Resource):
                         "language_env":db_com.language_env,
                         "deploy_source":db_com.deploy_source,
                         "database_config":db_com.database_config,
+                        "lb_methods":db_com.lb_methods,
                     }
                 )
             data['compute_list'] = com
@@ -438,6 +442,7 @@ class ReservationAPI(Resource):
                         "language_env": db_com.language_env,
                         "deploy_source": db_com.deploy_source,
                         "database_config": db_com.database_config,
+                        "lb_methods": db_com.lb_methods,
                     }
                 )
             data['compute_list'] = com
@@ -672,6 +677,7 @@ class CapacityReservation(Resource):
                                 "language_env": db_com.language_env,
                                 "deploy_source": db_com.deploy_source,
                                 "database_config": db_com.database_config,
+                                "lb_methods": db_com.lb_methods,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
