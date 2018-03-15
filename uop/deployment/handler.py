@@ -386,7 +386,7 @@ def check_domain_port(resource,app_image):
                             app["ingress_flag"] = "update"
                         else:
                             app["ingress_flag"] = "create"
-                        if not app.get("domain"):
+                        if not app.get("domain") and compute.domain:
                             app["ingress_flag"] = "delete"
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
