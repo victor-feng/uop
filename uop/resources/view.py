@@ -758,7 +758,8 @@ class ResourceDetail(Resource):
                         "host_env":db_com.host_env,
                         "language_env":db_com.language_env,
                         "deploy_source":db_com.deploy_source,
-                        "database_config":db_com.database_config
+                        "database_config":db_com.database_config,
+                        "lb_methods": db_com.lb_methods,
                     }
                 )
         result['resource_list'] = res
