@@ -130,26 +130,29 @@ class DeployCallback(Resource):
                 dep.deploy_result = "%s_success" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s成功" % deploy_type_dict[deploy_type],
                                      "%s_success" % deploy_type, "res")
-                # 如果回滚成功，修改部署版本
-                if deploy_type == "rollback":
-                    resource = ResourceModel.objects.get(res_id=resource_id)
-                    resource.deploy_name = deploy_name
-                    resource.save()
+
             elif res_status == False and end_flag == True:
                 dep.deploy_result = "%s_fail" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败" % deploy_type_dict[deploy_type],
                                      "%s_fail" % deploy_type, "res")
-                #如果部署失败修改domain和port
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                compute_list = resource.compute_list
-                if domain_flag == "True":
-                    for compute in compute_list:
-                        compute.domain = o_domain
-                        compute.port = o_port
-                        compute.save
-                    resource.save()
 
             dep.save()
+        # 如果回滚成功，修改部署版本
+        if  dep.deploy_result == "success" and deploy_type == "rollback":
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            resource.deploy_name = deploy_name
+            resource.save()
+
+        # 如果部署失败修改domain和port
+        if dep.deploy_result == "fail":
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            compute_list = resource.compute_list
+            if domain_flag == "True":
+                for compute in compute_list:
+                    compute.domain = o_domain
+                    compute.port = o_port
+                    compute.save
+                resource.save()
 
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
