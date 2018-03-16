@@ -289,7 +289,7 @@ class ResourceApplication(Resource):
         if args.reservation_status:
             if args.reservation_status in ["unreserved", "reserving", "set_success","set_fail", "revoke", "approval_fail"]:
                 condition["reservation_status"] = args.reservation_status
-                page_num, page_size = 0, 0
+            page_num, page_size = 0, 0
 
         if agg_by:
             pipeline = []
@@ -336,9 +336,6 @@ class ResourceApplication(Resource):
 
         result_list = []
         res={}
-        if args.reservation_status:
-            resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
-            pass
         try:
             total_count = ResourceModel.objects.filter(**condition).count()
             if page_num and page_size:
