@@ -581,7 +581,7 @@ class ConfigureK8sModel(db.Document):
     namespace = db.StringField(required=False, max_length=50)
 
     meta = {
-            "collection": "configure_nginx",
+            "collection": "configure_k8s",
             "index": [{
                 'fields': ['id'],
                 'unique': True,
