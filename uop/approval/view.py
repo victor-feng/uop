@@ -432,6 +432,7 @@ class ReservationAPI(Resource):
                         "mem": db_com.mem,
                         "image_url": url,
                         "quantity": db_com.quantity,
+                        "domain": db_com.domain,
                         "port": db_com.port,
                         "meta": meta,
                         "health_check": db_com.health_check,
