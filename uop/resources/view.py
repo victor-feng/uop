@@ -20,7 +20,7 @@ from uop.resources import resources_blueprint
 from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig,Approval
 from uop.resources.errors import resources_errors
 from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
-from uop.util import get_CRP_url, response_data
+from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -248,9 +248,11 @@ class ResourceApplication(Resource):
         parser.add_argument('cloud', type=str, location='args')
         parser.add_argument('resource_type', type=str, location='args')
         parser.add_argument('module_name', type=str, location='args')
-
+        parser.add_argument('reservation_status', type=str, location='args')
         args = parser.parse_args()
         agg_by = args.agg_by
+        page_num = int(args.page_num)
+        page_size = int(args.page_size)
         # agg_match = args.agg_match
         condition = {}
         if args.user_id:
@@ -277,13 +279,17 @@ class ResourceApplication(Resource):
         if args.department:
             condition["department"]=args.department
         if args.cloud:
-            condition["cloud"]=args.cloud
+            condition["cloud"] = args.cloud
         if args.resource_type:
-            condition["resource_type"]=args.resource_type
+            condition["resource_type"] = args.resource_type
         if args.project_name:
             condition["project_name"] = args.project_name
         if args.module_name:
             condition["module_name"] = args.module_name
+        if args.reservation_status:
+            if args.reservation_status  in ["unreserved", "reserving", "set_success","set_fail", "revoke", "approval_fail"]:
+                condition["reservation_status__in"] = args.reservation_status
+                page_num, page_size = 0, 0
 
         if agg_by:
             pipeline = []
@@ -330,11 +336,14 @@ class ResourceApplication(Resource):
 
         result_list = []
         res={}
+        if args.reservation_status:
+            resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+            pass
         try:
             total_count = ResourceModel.objects.filter(**condition).count()
-            if args.page_num and args.page_size:
-                skip_count = (args.page_num - 1) * args.page_size
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(args.page_size)
+            if page_num and page_size:
+                skip_count = (page_num - 1) * args.page_size
+                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(page_size)
             else:
                 resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
             res["total_count"]=total_count
@@ -387,6 +396,10 @@ class ResourceApplication(Resource):
                             deploy_result = 'set_success'
                     result['reservation_status'] = deploy_result
                 result_list.append(result)
+        if args.reservation_status:
+            if args.page_num and args.page_size:
+                result_list = [res for res in result_list if res["reservation_status"] == args.reservation_status]
+                result_list, res["total_count"] = pageinit(result_list, args.page_num, args.page_size)
         res["result_list"]=result_list
         code = 200
         ret = {

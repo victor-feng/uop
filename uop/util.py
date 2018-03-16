@@ -139,3 +139,22 @@ def response_data(code, msg, data):
     }
     return ret
 
+def pageinit(items, offset, limit):
+    if offset < 0 or limit < 0:
+        return []
+    assert isinstance(items, list)
+    total_len = len(items)
+    pages = total_len / limit
+    o_page = 1 if total_len % limit else 0
+    total_pages = pages + o_page
+    total_pages = total_pages if total_pages else 1
+    if total_pages > offset:
+        pre = (offset - 1) * limit
+        last = offset * limit
+        page_contents = items[pre:last]
+    elif total_pages == offset:
+        pre = (offset - 1) * limit
+        page_contents = items[pre:]
+    else:
+        page_contents = []
+    return page_contents, total_pages
