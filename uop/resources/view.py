@@ -400,7 +400,11 @@ class ResourceApplication(Resource):
             if args.page_num and args.page_size:
                 result_list = [res for res in result_list if res["reservation_status"] == args.reservation_status]
                 Log.logger.info("result_list:{}".format(result_list))
-                result_list, res["total_count"] = pageinit(result_list, args.page_num, args.page_size)
+                try:
+                    result_list, res["total_count"] = pageinit(result_list, args.page_num, args.page_size)
+                except Exception as exc:
+                    result_list, res["total_count"] = [], 0
+                    Log.logger.error("result_list:{}".format(str(exc)))
         res["result_list"]=result_list
         code = 200
         ret = {
