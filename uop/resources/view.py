@@ -251,8 +251,8 @@ class ResourceApplication(Resource):
         parser.add_argument('reservation_status', type=str, location='args')
         args = parser.parse_args()
         agg_by = args.agg_by
-        page_num = int(args.page_num)
-        page_size = int(args.page_size)
+        page_num = int(args.page_num if args.page_num else 0)
+        page_size = int(args.page_size if args.page_size else 0)
         # agg_match = args.agg_match
         condition = {}
         if args.user_id:
