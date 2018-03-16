@@ -287,7 +287,7 @@ class ResourceApplication(Resource):
         if args.module_name:
             condition["module_name"] = args.module_name
         if args.reservation_status:
-            if args.reservation_status  in ["unreserved", "reserving", "set_success","set_fail", "revoke", "approval_fail"]:
+            if args.reservation_status in ["unreserved", "reserving", "set_success","set_fail", "revoke", "approval_fail"]:
                 condition["reservation_status__in"] = args.reservation_status
                 page_num, page_size = 0, 0
 
@@ -414,7 +414,8 @@ class ResourceApplication(Resource):
                 'res': res
             }
         }
-        return ret, code
+        Log.logger.info("result_list:{}".format(ret))
+        return jsonify(ret)
 
     # @api_permission_control(request)
     @classmethod
