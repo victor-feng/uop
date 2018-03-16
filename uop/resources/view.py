@@ -398,9 +398,7 @@ class ResourceApplication(Resource):
                 result_list.append(result)
         if args.reservation_status:
             if args.page_num and args.page_size:
-                Log.logger.info("result_list1:{}".format(result_list))
                 result_list = [r for r in result_list if r["reservation_status"] == args.reservation_status]
-                Log.logger.info("result_list2:{}".format(result_list))
                 try:
                     result_list, res["total_count"] = pageinit(result_list, args.page_num, args.page_size)
                 except Exception as exc:
@@ -415,7 +413,6 @@ class ResourceApplication(Resource):
                 'res': res
             }
         }
-        Log.logger.info("result_list:{}".format(ret))
         return jsonify(ret)
 
     # @api_permission_control(request)
