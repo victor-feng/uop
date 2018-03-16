@@ -652,6 +652,7 @@ class ResourceProviderCallBack(Resource):
                         status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info[set_flag])
                         dep.deploy_result = "%s_success" % set_flag
                     else:
+                        status_record.status = "%s_success" % set_flag
                         status_record.msg = "%s资源%s成功,开始部署应用" % (mapping_msg_info.get(resource_type,resource_type), mapping_scale_info[set_flag])
                     status_record.deploy_id = deploy_id
                     dep.save()
