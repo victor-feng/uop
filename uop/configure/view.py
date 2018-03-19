@@ -348,7 +348,7 @@ class K8sNamespaceManage(Resource):
             data["namespace_name"] = namespace_name
             if config_map_name:
                 config_map_data = {}
-                data["namespace_name"] = namespace_name
+                data["config_map_name"] = config_map_name
                 config_map_data["filebeat.yml"] = config_map_info
                 data["config_map_data"] = config_map_data
             headers = {'Content-Type': 'application/json'}
