@@ -65,7 +65,7 @@ class Configure(Resource):
                                  tenantName=net.tenantName,
                                  networkName=net.networkName))
         elif category == 'namespace':
-            ret = NetWorkConfig.objects.filter(env=env)
+            ret = ConfigureK8sModel.objects.filter(env=env)
             for net in ret:
                 envs.append(dict(id=net.id,
                                  namespace_name=net.namespace_name,
