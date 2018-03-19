@@ -579,7 +579,10 @@ class NetWorkConfig(db.Document):
 class ConfigureK8sModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     env = db.StringField(required=False, max_length=50)
-    namespace = db.StringField(required=False, max_length=50)
+    namespace_name = db.StringField(required=False)
+    config_map_name = db.StringField(required=False)
+
+
 
     meta = {
             "collection": "configure_k8s",

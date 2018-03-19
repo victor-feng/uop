@@ -68,7 +68,8 @@ class Configure(Resource):
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
                 envs.append(dict(id=net.id,
-                                 namespace=net.namespace,
+                                 namespace_name=net.namespace_name,
+                                 config_map_name=net.config_map_name,
                                 ))
 
         else:  # disconf
@@ -104,7 +105,8 @@ class Configure(Resource):
         parser.add_argument('vlan_id', type=str)
         parser.add_argument('networkName', type=str)
         parser.add_argument('tenantName', type=str)
-        parser.add_argument('namespace', type=str)
+        parser.add_argument('namespace_name', type=str)
+        parser.add_argument('config_map_name', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -117,7 +119,8 @@ class Configure(Resource):
         vlan_id = args.vlan_id if args.vlan_id else ''
         networkName = args.networkName if args.networkName else ''
         tenantName = args.tenantName if args.tenantName else ''
-        namespace = args.namespace if args.namespace else ''
+        namespace_name = args.namespace_name if args.namespace_name else ''
+        config_map_name = args.config_map_name if args.config_map_name else ''
         Log.logger.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
@@ -138,7 +141,8 @@ class Configure(Resource):
             ret = ConfigureK8sModel(
                 id = id,
                 env = env,
-                namespace = namespace,
+                namespace_name = namespace_name,
+                config_map_name = config_map_name,
             ).save()
         else:
             ret = ConfigureDisconfModel(env=env,
@@ -173,7 +177,8 @@ class Configure(Resource):
         parser.add_argument('vlan_id', type=str)
         parser.add_argument('networkName', type=str)
         parser.add_argument('tenantName', type=str)
-        parser.add_argument('namespace', type=str)
+        parser.add_argument('namespace_name', type=str)
+        parser.add_argument('config_map_name', type=str)
         args = parser.parse_args()
         category = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -188,7 +193,8 @@ class Configure(Resource):
         vlan_id = args.vlan_id.strip() if args.vlan_id else ''
         networkName = args.networkName if args.networkName else ''
         tenantName = args.tenantName if args.tenantName else ''
-        namespace = args.namespace if args.namespace else ''
+        namespace_name = args.namespace_name if args.namespace_name else ''
+        config_map_name = args.config_map_name if args.config_map_name else ''
         Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
@@ -199,7 +205,7 @@ class Configure(Resource):
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName)
         elif category == "namespace":
             ret = ConfigureK8sModel.objects(id = id)
-            ret.update(id=id,env=env,namespace=namespace)
+            ret.update(id=id,env=env,namespace_name=namespace_name,config_map_name=config_map_name)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
