@@ -397,7 +397,8 @@ class ResourceApplication(Resource):
             if args.page_num and args.page_size:
                 result_list = [r for r in result_list if r["reservation_status"] == args.reservation_status]
                 try:
-                    result_list, res["total_count"] = pageinit(result_list, args.page_num, args.page_size)
+                    result_list, __ = pageinit(result_list, args.page_num, args.page_size)
+                    res["total_count"] = len(result_list)
                 except Exception as exc:
                     result_list, res["total_count"] = [], 0
                     Log.logger.error("result_list:{}".format(str(exc)))
