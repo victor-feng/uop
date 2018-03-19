@@ -391,3 +391,12 @@ def check_domain_port(resource,app_image):
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
     return app_image
+
+
+def get_database_info(deploy_id,project_name):
+    try:
+        resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
+
+    except Exception as e:
+        pass
+
