@@ -610,13 +610,18 @@ class ResourceProviderCallBack(Resource):
             vid = value.get("vid", '')
             cpu = str(value.get("cpu", '2'))
             mem = str(value.get("mem", '2'))
+            wvip = value.get("wvip", '')
+            vip = value.get("vip", '')
             if wid:
                 vid_list.append(wid)
             if rid:
                 vid_list.append(rid)
             if vid:
                 vid_list.append(vid)
-
+            if wvip:
+                resource.vip = wvip
+            if vip:
+                resource.vip = vip
             for instance in value.get('instance'):
                 os_ins_id = instance.get('os_inst_id')
                 ip = instance.get('ip')

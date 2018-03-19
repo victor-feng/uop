@@ -398,6 +398,7 @@ class ResourceModel(db.DynamicDocument):
     mongodb_network_id = db.StringField(required=False)
     cloud = db.StringField(required=False) #1 = cloud1.0 ,2=cloud2.0
     resource_type = db.StringField(required=False) #资源的类型是应用app，数据库 database
+    vip = db.StringField(required=False) #数据库集群的虚拟ip
 
 
 
