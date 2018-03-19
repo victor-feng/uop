@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask import current_app
-from uop.models import  ResourceModel, ComputeIns
+from uop.models import  ResourceModel, ComputeIns,Deployment
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
 from uop.log import Log
@@ -396,6 +396,8 @@ def check_domain_port(resource,app_image):
 def get_database_info(deploy_id,project_name):
     try:
         resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
+        dep_mysql = Deployment.objects.get(deploy_id=deploy_id)
+
 
     except Exception as e:
         pass
