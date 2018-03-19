@@ -335,7 +335,7 @@ class K8sNamespaceManage(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('namespace_name', type=str, location="json")
         parser.add_argument('config_map_name', type=str, location="json")
-        parser.add_argument('config_map_infp', type=str, location="json")
+        parser.add_argument('config_map_info', type=str, location="json")
         parser.add_argument('env', type=str, location="json")
         args = parser.parse_args()
         env = args.env
