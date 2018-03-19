@@ -205,7 +205,7 @@ class Configure(Resource):
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName)
         elif category == "namespace":
             ret = ConfigureK8sModel.objects(id = id)
-            ret.update(id=id,env=env,namespace_name=namespace_name,config_map_name=config_map_name)
+            ret.update(env=env,namespace_name=namespace_name,config_map_name=config_map_name)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
