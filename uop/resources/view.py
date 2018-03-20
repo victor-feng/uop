@@ -378,6 +378,10 @@ class ResourceApplication(Resource):
                 result['is_rollback'] = resource.is_rollback
                 result['cloud'] = resource.cloud
                 result['resource_type'] = resource.resource_type
+
+                deploy_source = resource.compute_list
+                Log.logger.debug("the resource compute deploy_source is:{}".format(deploy_source))
+
                 resource_id = resource.res_id
                 deploys = Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
