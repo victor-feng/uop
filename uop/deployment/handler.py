@@ -415,7 +415,7 @@ def get_database_info(project_name,database_password):
                 ip_list.extend(ips)
         resources_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
         if resources_mysql:
-            resource_mysql = resources_mysql[0:1]
+            resource_mysql = resources_mysql[0]
             mysql["ip"] = resource_mysql.vip
             mysql["port"] = resource_mysql.port
             mysql["database_user"] = project_name
@@ -424,7 +424,7 @@ def get_database_info(project_name,database_password):
             mysql["database"] = "mysql"
         resources_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")
         if resources_mongodb:
-            resource_mongodb = resources_mongodb[0:1]
+            resource_mongodb = resources_mongodb[0]
             mongodb["vip"] = resource_mongodb.vip
             mongodb["port"] = resource_mongodb.port
             mongodb["db_username"] = project_name
