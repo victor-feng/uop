@@ -404,17 +404,26 @@ def get_database_info(project_name,database_password):
     mysql = {}
     mongodb={}
     try:
-        resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
+        ip_list = []
+        resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"])
+        for res in resources_app:
+            compute_list = res.compute_list
+            for compute in compute_list:
+                ips = compute.ips
+                ip_list.extend(ips)
+        resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")[0:1]
         mysql["ip"] = resource_mysql.vip
         mysql["port"] = resource_mysql.port
         mysql["database_user"] = project_name
         mysql["database_password"] = database_password
+        mysql["ips"] = ip_list
         mysql["database"] = "mysql"
-        resource_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")
+        resource_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")[0:1]
         mongodb["vip"] = resource_mongodb.vip
         mongodb["port"] = resource_mongodb.port
         mongodb["db_username"] = project_name
         mongodb["db_password"] = database_password
+        mongodb["ips"] = ip_list
         mysql["database"] = "mongodb"
         database_info["mysql"] = mysql
         database_info["mongodb"] = mongodb
