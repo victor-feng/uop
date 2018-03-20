@@ -185,6 +185,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     mongodb = database_info.get("mongodb")
     data["mysql"] = mysql
     data["mongodb"] = mongodb
+    Log.logger.debug("11122222222222222222200000000000002222222222222222111111111111111 {}".format(mysql))
     err_msg = None
     result = None
     try:
