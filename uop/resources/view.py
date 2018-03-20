@@ -385,8 +385,9 @@ class ResourceApplication(Resource):
                         result['deploy_source'] = i.deploy_source
                         Log.logger.debug("the resource compute deploy_source is:{}".format(i.deploy_source))
                 else:
-                    result['deploy_source'] = ''
-                    
+                    result['deploy_source'] = ""
+                    Log.logger.debug("the deploy source is None")
+
                 resource_id = resource.res_id
                 deploys = Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
