@@ -97,6 +97,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('networkName', type=str)
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
+            parser.add_argument('namespace', type=str)
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -106,6 +107,7 @@ class ApprovalInfo(Resource):
             networkName = args.networkName
             tenantName = args.tenantName
             lb_methods = args.lb_methods
+            namespace = args.namespace
             network_id_dict={
                 "docker":docker_network_id,
                 "mysql":mysql_network_id,
@@ -146,6 +148,7 @@ class ApprovalInfo(Resource):
                         com.networkName = networkName
                         com.tenantName = tenantName
                         com.lb_methods = lb_methods
+                        com.namespace = namespace
                 if resource_list:
                     for res_obj in resource_list:
                         res_obj.network_id = network_id_dict.get(res_obj.ins_type)
@@ -314,6 +317,7 @@ class Reservation(Resource):
                         "deploy_source":db_com.deploy_source,
                         "database_config":db_com.database_config,
                         "lb_methods":db_com.lb_methods,
+                        "namespace":db_com.namespace,
                     }
                 )
             data['compute_list'] = com
@@ -444,6 +448,7 @@ class ReservationAPI(Resource):
                         "deploy_source": db_com.deploy_source,
                         "database_config": db_com.database_config,
                         "lb_methods": db_com.lb_methods,
+                        "namespace": db_com.namespace,
                     }
                 )
             data['compute_list'] = com
@@ -679,6 +684,7 @@ class CapacityReservation(Resource):
                                 "deploy_source": db_com.deploy_source,
                                 "database_config": db_com.database_config,
                                 "lb_methods": db_com.lb_methods,
+                                "namespace": db_com.namespace,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

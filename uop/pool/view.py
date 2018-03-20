@@ -144,7 +144,7 @@ class GetK8sNamespace(Resource):
             K8sInfos = ConfigureK8sModel.objects.filter(env=env)
             for info in K8sInfos:
                 res = {}
-                namespace_name = info.networkName
+                namespace_name = info.namespace_name
                 if namespace_name:
                     res["namespace_name"] = namespace_name
                     res_list.append(res)
