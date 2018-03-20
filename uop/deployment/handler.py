@@ -413,22 +413,26 @@ def get_database_info(project_name,database_password):
             for compute in compute_list:
                 ips = compute.ips
                 ip_list.extend(ips)
-        resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")[0:1]
-        mysql["ip"] = resource_mysql.vip
-        mysql["port"] = resource_mysql.port
-        mysql["database_user"] = project_name
-        mysql["database_password"] = database_password
-        mysql["ips"] = ip_list
-        mysql["database"] = "mysql"
-        resource_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")[0:1]
-        mongodb["vip"] = resource_mongodb.vip
-        mongodb["port"] = resource_mongodb.port
-        mongodb["db_username"] = project_name
-        mongodb["db_password"] = database_password
-        mongodb["ips"] = ip_list
-        mysql["database"] = "mongodb"
-        database_info["mysql"] = mysql
-        database_info["mongodb"] = mongodb
+        resources_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
+        if resources_mysql:
+            resource_mysql = resources_mysql[0:1]
+            mysql["ip"] = resource_mysql.vip
+            mysql["port"] = resource_mysql.port
+            mysql["database_user"] = project_name
+            mysql["database_password"] = database_password
+            mysql["ips"] = ip_list
+            mysql["database"] = "mysql"
+        resources_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")
+        if resources_mongodb:
+            resource_mongodb = resources_mongodb[0:1]
+            mongodb["vip"] = resource_mongodb.vip
+            mongodb["port"] = resource_mongodb.port
+            mongodb["db_username"] = project_name
+            mongodb["db_password"] = database_password
+            mongodb["ips"] = ip_list
+            mysql["database"] = "mongodb"
+            database_info["mysql"] = mysql
+            database_info["mongodb"] = mongodb
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
