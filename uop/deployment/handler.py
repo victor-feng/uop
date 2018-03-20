@@ -194,9 +194,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             'Content-Type': 'application/json',
         }
         # 上传disconf配置文件
-        Log.logger.debug("00000000000000000000000000000000000000000000000000000")
         upload_disconf_files_to_crp(disconf_info_list=disconf_server_info, env=res_obj['env'])
-        Log.logger.debug("111111111111111111111111000000000000000000000111111111111111111111111111111111111111111")
         file_paths = []
         if deploy_item.mysql_context:
             file_paths.append(('mysql', deploy_item.mysql_context))
@@ -204,10 +202,10 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             file_paths.append(('redis', deploy_item.redis_context))
         if deploy_item.mongodb_context:
             file_paths.append(('mongodb', deploy_item.mongodb_context))
-        Log.logger.debug("111111111111111111111111111111111111111111111111111111111111111111")
         if file_paths:
             res = upload_files_to_crp(file_paths, res_obj['env'])
             cont = json.loads(res.content)
+            Log.logger.debug("11111111111111111111111111111111111111 {}".format(cont))
             if cont.get('code') == 200:
                 for type, path_filename in cont['file_info'].items():
                     data[type]['path_filename'] = path_filename
