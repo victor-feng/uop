@@ -154,13 +154,18 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         "resource_name":res_obj.resource_name,
         "project_name": res_obj.project_name
     }
+    compute_list = res_obj.compute_list
+    if compute_list:
+        compute = compute_list[0]
+        namespace = compute.namespace
+        if namespace:
+            data["namespace"] = namespace
     if appinfo:  # 判断nginx信息，没有则不推送dns配置
         for app_info in res_obj.compute_list:
             dns_info = {'domain': app_info.domain,
                         'domain_ip': app_info.domain_ip
                         }
             data['dns'].append(dns_info)
-    compute_list = res_obj.compute_list
     docker_list = []
     for compute in compute_list:
         try:

@@ -784,6 +784,7 @@ class ResourceDetail(Resource):
                         "deploy_source":db_com.deploy_source,
                         "database_config":db_com.database_config,
                         "lb_methods": db_com.lb_methods,
+                        "namespace": db_com.namespace,
                     }
                 )
         result['resource_list'] = res
@@ -1174,6 +1175,7 @@ class GetMyResourcesInfo(Resource):
         resource_name = request.json.get('resource_name', "")
         cloud = request.json.get('cloud', "2")
         resource_type = request.json.get('resource_type', "2")
+        namespace = request.args.get('namespace')
         Log.logger.info(
             "get_myresource put parameters: user_id:{}, osid:{}, env:{}, operation:{}".format(user_id, osid, env,
                                                                                               operation))
@@ -1195,6 +1197,8 @@ class GetMyResourcesInfo(Resource):
             "resource_name":resource_name,
             "resource_type":resource_type
         }
+        if namespace:
+            data["namespace"] = namespace
         Log.logger.info("URL is:{}".format(manager_url) )
         headers = {'Content-Type': 'application/json'}
         data_str = json.dumps(data)
@@ -1307,16 +1311,20 @@ class Dockerlogs(Resource):
         resource_name = request.args.get('resource_name')
         cloud = request.args.get('cloud')
         user_id = request.args.get('user_id')
+        namespace = request.args.get('namespace')
         crp_url = get_CRP_url(env)
         url = crp_url + "api/openstack/docker/logs/"
-        data = json.dumps({
+        data = {
             "osid": osid,
             "resource_name":resource_name,
             "cloud":cloud,
-        })
+        }
+        if namespace:
+            data["namespace"] = namespace
+        data_str = json.dumps(data)
         try:
-            Log.logger.info("osid:{}".format(data))
-            ret = requests.post(url, data=data, headers={'Content-Type': 'application/json'}, timeout=60)
+            Log.logger.info("osid:{}".format(data_str))
+            ret = requests.post(url, data=data_str, headers={'Content-Type': 'application/json'}, timeout=60)
             Log.logger.info("ret:{}".format(ret.json()))
         except Exception as exc:
             Log.logger.error(str(exc))
