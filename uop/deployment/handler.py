@@ -219,9 +219,11 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         result = requests.post(url=url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
-        err_msg = rq.message.message
+        err_msg = str(rq)
+        Log.logger.error("deploy to crp error {err_msg}".format(err_msg=err_msg))
     except BaseException as e:
-        err_msg = e.message
+        err_msg = str(e)
+        Log.logger.error("deploy to crp error {err_msg}".format(err_msg=err_msg))
     return err_msg, result
 
 
