@@ -141,7 +141,7 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, environment, database_password, appinfo,
-                  disconf_server_info):
+                  disconf_server_info,resource_id):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
@@ -180,14 +180,11 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             Log.logger.error("Deploy to crp get docker info error {e}".format(e=str(e)))
     data['docker'] = docker_list
     #获取数据库信息
-    database_info = get_database_info(res_obj.project_name,database_password)
+    database_info = get_database_info(resource_id,database_password)
     Log.logger.debug("#####uop database info {}".format(database_info))
-    mysql = database_info.get("mysql")
-    if mysql:
-        data["mysql"] = mysql
-    mongodb = database_info.get("mongodb")
-    if mongodb:
-        data["mongodb"] = mongodb
+    if database_info:
+        db_type = database_info["database"]
+        data[db_type] = database_info
     err_msg = None
     result = None
     try:
@@ -210,7 +207,8 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             cont = json.loads(res.content)
             if cont.get('code') == 200:
                 for type, path_filename in cont['file_info'].items():
-                    data[type]['path_filename'] = path_filename
+                    if data.get(type):
+                        data[type]['path_filename'] = path_filename
             elif cont.get('code') == 500:
                 return 'upload sql file failed', result
         Log.logger.debug("{}  {}".format(url, json.dumps(headers)))
@@ -402,38 +400,24 @@ def check_domain_port(resource,app_image):
     return app_image
 
 
-def get_database_info(project_name,database_password):
+def get_database_info(resource_id,database_password):
     database_info={}
-    mysql = {}
-    mongodb={}
+    ip_list = []
     try:
-        ip_list = []
+        resource = ResourceModel.objects.get(res_id=resource_id)
+        project_name = resource.project_name
         resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"])
         for res in resources_app:
             compute_list = res.compute_list
             for compute in compute_list:
                 ips = compute.ips
                 ip_list.extend(ips)
-        resources_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
-        if resources_mysql:
-            resource_mysql = resources_mysql[0]
-            mysql["ip"] = resource_mysql.vip
-            mysql["port"] = resource_mysql.port
-            mysql["database_user"] = project_name
-            mysql["database_password"] = database_password
-            mysql["ips"] = ip_list
-            mysql["database"] = "mysql"
-        resources_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")
-        if resources_mongodb:
-            resource_mongodb = resources_mongodb[0]
-            mongodb["vip"] = resource_mongodb.vip
-            mongodb["port"] = resource_mongodb.port
-            mongodb["db_username"] = project_name
-            mongodb["db_password"] = database_password
-            mongodb["ips"] = ip_list
-            mysql["database"] = "mongodb"
-            database_info["mysql"] = mysql
-            database_info["mongodb"] = mongodb
+            database_info["ip"] = resource.vip
+            database_info["port"] = resource.port
+            database_info["database_user"] = project_name
+            database_info["database_password"] = database_password
+            database_info["ips"] = ip_list
+            database_info["database"] = "mysql"
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
