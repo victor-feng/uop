@@ -6,7 +6,7 @@ import json
 import requests
 from models import db
 from uop.util import get_CRP_url
-from uop.models import ResourceModel, Deployment, Cmdb, ViewCache, Statusvm
+from uop.models import ResourceModel, Deployment, Cmdb, ViewCache, Statusvm,ConfigureK8sModel
 from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
@@ -129,11 +129,14 @@ def flush_crp_to_cmdb():
             for env in env_list:
                 if not env:
                     continue
-                env_ = get_CRP_url(env)
-                crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
-                ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                meta = {k: v[-1] for k,v in ret.items()}
-                osid_status.append(meta)
+                K8sInfos = ConfigureK8sModel.objects.filter(env=env)
+                for info in K8sInfos:
+                    namespace = info.namespace_name
+                    env_ = get_CRP_url(env)
+                    crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
+                    ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                    meta = {k: v[-1] for k,v in ret.items()}
+                    osid_status.append(meta)
                 # Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if osid_status:
