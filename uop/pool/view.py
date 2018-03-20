@@ -6,7 +6,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
-from uop.models import ConfigureEnvModel,NetWorkConfig
+from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -131,6 +131,35 @@ class K8sNetworkApi(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
+class GetK8sNamespace(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str, location="args")
+        args = parser.parse_args()
+        env = args.env
+        data = {}
+        res_list = []
+        try:
+            K8sInfos = ConfigureK8sModel.objects.filter(env=env)
+            for info in K8sInfos:
+                res = {}
+                namespace_name = info.networkName
+                if namespace_name:
+                    res["namespace_name"] = namespace_name
+                    res_list.append(res)
+            data["res_list"] = res_list
+            code = 200
+            msg = "Get k8s namespace info info success"
+        except Exception as e:
+            code = 500
+            data = "Error"
+            msg = "Get k8s namespace info error %s" % str(e)
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
 
 
 
@@ -145,3 +174,4 @@ class K8sNetworkApi(Resource):
 pool_api.add_resource(StatisticAPI, '/statistics')
 pool_api.add_resource(NetworksAPI, '/networks')
 pool_api.add_resource(K8sNetworkApi, '/k8s/network')
+pool_api.add_resource(GetK8sNamespace, '/k8s/getnamespace')
