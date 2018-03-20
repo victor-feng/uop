@@ -110,7 +110,7 @@ class DeployCallback(Resource):
             else:
                 dep.deploy_result = "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg ="%s失败,错误日志为%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg)
+                status_record.msg ="%s %s失败,错误日志为%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg)
             status_record.save()
             dep.save()
         else:
