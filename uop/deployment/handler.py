@@ -181,11 +181,13 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     data['docker'] = docker_list
     #获取数据库信息
     database_info = get_database_info(res_obj.project_name,database_password)
+    Log.logger.debug("#####uop database info {}".format(database_info))
     mysql = database_info.get("mysql")
+    if mysql:
+        data["mysql"] = mysql
     mongodb = database_info.get("mongodb")
-    data["mysql"] = mysql
-    data["mongodb"] = mongodb
-    Log.logger.debug("11122222222222222222200000000000002222222222222222111111111111111 {}".format(mysql))
+    if mongodb:
+        data["mongodb"] = mongodb
     err_msg = None
     result = None
     try:
@@ -206,13 +208,9 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         if file_paths:
             res = upload_files_to_crp(file_paths, res_obj['env'])
             cont = json.loads(res.content)
-            Log.logger.debug("11111111111111111111111111111111111111 {}".format(cont))
             if cont.get('code') == 200:
-                Log.logger.debug("1112222222222222222222222222222222222111111111111111 {}".format(cont['file_info']))
-                Log.logger.debug("1112222222222222222222224444444444444444442222222222222111111111111111 {}".format(cont['file_info'].items()))
                 for type, path_filename in cont['file_info'].items():
                     data[type]['path_filename'] = path_filename
-                    Log.logger.debug("11111111111111333333333333333333333333333333333333333331111 {}".format(cont))
             elif cont.get('code') == 500:
                 return 'upload sql file failed', result
         Log.logger.debug("{}  {}".format(url, json.dumps(headers)))
