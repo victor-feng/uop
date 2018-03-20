@@ -290,11 +290,10 @@ class DeploymentListAPI(Resource):
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
             deploy_obj.approve_status = 'success'
-            resource_info = {}
             message = 'approve_allow success'
             ##推送到crp
-            err_msg, result = deploy_to_crp(deploy_obj, args.environment, resource_info, args.resource_name,
-                                            args.database_password, appinfo, disconf_server_info, cloud)
+            err_msg, result = deploy_to_crp(deploy_obj, args.environment,
+                                            args.database_password, appinfo, disconf_server_info)
             if err_msg:
                 deploy_obj.deploy_result = 'deploy_fail'
                 message = 'deploy_fail'

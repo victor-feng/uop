@@ -140,8 +140,8 @@ def get_resource_by_id(resource_id):
     return err_msg, resource_info
 
 
-def deploy_to_crp(deploy_item, environment, resource_info, resource_name, database_password, appinfo,
-                  disconf_server_info,cloud):
+def deploy_to_crp(deploy_item, environment, database_password, appinfo,
+                  disconf_server_info):
     res_obj = ResourceModel.objects.get(res_id=deploy_item.resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
@@ -179,6 +179,12 @@ def deploy_to_crp(deploy_item, environment, resource_info, resource_name, databa
         except AttributeError as e:
             Log.logger.error("Deploy to crp get docker info error {e}".format(e=str(e)))
     data['docker'] = docker_list
+    #获取数据库信息
+    database_info = get_database_info(res_obj.project_name,database_password)
+    mysql = database_info.get("mysql")
+    mongodb = database_info.get("mongodb")
+    data["mysql"] = mysql
+    data["mongodb"] = mongodb
     err_msg = None
     result = None
     try:
@@ -393,12 +399,27 @@ def check_domain_port(resource,app_image):
     return app_image
 
 
-def get_database_info(deploy_id,project_name):
+def get_database_info(project_name,database_password):
+    database_info={}
+    mysql = {}
+    mongodb={}
     try:
         resource_mysql = ResourceModel.objects.filter(project_name=project_name,resource_type = "mysql")
-        dep_mysql = Deployment.objects.get(deploy_id=deploy_id)
-
-
+        mysql["ip"] = resource_mysql.vip
+        mysql["port"] = resource_mysql.port
+        mysql["database_user"] = project_name
+        mysql["database_password"] = database_password
+        mysql["database"] = "mysql"
+        resource_mongodb = ResourceModel.objects.filter(project_name=project_name, resource_type="mongodb")
+        mongodb["vip"] = resource_mongodb.vip
+        mongodb["port"] = resource_mongodb.port
+        mongodb["db_username"] = project_name
+        mongodb["db_password"] = database_password
+        mysql["database"] = "mongodb"
+        database_info["mysql"] = mysql
+        database_info["mongodb"] = mongodb
     except Exception as e:
-        pass
+        err_msg = "Uop get database info error {e}".format(e=str(e))
+        Log.logger.error(err_msg)
+    return database_info
 
