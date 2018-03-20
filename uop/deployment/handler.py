@@ -207,8 +207,10 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             cont = json.loads(res.content)
             Log.logger.debug("11111111111111111111111111111111111111 {}".format(cont))
             if cont.get('code') == 200:
+                Log.logger.debug("1112222222222222222222222222222222222111111111111111 {}".format(cont['file_info']))
                 for type, path_filename in cont['file_info'].items():
                     data[type]['path_filename'] = path_filename
+                    Log.logger.debug("11111111111111333333333333333333333333333333333333333331111 {}".format(cont))
             elif cont.get('code') == 500:
                 return 'upload sql file failed', result
         Log.logger.debug("{}  {}".format(url, json.dumps(headers)))
