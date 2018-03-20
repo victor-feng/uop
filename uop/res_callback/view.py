@@ -605,13 +605,14 @@ class ResourceProviderCallBack(Resource):
         vid_list = []
         for key, value in db_info.items():
             os_ins_ids = []
-            wid = value.get("wvid", '')
-            rid = value.get("rvid", '')
-            vid = value.get("vid", '')
+            wid = value.get("wvid")
+            rid = value.get("rvid")
+            vid = value.get("vid")
             cpu = str(value.get("cpu", '2'))
             mem = str(value.get("mem", '2'))
-            wvip = value.get("wvip", '')
-            vip = value.get("vip", '')
+            wvip = value.get("wvip")
+            vip = value.get("vip")
+            port = value.get("port")
             if wid:
                 vid_list.append(wid)
             if rid:
@@ -622,6 +623,8 @@ class ResourceProviderCallBack(Resource):
                 resource.vip = wvip
             if vip:
                 resource.vip = vip
+            if port:
+                resource.port = port
             for instance in value.get('instance'):
                 os_ins_id = instance.get('os_inst_id')
                 ip = instance.get('ip')
