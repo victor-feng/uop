@@ -24,6 +24,13 @@ deploy_type_dict = {
     "reduce": "缩容"
 }
 
+mapping_msg_info = {
+    'app' : '容器云应用',
+    'kvm' : '虚拟化云应用',
+    'mysql':'mysql数据库',
+    'mongodb':'mongodb数据库',
+}
+
 
 class DeployCallback(Resource):
     # @api_permission_control(request)
@@ -99,20 +106,25 @@ class DeployCallback(Resource):
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_success" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg = "%s应用集群%s成功" % (res_type,deploy_type_dict[deploy_type])
+                status_record.msg = "%s %s成功" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type])
             else:
                 dep.deploy_result = "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg ="%s应用集群%s失败,错误日志为%s" % (res_type,deploy_type_dict[deploy_type],msg)
+                status_record.msg ="%s失败,错误日志为%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg)
             status_record.save()
             dep.save()
         else:
             if dep.deploy_result == "success":
-                dep.deploy_result = "%s_docker_success" % deploy_type
-                status_record.status = "%s_docker_success" % deploy_type
-                status_record.unique_flag = unique_flag
-                status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
-                deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
+                if res_type == "docker":
+                    dep.deploy_result = "%s_docker_success" % deploy_type
+                    status_record.status = "%s_docker_success" % deploy_type
+                    status_record.unique_flag = unique_flag
+                    status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
+                    deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
+                else:
+                    dep.deploy_result = "%s_success" % deploy_type
+                    status_record.unique_flag = unique_flag
+                    status_record.msg = "%s %s成功" % (mapping_msg_info[res_type], deploy_type_dict[deploy_type])
             elif dep.deploy_result == "fail":
                 if res_type == "docker":
                     dep.deploy_result = "%s_docker_fail" % deploy_type
