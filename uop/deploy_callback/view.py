@@ -25,7 +25,7 @@ deploy_type_dict = {
 }
 
 mapping_msg_info = {
-    'app' : '容器云应用',
+    'docker' : '容器云应用',
     'kvm' : '虚拟化云应用',
     'mysql':'mysql数据库',
     'mongodb':'mongodb数据库',
