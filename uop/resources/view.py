@@ -383,7 +383,7 @@ class ResourceApplication(Resource):
                     deploy_source_list = resource.compute_list
                     for i in deploy_source_list:
                         result['deploy_source'] = i.deploy_source
-                        Log.logger.debug("the resource compute deploy_source is:{}".format(i.deploy_source))
+                        # Log.logger.debug("the resource compute deploy_source is:{}".format(i.deploy_source))
                 else:
                     result['deploy_source'] = ""
 
