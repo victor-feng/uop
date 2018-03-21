@@ -130,12 +130,19 @@ def flush_crp_to_cmdb():
                 if not env:
                     continue
                 K8sInfos = ConfigureK8sModel.objects.filter(env=env)
-                for info in K8sInfos:
-                    namespace = info.namespace_name
+                if K8sInfos:
+                    for info in K8sInfos:
+                        namespace = info.namespace_name
+                        env_ = get_CRP_url(env)
+                        crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
+                        ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                        meta = {k: v[-1] for k,v in ret.items()}
+                        osid_status.append(meta)
+                else:
                     env_ = get_CRP_url(env)
-                    crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
+                    crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
                     ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                    meta = {k: v[-1] for k,v in ret.items()}
+                    meta = {k: v[-1] for k, v in ret.items()}
                     osid_status.append(meta)
                 # Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
