@@ -1133,7 +1133,6 @@ class GetMyResourcesInfo(Resource):
             page_count = request.args.get('page_count')
             ip = request.args.get('ip', "")
         result_list = []
-        Log.logger.debug("------------------------{}".format(APP_ENV))
         if APP_ENV == "development":
             # uid, token = get_uid_token()
             # params = {
@@ -1158,7 +1157,6 @@ class GetMyResourcesInfo(Resource):
             #     "env": env
             # }
             # return get_from_cmdb2(params, filters)
-            Log.logger.debug("------------222222222222222222222222------------{}".format(APP_ENV))
             return get_from_uop(args)
         url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
             args.resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
