@@ -318,6 +318,7 @@ class Reservation(Resource):
                         "database_config":db_com.database_config,
                         "lb_methods":db_com.lb_methods,
                         "namespace":db_com.namespace,
+                        "ready_probe_path":db_com.ready_probe_path,
                     }
                 )
             data['compute_list'] = com
@@ -449,6 +450,7 @@ class ReservationAPI(Resource):
                         "database_config": db_com.database_config,
                         "lb_methods": db_com.lb_methods,
                         "namespace": db_com.namespace,
+                        "ready_probe_path": db_com.ready_probe_path,
                     }
                 )
             data['compute_list'] = com
@@ -685,6 +687,7 @@ class CapacityReservation(Resource):
                                 "database_config": db_com.database_config,
                                 "lb_methods": db_com.lb_methods,
                                 "namespace": db_com.namespace,
+                                "ready_probe_path": db_com.ready_probe_path,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

@@ -160,10 +160,12 @@ class ResourceApplication(Resource):
                     language_env= compute.get("language_env")
                     deploy_source = compute.get("deploy_source")
                     database_config = compute.get("database_config")
+                    ready_probe_path = compute.get("ready_probe_path")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
-                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config)
+                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
+                                             ready_probe_path=ready_probe_path)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -600,11 +602,13 @@ class ResourceApplication(Resource):
                     language_env = compute.get("language_env")
                     deploy_source = compute.get("deploy_source")
                     database_config = compute.get("database_config")
+                    ready_probe_path = compute.get("ready_probe_path")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                              health_check=health_check,network_id=network_id,networkName=networkName,
                                              tenantName=tenantName,host_env=host_env
-                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config)
+                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
+                                             ready_probe_path=ready_probe_path)
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
@@ -785,6 +789,7 @@ class ResourceDetail(Resource):
                         "database_config":db_com.database_config,
                         "lb_methods": db_com.lb_methods,
                         "namespace": db_com.namespace,
+                        "ready_probe_path" : db_com.ready_probe_path,
                     }
                 )
         result['resource_list'] = res
@@ -923,11 +928,13 @@ class ResourceDetail(Resource):
             language_env = compute.get("language_env")
             deploy_source = compute.get("deploy_source")
             database_config = compute.get("database_config")
+            ready_probe_path = compute.get("ready_probe_path")
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
                                      quantity=quantity, port=port,docker_meta=meta_str,
                                      health_check=health_check,network_id=network_id,networkName=networkName,
                                      tenantName=tenantName,host_env=host_env,language_env=language_env,
-                                     deploy_source=deploy_source,database_config=database_config)
+                                     deploy_source=deploy_source,database_config=database_config,
+                                     ready_probe_path=ready_probe_path)
             resource_application.compute_list.append(compute_ins)
 
         try:
