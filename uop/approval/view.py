@@ -149,6 +149,7 @@ class ApprovalInfo(Resource):
                         com.tenantName = tenantName
                         com.lb_methods = lb_methods
                         com.namespace = namespace
+                        com.save()
                 if resource_list:
                     for res_obj in resource_list:
                         res_obj.network_id = network_id_dict.get(res_obj.ins_type)
