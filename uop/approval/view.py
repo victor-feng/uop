@@ -294,7 +294,8 @@ class Reservation(Resource):
                 deploy_source = db_com.deploy_source
                 host_env = db_com.host_env
                 url = db_com.url
-                if host_env == "docker" and deploy_source == "image":
+                ready_probe_path = db_com.ready_probe_path
+                if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
                     url = BASE_K8S_IMAGE
                 com.append(
                     {
@@ -427,7 +428,8 @@ class ReservationAPI(Resource):
                 host_env = db_com.host_env
                 deploy_source = db_com.deploy_source
                 url = db_com.url
-                if host_env == "docker" and deploy_source == "image":
+                ready_probe_path = db_com.ready_probe_path
+                if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
                     url = BASE_K8S_IMAGE
                 com.append(
                     {
