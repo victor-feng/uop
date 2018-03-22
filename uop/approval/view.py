@@ -656,7 +656,8 @@ class CapacityReservation(Resource):
                 deploy_source = db_com.deploy_source
                 host_env = db_com.host_env
                 url = db_com.url
-                if host_env == "docker" and deploy_source == "image":
+                ready_probe_path = db_com.ready_probe_path
+                if host_env == "docker" and deploy_source == "image" and ready_probe_path:
                     url = BASE_K8S_IMAGE
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
