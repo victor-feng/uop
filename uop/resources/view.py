@@ -1213,6 +1213,7 @@ class GetMyResourcesInfo(Resource):
         ret = requests.post(manager_url, data=data_str, headers=headers)
         # 操作成功 调用查询docker状态的接口
         response = ret.json()
+        """
         if response.get('code') == 200:
             flush_crp_to_cmdb_by_osid(osid, env)
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
@@ -1223,7 +1224,7 @@ class GetMyResourcesInfo(Resource):
             elif operation == 'restart':
                 status = 'rebooting'
             ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
-
+        """
         return response
 
     # @api_permission_control(request)
