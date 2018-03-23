@@ -24,7 +24,7 @@ from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop, delete_uop, get_counts
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop, delete_uop, get_counts,updata_deployment_info
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -1213,6 +1213,8 @@ class GetMyResourcesInfo(Resource):
         ret = requests.post(manager_url, data=data_str, headers=headers)
         # 操作成功 调用查询docker状态的接口
         response = ret.json()
+        if response.get('code') == 200 and cloud == "2":
+            updata_deployment_info(resource_name,env,url)
         """
         if response.get('code') == 200:
             flush_crp_to_cmdb_by_osid(osid, env)
