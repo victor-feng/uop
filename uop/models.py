@@ -566,6 +566,7 @@ class NetWorkConfig(db.Document):
     networkName = db.StringField(default='',)
     tenantName = db.StringField(default='',)
     is_deleted = db.IntField(required=False, default=0)
+    cloud = db.IntField(required=False)
 
     meta = {
         'collection': 'network_config',

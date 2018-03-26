@@ -63,7 +63,8 @@ class Configure(Resource):
                                  sub_network=net.sub_network,
                                  vlan_id=net.vlan_id,
                                  tenantName=net.tenantName,
-                                 networkName=net.networkName))
+                                 networkName=net.networkName,
+                                 cloud = net.cloud))
         elif category == 'namespace':
             ret = ConfigureK8sModel.objects.filter(env=env)
             for net in ret:
@@ -107,6 +108,7 @@ class Configure(Resource):
         parser.add_argument('tenantName', type=str)
         parser.add_argument('namespace_name', type=str)
         parser.add_argument('config_map_name', type=str)
+        parser.add_argument('cloud', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -121,6 +123,7 @@ class Configure(Resource):
         tenantName = args.tenantName if args.tenantName else ''
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
+        cloud = args.cloud if args.cloud else ''
         Log.logger.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
@@ -136,7 +139,8 @@ class Configure(Resource):
                                 vlan_id=vlan_id,
                                 tenantName=tenantName,
                                 networkName=networkName,
-                                id=id).save()
+                                id=id,
+                                cloud = cloud).save()
         elif category == "namespace":
             ret = ConfigureK8sModel(
                 id = id,
@@ -179,6 +183,7 @@ class Configure(Resource):
         parser.add_argument('tenantName', type=str)
         parser.add_argument('namespace_name', type=str)
         parser.add_argument('config_map_name', type=str)
+        parser.add_argument('cloud', type=str)
         args = parser.parse_args()
         category = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -195,6 +200,7 @@ class Configure(Resource):
         tenantName = args.tenantName if args.tenantName else ''
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
+        cloud = args.cloud if args.cloud else ''
         Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
@@ -202,7 +208,7 @@ class Configure(Resource):
             ret.update(name=name, ip=ip)
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
-            ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName)
+            ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName,cloud=cloud)
         elif category == "namespace":
             ret = ConfigureK8sModel.objects(id = id)
             ret.update(env=env,namespace_name=namespace_name,config_map_name=config_map_name)
@@ -281,6 +287,7 @@ class ConfigureNetwork(Resource):
                 network_info["vlan_name"] = name
                 network_info["vlan_id"] = info[0]
                 network_info["subnets"] = info[1]
+                network_info["cloud"] = info[2]
                 network_list.append(network_info)
         except Exception as e:
             err_msg = e.args

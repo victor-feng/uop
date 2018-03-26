@@ -23,10 +23,12 @@ class NetworksAPI(Resource):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('env', type=str,location="args")
+            parser.add_argument('cloud', type=str, location="args")
             args = parser.parse_args()
             env=args.env
+            cloud = args.cloud
             res = []
-            Networks=NetWorkConfig.objects.filter(env=env)
+            Networks=NetWorkConfig.objects.filter(env=env,cloud=cloud)
             for network in Networks:
                 network_info={}
                 name=network.name
