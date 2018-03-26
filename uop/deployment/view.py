@@ -293,7 +293,7 @@ class DeploymentListAPI(Resource):
             message = 'approve_allow success'
             ##推送到crp
             err_msg, result = deploy_to_crp(deploy_obj, args.environment,
-                                            args.database_password, appinfo, disconf_server_info,args.resource_id)
+                                            args.database_password, appinfo, disconf_server_info)
             if err_msg:
                 deploy_obj.deploy_result = 'deploy_fail'
                 message = 'deploy_fail'
@@ -618,10 +618,8 @@ class DeploymentListAPI(Resource):
                 if not err_msg:
                     err_msg, result = deploy_to_crp(deploy,
                                                     environment,
-                                                    resource_info,
-                                                    resource_name,
                                                     database_password,
-                                                    appinfo, disconf_server_info,cloud)
+                                                    appinfo, disconf_server_info)
                     if err_msg:
                         deploy.deploy_result = 'deploy_fail'
                 deploy.save()
