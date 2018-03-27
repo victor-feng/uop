@@ -424,7 +424,7 @@ def get_database_info(resource_id,database_password):
             database_info["database_user"] = project_name
             database_info["database_password"] = database_password
             database_info["ips"] = ip_list
-            database_info["database"] = "mysql"
+            database_info["database"] = resource.resource_type
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
