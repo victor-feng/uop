@@ -833,20 +833,20 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.set_flag = set_flag
                 status_record.save()
             if var_dict:
-                Log.logger.info("This is var to image operations")
+                Log.logger.info("This is war to image operations")
                 resource_id = var_dict.get('resource_id')
-                var_to_image_status = var_dict.get('var_to_image_status')
+                war_to_image_status = var_dict.get('war_to_image_status')
                 status_record = StatusRecord()
                 status_record.res_id = resource_id
-                if var_to_image_status == "var_to_image_running":
-                    status_record.status = var_to_image_status
-                    status_record.msg = "var包转镜像进行中"
-                elif var_to_image_status == "var_to_image_success":
-                    status_record.status = var_to_image_status
-                    status_record.msg = "var包转镜像完成"
+                if war_to_image_status == "war_to_image_running":
+                    status_record.status = war_to_image_status
+                    status_record.msg = "war包转镜像进行中"
+                elif war_to_image_status == "war_to_image_success":
+                    status_record.status = war_to_image_status
+                    status_record.msg = "war包转镜像完成"
                 status_record.set_flag = set_flag
                 status_record.save()
-                Log.logger.info("Var to image operations successful")
+                Log.logger.info("War to image operations successful")
             if build_image:
                 Log.logger.info("This is build image progress")
                 resource_id = build_image.get('resource_id')
