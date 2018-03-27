@@ -755,6 +755,8 @@ class ResourceStatusProviderCallBack(Resource):
         instance = request_data.get('instance', '')
         db_push = request_data.get('db_push', '')
         set_flag = request_data.get('set_flag', '')
+        var_dict = request_data.get('var_dict', '')
+        build_image = request_data.get("build_image", '')
         try:
             if instance:
                 resource_id = instance.get('resource_id')
@@ -830,6 +832,37 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
+            if var_dict:
+                Log.logger.info("This is var to image operations")
+                resource_id = var_dict.get('resource_id')
+                var_to_image_status = var_dict.get('var_to_image_status')
+                status_record = StatusRecord()
+                status_record.res_id = resource_id
+                if var_to_image_status == "var_to_image_running":
+                    status_record.status = var_to_image_status
+                    status_record.msg = "var包转镜像进行中"
+                elif var_to_image_status == "var_to_image_success":
+                    status_record.status = var_to_image_status
+                    status_record.msg = "var包转镜像完成"
+                status_record.set_flag = set_flag
+                status_record.save()
+                Log.logger.info("Var to image operations successful")
+            if build_image:
+                Log.logger.info("This is build image progress")
+                resource_id = build_image.get('resource_id')
+                build_image_status = build_image.get('build_image_status')
+                status_record = StatusRecord()
+                status_record.res_id = resource_id
+
+                if build_image_status == "build_image_running":
+                    status_record.status = build_image_status
+                    status_record.msg = "镜像构建中"
+                elif build_image_status == "build_image_success":
+                    status_record.status = build_image_status
+                    status_record.msg = "镜像构建完成"
+                status_record.set_flag = set_flag
+                status_record.save()
+                Log.logger.info("Build image successfully")
         except Exception as e:
             Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
             code = 500
