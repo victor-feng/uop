@@ -419,12 +419,12 @@ def get_database_info(resource_id,database_password):
             for compute in compute_list:
                 ips = compute.ips
                 ip_list.extend(ips)
-            database_info["ip"] = resource.vip
-            database_info["port"] = resource.port
-            database_info["database_user"] = project_name
-            database_info["database_password"] = database_password
-            database_info["ips"] = ip_list
-            database_info["database"] = resource.resource_type
+        database_info["ip"] = resource.vip
+        database_info["port"] = resource.port
+        database_info["database_user"] = project_name
+        database_info["database_password"] = database_password
+        database_info["ips"] = ip_list
+        database_info["database"] = resource.resource_type
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
