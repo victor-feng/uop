@@ -757,6 +757,7 @@ class ResourceStatusProviderCallBack(Resource):
         set_flag = request_data.get('set_flag', '')
         var_dict = request_data.get('var_dict', '')
         build_image = request_data.get("build_image", '')
+        push_image = request_data.get("push_image", '')
         try:
             if instance:
                 resource_id = instance.get('resource_id')
@@ -863,6 +864,21 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.set_flag = set_flag
                 status_record.save()
                 Log.logger.info("Build image successfully")
+            if push_image:
+                resource_id = push_image.get("resource_id")
+                push_image_status = push_image.get("push_image_status")
+                status_record = StatusRecord()
+                status_record.res_id = resource_id
+                
+                if push_image_status == "push_image_running":
+                    status_record.status = push_image_status
+                    status_record.msg = "推送镜像中"
+                elif push_image_status == "push_image_success":
+                    status_record.status = push_image_status
+                    status_record.msg = "镜像推送完成"
+                status_record.set_flag = set_flag
+                status_record.save()
+
         except Exception as e:
             Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
             code = 500
