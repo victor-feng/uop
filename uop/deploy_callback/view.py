@@ -150,7 +150,7 @@ class DeployCallback(Resource):
 
             dep.save()
         # 如果回滚成功，修改部署版本
-        if  dep.deploy_result == "success" and deploy_type == "rollback":
+        if  dep.deploy_result == "rollback_success" and deploy_type == "rollback":
             resource = ResourceModel.objects.get(res_id=resource_id)
             resource.deploy_name = deploy_name
             resource.save()
