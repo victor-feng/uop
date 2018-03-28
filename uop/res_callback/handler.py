@@ -318,6 +318,7 @@ def crp_data_cmdb(args):
 
 
 def save_resource_id(instances, resource):
+    Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
