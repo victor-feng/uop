@@ -16,7 +16,7 @@ save_lock = Lock()
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
-
+CMDB2_ENTITY = configs[APP_ENV].CMDB2_ENTITY
 __all__ = [
     "transition_state_logger", "transit_request_data",
     "transit_repo_items", "do_transit_repo_items",
@@ -319,6 +319,17 @@ def crp_data_cmdb(args):
 
 def save_resource_id(instances, resource):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
+    statusvm = Statusvm.objects.filter(resource_id=resource.res_id)
+    get_view_num = lambda x: x[0] if x else ""
+    if statusvm:
+        ins = [ins for ins in instances if ins["_id"] == 1][0]
+        view_id = ins["instance_id"]
+        view_num = get_view_num(
+            [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == ins["model_id"]]
+        ),
+        for sv in statusvm:
+            sv.resource_view_id = view_id
+            sv.view_num = view_num
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
         try:

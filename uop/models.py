@@ -64,7 +64,8 @@ class Statusvm(db.DynamicDocument):
     """
     resource_name = db.StringField(required=True)
     resource_id = db.StringField(required=True)
-
+    resource_view_id = db.StringField(required=False)
+    view_num = db.StringField(required=False)
     business_name = db.StringField(required=True)
     module_name = db.StringField(required=True)
     project_name = db.StringField(required=True)
@@ -76,6 +77,7 @@ class Statusvm(db.DynamicDocument):
     osid = db.StringField(required=True)
     ip = db.StringField(required=False)
     os_type = db.StringField(required=False)
+
     user_id = db.StringField(required=False)
     status = db.StringField(required=True)
     create_time = db.DateTimeField(required=False)
