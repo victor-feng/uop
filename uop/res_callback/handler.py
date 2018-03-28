@@ -438,6 +438,45 @@ def judge_value_format(item, pro, attach):
         return ""
 
 
+def get_host_instance_id(name_ip):
+    name, ip = "", ""
+    if len(name_ip) == 2:
+        ip = name_ip[1]
+    else:
+        name = name_ip[0]
+    url = CMDB2_URL + "cmdb/openapi/scene_graph/action/"
+    uid, token = get_uid_token()
+    view_num = CMDB2_VIEWS["8"][0] # 物理机视图num
+    res_id = CMDB2_VIEWS["8"][2] # 物理机实体id
+    data = {
+        "uid": uid,
+        "token": token,
+        "sign": "",
+        "data": {
+            "id": "",
+            "name": view_num,
+            "entity": [
+                {
+                    "id": res_id,
+                    "parameters": [{
+                        "code": "IP" if ip else "baseInfo",
+                        "value": ip if ip else name
+                    }]
+                }
+            ]
+        }
+    }
+    data_str = json.dumps(data)
+    try:
+        # Log.logger.info("cmdb2_graph_search data:{}".format(data))
+        ret_data = requests.post(url, data=data_str, timeout=5).json()["data"]
+        Log.logger.info("####data:{}".format(ret_data))
+    except Exception as exc:
+        ret_data = []
+        Log.logger.error("data error:{}".format(str(exc)))
+    return ret_data
+
+
 def format_data_cmdb(relations, item, model, attach, index, up_level, physical_server_model_id=None):
     '''
 
@@ -472,6 +511,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         )
     }
     if item.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+        get_host_instance_id(item.get("physical_server"))
         r = [
             dict(
                 rel, start_id = i["_id"],
