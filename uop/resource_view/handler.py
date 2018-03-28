@@ -135,8 +135,8 @@ def cmdb2_graph_search(args):
                 {
                     "id": res_id,
                     "parameters": [{
-                        "code": args.code if args.code else "baseInfo",
-                        "value": args.value.decode(encoding="utf-8")
+                        "code": args.code if args.code else "",
+                        "value": args.value.decode(encoding="utf-8") if args.value else ""
                     }]
                 }
             ]
