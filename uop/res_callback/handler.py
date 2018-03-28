@@ -311,30 +311,30 @@ def crp_data_cmdb(args):
     if set_flag in ["increase", "reduce"]:
         if cloud == "2" and resource_type == "app":
             flag = True
-    if not flag: # 按照常规扩缩容
-        instances, relations = [], []
-        statusvm = Statusvm.objects.filter(resource_id=res_id)
-        docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
-        if statusvm:
-            for sv in statusvm:
-                tomcat_instance_id = sv.view_id
-        tomcat_level = {
-            "instance_id": tomcat_instance_id,
-            "model_id": CMDB2_ENTITY["tomcat"],
-            "_id": ""
-        }
-        for ct in args["container"]:
-            attach = {
-                "image_name": ct.get("image_url", ""),
-                "create_date": args.get("created_time", "")
+        if not flag: # 按照常规扩缩容
+            instances, relations = [], []
+            statusvm = Statusvm.objects.filter(resource_id=res_id)
+            docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
+            if statusvm:
+                for sv in statusvm:
+                    tomcat_instance_id = sv.resource_view_id
+            tomcat_level = {
+                "instance_id": tomcat_instance_id,
+                "model_id": CMDB2_ENTITY["tomcat"],
+                "_id": ""
             }
-            for index, ins in enumerate(ct["instance"]):
-                ins["baseinfo"] = ins.get("instance_name")
-                i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level)
-                instances.append(i)
-                relations.extend(r)
-
-
+            for ct in args["container"]:
+                attach = {
+                    "image_name": ct.get("image_url", ""),
+                    "create_date": args.get("created_time", "")
+                }
+                for index, ins in enumerate(ct["instance"]):
+                    ins["baseinfo"] = ins.get("instance_name")
+                    i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level)
+                    instances.append(i)
+                    relations.extend(r)
+        else:
+            instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     else:
         instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
