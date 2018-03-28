@@ -331,6 +331,7 @@ def save_resource_id(instances, res_id):
         for sv in statusvm:
             sv.resource_view_id = view_id
             sv.view_num = view_num
+            sv.save()
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
