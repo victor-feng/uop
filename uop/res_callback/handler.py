@@ -292,7 +292,7 @@ def crp_data_cmdb(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations(CMDB2_VIEWS["1"][0]) # B7
     models_list = data["entity"]
-    resource = ResourceModel.objects(res_id=args.get('resource_id'))
+    res_id=args.get('resource_id')
     instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
     data = {
@@ -310,16 +310,17 @@ def crp_data_cmdb(args):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], resource)
+            save_resource_id(ret["data"]["instance"], res_id)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, resource):
+def save_resource_id(instances, res_id):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
-    statusvm = Statusvm.objects.filter(resource_id=resource.res_id)
+    resource = ResourceModel.objects(res_id=res_id)
+    statusvm = Statusvm.objects.filter(resource_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     if statusvm:
         ins = [ins for ins in instances if ins["_id"] == 1][0]
@@ -480,7 +481,7 @@ def get_host_instance_id(name_ip):
     }
     data_str = json.dumps(data)
     try:
-        # Log.logger.info("cmdb2_graph_search data:{}".format(data))
+        Log.logger.info("cmdb2_graph_search request data:{}".format(data))
         ret_data = requests.post(url, data=data_str, timeout=5).json()["data"]
         Log.logger.info("####data:{}".format(ret_data))
     except Exception as exc:
