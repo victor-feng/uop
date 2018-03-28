@@ -481,7 +481,6 @@ class DeploymentListAPI(Resource):
         try:
             deploy = Deployment.objects.get(deploy_id=deploy_id)
             if len(deploy):
-
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
                 disconf_list = deploy.disconf_list
@@ -506,8 +505,11 @@ class DeploymentListAPI(Resource):
                             domain_list.append({"domain": domain, 'domain_ip': domain_ip})
                             crp_data['domain_list'] = domain_list
                         # 调用CRP 删除nginx资源
-                        crp_data = json.dumps(crp_data)
-                        requests.delete(crp_url, data=crp_data)
+                        d_count = ResourceModel.objects.filter(domain=domain).count()
+                        #如果还有一个以上的工程使用这个domain 不删除
+                        if d_count <= 1:
+                            crp_data = json.dumps(crp_data)
+                            requests.delete(crp_url, data=crp_data)
                 deploy.delete()
 
                 # 回写CMDB

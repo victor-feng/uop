@@ -107,6 +107,7 @@ class ResourceApplication(Resource):
             compute_list = info.get("compute_list")
             cloud = info.get("cloud","")
             resource_type = info.get("resource_type","")
+            domain = info.get("domain", "")
             res_info_dict["resource_id"] = res_id
             res_info_dict["resource_name"] = resource_name
             res_info_dict["project_id"] = cmdb2_project_id
@@ -120,7 +121,7 @@ class ResourceApplication(Resource):
                                                  user_name=user_name, user_id=user_id,env=env,
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
-                                                 cloud = cloud,resource_type = resource_type)
+                                                 cloud = cloud,resource_type = resource_type,domain=domain)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -161,11 +162,12 @@ class ResourceApplication(Resource):
                     deploy_source = compute.get("deploy_source")
                     database_config = compute.get("database_config")
                     ready_probe_path = compute.get("ready_probe_path")
+                    domain_path = compute.get("domain_path")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
                                              ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
-                                             ready_probe_path=ready_probe_path)
+                                             ready_probe_path=ready_probe_path,domain_path=domain_path)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -456,10 +458,12 @@ class ResourceApplication(Resource):
                         domain = compute.domain
                         domain_ip = compute.domain_ip
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip})
-                    crp_data['domain_list'] = domain_list
-                    crp_data = json.dumps(crp_data)
-                    requests.delete(crp_url, data=crp_data)
-                    # deploy.delete()
+                    d_count = ResourceModel.objects.filter(domain=domain).count()
+                    if d_count <= 1:
+                        crp_data['domain_list'] = domain_list
+                        crp_data = json.dumps(crp_data)
+                        requests.delete(crp_url, data=crp_data)
+                        # deploy.delete()
                 # 调用CRP 删除资源
                 os_ins_ip_list = resources.os_ins_ip_list
                 for os_ip in os_ins_ip_list:
@@ -542,6 +546,7 @@ class ResourceApplication(Resource):
         parser.add_argument('compute_list', type=list, location='json')
         parser.add_argument('cloud', type=str)
         parser.add_argument('resource_type', type=str)
+        parser.add_argument('domain', type=str)
         args = parser.parse_args()
         res_id = args.res_id
         resource_name = args.resource_name
@@ -562,6 +567,7 @@ class ResourceApplication(Resource):
         module_name = args.module_name
         business_name = args.business_name
         cmdb2_project_id = args.cmdb2_project_id
+        domain = args.domain
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
@@ -583,6 +589,7 @@ class ResourceApplication(Resource):
                 resource.module_name = module_name
                 resource.business_name = business_name
                 resource.cmdb2_project_id = cmdb2_project_id
+                resource.domain = domain
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
                     ins_id = str(uuid.uuid1())
@@ -603,12 +610,13 @@ class ResourceApplication(Resource):
                     deploy_source = compute.get("deploy_source")
                     database_config = compute.get("database_config")
                     ready_probe_path = compute.get("ready_probe_path")
+                    domain_path = compute.get("domain_path")
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                              health_check=health_check,network_id=network_id,networkName=networkName,
                                              tenantName=tenantName,host_env=host_env
                                              ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
-                                             ready_probe_path=ready_probe_path)
+                                             ready_probe_path=ready_probe_path,domain_path=domain_path)
                     resource.compute_list.append(compute_ins)
                 for res in resource_list:
                     ins_name = res.get('res_name', '未知名称')
@@ -790,6 +798,7 @@ class ResourceDetail(Resource):
                         "lb_methods": db_com.lb_methods,
                         "namespace": db_com.namespace,
                         "ready_probe_path" : db_com.ready_probe_path,
+                        "domain_path":db_com.domain_path,
                     }
                 )
         result['resource_list'] = res
@@ -867,6 +876,7 @@ class ResourceDetail(Resource):
         parser.add_argument('compute_list', type=list, location='json')
         parser.add_argument('cloud', type=str)
         parser.add_argument('resource_type', type=str)
+        parser.add_argument('domain', type=str)
         args = parser.parse_args()
 
         resource_application.resource_name = args.resource_name
@@ -877,7 +887,7 @@ class ResourceDetail(Resource):
         resource_application.domain = args.domain
         resource_application.env = args.env
         resource_application.application_status = args.application_status
-        # resource_application.approval_status = args.approval_status
+        resource_application.approval_status = args.domain
         resource_list = args.resource_list
         compute_list = args.compute_list
 
@@ -929,12 +939,13 @@ class ResourceDetail(Resource):
             deploy_source = compute.get("deploy_source")
             database_config = compute.get("database_config")
             ready_probe_path = compute.get("ready_probe_path")
+            domain_path = compute.get("domain_path")
             compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url,
                                      quantity=quantity, port=port,docker_meta=meta_str,
                                      health_check=health_check,network_id=network_id,networkName=networkName,
                                      tenantName=tenantName,host_env=host_env,language_env=language_env,
                                      deploy_source=deploy_source,database_config=database_config,
-                                     ready_probe_path=ready_probe_path)
+                                     ready_probe_path=ready_probe_path,domain_path=domain_path)
             resource_application.compute_list.append(compute_ins)
 
         try:
