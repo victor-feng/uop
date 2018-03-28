@@ -451,7 +451,7 @@ def judge_value_format(item, pro, attach):
 
 
 def get_host_instance_id(name_ip):
-    name, ip = "", ""
+    name, ip = name_ip.split("@")
     if len(name_ip) == 2:
         ip = name_ip[1]
     else:

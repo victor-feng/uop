@@ -377,6 +377,8 @@ class ResourceProviderTransitions(object):
             Log.logger.debug("Add Item(%s): p_code(%s) for self.pcode_mapper" % (item_id, p_code))
 
     def _do_get_physical_server_for_instance(self, physical_server):
+        if "@" in physical_server:
+            physical_server = physical_server.split("@")[0]
         condition = 'item_id=physical_server&p_code=hostname&value=' + physical_server
         CMDB_URL = current_app.config['CMDB_URL']
         CMDB_REPO_ITEM_CONDITION_GET_URL = CMDB_URL+'cmdb/api/repo_detail/'
