@@ -145,7 +145,7 @@ def cmdb2_graph_search(args):
     data_str = json.dumps(data)
     try:
         # Log.logger.info("cmdb2_graph_search data:{}".format(data))
-        data = requests.post(url, data=data_str, timeout=5).json()["data"]
+        data = requests.post(url, data=data_str, timeout=300).json()["data"]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
