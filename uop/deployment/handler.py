@@ -340,7 +340,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
                                  network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
-                                 ready_probe_path=o.ready_probe_path,lb_methods=o.lb_methods,namespace=o.namespace)
+                                 ready_probe_path=o.ready_probe_path,lb_methods=o.lb_methods,namespace=o.namespace,domain_path=o.domain_path )
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:
@@ -396,10 +396,10 @@ def check_domain_port(resource,app_image):
                 if compute.ins_id == app.get("ins_id"):
                     app["o_domain"] = compute.domain
                     app["o_port"] = compute.port
-                    if compute.domain != app.get("domain"):
-                        if compute.domain:
+                    if compute.domain != app.get("domain") or compute.domain_path != app.get("domain_path"):
+                        if compute.domain or compute.domain_path:
                             app["ingress_flag"] = "update"
-                        else:
+                        elif not compute.domain and not compute.domain_path:
                             app["ingress_flag"] = "create"
                         if not app.get("domain") and compute.domain:
                             app["ingress_flag"] = "delete"
