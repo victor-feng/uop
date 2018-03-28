@@ -323,11 +323,12 @@ def save_resource_id(instances, res_id):
     statusvm = Statusvm.objects.filter(resource_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     if statusvm:
-        ins = [ins for ins in instances if ins["_id"] == 1][0]
-        view_id = ins["instance_id"]
+        instance = [ins for ins in instances if ins["_id"] == 1][0]
+        view_id = instance["instance_id"]
         view_num = get_view_num(
-            [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == ins["model_id"]]
+            [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
         ),
+        Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
         for sv in statusvm:
             sv.resource_view_id = view_id
             sv.view_num = view_num
