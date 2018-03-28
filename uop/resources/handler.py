@@ -228,6 +228,8 @@ def get_from_uop(args):
             tmp_result['module_name'] = pi.module_name
             tmp_result['project_name'] = pi.project_name
             tmp_result['resource_status'] = pi.status
+            tmp_result['view_id'] = pi.resource_view_id
+            tmp_result['view_num'] = pi.view_num
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
             result_list.append(tmp_result)
