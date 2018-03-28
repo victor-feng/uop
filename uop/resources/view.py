@@ -433,6 +433,7 @@ class ResourceApplication(Resource):
         parser.add_argument('res_id', type=str)
         args = parser.parse_args()
         res_id = args.res_id
+        domain = None
         try:
             os_inst_ip_list = []
             resources = ResourceModel.objects.get(res_id=res_id)
