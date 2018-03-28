@@ -172,11 +172,14 @@ def filter_status_data(p_code):
     for r in res:
         osid_ip_list = r.os_ins_ip_list
         compute_list = r.compute_list
+        view_id, view_num = "", ""
         # Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
         if r.cloud == "2" and r.resource_type == "app":
             dirty = Statusvm.objects.filter(resource_id=r.res_id)
             if dirty:
                 for d in dirty:
+                    view_id = d.resource_view_id
+                    view_num = d.view_num
                     d.delete()
         for oi in osid_ip_list:
             meta = {}
@@ -188,6 +191,8 @@ def filter_status_data(p_code):
             meta["module_name"] = r.module_name
             meta["business_name"] = r.business_name
             meta["project_id"] = r.project_id
+            meta["resource_view_id"] = view_id
+            meta["view_num"] = view_num
             if compute_list:
                 meta["domain"] = compute_list[0].domain
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
@@ -293,7 +298,45 @@ def crp_data_cmdb(args):
     data = get_relations(CMDB2_VIEWS["1"][0]) # B7
     models_list = data["entity"]
     res_id=args.get('resource_id')
-    instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
+    status = args.get('status')
+    error_msg = args.get('error_msg')
+    set_flag = args.get('set_flag')
+    resource_type = args.get('resource_type')
+    resource = ResourceModel.objects.get(res_id=res_id)
+    env = resource.env
+    cloud = resource.cloud
+    flag = False
+    if status != "ok":
+        return
+    if set_flag in ["increase", "reduce"]:
+        if cloud == "2" and resource_type == "app":
+            flag = True
+    if not flag: # 按照常规扩缩容
+        instances, relations = [], []
+        statusvm = Statusvm.objects.filter(resource_id=res_id)
+        docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
+        if statusvm:
+            for sv in statusvm:
+                tomcat_instance_id = sv.view_id
+        tomcat_level = {
+            "instance_id": tomcat_instance_id,
+            "model_id": CMDB2_ENTITY["tomcat"],
+            "_id": ""
+        }
+        for ct in args["container"]:
+            attach = {
+                "image_name": ct.get("image_url", ""),
+                "create_date": args.get("created_time", "")
+            }
+            for index, ins in enumerate(ct["instance"]):
+                ins["baseinfo"] = ins.get("instance_name")
+                i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level)
+                instances.append(i)
+                relations.extend(r)
+
+
+    else:
+        instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     uid, token = get_uid_token()
     data = {
         "uid": uid,
