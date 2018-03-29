@@ -373,7 +373,7 @@ def save_resource_id(instances, res_id, cmdb1_url):
     res = ResourceModel.objects.filter(res_id=res_id)
     if res:
         for r in res: # 数据加到UOP和cmdb1.0
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, resource.cmdb_p_code)
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
 
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
