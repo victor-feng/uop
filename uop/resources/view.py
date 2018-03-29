@@ -462,9 +462,9 @@ class ResourceApplication(Resource):
                     d_count = ResourceModel.objects.filter(domain=domain).count()
                     if d_count <= 1:
                         crp_data['domain_list'] = domain_list
-                        crp_data = json.dumps(crp_data)
-                        requests.delete(crp_url, data=crp_data)
-                        # deploy.delete()
+                    crp_data = json.dumps(crp_data)
+                    requests.delete(crp_url, data=crp_data)
+                    # deploy.delete()
                 # 调用CRP 删除资源
                 os_ins_ip_list = resources.os_ins_ip_list
                 for os_ip in os_ins_ip_list:
