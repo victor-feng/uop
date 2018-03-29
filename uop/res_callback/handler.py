@@ -300,6 +300,7 @@ def crp_data_cmdb(args, cmdb1_url):
     set_flag = args.get('set_flag')
     resource_type = args.get('resource_type')
     resource = ResourceModel.objects.get(res_id=res_id)
+    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
     env = resource.env
     cloud = resource.cloud
     flag = False
@@ -328,7 +329,7 @@ def crp_data_cmdb(args, cmdb1_url):
                 }
                 for index, ins in enumerate(ct["instance"]):
                     ins["baseinfo"] = ins.get("instance_name")
-                    i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level)
+                    i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
                     instances.append(i)
                     relations.extend(r)
         else:
