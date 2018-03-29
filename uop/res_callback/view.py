@@ -713,9 +713,7 @@ class ResourceProviderCallBack(Resource):
                 CPR_URL = get_CRP_url(env)
                 url = CPR_URL + "api/deploy/deploys"
                 deploy_to_crp(resource_id, url, set_flag, cloud,increase_ips)
-        CMDB_URL = current_app.config['CMDB_URL']
-        CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/vmdocker/status/'
-        push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, resource.cmdb_p_code)
+
 
     # @api_permission_control(request)
     @classmethod
@@ -736,7 +734,9 @@ class ResourceProviderCallBack(Resource):
             }
             return ret, code
         # 异步存到CMDB2
-        crp_data_cmdb(request_data)
+        CMDB_URL = current_app.config['CMDB_URL']
+        crp_data_cmdb(request_data, CMDB_URL)
+
         res = {
             "code": code,
             "result": {

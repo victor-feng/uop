@@ -163,7 +163,7 @@ def get_resources_all_pcode():
     return pcode_list
 
 
-def filter_status_data(p_code):
+def filter_status_data(p_code, id, num):
     data = {
         "vm_status":[]
     }
@@ -178,8 +178,6 @@ def filter_status_data(p_code):
             dirty = Statusvm.objects.filter(resource_id=r.res_id)
             if dirty:
                 for d in dirty:
-                    view_id = d.resource_view_id
-                    view_num = d.view_num
                     d.delete()
         for oi in osid_ip_list:
             meta = {}
@@ -191,8 +189,8 @@ def filter_status_data(p_code):
             meta["module_name"] = r.module_name
             meta["business_name"] = r.business_name
             meta["project_id"] = r.project_id
-            meta["resource_view_id"] = view_id
-            meta["view_num"] = view_num
+            meta["resource_view_id"] = id
+            meta["view_num"] = num
             if compute_list:
                 meta["domain"] = compute_list[0].domain
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
@@ -212,12 +210,11 @@ def filter_status_data(p_code):
     return data
 
 
-@async
-def push_vm_docker_status_to_cmdb(url, p_code=None):
+def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
-    data = filter_status_data(p_code)
+    data = filter_status_data(p_code, id, num)
     # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         ret = requests.post(url, data=json.dumps(data)).json()
@@ -290,7 +287,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
 
 # 解析crp传回来的数据录入CMDB2.0
 @async
-def crp_data_cmdb(args):
+def crp_data_cmdb(args, cmdb1_url):
     assert(isinstance(args, dict))
     Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
@@ -312,6 +309,7 @@ def crp_data_cmdb(args):
         if cloud == "2" and resource_type == "app":
             flag = True
         if not flag: # 按照常规扩缩容
+            Log.logger.info("Virtual cloud increase".format(data))
             instances, relations = [], []
             statusvm = Statusvm.objects.filter(resource_id=res_id)
             docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
@@ -334,7 +332,7 @@ def crp_data_cmdb(args):
                     instances.append(i)
                     relations.extend(r)
         else:
-            Log.logger.info("CLOUD2 increase".format(data))
+            Log.logger.info("Docker cloud increase".format(data))
             instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     else:
         instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
@@ -354,29 +352,29 @@ def crp_data_cmdb(args):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], res_id)
+            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, res_id):
+def save_resource_id(instances, res_id, cmdb1_url):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
-    statusvm = Statusvm.objects.filter(resource_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
-    if statusvm:
-        instance = [ins for ins in instances if ins["_id"] == 1][0]
-        view_id = str(instance["instance_id"])
-        view_num = get_view_num(
+    instance = [ins for ins in instances if ins["_id"] == 1][0]
+    view_id = str(instance["instance_id"])
+    view_num = get_view_num(
             [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
         ),
-        Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
-        for sv in statusvm:
-            sv.resource_view_id = view_id
-            sv.view_num = view_num[0] if isinstance(view_num, tuple) else view_num
-            sv.save()
+    Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
+    CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+    res = ResourceModel.objects.filter(res_id=res_id)
+    if res:
+        for r in res: # 数据加到UOP和cmdb1.0
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, resource.cmdb_p_code)
+
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
