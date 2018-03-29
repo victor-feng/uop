@@ -286,7 +286,7 @@ class DeploymentListAPI(Resource):
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
-                appinfo = [dict(app, port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
+                appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
             deploy_obj.approve_status = 'success'
