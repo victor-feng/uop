@@ -133,7 +133,8 @@ def cmdb2_graph_search(args):
             "name": view_num,
             "entity": [
                 {
-                    "id": res_id,
+                    "id":"",
+                    "instance_id": res_id,
                     "parameters": [{
                         "code": args.code if args.code else "baseInfo",
                         "value": args.value.decode(encoding="utf-8") if args.value else ""
