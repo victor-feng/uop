@@ -149,11 +149,11 @@ def flush_crp_to_cmdb():
             if osid_status:
                 for os in osid_status:
                     for k, v in os.items():
-                        vm = Statusvm.objects.filter(osid=str(k))
-                        if vm:
-                            for v in vm:
-                                v.status = v
-                                v.save()
+                        vms = Statusvm.objects.filter(osid=str(k))
+                        if vms:
+                            for vm in vms:
+                                vm.status = v
+                                vm.save()
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
