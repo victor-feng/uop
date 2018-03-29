@@ -371,6 +371,7 @@ def save_resource_id(instances, res_id, cmdb1_url):
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
     res = ResourceModel.objects.filter(res_id=res_id)
+    view_num = view_num[0] if isinstance(view_num, tuple) else view_num
     if res:
         for r in res: # 数据加到UOP和cmdb1.0
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, r.cmdb_p_code)
