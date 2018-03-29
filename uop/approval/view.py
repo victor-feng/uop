@@ -900,6 +900,8 @@ class RollBackReservation(Resource):
                         res_compute["url"] = compute["url"]
                         res_compute["port"] = compute["port"]
                         res_compute["domain"] = compute["domain"]
+                        res_compute["domain_path"] = compute["domain_path"]
+                        res_compute["database_config"] = compute["database_config"]
             resource.save()
             # ----------
             appinfo = []
