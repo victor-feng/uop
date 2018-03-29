@@ -68,7 +68,7 @@ class DevelopmentConfig(BaseConfig):
     UPLOAD_FOLDER = "/data/"
     BASE_K8S_IMAGE = "reg1.syswin.com/base/uop-base-k8s:v-1.0.1"
     K8S_NGINX_PORT = "80"
-    K8S_NGINX_IPS = ["172.28.11.128","172.28.11.133"]
+    K8S_NGINX_IPS = ["172.28.11.128", "172.28.11.133", "172.28.11.134"]
 configs = {
     'development': DevelopmentConfig,
 }
