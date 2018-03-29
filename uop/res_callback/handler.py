@@ -292,7 +292,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
 @async
 def crp_data_cmdb(args):
     assert(isinstance(args, dict))
-    # Log.logger.info("###data:{}".format(args))
+    Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
     url = CMDB2_URL + "cmdb/openapi/graph/"
     data = get_relations(CMDB2_VIEWS["1"][0]) # B7
@@ -334,6 +334,7 @@ def crp_data_cmdb(args):
                     instances.append(i)
                     relations.extend(r)
         else:
+            Log.logger.info("CLOUD2 increase".format(data))
             instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
     else:
         instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
