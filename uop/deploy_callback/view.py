@@ -106,11 +106,11 @@ class DeployCallback(Resource):
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_success" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg = "%s %s成功\n%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],'--'*8)
+                status_record.msg = "%s %s成功\n%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],'-sb-'*8)
             else:
                 dep.deploy_result = "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg ="%s %s失败,错误日志为%s\n%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg,'--'*8)
+                status_record.msg ="%s %s失败,错误日志为%s\n%s" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg,'-sb-'*8)
             status_record.save()
             dep.save()
         else:
@@ -141,12 +141,12 @@ class DeployCallback(Resource):
             if res_status == True and end_flag == True:
                 dep.deploy_result = "%s_success" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s成功\n%s" % deploy_type_dict[deploy_type],
-                                     "%s_success" % deploy_type, "res",'--'*8)
+                                     "%s_success" % deploy_type, "res",'-sb-'*8)
 
             elif res_status == False and end_flag == True:
                 dep.deploy_result = "%s_fail" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败\n%s" % deploy_type_dict[deploy_type],
-                                     "%s_fail" % deploy_type, "res",'--'*8)
+                                     "%s_fail" % deploy_type, "res",'-sb-'*8)
 
             dep.save()
         # 如果回滚成功，修改部署版本
