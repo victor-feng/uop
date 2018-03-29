@@ -617,6 +617,8 @@ class CapacityReservation(Resource):
         data['resource_id'] = resource.res_id
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
+        data['project_id'] = resource.cmdb2_project_id
+        data['department_id'] = resource.department_id
         data['env'] = resource.env
         data['docker_network_id'] = resource.docker_network_id
         data['mysql_network_id'] = resource.mysql_network_id
