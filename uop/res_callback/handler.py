@@ -363,7 +363,7 @@ def crp_data_cmdb(args, cmdb1_url):
 def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
-    res = ResourceModel.objects.filter(res_id=res_id)
+    res = ResourceModel.objects.get(res_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0]
     if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
@@ -378,9 +378,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
 
-    if res:
-        for r in res: # 数据加到UOP和cmdb1.0
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, r.cmdb_p_code)
+    push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
 
     ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
     if ins_id:
