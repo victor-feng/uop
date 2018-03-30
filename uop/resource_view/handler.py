@@ -14,6 +14,7 @@ from uop.item_info.handler import get_uid_token
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
+CMDB2_ENTITY = configs[APP_ENV].CMDB2_ENTITY
 __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
 ]
@@ -148,7 +149,7 @@ def cmdb2_graph_search(args):
         # Log.logger.info("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
         idlist = list(get_instance_id_list(res_id))
-        data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist]
+        data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
@@ -204,6 +205,7 @@ def attach_resource_env(next_instance, resources, relation, id):
                         ni["instance_id"] in [r["end_id"] for r in relation if r["start_id"] == id]
             ])
     return children
+
 
 def get_instance_id_list(id):
     sv = Statusvm.objects.filter(resource_view_id=id)
