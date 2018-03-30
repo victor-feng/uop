@@ -306,7 +306,7 @@ def crp_data_cmdb(args, cmdb1_url):
     flag = False
     if status != "ok":
         return
-    if set_flag in ["increase"]:
+    if set_flag in ["increase", "reduce"]:
         if cloud == "2" and resource_type == "app":
             flag = True
         if not flag: # 按照常规扩缩容
