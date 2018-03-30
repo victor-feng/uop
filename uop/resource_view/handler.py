@@ -149,7 +149,14 @@ def cmdb2_graph_search(args):
         # Log.logger.info("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
         idlist = list(get_instance_id_list(res_id))
-        data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
+        tmp = []
+        for ins in data["instance"]:
+            if ins["entity_id"] in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]:
+                if ins["instance_id"] not in idlist: # 去除缩容减少的，后期删CMDB2
+                    continue
+            tmp.append(ins)
+        data["instance"] = tmp
+        # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
