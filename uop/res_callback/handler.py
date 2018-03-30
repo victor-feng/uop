@@ -385,8 +385,8 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
                 if os_ip.ip in str(ins["parameters"]):
                     os_ip.instance_id = ins["instance_id"]
             for p in ins["parameters"]:
-                if p.code.upper() == "IP":
-                    return p.value
+                if p["code"].upper() == "IP":
+                    return p["value"]
         except Exception as exc:
             Log.logger.error("get_ip error:{}".format(str(exc)))
         return ""
