@@ -379,8 +379,18 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
 
     push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
-
-    ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
+    def get_ip(ins):
+        try:
+            for os_ip in res.os_ins_ip_list:
+                if os_ip.ip in str(ins["parameters"]):
+                    os_ip.instance_id = ins["instance_id"]
+            for p in ins["parameters"]:
+                if p.code.upper() == "IP":
+                    return p.value
+        except Exception as exc:
+            Log.logger.error("get_ip error:{}".format(str(exc)))
+        return ""
+    ins_id = [ins["instance_id"] + "@_" + ins["entity_name"] + "@_" + get_ip(ins) for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
             with save_lock:

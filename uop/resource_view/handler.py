@@ -6,7 +6,7 @@ import json
 import requests
 from flask import current_app
 from uop.log import Log
-from uop.models import ResourceModel
+from uop.models import ResourceModel, Statusvm
 from uop.util import response_data
 from config import configs, APP_ENV
 from uop.item_info.handler import get_uid_token
@@ -147,6 +147,8 @@ def cmdb2_graph_search(args):
     try:
         # Log.logger.info("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
+        idlist = list(get_instance_id_list(res_id))
+        data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
@@ -203,4 +205,12 @@ def attach_resource_env(next_instance, resources, relation, id):
             ])
     return children
 
+def get_instance_id_list(id):
+    sv = Statusvm.objects.filter(resource_view_id=id)
+    if sv:
+        for s in sv:
+            res_id = s.resource_id
+    res = ResourceModel.objects.get(res_id=res_id)
+    for os_ip in res.os_ins_ip_list:
+        yield os_ip.instance_id
 

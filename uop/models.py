@@ -351,6 +351,8 @@ class OS_ip_dic(db.EmbeddedDocument):
     os_type = db.StringField(required=False)
     cpu = db.StringField(required=False)
     mem = db.StringField(required=False)
+    instance_id = db.StringField(required=False)
+
     meta = {
         'collection': 'os_ip_dic',
         'index': [
