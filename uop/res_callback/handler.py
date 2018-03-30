@@ -373,8 +373,11 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
         ),
         view_num = view_num[0] if isinstance(view_num, tuple) else view_num
     if set_flag in ["increase"] and not flag: # 虚拟化云的扩容
-        sv = Statusvm.objects.get(resource_id=res_id)
-        view_id, view_num = sv.resource_view_id, sv.view_num
+        sv = Statusvm.objects.filter(resource_id=res_id)
+        if sv:
+            for s in sv:
+                view_id, view_num = s.resource_view_id, s.view_num
+                break
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
 
