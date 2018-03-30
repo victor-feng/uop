@@ -368,7 +368,7 @@ def save_resource_id(instances, res_id, cmdb1_url):
     view_id = str(instance["instance_id"])
     view_num = get_view_num(
             [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
-        ),
+    ),
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
     res = ResourceModel.objects.filter(res_id=res_id)
@@ -565,8 +565,9 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             )(model["parameters"], item, attach)
         )
     }
-    if item.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
-        get_host_instance_id(item.get("physical_server"))
+    if item.get("physical_server") and physical_server_model_id: #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+        # get_host_instance_id(item.get("physical_server"))
+        Log.logger.info("physical_server_model_id is {} \n.".format(physical_server_model_id))
         r = [
             dict(
                 rel, start_id = i["_id"],
