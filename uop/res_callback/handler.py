@@ -384,6 +384,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
             for os_ip in res.os_ins_ip_list:
                 if os_ip.ip in str(ins["parameters"]):
                     os_ip.instance_id = ins["instance_id"]
+                    os_ip.save()
             for p in ins["parameters"]:
                 if p["code"].upper() == "IP":
                     return p["value"]
