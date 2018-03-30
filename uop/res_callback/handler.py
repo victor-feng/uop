@@ -329,7 +329,7 @@ def crp_data_cmdb(args, cmdb1_url):
                 }
                 for index, ins in enumerate(ct["instance"]):
                     ins["baseinfo"] = ins.get("instance_name")
-                    i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
+                    i, r = format_data_cmdb(data["relations"], ins, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
                     instances.append(i)
                     relations.extend(r)
         else:
