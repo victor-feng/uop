@@ -353,26 +353,31 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url)
+            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, flag)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, res_id, cmdb1_url):
+def save_resource_id(instances, res_id, cmdb1_url, flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
+    res = ResourceModel.objects.filter(res_id=res_id)
+    sv = Statusvm.objects.get(resource_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0]
-    view_id = str(instance["instance_id"])
-    view_num = get_view_num(
-            [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
-    ),
+    if flag:
+        view_id = str(instance["instance_id"])
+        view_num = get_view_num(
+                [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
+        ),
+        view_num = view_num[0] if isinstance(view_num, tuple) else view_num
+    else:
+        view_id, view_num = sv.resource_view_id, sv.view_num
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
-    res = ResourceModel.objects.filter(res_id=res_id)
-    view_num = view_num[0] if isinstance(view_num, tuple) else view_num
+
     if res:
         for r in res: # 数据加到UOP和cmdb1.0
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, r.cmdb_p_code)
