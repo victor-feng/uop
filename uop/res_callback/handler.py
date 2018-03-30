@@ -364,7 +364,6 @@ def save_resource_id(instances, res_id, cmdb1_url, flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
     res = ResourceModel.objects.filter(res_id=res_id)
-    sv = Statusvm.objects.get(resource_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0]
     if flag:
@@ -374,6 +373,7 @@ def save_resource_id(instances, res_id, cmdb1_url, flag):
         ),
         view_num = view_num[0] if isinstance(view_num, tuple) else view_num
     else:
+        sv = Statusvm.objects.get(resource_id=res_id)
         view_id, view_num = sv.resource_view_id, sv.view_num
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
