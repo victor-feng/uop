@@ -390,7 +390,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
         except Exception as exc:
             Log.logger.error("get_ip error:{}".format(str(exc)))
         return ""
-    ins_id = [ins["instance_id"] + "@_" + ins["entity_name"] + "@_" + get_ip(ins) for ins in instances if ins["instance_id"]]
+    ins_id = [ins["instance_id"] + "@_" + get_ip(ins) for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
             with save_lock:
