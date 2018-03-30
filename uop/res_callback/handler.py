@@ -306,7 +306,7 @@ def crp_data_cmdb(args, cmdb1_url):
     flag = False
     if status != "ok":
         return
-    if set_flag in ["increase", "reduce"]:
+    if set_flag in ["increase"]:
         if cloud == "2" and resource_type == "app":
             flag = True
         if not flag: # 按照常规扩缩容
@@ -353,26 +353,26 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, flag)
+            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, res_id, cmdb1_url, flag):
+def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
     res = ResourceModel.objects.filter(res_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0]
-    if flag:
+    if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
         view_id = str(instance["instance_id"])
         view_num = get_view_num(
                 [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
         ),
         view_num = view_num[0] if isinstance(view_num, tuple) else view_num
-    else:
+    if set_flag in ["increase"] and not flag: # 虚拟化云的扩容
         sv = Statusvm.objects.get(resource_id=res_id)
         view_id, view_num = sv.resource_view_id, sv.view_num
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
