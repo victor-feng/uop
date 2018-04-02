@@ -234,6 +234,8 @@ def get_from_uop(args):
                             return app.domain, app.domain_ip,app.namespace
                     return False
             return 1
+
+        Log.logger.info("resources:{}".format(resources))
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
