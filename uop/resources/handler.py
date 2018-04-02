@@ -480,7 +480,7 @@ def get_deploy_counts():
 @async
 def updata_deployment_info(resource_name,env,url):
     try:
-        for i in range(5):
+        for i in range(6):
             time.sleep(10)
             info_url = "{}api/openstack/k8s/deploymentpod?deployment_name={}".format(url, resource_name)
             ret = requests.get(info_url)
