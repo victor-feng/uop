@@ -122,6 +122,7 @@ def flush_crp_to_cmdb():
     resources = ResourceModel.objects.filter(approval_status="success")
     env_list = set([])
     osid_status = []
+    now = datetime.datetime.now()
     with db.app.app_context():
         for resource in resources:
             env_list.add(resource.env)
@@ -152,10 +153,9 @@ def flush_crp_to_cmdb():
                         vms = Statusvm.objects.filter(osid=str(k))
                         if not vms:
                             q="-".join(str(k).split("-")[:-2])
-                            vms = Statusvm.objects.filter(resource_name__contains=q)
+                            vms = Statusvm.objects.filter(resource_name__contains=q,update_time__ne=now)
                         if vms:
-                            for vm in vms:
-                                vm.update(status=v[-1],osid=k,ip=v[0])
+                            vms[0].update(status=v[-1], osid=k, ip=v[0],update_time=now)
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:

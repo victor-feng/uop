@@ -513,7 +513,8 @@ def updata_deployment_info(resource_name,env,url):
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
-                    vm.update(status=vmid_ip[2], osid=vmid_ip[0], ip=vmid_ip[1])
+                    one = vmid_ip.pop()
+                    vm.update(status=one[2], osid=one[0], ip=one[1])
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
