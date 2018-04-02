@@ -487,7 +487,7 @@ def updata_deployment_info(resource_name,env,url):
         res_list = response["result"]["data"]["res_list"]
         if response.get('code') == 200:
             resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
-            res = ResourceModel.objects(resource_name=resource_name, env=env)
+            # res = ResourceModel.objects(resource_name=resource_name, env=env)
             os_ins_ip_list = resource.os_ins_ip_list
             compute_list = resource.compute_list
             os_ins = []
@@ -496,6 +496,7 @@ def updata_deployment_info(resource_name,env,url):
             mem = "2"
             resource.os_ins_ip_list = os_ins
             resource.save()
+            resource.reload()
             osid_ip = [(res.get("pod_name"), res.get("pod_ip"))for res in res_list]
             for os_ins in os_ins_ip_list:
                 if os_ins.os_type == "docker":
