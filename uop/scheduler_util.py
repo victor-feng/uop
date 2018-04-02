@@ -157,10 +157,7 @@ def flush_crp_to_cmdb():
                         if vms:
                             Log.logger.debug("---------------22222222222222222222222--------------------{}".format(vms))
                             for vm in vms:
-                                vm.status = v[-1]
-                                vm.osid = str(k)
-                                vm.ip = str(v[1])
-                                vm.save()
+                                vm.update(status=v[-1],osid=k,ip=v[1])
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
