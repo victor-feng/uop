@@ -189,6 +189,7 @@ def update_statusvm(vm):
     else:
         return vm.osid, vm.ip
 
+
 def get_from_uop(args):
     resource_type, resource_name, module_name,business_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = \
         args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
@@ -284,6 +285,7 @@ def get_from_uop(args):
         Log.logger.error("Statusflush error:{}".format(str(exc)))
         res = response_data(code, str(exc), "")
     return res
+
 
 @async
 def delete_uop(res_id):
@@ -485,25 +487,30 @@ def updata_deployment_info(resource_name,env,url):
         res_list = response["result"]["data"]["res_list"]
         if response.get('code') == 200:
             resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
+            # res = ResourceModel.objects(resource_name=resource_name, env=env)
             os_ins_ip_list = resource.os_ins_ip_list
             compute_list = resource.compute_list
             os_ins_ips = []
             ips=[]
             cpu = "2"
             mem = "2"
+            osid_ip = [(res.get("pod_name"), res.get("pod_ip"))for res in res_list]
             for os_ins in os_ins_ip_list:
-                if os_ins.os_type == "docker":
-                    cpu = os_ins.cpu
-                    mem = os_ins.mem
-                else:
-                    os_ins_ips.append(os_ins)
-            for res in res_list:
-                ip = res.get("pod_ip")
-                os_ins_id = res.get("pod_name")
-                os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker", cpu=cpu, mem=mem,
-                                      os_vol_id=None)
-                os_ins_ips.append(os_ip_dic)
-                ips.append(ip)
+                one = osid_ip.pop()
+                os_ins.update_one(os_ins_id=one[0], ip=one[1])
+            # for os_ins in os_ins_ip_list:
+            #     if os_ins.os_type == "docker":
+            #         cpu = os_ins.cpu
+            #         mem = os_ins.mem
+            #     else:
+            #         os_ins_ips.append(os_ins)
+            # for res in res_list:
+            #     ip = res.get("pod_ip")
+            #     os_ins_id = res.get("pod_name")
+            #     os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker", cpu=cpu, mem=mem,
+            #                           os_vol_id=None)
+            #     os_ins_ips.append(os_ip_dic)
+            #     ips.append(ip)
             for compute in compute_list:
                 compute.ips = ips
                 compute.save()
