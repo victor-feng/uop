@@ -90,8 +90,8 @@ class Statusvm(db.DynamicDocument):
             'collection': 'status_vm',
             'indexes': [
                 {
-                    'fields': ['osid'],
-                    'unique': True,
+                    'fields': ['osid',"resource_name"],
+                    'unique': False,
                 }
             ],
             }
