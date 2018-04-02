@@ -492,15 +492,11 @@ def updata_deployment_info(resource_name,env,url):
                 compute_list = resource.compute_list
                 os_ins_list = []
                 ips=[]
-                cpu = "2"
-                mem = "2"
-
                 osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"))for res in res_list]
                 vmid_ip = osid_ip
                 for os_ins in os_ins_ip_list:
-                    if os_ins.os_type == "docker":
-                        cpu = os_ins.cpu
-                        mem = os_ins.mem
+                    cpu = getattr(os_ins, "cpu")
+                    mem = getattr(os_ins, "mem")
                     one = osid_ip.pop()
                     os_ins_list.append(OS_ip_dic(
                             ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
