@@ -490,25 +490,24 @@ def updata_deployment_info(resource_name,env,url):
                 resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
                 os_ins_ip_list = resource.os_ins_ip_list
                 compute_list = resource.compute_list
-                os_ins = []
+                os_ins_list = []
                 ips=[]
                 cpu = "2"
                 mem = "2"
 
                 osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"))for res in res_list]
-                Log.logger.debug("------------------------------------------------------{}".format(osid_ip))
                 for os_ins in os_ins_ip_list:
                     if os_ins.os_type == "docker":
                         cpu = os_ins.cpu
                         mem = os_ins.mem
                     one = osid_ip.pop()
-                    os_ins.append(OS_ip_dic(
+                    os_ins_list.append(OS_ip_dic(
                             ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
                     )
                 for compute in compute_list:
                     compute.ips = ips
                     compute.save()
-                resource.os_ins_ip_list = os_ins
+                resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
