@@ -496,6 +496,7 @@ def updata_deployment_info(resource_name,env,url):
                 mem = "2"
 
                 osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"))for res in res_list]
+                vmid_ip = osid_ip
                 for os_ins in os_ins_ip_list:
                     if os_ins.os_type == "docker":
                         cpu = os_ins.cpu
@@ -512,7 +513,7 @@ def updata_deployment_info(resource_name,env,url):
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
-                    vm.update(status=osid_ip[2], osid=osid_ip[0], ip=osid_ip[1])
+                    vm.update(status=vmid_ip[2], osid=vmid_ip[0], ip=vmid_ip[1])
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
