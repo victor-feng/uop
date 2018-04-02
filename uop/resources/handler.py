@@ -236,7 +236,7 @@ def get_from_uop(args):
                         for app in r.compute_list:
                             return app.domain, app.domain_ip,app.namespace
                     return False
-            return "1"
+            return False if flag else "1"
 
         Log.logger.info("resources:{}".format(resources))
         for pi in resources:
