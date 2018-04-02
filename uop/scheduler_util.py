@@ -226,5 +226,6 @@ def get_one_view(uid, token, view_id):
         Log.logger.error("get_relations error: {}".format(str(exc)))
 
 if __name__ == "__main__":
-    get_relations()
+    #get_relations()
+    flush_crp_to_cmdb()
     pass
