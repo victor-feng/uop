@@ -238,7 +238,7 @@ def get_from_uop(args):
                     return False
             return False if flag else "1"
 
-        Log.logger.info("resources:{}".format(resources))
+        # Log.logger.info("resources:{}".format(resources))
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
@@ -267,7 +267,7 @@ def get_from_uop(args):
             tmp_result['osid'] = osid
             tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
-        Log.logger.info("result_list:{}".format(result_list))
+        # Log.logger.info("result_list:{}".format(result_list))
         if page_num and page_count:
             page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
         else:
