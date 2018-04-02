@@ -175,8 +175,8 @@ def update_statusvm(vm):
     except Exception as exc:
         return vm.osid, vm.ip
 
-    flag = [i for i in res.os_ins_ip_list if i.osid == vm.osid]
-    new_osip = [i for i in res.os_ins_ip_list if i.osid not in  old_osid_list]
+    flag = [i for i in res.os_ins_ip_list if i.os_ins_id == vm.osid]
+    new_osip = [i for i in res.os_ins_ip_list if i.os_ins_id not in  old_osid_list]
     if not flag: # 重启变了osid
         try:
             no = new_osip.pop()
