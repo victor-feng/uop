@@ -180,9 +180,9 @@ def update_statusvm(vm):
     if not flag: # 重启变了osid
         try:
             no = new_osip.pop()
-            vm.osid, vm.ip= no.osid, no.ip
+            vm.osid, vm.ip = no.os_ins_id, no.ip
             vm.save()
-            return no.osid, no.ip
+            return no.os_ins_id, no.ip
         except Exception as exc:
             Log.logger.error("update_statusvm error:{}".format(exc))
             return vm.osid, vm.ip
