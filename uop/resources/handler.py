@@ -264,9 +264,9 @@ def get_from_uop(args):
             tmp_result['view_num'] = pi.view_num
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
-            osid, ip = update_statusvm(pi)
-            tmp_result['osid'] = osid
-            tmp_result['resource_ip'] = ip
+            # osid, ip = update_statusvm(pi)
+            # tmp_result['osid'] = osid
+            # tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
         # Log.logger.info("result_list:{}".format(result_list))
         if page_num and page_count:
