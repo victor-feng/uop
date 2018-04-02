@@ -164,10 +164,36 @@ def get_from_cmdb2(args, filters, download=False):
         return  [] if download else jsonify(response)
 
 
+def update_statusvm(vm):
+    res_id = vm.resource_id
+    vms = Statusvm.objects.filter(resource_id=res_id)
+    old_osid_list = []
+    if vms:
+        old_osid_list = [v.osid for v in vms]
+    try:
+        res = ResourceModel.objects.get(res_id = res_id)
+    except Exception as exc:
+        return vm.osid, vm.ip
+
+    flag = [i for i in res.os_ins_ip_list if i.osid == vm.osid]
+    new_osip = [i for i in res.os_ins_ip_list if i.osid not in  old_osid_list]
+    if not flag: # 重启变了osid
+        try:
+            no = new_osip.pop()
+            vm.osid, vm.ip= no.osid, no.ip
+            vm.save()
+            return no.osid, no.ip
+        except Exception as exc:
+            Log.logger.error("update_statusvm error:{}".format(exc))
+            return vm.osid, vm.ip
+    else:
+        return vm.osid, vm.ip
+
 def get_from_uop(args):
     resource_type, resource_name, module_name,business_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = \
         args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
+
     try:
         attach_key = lambda v, query, key, filter: query.update({key: v}) if filter else ""
 
@@ -232,6 +258,9 @@ def get_from_uop(args):
             tmp_result['view_num'] = pi.view_num
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
+            osid, ip = update_statusvm(pi)
+            tmp_result['osid'] = osid
+            tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
 
         if page_num and page_count:
