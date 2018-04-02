@@ -230,6 +230,8 @@ def get_from_uop(args):
                         return r.cloud if r.cloud else 1
                 else:
                     for r in res:
+                        if isinstance(r.compute_list, int):
+                            return ""
                         for app in r.compute_list:
                             return app.domain, app.domain_ip,app.namespace
                     return False
