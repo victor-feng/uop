@@ -480,49 +480,35 @@ def get_deploy_counts():
 @async
 def updata_deployment_info(resource_name,env,url):
     try:
-        time.sleep(10)
-        info_url = "{}api/openstack/k8s/deploymentpod?deployment_name={}".format(url, resource_name)
-        ret = requests.get(info_url)
-        response = ret.json()
-        res_list = response["result"]["data"]["res_list"]
-        if response.get('code') == 200:
-            resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
-            # res = ResourceModel.objects(resource_name=resource_name, env=env)
-            os_ins_ip_list = resource.os_ins_ip_list
-            compute_list = resource.compute_list
-            os_ins = []
-            ips=[]
-            cpu = "2"
-            mem = "2"
+        for i in range(5):
+            time.sleep(10)
+            info_url = "{}api/openstack/k8s/deploymentpod?deployment_name={}".format(url, resource_name)
+            ret = requests.get(info_url)
+            response = ret.json()
+            res_list = response["result"]["data"]["res_list"]
+            if response.get('code') == 200:
+                resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
+                os_ins_ip_list = resource.os_ins_ip_list
+                compute_list = resource.compute_list
+                os_ins = []
+                ips=[]
+                cpu = "2"
+                mem = "2"
 
-            osid_ip = [(res.get("pod_name"), res.get("pod_ip"))for res in res_list]
-            for os_ins in os_ins_ip_list:
-                if os_ins.os_type == "docker":
-                    cpu = os_ins.cpu
-                    mem = os_ins.mem
-                one = osid_ip.pop()
-                os_ins.append(OS_ip_dic(
-                        ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
-                )
-
-            # for os_ins in os_ins_ip_list:
-            #     if os_ins.os_type == "docker":
-            #         cpu = os_ins.cpu
-            #         mem = os_ins.mem
-            #     else:
-            #         os_ins_ips.append(os_ins)
-            # for res in res_list:
-            #     ip = res.get("pod_ip")
-            #     os_ins_id = res.get("pod_name")
-            #     os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker", cpu=cpu, mem=mem,
-            #                           os_vol_id=None)
-            #     os_ins_ips.append(os_ip_dic)
-            #     ips.append(ip)
-            for compute in compute_list:
-                compute.ips = ips
-                compute.save()
-            resource.os_ins_ip_list = os_ins
-            resource.save()
+                osid_ip = [(res.get("pod_name"), res.get("pod_ip"))for res in res_list]
+                for os_ins in os_ins_ip_list:
+                    if os_ins.os_type == "docker":
+                        cpu = os_ins.cpu
+                        mem = os_ins.mem
+                    one = osid_ip.pop()
+                    os_ins.append(OS_ip_dic(
+                            ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
+                    )
+                for compute in compute_list:
+                    compute.ips = ips
+                    compute.save()
+                resource.os_ins_ip_list = os_ins
+                resource.save()
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
