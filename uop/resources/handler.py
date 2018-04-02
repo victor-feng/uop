@@ -224,6 +224,7 @@ def get_from_uop(args):
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
         def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id)
+            Log.logger.info("res:{}".format(res))
             if res:
                 if not flag:
                     for r in res:
