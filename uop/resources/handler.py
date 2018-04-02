@@ -487,17 +487,26 @@ def updata_deployment_info(resource_name,env,url):
         res_list = response["result"]["data"]["res_list"]
         if response.get('code') == 200:
             resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
-            # res = ResourceModel.objects(resource_name=resource_name, env=env)
+            res = ResourceModel.objects(resource_name=resource_name, env=env)
             os_ins_ip_list = resource.os_ins_ip_list
             compute_list = resource.compute_list
-            os_ins_ips = []
+            os_ins = []
             ips=[]
             cpu = "2"
             mem = "2"
+            resource.os_ins_ip_list = os_ins
+            resource.save()
             osid_ip = [(res.get("pod_name"), res.get("pod_ip"))for res in res_list]
             for os_ins in os_ins_ip_list:
+                if os_ins.os_type == "docker":
+                    cpu = os_ins.cpu
+                    mem = os_ins.mem
                 one = osid_ip.pop()
-                os_ins.update_one(os_ins_id=one[0], ip=one[1])
+                os_ins.append(OS_ip_dic(
+                        ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
+                )
+            resource.os_ins_ip_list = os_ins
+            resource.save()
             # for os_ins in os_ins_ip_list:
             #     if os_ins.os_type == "docker":
             #         cpu = os_ins.cpu
@@ -514,8 +523,8 @@ def updata_deployment_info(resource_name,env,url):
             for compute in compute_list:
                 compute.ips = ips
                 compute.save()
-            resource.os_ins_ip_list = os_ins_ips
-            resource.save()
+            # resource.os_ins_ip_list = os_ins_ips
+            # resource.save()
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
