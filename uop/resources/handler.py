@@ -521,9 +521,6 @@ def updata_deployment_info(resource_name,env,url):
             for compute in compute_list:
                 compute.ips = ips
                 compute.save()
-            resource.os_ins_ip_list = []
-            resource.save()
-            resource.reload()
             resource.os_ins_ip_list = os_ins
             resource.save()
     except Exception as e:
