@@ -155,6 +155,7 @@ def flush_crp_to_cmdb():
                             Log.logger.debug("---------------qqqqqqqqqqq--------------------{}".format(q))
                             vms = Statusvm.objects.filter(resource_name__contains=q)
                         if vms:
+                            Log.logger.debug("---------------22222222222222222222222--------------------{}".format(vms))
                             for vm in vms:
                                 vm.status = v[-1]
                                 vm.osid = str(k)
