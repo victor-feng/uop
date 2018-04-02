@@ -262,7 +262,7 @@ def get_from_uop(args):
             tmp_result['osid'] = osid
             tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
-
+        Log.logger.info("result_list:{}".format(result_list))
         if page_num and page_count:
             page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
         else:
