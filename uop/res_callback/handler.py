@@ -353,19 +353,21 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag)
+            db_flag = True if args.get("db_info") else False
+            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag):
+def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
     res = ResourceModel.objects.get(res_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
-    instance = [ins for ins in instances if ins["_id"] == 1][0]
+    instance = [ins for ins in instances if ins["_id"] == 1][0] if not db_flag else \
+        [ins for ins in instances if ins["_id"] == 2][0]
     if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
         view_id = str(instance["instance_id"])
         view_num = get_view_num(
