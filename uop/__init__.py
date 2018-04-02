@@ -33,7 +33,7 @@ class Config(object):
             'func': 'uop.scheduler_util:flush_crp_to_cmdb',
             # 'args': (1, 2),
             'trigger': 'interval',
-            'seconds': 60 * 5
+            'seconds': 60 * 1
         },
         {
             'id': 'get_relations',
