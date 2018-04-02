@@ -136,13 +136,13 @@ def flush_crp_to_cmdb():
                         env_ = get_CRP_url(env)
                         crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
                         ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                        meta = {k: v for k,v in ret.items()}
+                        meta = {k:v for k,v in ret.items()}
                         osid_status.append(meta)
                 else:
                     env_ = get_CRP_url(env)
                     crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
                     ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                    meta = {k: v for k, v in ret.items()}
+                    meta = {k:v for k, v in ret.items()}
                     osid_status.append(meta)
                 #Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
@@ -155,7 +155,7 @@ def flush_crp_to_cmdb():
                             vms = Statusvm.objects.filter(resource_name__contains=q)
                         if vms:
                             for vm in vms:
-                                vm.update(status=v[-1],osid=k,ip=v[1])
+                                vm.update(status=v[-1],osid=k,ip=v[0])
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
