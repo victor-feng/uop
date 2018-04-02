@@ -144,7 +144,7 @@ def flush_crp_to_cmdb():
                     ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
                     meta = {k: v[-1] for k, v in ret.items()}
                     osid_status.append(meta)
-                # Log.logger.info("####meta:{}".format(meta))
+                Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if osid_status:
                 for os in osid_status:
