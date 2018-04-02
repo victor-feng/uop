@@ -232,7 +232,7 @@ def get_from_uop(args):
                 else:
                     for r in res:
                         if isinstance(r.compute_list, int):
-                            return ""
+                            return False
                         for app in r.compute_list:
                             return app.domain, app.domain_ip,app.namespace
                     return False
