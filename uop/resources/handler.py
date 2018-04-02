@@ -224,11 +224,11 @@ def get_from_uop(args):
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
         def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id)
-            Log.logger.info("res:{}".format(res))
+            # Log.logger.info("res:{}".format(res))
             if res:
                 if not flag:
                     for r in res:
-                        return r.cloud if r.cloud else 1
+                        return r.cloud if r.cloud else "1"
                 else:
                     for r in res:
                         if isinstance(r.compute_list, int):
@@ -236,7 +236,7 @@ def get_from_uop(args):
                         for app in r.compute_list:
                             return app.domain, app.domain_ip,app.namespace
                     return False
-            return 1
+            return "1"
 
         Log.logger.info("resources:{}".format(resources))
         for pi in resources:
