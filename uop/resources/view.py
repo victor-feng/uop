@@ -1081,25 +1081,32 @@ class ResourceRecord(Resource):
 class GetDBInfo(Resource):
     # @api_permission_control(request)
     def get(cls, res_id):
-        err_msg, resource_info = get_resource_by_id(res_id)
-        mysql_ip = {
-            'wvip': resource_info.get('mysql_cluster', {'wvip': '127.0.0.1'}).get('wvip'),
-            'rvip': resource_info.get('mysql_cluster', {'rvip': '127.0.0.1'}).get('rvip'),
-        }
-        redis_ip = {
-            'vip': resource_info.get('redis_cluster', {'vip': '127.0.0.1'}).get('vip')
-        }
-        mongodb_ip = {
-            'vip1': resource_info.get('mongodb_cluster', {'vip1': '127.0.0.1'}).get('vip1'),
-            'vip2': resource_info.get('mongodb_cluster', {'vip2': '127.0.0.1'}).get('vip2'),
-            'vip3': resource_info.get('mongodb_cluster', {'vip3': '127.0.0.1'}).get('vip3'),
-            'vip': resource_info.get('mongodb_instance', {'vip': '127.0.0.1'}).get('vip'),
-        }
-        data = {
-            'mysql_ip': mysql_ip,
-            'redis_ip': redis_ip,
-            'mongodb_ip': mongodb_ip,
-        }
+        err_msg = None
+        try:
+            resource = ResourceModel.objects.get(res_id=res_id)
+            os_ins_ip_list = resource.os_ins_ip_list
+            for os_ins in os_ins_ip_list:
+                vip = os_ins.vip
+                wvip = os_ins.wvip
+                rvip = os_ins.rvip
+
+            mysql_ip = {
+                'wvip': wvip,
+                'rvip': rvip,
+            }
+            redis_ip = {
+                'vip': vip
+            }
+            mongodb_ip = {
+                'vip': vip,
+            }
+            data = {
+                'mysql_ip': mysql_ip,
+                'redis_ip': redis_ip,
+                'mongodb_ip': mongodb_ip,
+            }
+        except Exception as e:
+            err_msg = "Get dbinfo error {e}".format(e=str(e))
         if err_msg:
             code = 500
             ret = {
