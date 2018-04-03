@@ -7,6 +7,8 @@ from uop.log import Log
 from uop.deploy_callback.errors import deploy_cb_errors
 from uop.deploy_callback.handler import get_deploy_status, create_status_record
 from uop.models import Deployment, ResourceModel, StatusRecord
+from uop.resources.handler import updata_deployment_info
+from uop.util import get_CRP_url
 from uop.permission.handler import api_permission_control
 import requests
 import datetime
@@ -163,7 +165,12 @@ class DeployCallback(Resource):
                 compute.domain = o_domain
                 compute.port = o_port
             resource.save()
-
+        #如果k8s应用部署成功，修改resource和statusvm表
+        if cloud == 2 and args.result == "success" and res_type == "docker":
+            resource_name = dep.resource_name
+            env = dep.environment
+            url = get_CRP_url(env)
+            updata_deployment_info(resource_name,env,url)
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
