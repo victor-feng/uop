@@ -408,7 +408,7 @@ def check_domain_port(resource,app_image):
     return app_image
 
 
-def get_database_info(resource,database_password,resource_type):
+def get_database_info(resource,database_password):
     database_info={}
     ip_list = []
     try:
