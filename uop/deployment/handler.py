@@ -424,7 +424,7 @@ def get_database_info(resource,database_password):
         for os_ins in os_ins_ip_list:
             port = os_ins.port
             vip = os_ins.vip
-            wvip = os.wvip
+            wvip = os_ins.wvip
             ip = wvip if wvip else vip
         database_info["ip"] = ip
         database_info["port"] = port
