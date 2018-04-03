@@ -352,6 +352,10 @@ class OS_ip_dic(db.EmbeddedDocument):
     cpu = db.StringField(required=False)
     mem = db.StringField(required=False)
     instance_id = db.StringField(required=False)
+    wvip = db.StringField(required=False)
+    rvip = db.StringField(required=False)
+    vip = db.StringField(required=False)
+    port = db.StringField(required=False)
 
     meta = {
         'collection': 'os_ip_dic',
@@ -404,8 +408,6 @@ class ResourceModel(db.DynamicDocument):
     mongodb_network_id = db.StringField(required=False)
     cloud = db.StringField(required=False) #1 = cloud1.0 ,2=cloud2.0
     resource_type = db.StringField(required=False) #资源的类型是应用app，数据库 database
-    vip = db.StringField(required=False) #数据库集群的虚拟ip
-    port = db.StringField(required=False)  # 数据库集群的端口
 
 
 

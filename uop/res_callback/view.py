@@ -620,6 +620,7 @@ class ResourceProviderCallBack(Resource):
             cpu = str(value.get("cpu", '2'))
             mem = str(value.get("mem", '2'))
             wvip = value.get("wvip")
+            rvip = value.get("rvip")
             vip = value.get("vip")
             port = value.get("port")
             if wid:
@@ -628,19 +629,13 @@ class ResourceProviderCallBack(Resource):
                 vid_list.append(rid)
             if vid:
                 vid_list.append(vid)
-            if wvip:
-                resource.vip = wvip
-            if vip:
-                resource.vip = vip
-            if port:
-                resource.port = port
             for instance in value.get('instance'):
                 os_ins_id = instance.get('os_inst_id')
                 ip = instance.get('ip')
                 os_type = instance.get('instance_type')
                 os_vol_id = instance.get('os_vol_id')
                 os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type=os_type, cpu=cpu, mem=mem,
-                                      os_vol_id=os_vol_id)
+                                      os_vol_id=os_vol_id,wvip=wvip,rvip=rvip,vip=vip,port=port)
                 os_ip_list.append(os_ip_dic)
                 os_ids.append(os_ins_id)
             if os_ins_ids:
