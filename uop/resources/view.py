@@ -1086,9 +1086,9 @@ class GetDBInfo(Resource):
             resource = ResourceModel.objects.get(res_id=res_id)
             os_ins_ip_list = resource.os_ins_ip_list
             for os_ins in os_ins_ip_list:
-                vip = os_ins.vip
-                wvip = os_ins.wvip
-                rvip = os_ins.rvip
+                vip = os_ins.vip if os_ins.vip else "127.0.0.1"
+                wvip = os_ins.wvip if os_ins.wvip else "127.0.0.1"
+                rvip = os_ins.rvip if os_ins.rvip else "127.0.0.1"
 
             mysql_ip = {
                 'wvip': wvip,
