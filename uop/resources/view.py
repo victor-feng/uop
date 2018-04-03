@@ -1095,7 +1095,7 @@ class GetDBInfo(Resource):
                 'rvip': rvip,
             }
             redis_ip = {
-                'vip': vip
+                'vip': "127.0.0.1"
             }
             mongodb_ip = {
                 'vip': vip,
