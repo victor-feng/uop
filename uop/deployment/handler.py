@@ -187,7 +187,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             Log.logger.error("Deploy to crp get docker info error {e}".format(e=str(e)))
     data['docker'] = docker_list
     #获取数据库信息
-    database_info = get_database_info(resource_id,database_password)
+    database_info = get_database_info(res_obj,database_password)
     Log.logger.debug("#####uop database info {}".format(database_info))
     if database_info:
         db_type = database_info["database"]
@@ -408,24 +408,30 @@ def check_domain_port(resource,app_image):
     return app_image
 
 
-def get_database_info(resource_id,database_password):
+def get_database_info(resource,database_password,resource_type):
     database_info={}
     ip_list = []
     try:
-        resource = ResourceModel.objects.get(res_id=resource_id)
+        os_ins_ip_list=resource.os_ins_ip_list
         project_name = resource.project_name
+        resource_type = resource.resource_type
         resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"])
         for res in resources_app:
             compute_list = res.compute_list
             for compute in compute_list:
                 ips = compute.ips
                 ip_list.extend(ips)
-        database_info["ip"] = resource.vip
-        database_info["port"] = resource.port
+        for os_ins in os_ins_ip_list:
+            port = os_ins.port
+            vip = os_ins.vip
+            wvip = os.wvip
+            ip = wvip if wvip else vip
+        database_info["ip"] = ip
+        database_info["port"] = port
         database_info["database_user"] = project_name
         database_info["database_password"] = database_password
         database_info["ips"] = ip_list
-        database_info["database"] = resource.resource_type
+        database_info["database"] = resource_type
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
