@@ -280,6 +280,7 @@ class ComputeIns(db.EmbeddedDocument):
     health_check = db.IntField(required=False)
     network_id = db.StringField(required=False)
     networkName = db.StringField(required=False)
+    certificate = db.StringField(required=False)
     tenantName = db.StringField(required=False)
     host_env = db.StringField(required=False)  # 宿主机环境 docker，kvm，physical_server
     language_env = db.StringField(required=False)  # 语言环境，python，java，php
@@ -334,7 +335,6 @@ class DBIns(db.EmbeddedDocument):
     volume_size = db.IntField(required=False, default_value=0)
     network_id = db.StringField(required=False)
     image_id = db.StringField(required=False)
-    certificate = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'index': [
