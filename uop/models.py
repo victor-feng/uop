@@ -288,6 +288,7 @@ class ComputeIns(db.EmbeddedDocument):
     lb_methods = db.StringField(required=False)  #负载均衡算法,round_robin 轮询,least_conn 最少连接,ip_hash 会话保持
     namespace = db.StringField(required=False) #k8s 命名空间
     ready_probe_path = db.StringField(required=False) #就绪探针路径
+    host_mapping = db.StringField(required=False)  # 就绪探针路径
 
 
     meta = {
