@@ -110,8 +110,7 @@ class ApprovalInfo(Resource):
             lb_methods = args.lb_methods
             namespace = args.namespace
             host_mapping = args.host_mapping
-            if host_mapping:
-                host_mapping=json.dumps(host_mapping)
+            host_mapping=json.dumps(host_mapping)
             network_id_dict={
                 "docker":docker_network_id,
                 "mysql":mysql_network_id,
