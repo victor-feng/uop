@@ -800,6 +800,7 @@ class ResourceDetail(Resource):
                         "namespace": db_com.namespace,
                         "ready_probe_path" : db_com.ready_probe_path,
                         "domain_path":db_com.domain_path,
+                        "host_mapping":db_com.host_mapping,
                     }
                 )
         result['resource_list'] = res
