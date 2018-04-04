@@ -98,7 +98,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
             parser.add_argument('namespace', type=str)
-            parser.add_argument('host_mapping', type=list)
+            parser.add_argument('host_mapping', type=list,location='json')
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
