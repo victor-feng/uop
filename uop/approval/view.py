@@ -98,7 +98,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
             parser.add_argument('namespace', type=str)
-            parser.add_argument('host_mapping', type=str)
+            parser.add_argument('host_mapping', type=list)
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -110,6 +110,7 @@ class ApprovalInfo(Resource):
             lb_methods = args.lb_methods
             namespace = args.namespace
             host_mapping = args.host_mapping
+            host_mapping=json.dumps(host_mapping)
             network_id_dict={
                 "docker":docker_network_id,
                 "mysql":mysql_network_id,
