@@ -466,6 +466,7 @@ class ResourceApplication(Resource):
                     requests.delete(crp_url, data=crp_data)
                     # deploy.delete()
                 # 调用CRP 删除资源
+                namespace = None
                 compute_list = resources.compute_list
                 for compute in compute_list:
                     namespace = compute.namespace
