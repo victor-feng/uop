@@ -310,7 +310,8 @@ class CheckImageUrl(Resource):
             if num ==1:
                 image_info=image_url.strip().split(':')
                 image_tag=image_info[1]
-                if image_tag:
+                image_url = image_info[0]
+                if image_tag and image_url != "http" and ".war" not in image_tag:
                     status='success'
                     msg='image url check success'
                 else:
