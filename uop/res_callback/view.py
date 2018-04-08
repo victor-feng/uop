@@ -850,6 +850,7 @@ class ResourceStatusProviderCallBack(Resource):
                 elif war_to_image_status == "war_to_image_success":
                     status_record.status = war_to_image_status
                     status_record.msg = "war包转镜像完成"
+                status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
                 Log.logger.info("War to image operations successful")
@@ -866,6 +867,7 @@ class ResourceStatusProviderCallBack(Resource):
                 elif build_image_status == "build_image_success":
                     status_record.status = build_image_status
                     status_record.msg = "镜像构建完成"
+                status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
                 Log.logger.info("Build image successfully")
@@ -881,6 +883,7 @@ class ResourceStatusProviderCallBack(Resource):
                 elif push_image_status == "push_image_success":
                     status_record.status = push_image_status
                     status_record.msg = "镜像推送完成"
+                status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
 
