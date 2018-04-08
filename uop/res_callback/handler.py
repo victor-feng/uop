@@ -458,7 +458,9 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         attach = {
             "version": db_contents["version"],
             "create_date": raw.get("created_time", ""),
-            "baseinfo": db_contents["cluster_name"]
+            "baseinfo": db_contents["cluster_name"],
+            "write_ip": db_contents.get("wvip", ""),
+            "read_ip": db_contents.get("rvip", "")
         }
         virtual_server = {
             "memory": db_contents["mem"],
