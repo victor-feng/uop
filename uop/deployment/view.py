@@ -273,11 +273,11 @@ class DeploymentListAPI(Resource):
                             disconf_info.disconf_server_password = disconf_info_front.get('disconf_server_password')
                             disconf_info.disconf_env = disconf_info_front.get('disconf_env')
                             disconf_info.disconf_app_name = disconf_info_front.get('disconf_app_name')
-            deploy_obj.save()
+            #deploy_obj.save()
 
             # 将computer信息如IP，更新到数据库
             deploy_obj.app_image = str(args.app_image)
-            deploy_obj.save()
+            #deploy_obj.save()
             cmdb_url = current_app.config['CMDB_URL']
             app_image = args.app_image
             #如果是k8s应用判断域名是否变化

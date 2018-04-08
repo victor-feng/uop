@@ -30,7 +30,7 @@ class DevelopmentConfig(BaseConfig):
     }
     #CMDB_URL = "http://cmdb-dev.syswin.com/"
     CMDB_URL = "http://172.28.20.124:6000/"
-    CMDB2_URL = "http://cmdb2-test.syswin.com/"
+    CMDB2_URL = "http://cmdb2.syswin.com/"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
     CMDB2_OPEN_USER = "uop"
 
@@ -68,7 +68,7 @@ class DevelopmentConfig(BaseConfig):
     UPLOAD_FOLDER = "/data/"
     BASE_K8S_IMAGE = "reg1.syswin.com/base/uop-base-k8s:v-1.0.1"
     K8S_NGINX_PORT = "80"
-    K8S_NGINX_IPS = ["172.28.11.133"]
+    K8S_NGINX_IPS = ["172.28.13.5"]
 configs = {
     'development': DevelopmentConfig,
 }

@@ -206,7 +206,9 @@ def filter_status_data(p_code, id, num):
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
             data["vm_status"].append(meta)
-            Statusvm.created_status(**meta)
+            vm = Statusvm.objects.filter(osid=meta["osid"])
+            if not vm:
+                Statusvm.created_status(**meta)
     return data
 
 
@@ -300,6 +302,7 @@ def crp_data_cmdb(args, cmdb1_url):
     set_flag = args.get('set_flag')
     resource_type = args.get('resource_type')
     resource = ResourceModel.objects.get(res_id=res_id)
+    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
     env = resource.env
     cloud = resource.cloud
     flag = False
@@ -328,7 +331,7 @@ def crp_data_cmdb(args, cmdb1_url):
                 }
                 for index, ins in enumerate(ct["instance"]):
                     ins["baseinfo"] = ins.get("instance_name")
-                    i, r = format_data_cmdb(data["relations"], args, docker_model, attach, len(instances), tomcat_level)
+                    i, r = format_data_cmdb(data["relations"], ins, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
                     instances.append(i)
                     relations.extend(r)
         else:
@@ -352,30 +355,50 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url)
+            db_flag = True if args.get("db_info") else False
+            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else:
             Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
 
-def save_resource_id(instances, res_id, cmdb1_url):
+def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
     Log.logger.info("CMDB2.O instance_id: {}".format(instances))
     resource = ResourceModel.objects(res_id=res_id)
+    res = ResourceModel.objects.get(res_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
-    instance = [ins for ins in instances if ins["_id"] == 1][0]
-    view_id = str(instance["instance_id"])
-    view_num = get_view_num(
-            [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
+    instance = [ins for ins in instances if ins["_id"] == 1][0] if not db_flag else \
+        [ins for ins in instances if ins["_id"] == 2][0]
+    if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
+        view_id = str(instance["instance_id"])
+        view_num = get_view_num(
+                [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
         ),
+        view_num = view_num[0] if isinstance(view_num, tuple) else view_num
+    if set_flag in ["increase"] and not flag: # 虚拟化云的扩容
+        sv = Statusvm.objects.filter(resource_id=res_id)
+        if sv:
+            for s in sv:
+                view_id, view_num = s.resource_view_id, s.view_num
+                break
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
     CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
-    res = ResourceModel.objects.filter(res_id=res_id)
-    if res:
-        for r in res: # 数据加到UOP和cmdb1.0
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, r.cmdb_p_code)
 
-    ins_id = [ins["instance_id"] for ins in instances if ins["instance_id"]]
+    push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
+    def get_ip(ins):
+        try:
+            for os_ip in res.os_ins_ip_list:
+                if os_ip.ip in str(ins["parameters"]):
+                    os_ip.instance_id = ins["instance_id"]
+                    os_ip.save()
+            for p in ins["parameters"]:
+                if p["code"].upper() == "IP":
+                    return p["value"]
+        except Exception as exc:
+            Log.logger.error("get_ip error:{}".format(str(exc)))
+        return ""
+    ins_id = [ins["instance_id"] + "@_" + get_ip(ins) for ins in instances if ins["instance_id"]]
     if ins_id:
         try:
             with save_lock:
@@ -435,7 +458,9 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         attach = {
             "version": db_contents["version"],
             "create_date": raw.get("created_time", ""),
-            "baseinfo": db_contents["cluster_name"]
+            "baseinfo": db_contents["cluster_name"],
+            "write_ip": db_contents.get("wvip", ""),
+            "read_ip": db_contents.get("rvip", "")
         }
         virtual_server = {
             "memory": db_contents["mem"],
@@ -563,8 +588,9 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             )(model["parameters"], item, attach)
         )
     }
-    if item.get("physical_server"): #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
-        get_host_instance_id(item.get("physical_server"))
+    if item.get("physical_server") and physical_server_model_id: #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+        # get_host_instance_id(item.get("physical_server"))
+        Log.logger.info("physical_server_model_id is {} \n.".format(physical_server_model_id))
         r = [
             dict(
                 rel, start_id = i["_id"],

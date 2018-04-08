@@ -90,8 +90,8 @@ class Statusvm(db.DynamicDocument):
             'collection': 'status_vm',
             'indexes': [
                 {
-                    'fields': ['osid'],
-                    'unique': True,
+                    'fields': ['osid',"resource_name"],
+                    'unique': False,
                 }
             ],
             }
@@ -280,6 +280,7 @@ class ComputeIns(db.EmbeddedDocument):
     health_check = db.IntField(required=False)
     network_id = db.StringField(required=False)
     networkName = db.StringField(required=False)
+    certificate = db.StringField(required=False)
     tenantName = db.StringField(required=False)
     host_env = db.StringField(required=False)  # 宿主机环境 docker，kvm，physical_server
     language_env = db.StringField(required=False)  # 语言环境，python，java，php
@@ -288,6 +289,7 @@ class ComputeIns(db.EmbeddedDocument):
     lb_methods = db.StringField(required=False)  #负载均衡算法,round_robin 轮询,least_conn 最少连接,ip_hash 会话保持
     namespace = db.StringField(required=False) #k8s 命名空间
     ready_probe_path = db.StringField(required=False) #就绪探针路径
+    host_mapping = db.StringField(required=False)  # 就绪探针路径
 
 
     meta = {
@@ -351,6 +353,12 @@ class OS_ip_dic(db.EmbeddedDocument):
     os_type = db.StringField(required=False)
     cpu = db.StringField(required=False)
     mem = db.StringField(required=False)
+    instance_id = db.StringField(required=False)
+    wvip = db.StringField(required=False)
+    rvip = db.StringField(required=False)
+    vip = db.StringField(required=False)
+    port = db.StringField(required=False)
+
     meta = {
         'collection': 'os_ip_dic',
         'index': [
@@ -402,8 +410,6 @@ class ResourceModel(db.DynamicDocument):
     mongodb_network_id = db.StringField(required=False)
     cloud = db.StringField(required=False) #1 = cloud1.0 ,2=cloud2.0
     resource_type = db.StringField(required=False) #资源的类型是应用app，数据库 database
-    vip = db.StringField(required=False) #数据库集群的虚拟ip
-    port = db.StringField(required=False)  # 数据库集群的端口
 
 
 
@@ -568,7 +574,7 @@ class NetWorkConfig(db.Document):
     networkName = db.StringField(default='',)
     tenantName = db.StringField(default='',)
     is_deleted = db.IntField(required=False, default=0)
-    cloud = db.IntField(required=False)
+    cloud = db.StringField(required=False)
 
     meta = {
         'collection': 'network_config',

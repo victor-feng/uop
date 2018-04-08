@@ -119,9 +119,10 @@ def _delete_res(res_id):
 # 刷新 虚拟机 状态的 调用接口
 def flush_crp_to_cmdb():
     Log.logger.info('----------------flush_crp_to_cmdb job/5min----------------')
-    resources = ResourceModel.objects.all()
+    resources = ResourceModel.objects.filter(approval_status="success")
     env_list = set([])
     osid_status = []
+    now = datetime.datetime.now()
     with db.app.app_context():
         for resource in resources:
             env_list.add(resource.env)
@@ -136,24 +137,25 @@ def flush_crp_to_cmdb():
                         env_ = get_CRP_url(env)
                         crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
                         ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                        meta = {k: v[-1] for k,v in ret.items()}
+                        meta = {k:v for k,v in ret.items()}
                         osid_status.append(meta)
                 else:
                     env_ = get_CRP_url(env)
                     crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
                     ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                    meta = {k: v[-1] for k, v in ret.items()}
+                    meta = {k:v for k, v in ret.items()}
                     osid_status.append(meta)
-                # Log.logger.info("####meta:{}".format(meta))
+                #Log.logger.info("####meta:{}".format(meta))
             cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
             if osid_status:
                 for os in osid_status:
                     for k, v in os.items():
                         vms = Statusvm.objects.filter(osid=str(k))
+                        if not vms:
+                            q="-".join(str(k).split("-")[:-2])
+                            vms = Statusvm.objects.filter(resource_name__contains=q,update_time__ne=now)
                         if vms:
-                            for vm in vms:
-                                vm.status = v
-                                vm.save()
+                            vms[0].update(status=v[-1], osid=k, ip=v[0],update_time=now)
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
@@ -221,5 +223,6 @@ def get_one_view(uid, token, view_id):
         Log.logger.error("get_relations error: {}".format(str(exc)))
 
 if __name__ == "__main__":
-    get_relations()
+    #get_relations()
+    flush_crp_to_cmdb()
     pass

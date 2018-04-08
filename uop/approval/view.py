@@ -98,6 +98,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
             parser.add_argument('namespace', type=str)
+            parser.add_argument('host_mapping', type=list,location='json')
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -108,6 +109,9 @@ class ApprovalInfo(Resource):
             tenantName = args.tenantName
             lb_methods = args.lb_methods
             namespace = args.namespace
+            host_mapping = args.host_mapping
+            if host_mapping is not None:
+                host_mapping=json.dumps(host_mapping)
             network_id_dict={
                 "docker":docker_network_id,
                 "mysql":mysql_network_id,
@@ -149,7 +153,7 @@ class ApprovalInfo(Resource):
                         com.tenantName = tenantName
                         com.lb_methods = lb_methods
                         com.namespace = namespace
-                        com.save()
+                        com.host_mapping = host_mapping
                 if resource_list:
                     for res_obj in resource_list:
                         res_obj.network_id = network_id_dict.get(res_obj.ins_type)
@@ -322,6 +326,7 @@ class Reservation(Resource):
                         "namespace":db_com.namespace,
                         "ready_probe_path":db_com.ready_probe_path,
                         "domain_path": db_com.domain_path,
+                        "host_mapping": db_com.host_mapping,
                     }
                 )
             data['compute_list'] = com
@@ -456,6 +461,7 @@ class ReservationAPI(Resource):
                         "namespace": db_com.namespace,
                         "ready_probe_path": db_com.ready_probe_path,
                         "domain_path": db_com.domain_path,
+                        "host_mapping": db_com.host_mapping,
                     }
                 )
             data['compute_list'] = com
@@ -697,6 +703,7 @@ class CapacityReservation(Resource):
                                 "namespace": db_com.namespace,
                                 "ready_probe_path": db_com.ready_probe_path,
                                 "domain_path": db_com.domain_path,
+                                "host_mapping":db_com.host_mapping,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
@@ -900,6 +907,8 @@ class RollBackReservation(Resource):
                         res_compute["url"] = compute["url"]
                         res_compute["port"] = compute["port"]
                         res_compute["domain"] = compute["domain"]
+                        res_compute["domain_path"] = compute["domain_path"]
+                        res_compute["database_config"] = compute["database_config"]
             resource.save()
             # ----------
             appinfo = []

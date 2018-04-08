@@ -165,7 +165,8 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     if appinfo:  # 判断nginx信息，没有则不推送dns配置
         for app_info in res_obj.compute_list:
             dns_info = {'domain': app_info.domain,
-                        'domain_ip': app_info.domain_ip
+                        'domain_ip': app_info.domain_ip,
+                        'certificate': app_info.certificate
                         }
             data['dns'].append(dns_info)
     docker_list = []
@@ -187,7 +188,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             Log.logger.error("Deploy to crp get docker info error {e}".format(e=str(e)))
     data['docker'] = docker_list
     #获取数据库信息
-    database_info = get_database_info(resource_id,database_password)
+    database_info = get_database_info(res_obj,database_password)
     Log.logger.debug("#####uop database info {}".format(database_info))
     if database_info:
         db_type = database_info["database"]
@@ -334,13 +335,14 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
-            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem,
+            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
                                  network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
-                                 ready_probe_path=o.ready_probe_path,lb_methods=o.lb_methods,namespace=o.namespace,domain_path=match_one.get("domain_path") )
+                                 ready_probe_path=o.ready_probe_path,lb_methods=o.lb_methods,namespace=o.namespace,domain_path=match_one.get("domain_path"),
+                                 host_mapping=o.host_mapping )
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:
@@ -408,24 +410,30 @@ def check_domain_port(resource,app_image):
     return app_image
 
 
-def get_database_info(resource_id,database_password):
+def get_database_info(resource,database_password):
     database_info={}
     ip_list = []
     try:
-        resource = ResourceModel.objects.get(res_id=resource_id)
+        os_ins_ip_list=resource.os_ins_ip_list
         project_name = resource.project_name
+        resource_type = resource.resource_type
         resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"])
         for res in resources_app:
             compute_list = res.compute_list
             for compute in compute_list:
                 ips = compute.ips
                 ip_list.extend(ips)
-        database_info["ip"] = resource.vip
-        database_info["port"] = resource.port
+        for os_ins in os_ins_ip_list:
+            port = os_ins.port
+            vip = os_ins.vip
+            wvip = os_ins.wvip
+            ip = wvip if wvip else vip
+        database_info["ip"] = ip
+        database_info["port"] = port
         database_info["database_user"] = project_name
         database_info["database_password"] = database_password
         database_info["ips"] = ip_list
-        database_info["database"] = resource.resource_type
+        database_info["database"] = resource_type
     except Exception as e:
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)

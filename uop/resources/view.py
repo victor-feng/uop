@@ -462,9 +462,9 @@ class ResourceApplication(Resource):
                     d_count = ResourceModel.objects.filter(domain=domain).count()
                     if d_count <= 1:
                         crp_data['domain_list'] = domain_list
-                        crp_data = json.dumps(crp_data)
-                        requests.delete(crp_url, data=crp_data)
-                        # deploy.delete()
+                    crp_data = json.dumps(crp_data)
+                    requests.delete(crp_url, data=crp_data)
+                    # deploy.delete()
                 # 调用CRP 删除资源
                 os_ins_ip_list = resources.os_ins_ip_list
                 for os_ip in os_ins_ip_list:
@@ -800,6 +800,7 @@ class ResourceDetail(Resource):
                         "namespace": db_com.namespace,
                         "ready_probe_path" : db_com.ready_probe_path,
                         "domain_path":db_com.domain_path,
+                        "host_mapping":db_com.host_mapping,
                     }
                 )
         result['resource_list'] = res
@@ -1081,25 +1082,32 @@ class ResourceRecord(Resource):
 class GetDBInfo(Resource):
     # @api_permission_control(request)
     def get(cls, res_id):
-        err_msg, resource_info = get_resource_by_id(res_id)
-        mysql_ip = {
-            'wvip': resource_info.get('mysql_cluster', {'wvip': '127.0.0.1'}).get('wvip'),
-            'rvip': resource_info.get('mysql_cluster', {'rvip': '127.0.0.1'}).get('rvip'),
-        }
-        redis_ip = {
-            'vip': resource_info.get('redis_cluster', {'vip': '127.0.0.1'}).get('vip')
-        }
-        mongodb_ip = {
-            'vip1': resource_info.get('mongodb_cluster', {'vip1': '127.0.0.1'}).get('vip1'),
-            'vip2': resource_info.get('mongodb_cluster', {'vip2': '127.0.0.1'}).get('vip2'),
-            'vip3': resource_info.get('mongodb_cluster', {'vip3': '127.0.0.1'}).get('vip3'),
-            'vip': resource_info.get('mongodb_instance', {'vip': '127.0.0.1'}).get('vip'),
-        }
-        data = {
-            'mysql_ip': mysql_ip,
-            'redis_ip': redis_ip,
-            'mongodb_ip': mongodb_ip,
-        }
+        err_msg = None
+        try:
+            resource = ResourceModel.objects.get(res_id=res_id)
+            os_ins_ip_list = resource.os_ins_ip_list
+            for os_ins in os_ins_ip_list:
+                vip = os_ins.vip if os_ins.vip else "127.0.0.1"
+                wvip = os_ins.wvip if os_ins.wvip else "127.0.0.1"
+                rvip = os_ins.rvip if os_ins.rvip else "127.0.0.1"
+
+            mysql_ip = {
+                'wvip': wvip,
+                'rvip': rvip,
+            }
+            redis_ip = {
+                'vip': "127.0.0.1"
+            }
+            mongodb_ip = {
+                'vip': vip,
+            }
+            data = {
+                'mysql_ip': mysql_ip,
+                'redis_ip': redis_ip,
+                'mongodb_ip': mongodb_ip,
+            }
+        except Exception as e:
+            err_msg = "Get dbinfo error {e}".format(e=str(e))
         if err_msg:
             code = 500
             ret = {

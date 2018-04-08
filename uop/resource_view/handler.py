@@ -6,7 +6,7 @@ import json
 import requests
 from flask import current_app
 from uop.log import Log
-from uop.models import ResourceModel
+from uop.models import ResourceModel, Statusvm
 from uop.util import response_data
 from config import configs, APP_ENV
 from uop.item_info.handler import get_uid_token
@@ -14,6 +14,7 @@ from uop.item_info.handler import get_uid_token
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
+CMDB2_ENTITY = configs[APP_ENV].CMDB2_ENTITY
 __all__ = [
     "response_data_not_found", "cmdb_graph_search", "cmdb2_graph_search"
 ]
@@ -133,7 +134,8 @@ def cmdb2_graph_search(args):
             "name": view_num,
             "entity": [
                 {
-                    "id": res_id,
+                    "id":"",
+                    "instance_id": res_id,
                     "parameters": [{
                         "code": args.code if args.code else "baseInfo",
                         "value": args.value.decode(encoding="utf-8") if args.value else ""
@@ -146,6 +148,15 @@ def cmdb2_graph_search(args):
     try:
         # Log.logger.info("cmdb2_graph_search data:{}".format(data))
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
+        idlist = list(get_instance_id_list(res_id))
+        tmp = []
+        for ins in data["instance"]:
+            if ins["entity_id"] in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]:
+                if ins["instance_id"] not in idlist: # 去除缩容减少的，后期删CMDB2
+                    continue
+            tmp.append(ins)
+        data["instance"] = tmp
+        # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
@@ -202,4 +213,13 @@ def attach_resource_env(next_instance, resources, relation, id):
             ])
     return children
 
+
+def get_instance_id_list(id):
+    sv = Statusvm.objects.filter(resource_view_id=id)
+    if sv:
+        for s in sv:
+            res_id = s.resource_id
+    res = ResourceModel.objects.get(res_id=res_id)
+    for os_ip in res.os_ins_ip_list:
+        yield os_ip.instance_id
 

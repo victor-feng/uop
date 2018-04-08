@@ -164,10 +164,37 @@ def get_from_cmdb2(args, filters, download=False):
         return  [] if download else jsonify(response)
 
 
+def update_statusvm(vm):
+    res_id = vm.resource_id
+    vms = Statusvm.objects.filter(resource_id=res_id)
+    old_osid_list = []
+    if vms:
+        old_osid_list = [v.osid for v in vms]
+    try:
+        res = ResourceModel.objects.get(res_id = res_id)
+    except Exception as exc:
+        return vm.osid, vm.ip
+
+    flag = [i for i in res.os_ins_ip_list if i.os_ins_id == vm.osid]
+    new_osip = [i for i in res.os_ins_ip_list if i.os_ins_id not in  old_osid_list]
+    if not flag: # 重启变了osid
+        try:
+            no = new_osip.pop()
+            vm.osid, vm.ip = no.os_ins_id, no.ip
+            vm.save()
+            return no.os_ins_id, no.ip
+        except Exception as exc:
+            Log.logger.error("update_statusvm error:{}".format(exc))
+            return vm.osid, vm.ip
+    else:
+        return vm.osid, vm.ip
+
+
 def get_from_uop(args):
     resource_type, resource_name, module_name,business_name, project_name, start_time, end_time, status, page_num, page_count, env, user_id, department, ip = \
         args.resource_type, args.resource_name, args.module_name,args.business_name,args.project_name, args.start_time, args.end_time,args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip
     query, result_list = {}, []
+
     try:
         attach_key = lambda v, query, key, filter: query.update({key: v}) if filter else ""
 
@@ -198,16 +225,21 @@ def get_from_uop(args):
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
         def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id)
+            # Log.logger.info("res:{}".format(res))
             if res:
                 if not flag:
                     for r in res:
-                        return r.cloud if r.cloud else 1
+                        return r.cloud if r.cloud else "1"
                 else:
                     for r in res:
+                        if isinstance(r.compute_list, int):
+                            return False
                         for app in r.compute_list:
                             return app.domain, app.domain_ip,app.namespace
                     return False
-            return 1
+            return False if flag else "1"
+
+        # Log.logger.info("resources:{}".format(resources))
         for pi in resources:
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
@@ -232,8 +264,11 @@ def get_from_uop(args):
             tmp_result['view_num'] = pi.view_num
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
+            # osid, ip = update_statusvm(pi)
+            # tmp_result['osid'] = osid
+            # tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
-
+        # Log.logger.info("result_list:{}".format(result_list))
         if page_num and page_count:
             page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
         else:
@@ -250,6 +285,7 @@ def get_from_uop(args):
         Log.logger.error("Statusflush error:{}".format(str(exc)))
         res = response_data(code, str(exc), "")
     return res
+
 
 @async
 def delete_uop(res_id):
@@ -444,37 +480,37 @@ def get_deploy_counts():
 @async
 def updata_deployment_info(resource_name,env,url):
     try:
-        time.sleep(10)
-        info_url = "{}api/openstack/k8s/deploymentpod?deployment_name={}".format(url, resource_name)
-        ret = requests.get(info_url)
-        response = ret.json()
-        res_list = response["result"]["data"]["res_list"]
-        if response.get('code') == 200:
-            resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
-            os_ins_ip_list = resource.os_ins_ip_list
-            compute_list = resource.compute_list
-            os_ins_ips = []
-            ips=[]
-            cpu = "2"
-            mem = "2"
-            for os_ins in os_ins_ip_list:
-                if os_ins.os_type == "docker":
-                    cpu = os_ins.cpu
-                    mem = os_ins.mem
-                else:
-                    os_ins_ips.append(os_ins)
-            for res in res_list:
-                ip = res.get("pod_ip")
-                os_ins_id = res.get("pod_name")
-                os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type="docker", cpu=cpu, mem=mem,
-                                      os_vol_id=None)
-                os_ins_ips.append(os_ip_dic)
-                ips.append(ip)
-            for compute in compute_list:
-                compute.ips = ips
-                compute.save()
-            resource.os_ins_ip_list = os_ins_ips
-            resource.save()
+        for i in range(6):
+            time.sleep(10)
+            info_url = "{}api/openstack/k8s/deploymentpod?deployment_name={}".format(url, resource_name)
+            ret = requests.get(info_url)
+            response = ret.json()
+            res_list = response["result"]["data"]["res_list"]
+            if response.get('code') == 200:
+                resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
+                os_ins_ip_list = resource.os_ins_ip_list
+                compute_list = resource.compute_list
+                os_ins_list = []
+                ips=[]
+                osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"))for res in res_list]
+                vmid_ip = osid_ip
+                for os_ins in os_ins_ip_list:
+                    cpu = getattr(os_ins, "cpu")
+                    mem = getattr(os_ins, "mem")
+                    one = osid_ip.pop()
+                    os_ins_list.append(OS_ip_dic(
+                            ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
+                    )
+                for compute in compute_list:
+                    compute.ips = ips
+                    compute.save()
+                resource.os_ins_ip_list = os_ins_list
+                resource.save()
+                #更新Statusvm表数据
+                vms = Statusvm.objects.filter(resource_name=resource_name)
+                for vm in vms:
+                    one = vmid_ip.pop()
+                    vm.update(status=one[2], osid=one[0], ip=one[1])
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
