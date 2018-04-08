@@ -755,7 +755,7 @@ class ResourceStatusProviderCallBack(Resource):
         instance = request_data.get('instance', '')
         db_push = request_data.get('db_push', '')
         set_flag = request_data.get('set_flag', '')
-        var_dict = request_data.get('var_dict', '')
+        war_dict = request_data.get('war_dict', '')
         build_image = request_data.get("build_image", '')
         push_image = request_data.get("push_image", '')
         try:
@@ -833,10 +833,10 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
-            if var_dict:
+            if war_dict:
                 Log.logger.info("This is war to image operations")
-                resource_id = var_dict.get('resource_id')
-                war_to_image_status = var_dict.get('war_to_image_status')
+                resource_id = war_dict.get('resource_id')
+                war_to_image_status = war_dict.get('war_to_image_status')
                 status_record = StatusRecord()
                 status_record.res_id = resource_id
                 if war_to_image_status == "war_to_image_running":
