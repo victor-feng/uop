@@ -206,7 +206,9 @@ def filter_status_data(p_code, id, num):
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
             data["vm_status"].append(meta)
-            Statusvm.created_status(**meta)
+            vm = Statusvm.objects.filter(osid=meta["osid"])
+            if not vm:
+                Statusvm.created_status(**meta)
     return data
 
 
