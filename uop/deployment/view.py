@@ -278,22 +278,15 @@ class DeploymentListAPI(Resource):
 
         def save_to_db(args):
             resource = ResourceModel.objects.get(res_id=args.resource_id)
-            deps = Deployment.objects.filter(resource_id=args.resource_id)
-            cloud = resource.cloud
-            resource_type = resource.resource_type
             mysql_context = args.mysql_context
             redis_context = args.redis_context
             mongodb_context = args.mongodb_context
             uid = args.uid
             app_image = args.app_image
             for app in app_image:
-                if deps.__len__() > 0:
-                    app["is_nginx"] = 0
-                else:
-                    app["is_nginx"] = 1
-            # 如果是k8s应用判断域名是否变化
-            if cloud == '2' and resource_type == "app":
-                app_image=check_domain_port(resource,app_image)
+                app["is_nginx"] = 0
+            # 判断域名是否变化
+            app_image=check_domain_port(resource,app_image)
             #---
             if args.mysql_exe_mode == 'tag' and args.mysql_context:
                 mysql_context = write_file(uid, args.mysql_context, 'mysql')
