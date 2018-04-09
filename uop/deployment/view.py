@@ -247,7 +247,6 @@ class DeploymentListAPI(Resource):
 
             # 将computer信息如IP，更新到数据库
             cmdb_url = current_app.config['CMDB_URL']
-            #app_image = eval(deploy_obj.app_image)
             appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
@@ -279,6 +278,7 @@ class DeploymentListAPI(Resource):
 
         def save_to_db(args):
             resource = ResourceModel.objects.get(res_id=args.resource_id)
+            deps = Deployment.objects.filter(resource_id=args.resource_id)
             cloud = resource.cloud
             resource_type = resource.resource_type
             mysql_context = args.mysql_context
@@ -287,7 +287,10 @@ class DeploymentListAPI(Resource):
             uid = args.uid
             app_image = args.app_image
             for app in app_image:
-                app["is_nginx"] = 0
+                if deps.__len__() > 0:
+                    app["is_nginx"] = 0
+                else:
+                    app["is_nginx"] = 1
             # 如果是k8s应用判断域名是否变化
             if cloud == '2' and resource_type == "app":
                 app_image=check_domain_port(resource,app_image)
