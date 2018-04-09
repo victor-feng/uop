@@ -280,8 +280,8 @@ class DeploymentListAPI(Resource):
 
             # 将computer信息如IP，更新到数据库
             cmdb_url = current_app.config['CMDB_URL']
-            app_image = eval(deploy_obj.app_image)
-            appinfo = attach_domain_ip(app_image, resource, cmdb_url)
+            #app_image = eval(deploy_obj.app_image)
+            appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
                 appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
