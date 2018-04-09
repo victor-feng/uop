@@ -108,11 +108,11 @@ class DeployCallback(Resource):
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_success" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg = "%s %s成功\n" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type])
+                status_record.msg = "%s %s成功\n" % (mapping_msg_info.get(res_type,res_type),deploy_type_dict.get(deploy_type,deploy_type))
             else:
                 dep.deploy_result = "%s_fail" % deploy_type
                 status_record.unique_flag = unique_flag
-                status_record.msg ="%s %s失败,错误日志为%s\n" % (mapping_msg_info[res_type],deploy_type_dict[deploy_type],msg)
+                status_record.msg ="%s %s失败,错误日志为%s\n" % (mapping_msg_info.get(res_type,res_type),deploy_type_dict.get(deploy_type,deploy_type),msg)
             status_record.save()
             dep.save()
         else:
@@ -122,18 +122,18 @@ class DeployCallback(Resource):
                     status_record.status = "%s_docker_success" % deploy_type
                     status_record.unique_flag = unique_flag
                     status_record.msg = "%s_docker:%s %s成功，状态为%s，所属集群为%s,%s" % (
-                    deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name,msg)
+                    deploy_type, ip, deploy_type_dict.get(deploy_type,deploy_type), vm_state, cluster_name,msg)
                 else:
                     dep.deploy_result = "%s_success" % deploy_type
                     status_record.unique_flag = unique_flag
-                    status_record.msg = "%s %s成功" % (mapping_msg_info[res_type], deploy_type_dict[deploy_type])
+                    status_record.msg = "%s %s成功" % (mapping_msg_info.get(res_type,res_type),deploy_type_dict.get(deploy_type,deploy_type))
             elif dep.deploy_result == "fail":
                 if res_type == "docker":
                     dep.deploy_result = "%s_docker_fail" % deploy_type
                     status_record.status = "%s_docker_fail" % deploy_type
                     status_record.unique_flag = unique_flag
                     status_record.msg = "%s_docker:%s %s失败，状态为%s，所属集群为%s，错误日志为：%s" % (
-                    deploy_type, ip, deploy_type_dict[deploy_type], vm_state, cluster_name, msg)
+                    deploy_type, ip, deploy_type_dict.get(deploy_type,deploy_type), vm_state, cluster_name, msg)
                 else:
                     status_record.status = "deploy_%s_fail" % res_type
                     status_record.msg = "deploy_%s:部署失败，错误日志为：%s" % (res_type, msg)
@@ -142,12 +142,12 @@ class DeployCallback(Resource):
             res_status, count = get_deploy_status(deploy_id, deploy_type, res_type,unique_flag)
             if res_status == True and end_flag == True:
                 dep.deploy_result = "%s_success" % deploy_type
-                create_status_record(resource_id, deploy_id, deploy_type, "%s成功\n" % deploy_type_dict[deploy_type],
+                create_status_record(resource_id, deploy_id, deploy_type, "%s成功\n" % deploy_type_dict.get(deploy_type,deploy_type),
                                      "%s_success" % deploy_type, "res")
 
             elif res_status == False and end_flag == True:
                 dep.deploy_result = "%s_fail" % deploy_type
-                create_status_record(resource_id, deploy_id, deploy_type, "%s失败\n" % deploy_type_dict[deploy_type],
+                create_status_record(resource_id, deploy_id, deploy_type, "%s失败\n" % deploy_type_dict.get(deploy_type,deploy_type),
                                      "%s_fail" % deploy_type, "res")
 
             dep.save()
