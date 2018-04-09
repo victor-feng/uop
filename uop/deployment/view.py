@@ -1082,7 +1082,7 @@ class RollBackAPI(Resource):
             now_deploy_name = resource.deploy_name.strip().split('@')[0]
             deployments["now_deploy_name"] = now_deploy_name
             deploys = Deployment.objects.filter(resource_id=resource_id,
-                                                approve_status="success",deploy_type="deploy").order_by('-created_time')
+                                                approve_status="success",deploy_type="deploy",deploy_result="deploy_success").order_by('-created_time')
             for dep in deploys:
                 deploy_name = dep.deploy_name
                 release_notes = dep.release_notes
