@@ -82,17 +82,6 @@ class DeploymentListAPI(Resource):
         if args.resource_id:
             resource_id = args.resource_id
             condition['resource_id'] = resource_id
-            """
-            # 判断是否必填nginx，如果之前的部署填过nginx，之后的部署必须填nginx
-            deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
-            for dep in deps:
-                app_image = eval(dep.app_image)
-                for app in app_image:
-                    domain_ip = app.get("domain_ip")
-                    ins_id = app.get("ins_id", '')
-                    if domain_ip:
-                        domain_info.append(ins_id)
-           """
         deployments = []
         res={}
         try:
@@ -130,28 +119,6 @@ class DeploymentListAPI(Resource):
                                 break
                         else:
                             disconf.append(instance_info)
-                ###############
-                """ 
-                app_image = eval(deployment.app_image)
-                for app in app_image:
-                    domain = app.get("domain")
-                    ins_id = app.get("ins_id", '')
-                    if not domain:
-                        app["is_nginx"] = 0
-                    elif ins_id in domain_info:
-                        app["is_nginx"] = 1
-                    elif ins_id not in domain_info:
-                        app["is_nginx"] = 0
-                      
-                resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
-                resource_type, project_name, business_name, module_name = "" , "", "",""
-                if resource:
-                    for r in resource:
-                        project_name = r.project_name
-                        business_name = r.business_name
-                        module_name = r.module_name
-                        resource_type = r.resource_type
-                """
                 deployments.append({
                     'deploy_id': deployment.deploy_id,
                     'deploy_name': deployment.deploy_name,
