@@ -319,6 +319,8 @@ class DeploymentListAPI(Resource):
             mongodb_context = args.mongodb_context
             uid = args.uid
             app_image = args.app_image
+            for app in app_image:
+                app["is_nginx"] = 0
             # 如果是k8s应用判断域名是否变化
             if cloud == '2' and resource_type == "app":
                 app_image=check_domain_port(resource,app_image)
