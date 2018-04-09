@@ -171,7 +171,7 @@ class DeploymentListAPI(Resource):
                     'redis_context': deployment.redis_context,
                     'mongodb_tag': deployment.mongodb_tag,
                     'mongodb_context': deployment.mongodb_context,
-                    'app_image': deployment.app_image,
+                    'app_image': eval(deployment.app_image),
                     # 'app_image': type(deployment.app_image),
                     'created_time': str(deployment.created_time),
                     'deploy_result': deployment.deploy_result,
