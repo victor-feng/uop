@@ -82,6 +82,7 @@ class DeploymentListAPI(Resource):
         if args.resource_id:
             resource_id = args.resource_id
             condition['resource_id'] = resource_id
+            """
             # 判断是否必填nginx，如果之前的部署填过nginx，之后的部署必须填nginx
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('created_time')
             for dep in deps:
@@ -91,6 +92,7 @@ class DeploymentListAPI(Resource):
                     ins_id = app.get("ins_id", '')
                     if domain_ip:
                         domain_info.append(ins_id)
+           """
         deployments = []
         res={}
         try:
@@ -129,6 +131,7 @@ class DeploymentListAPI(Resource):
                         else:
                             disconf.append(instance_info)
                 ###############
+                """ 
                 app_image = eval(deployment.app_image)
                 for app in app_image:
                     domain = app.get("domain")
@@ -139,7 +142,7 @@ class DeploymentListAPI(Resource):
                         app["is_nginx"] = 1
                     elif ins_id not in domain_info:
                         app["is_nginx"] = 0
-                """        
+                      
                 resource = ResourceModel.objects.filter(res_id=deployment.resource_id)
                 resource_type, project_name, business_name, module_name = "" , "", "",""
                 if resource:
@@ -168,7 +171,7 @@ class DeploymentListAPI(Resource):
                     'redis_context': deployment.redis_context,
                     'mongodb_tag': deployment.mongodb_tag,
                     'mongodb_context': deployment.mongodb_context,
-                    'app_image': app_image,
+                    'app_image': deployment.app_image,
                     # 'app_image': type(deployment.app_image),
                     'created_time': str(deployment.created_time),
                     'deploy_result': deployment.deploy_result,
@@ -276,13 +279,8 @@ class DeploymentListAPI(Resource):
             #deploy_obj.save()
 
             # 将computer信息如IP，更新到数据库
-            deploy_obj.app_image = str(args.app_image)
-            #deploy_obj.save()
             cmdb_url = current_app.config['CMDB_URL']
-            app_image = args.app_image
-            #如果是k8s应用判断域名是否变化
-            if cloud == '2' and resource_type == "app":
-                app_image=check_domain_port(resource, app_image)
+            app_image = eval(deploy_obj.app_image)
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
@@ -313,10 +311,18 @@ class DeploymentListAPI(Resource):
             return message
 
         def save_to_db(args):
+            resource = ResourceModel.objects.get(res_id=args.resource_id)
+            cloud = resource.cloud
+            resource_type = resource.resource_type
             mysql_context = args.mysql_context
             redis_context = args.redis_context
             mongodb_context = args.mongodb_context
             uid = args.uid
+            app_image = args.app_image
+            # 如果是k8s应用判断域名是否变化
+            if cloud == '2' and resource_type == "app":
+                app_image=check_domain_port(resource,app_image)
+            #---
             if args.mysql_exe_mode == 'tag' and args.mysql_context:
                 mysql_context = write_file(uid, args.mysql_context, 'mysql')
             if args.redis_exe_mode == 'tag' and args.redis_context:
@@ -344,7 +350,7 @@ class DeploymentListAPI(Resource):
                 redis_context=redis_context,
                 mongodb_tag=args.mongodb_exe_mode,
                 mongodb_context=mongodb_context,
-                app_image=str(args.app_image),
+                app_image=str(app_image),
                 deploy_result=deploy_result,
                 apply_status=args.apply_status,
                 approve_status=args.approve_status,

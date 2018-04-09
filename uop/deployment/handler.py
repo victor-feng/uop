@@ -398,13 +398,17 @@ def check_domain_port(resource,app_image):
                 if compute.ins_id == app.get("ins_id"):
                     app["o_domain"] = compute.domain
                     app["o_port"] = compute.port
+                    app["is_nginx"] = 0
                     if compute.domain != app.get("domain") or compute.domain_path != app.get("domain_path"):
                         if compute.domain or compute.domain_path:
                             app["ingress_flag"] = "update"
+                            app["is_nginx"] = 1
                         elif not compute.domain and not compute.domain_path:
                             app["ingress_flag"] = "create"
+                            app["is_nginx"] = 1
                         if not app.get("domain") and compute.domain:
                             app["ingress_flag"] = "delete"
+                            app["is_nginx"] = 1
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
     return app_image
