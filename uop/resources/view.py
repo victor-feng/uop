@@ -1441,11 +1441,11 @@ class ResourceType(Resource):
                     code = 401
                     msg = 'Project type is not exist!'
             else:
-                code = 402
-                msg = 'The resource model is not exist!'
+                code = 200
+                msg = 'successful'
         else:
             code = 403
-            msg = 'Missing parameter'
+            msg = 'issing parameter'
         res_content = {
             "msg": msg,
             "content": res_type_content,
