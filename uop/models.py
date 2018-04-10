@@ -37,6 +37,20 @@ class ModelCache(db.Document):
         ]
     }
 
+class HostsCache(db.Document):
+    instance_id = db.StringField(default="", unique=True)
+    ip = db.StringField(required=False)
+    name = db.StringField(required=False)
+    cache_date = db.DateTimeField()
+    meta = {
+        'indexes': [
+            'instance_id',
+            {
+                'fields': ['cache_date'],
+                'expireAfterSeconds': 60 * 60 * 24 * 7
+            }
+        ]
+    }
 
 class Token(db.Document):
     token = db.StringField()
