@@ -571,30 +571,30 @@ class DeploymentListAPI(Resource):
         try:
             deploys = Deployment.objects.filter(resource_id=resource_id,deploy_result="deploy_fail").order_by('-created_time')
             if deploys:
+                resource = ResourceModel.objects.get(res_id=resource_id)
                 deploy=deploys[0]
                 environment=deploy.environment
-                resource_name=deploy.resource_name
                 database_password=deploy.database_password
-                #更新状态
-                deploy.deploy_result = 'deploying'
+                cloud = resource.cloud
+                resource_type = resource.resource_type
                 #获取disconf信息
                 disconf_server_info=deal_disconf_info(deploy)
                 # 将computer信息如IP，更新到数据库
                 app_image=eval(deploy.app_image)
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                cloud = resource.cloud
                 cmdb_url = current_app.config['CMDB_URL']
                 appinfo = attach_domain_ip(app_image, resource, cmdb_url)
+                if cloud == '2' and resource_type == "app":
+                    appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
                 ##推送到crp
                 deploy.approve_status = 'success'
-                err_msg, resource_info = get_resource_by_id(resource_id)
-                if not err_msg:
-                    err_msg, result = deploy_to_crp(deploy,
-                                                    environment,
-                                                    database_password,
-                                                    appinfo, disconf_server_info)
-                    if err_msg:
-                        deploy.deploy_result = 'deploy_fail'
+                err_msg, result = deploy_to_crp(deploy,
+                                                environment,
+                                                database_password,
+                                                appinfo, disconf_server_info)
+                if err_msg:
+                    deploy.deploy_result = 'deploy_fail'
+                # 更新状态
+                deploy.deploy_result = 'deploying'
                 deploy.save()
 
             else:
