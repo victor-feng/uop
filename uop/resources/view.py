@@ -1420,6 +1420,7 @@ class ResourceType(Resource):
         app_val = ['app', 'kvm']
         database_val = ['mysql', 'mongodb', 'redis']
         res = ResourceModel.objects.filter(**condition)
+        Log.logger.info("The resource model is {}".format(res))
         code = 200
         if res:
             if project_type == 'application':
@@ -1457,4 +1458,4 @@ resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
 resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
 resources_api.add_resource(testdeltecmdb, '/testdeltecmdb/')
 resources_api.add_resource(Statistic, '/statistic/')
-resources_api.add_resource(ResourceType, '/type')
+resources_api.add_resource(ResourceType, '/project')
