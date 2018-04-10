@@ -1059,7 +1059,7 @@ class ResourceDeleteCallBack(Resource):
             "code": code,
             "result": {
                 "res": "success",
-                "msg": "get msg success",
+                "msg": "Resource delete success",
             }
         }
         return res, code

@@ -466,6 +466,10 @@ class ResourceApplication(Resource):
                     requests.delete(crp_url, data=crp_data)
                     # deploy.delete()
                 # 调用CRP 删除资源
+                namespace = None
+                compute_list = resources.compute_list
+                for compute in compute_list:
+                    namespace = compute.namespace
                 os_ins_ip_list = resources.os_ins_ip_list
                 for os_ip in os_ins_ip_list:
                     os_ip_dict = {}
@@ -480,7 +484,8 @@ class ResourceApplication(Resource):
                     "os_ins_ip_list": os_inst_ip_list,
                     "vid_list":resources.vid_list,
                     "set_flag": 'res',
-                    'syswin_project':'uop'
+                    'syswin_project':'uop',
+                    'namespace':namespace,
                 }
                 env_ = get_CRP_url(resources.env)
                 crp_url = '%s%s' % (env_, 'api/resource/deletes')

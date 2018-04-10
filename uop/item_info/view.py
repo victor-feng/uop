@@ -310,8 +310,8 @@ class CheckImageUrl(Resource):
             if num ==1:
                 image_info=image_url.strip().split(':')
                 image_tag=image_info[1]
-                image_url = image_info[0]
-                if image_tag and image_url != "http" and ".war" not in image_tag:
+                image_repo = image_info[0]
+                if image_tag and image_repo != "http" and ".war" not in image_tag:
                     status='success'
                     msg='image url check success'
                 else:
@@ -335,6 +335,37 @@ class CheckImageUrl(Resource):
         }
         return ret, code
 
+class CheckWarUrl(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('war_url', type=str)
+        parser.add_argument('project_name', type=str)
+        args = parser.parse_args()
+        war_url = args.war_url
+        project_name = args.project_name
+        code = 200
+        try:
+            war_name = "{}.war".format(project_name)
+            url_war_name = war_url.strip().split("/")[-1]
+            if url_war_name == war_name:
+                status = 'success'
+                msg = 'war url check success'
+            else:
+                status = 'failed'
+                msg = 'war url check failed'
+        except Exception as e:
+            code = 500
+            status = 'error'
+            msg = 'war url check error'
+
+        ret = {
+            'code': code,
+            'result': {
+                'msg': msg,
+                'status':status,
+            }
+        }
+        return ret, code
 
 class BusinessProject(Resource):
     '''
@@ -468,5 +499,6 @@ iteminfo_api.add_resource(ItemInfo, '/iteminfoes/<string:item_id>')
 iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
 iteminfo_api.add_resource(CheckImageUrl, '/check_image_url')
+iteminfo_api.add_resource(CheckWarUrl, '/check_war_url')
 iteminfo_api.add_resource(BusinessProject, '/cmdbinfo')
 iteminfo_api.add_resource(CmdbModels, '/cmdbmodels')
