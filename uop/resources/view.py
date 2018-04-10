@@ -1428,6 +1428,8 @@ class ResourceType(Resource):
                 if project_type == 'application':
                     for i in res:
                         if i.resource_type in app_val:
+                            if i.resource_type == 'app':
+                                i.resource_type = 'docker'
                             res_type_content.append(i.resource_type)
                             code = 200
                             msg = 'successful'
