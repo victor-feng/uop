@@ -310,8 +310,8 @@ class CheckImageUrl(Resource):
             if num ==1:
                 image_info=image_url.strip().split(':')
                 image_tag=image_info[1]
-                image_url = image_info[0]
-                if image_tag and image_url != "http" and ".war" not in image_tag:
+                image_repo = image_info[0]
+                if image_tag and image_repo != "http" and ".war" not in image_tag:
                     status='success'
                     msg='image url check success'
                 else:
@@ -347,8 +347,12 @@ class CheckWarUrl(Resource):
         try:
             war_name = "{}.war".format(project_name)
             url_war_name = war_url.strip().split("/")[-1]
-
-
+            if url_war_name == war_name:
+                status = 'success'
+                msg = 'war url check success'
+            else:
+                status = 'failed'
+                msg = 'war url check failed'
         except Exception as e:
             code = 500
             status = 'error'
