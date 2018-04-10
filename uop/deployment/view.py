@@ -1067,27 +1067,41 @@ class CapacityInfoAPI(Resource):
 
 class RollBackAPI(Resource):
     # 应用回滚
-
-
     # @api_permission_control(request)
     def get(self):
+        # distinguish_tag 为资源管理和部署申请返回值不同做区分 resource_manage deploy_apply
         parser = reqparse.RequestParser()
         parser.add_argument('resource_id', type=str, location='args')
+        parser.add_argument('distinguish_tag', type=str, location='args')
         args = parser.parse_args()
         resource_id = args.resource_id
+        distinguish_tag = args.distinguish_tag
+
+        deployments = {}
+        history_version = []
+        resource = ResourceModel.objects.get(res_id=resource_id)
+        now_deploy_name = resource.deploy_name.strip().split('@')[0]
+        deployments["now_deploy_name"] = now_deploy_name
         try:
-            deployments = {}
-            history_version = []
-            resource = ResourceModel.objects.get(res_id=resource_id)
-            now_deploy_name = resource.deploy_name.strip().split('@')[0]
-            deployments["now_deploy_name"] = now_deploy_name
-            deploys = Deployment.objects.filter(resource_id=resource_id,
-                                                approve_status="success",deploy_type="deploy").order_by('-created_time')
-            for dep in deploys:
-                deploy_name = dep.deploy_name
-                release_notes = dep.release_notes
-                if deploy_name != now_deploy_name:
-                    history_version.append({"deploy_name": deploy_name, "release_notes": release_notes})
+            if distinguish_tag == "resource_manage":
+                deploys = Deployment.objects.filter(resource_id=resource_id,
+                                                    approve_status="success",deploy_type="deploy").order_by('-created_time')
+
+            elif distinguish_tag == "deploy_apply":
+                deploys = Deployment.objects.filter(
+                    resource_id=resource_id,
+                    deploy_type="deploy"
+                ).order_by('-created_time')
+            else:
+                deploys = []
+
+            # release_notes 部署详情 deploy_name 部署版本
+            if deploys:
+                for dep in deploys:
+                    deploy_name = dep.deploy_name
+                    release_notes = dep.release_notes
+                    if deploy_name != now_deploy_name:
+                        history_version.append({"deploy_name": deploy_name, "release_notes": release_notes})
             deployments["history_version"] = history_version
 
         except Exception as e:
