@@ -1419,28 +1419,33 @@ class ResourceType(Resource):
         condition['project_name'] = project_name
         app_val = ['app', 'kvm']
         database_val = ['mysql', 'mongodb', 'redis']
-        res = ResourceModel.objects.filter(**condition)
-        Log.logger.info("The resource model is {}".format(res))
-        code = 200
-        if res:
-            if project_type == 'application':
-                for i in res:
-                    if i.resource_type in app_val:
-                        res_type_content.append(i.resource_type)
-                        code = 200
-                        msg = 'successful'
-            elif project_type == 'database':
-                for i in res:
-                    if i.resource_type in database_val:
-                        res_type_content.append(i.resource_type)
-                        code = 200
-                        msg = 'successful'
+
+        if project_name and project_type:
+            res = ResourceModel.objects.filter(**condition)
+            Log.logger.info("The resource model is {}".format(res))
+            code = 200
+            if res:
+                if project_type == 'application':
+                    for i in res:
+                        if i.resource_type in app_val:
+                            res_type_content.append(i.resource_type)
+                            code = 200
+                            msg = 'successful'
+                elif project_type == 'database':
+                    for i in res:
+                        if i.resource_type in database_val:
+                            res_type_content.append(i.resource_type)
+                            code = 200
+                            msg = 'successful'
+                else:
+                    code = 401
+                    msg = 'Project type is not exist!'
             else:
-                code = 401
-                msg = 'Project type is not exist!'
+                code = 402
+                msg = 'The resource model is not exist!'
         else:
-            code = 402
-            msg = 'The resource model is not exist!'
+            code = 403
+            msg = 'Missing parameter'
         res_content = {
             "msg": msg,
             "content": res_type_content,
