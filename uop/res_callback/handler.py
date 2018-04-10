@@ -5,7 +5,7 @@ import copy
 import requests
 import datetime
 import time
-from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm
+from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm, HostsCache
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
@@ -546,13 +546,21 @@ def get_host_instance_id(name_ip):
     }
     data_str = json.dumps(data)
     try:
+
+        cache_match = HostsCache.objects.filter(ip=ip) if ip else HostsCache.objects.filter(name=name)
+        if cache_match:
+            for cm in cache_match:
+                return cm.instance_id
         Log.logger.info("cmdb2_graph_search request data:{}".format(data))
         ret_data = requests.post(url, data=data_str, timeout=5).json()["data"]
         Log.logger.info("####data:{}".format(ret_data))
+        psid = ret_data["instance"][0]["instance_id"]
+        host = HostsCache(instance_id=psid, name=name, ip=ip, cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
+        host.save()
     except Exception as exc:
-        ret_data = []
+        psid = ""
         Log.logger.error("data error:{}".format(str(exc)))
-    return ret_data
+    return psid
 
 
 def format_data_cmdb(relations, item, model, attach, index, up_level, physical_server_model_id=None):
@@ -589,7 +597,8 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         )
     }
     if item.get("physical_server") and physical_server_model_id: #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
-        # get_host_instance_id(item.get("physical_server"))
+        psid = get_host_instance_id(item.get("physical_server"))
+        host_instance_id = psid if psid else host_instance_id
         Log.logger.info("physical_server_model_id is {} \n.".format(physical_server_model_id))
         r = [
             dict(
