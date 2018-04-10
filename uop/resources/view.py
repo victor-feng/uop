@@ -17,7 +17,8 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from uop.resources.handler import *
 from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
-from uop.models import ResourceModel, DBIns, ComputeIns, Deployment, NetWorkConfig,Approval
+from uop.models import (ResourceModel, DBIns, ComputeIns, Deployment,
+                        NetWorkConfig,Approval)
 from uop.resources.errors import resources_errors
 from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url, response_data, pageinit
@@ -1402,6 +1403,51 @@ class Statistic(Resource):
         response = get_counts()
         return response
 
+
+class ResourceType(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('project_type', type=str, location='args')
+        parser.add_argument('project_name', type=str, location='args')
+        args = parser.parse_args()
+        condition = {}
+        res_type_content = []
+        msg = ''
+        project_type = args.project_type
+        project_name = args.project_name
+        condition['project_name'] = project_name
+        app_val = ['app', 'kvm']
+        database_val = ['mysql', 'mongodb', 'redis']
+        res = ResourceModel.objects.filter(**condition)
+        code = 200
+        if res:
+            if project_type == 'application':
+                for i in res:
+                    if i.resource_type in app_val:
+                        res_type_content.append(i.resource_type)
+                        code = 200
+                        msg = 'successful'
+            elif project_type == 'database':
+                for i in res:
+                    if i.resource_type in database_val:
+                        res_type_content.append(i.resource_type)
+                        code = 200
+                        msg = 'successful'
+            else:
+                code = 401
+                msg = 'Project type is not exist!'
+        else:
+            code = 402
+            msg = 'The resource model is not exist!'
+        res_content = {
+            "msg": msg,
+            "content": res_type_content,
+            "code": code
+        }
+        return res_content
+
+
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(App, '/app/')
@@ -1411,3 +1457,4 @@ resources_api.add_resource(GetMyResourcesInfo, '/get_myresources/')
 resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
 resources_api.add_resource(testdeltecmdb, '/testdeltecmdb/')
 resources_api.add_resource(Statistic, '/statistic/')
+resources_api.add_resource(ResourceType, '/type')
