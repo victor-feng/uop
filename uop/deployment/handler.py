@@ -408,7 +408,7 @@ def check_domain_port(resource,app_image):
                             if compute.domain or compute.domain_path:
                                 app["ingress_flag"] = "update"
                                 app["is_nginx"] = 1
-                            elif not compute.domain and not compute.domain_path:
+                            elif not compute.domain and app.get("domain"):
                                 app["ingress_flag"] = "create"
                                 app["is_nginx"] = 1
                             if not app.get("domain") and compute.domain:

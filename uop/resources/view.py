@@ -17,7 +17,7 @@ from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1, get_from_uop, delete_uop, get_counts,updata_deployment_info
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1,get_counts,updata_deployment_info,delete_resource_deploy,get_from_uop
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -427,100 +427,8 @@ class ResourceApplication(Resource):
         parser.add_argument('res_id', type=str)
         args = parser.parse_args()
         res_id = args.res_id
-        domain = None
-        try:
-            os_inst_ip_list = []
-            resources = ResourceModel.objects.get(res_id=res_id)
-            if len(resources):
-                deploys = Deployment.objects.filter(resource_id=res_id)
-                for deploy in deploys:
-                    env_ = get_CRP_url(deploy.environment)
-                    crp_url = '%s%s' % (env_, 'api/deploy/deploys')
-                    disconf_list = deploy.disconf_list
-                    disconfs = []
-                    for dis in disconf_list:
-                        dis_ = dis.to_json()
-                        disconfs.append(eval(dis_))
-                    crp_data = {
-                        "disconf_list": disconfs,
-                        "resource_id": res_id,
-                        "domain_list": [],
-                        "set_flag": 'res'
-                    }
-                    compute_list = resources.compute_list
-                    domain_list = []
-                    for compute in compute_list:
-                        domain = compute.domain
-                        domain_ip = compute.domain_ip
-                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
-                    d_count = ResourceModel.objects.filter(domain=domain,is_deleted=0).count()
-                    if d_count <= 1:
-                        crp_data['domain_list'] = domain_list
-                    crp_data = json.dumps(crp_data)
-                    requests.delete(crp_url, data=crp_data)
-                    # deploy.delete()
-                # 调用CRP 删除资源
-                namespace = None
-                compute_list = resources.compute_list
-                for compute in compute_list:
-                    namespace = compute.namespace
-                os_ins_ip_list = resources.os_ins_ip_list
-                for os_ip in os_ins_ip_list:
-                    os_ip_dict = {}
-                    os_ip_dict["os_ins_id"] = os_ip["os_ins_id"]
-                    os_ip_dict["os_vol_id"] = os_ip["os_vol_id"]
-                    os_inst_ip_list.append(os_ip_dict)
-                crp_data = {
-                    "resource_id": resources.res_id,
-                    "resource_name":resources.resource_name,
-                    "resource_type": resources.resource_type,
-                    "cloud":resources.cloud,
-                    "os_ins_ip_list": os_inst_ip_list,
-                    "vid_list":resources.vid_list,
-                    "set_flag": 'res',
-                    'syswin_project':'uop',
-                    'namespace':namespace,
-                }
-                env_ = get_CRP_url(resources.env)
-                crp_url = '%s%s' % (env_, 'api/resource/deletes')
-                crp_data = json.dumps(crp_data)
-                requests.delete(crp_url, data=crp_data)
-                cmdb_p_code = resources.cmdb_p_code
-                resources.is_deleted = 1
-                resources.deleted_date = datetime.datetime.now()
-                resources.save()
-                # 回写CMDB
-                delete_cmdb1(cmdb_p_code)
-                delete_uop(res_id)
-                delete_cmdb2(res_id)
-            else:
-                ret = {
-                    'code': 200,
-                    'result': {
-                        'res': 'success',
-                        'msg': 'Resource not found.'
-                    }
-                }
-                return ret, 200
-        except Exception as e:
-            # print e
-            Log.logger.error(str(e))
-            ret = {
-                'code': 500,
-                'result': {
-                    'res': 'fail',
-                    'msg': 'Delete resource application failed.'
-                }
-            }
-            return ret, 500
-        ret = {
-            'code': 200,
-            'result': {
-                'res': 'success',
-                'msg': 'Delete resource application success.'
-            }
-        }
-        return ret, 200
+        ret,code=delete_resource_deploy(res_id)
+        return  ret,code
 
     # @api_permission_control(request)
     @classmethod

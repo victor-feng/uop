@@ -11,12 +11,13 @@ import datetime
 from uop.log import Log
 from uop.util import async, response_data
 from config import APP_ENV, configs
-from uop.models import ResourceModel, Statusvm,OS_ip_dic
+from uop.models import ResourceModel, Statusvm,OS_ip_dic,Deployment
 from uop.item_info.handler import delete_instance, get_uid_token
 from flask import jsonify
 import  xlsxwriter
 import uuid
 import sys,os
+from uop.util import get_CRP_url
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -514,3 +515,112 @@ def updata_deployment_info(resource_name,env,url):
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
+
+def delete_resource_deploy(res_id):
+    domain = None
+    os_inst_ip_list = []
+    try:
+        resources_obj = ResourceModel.objects.filter(res_id=res_id)
+        if len(resources_obj):
+            resources=resources_obj[0]
+            resource_type=resources.resource_type
+            cloud = resources.cloud
+            deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
+            for deploy in deploys:
+                env_ = get_CRP_url(deploy.environment)
+                crp_url = '%s%s' % (env_, 'api/deploy/deploys')
+                disconf_list = deploy.disconf_list
+                disconfs = []
+                for dis in disconf_list:
+                    dis_ = dis.to_json()
+                    disconfs.append(eval(dis_))
+                crp_data = {
+                    "disconf_list": disconfs,
+                    "resource_id": res_id,
+                    "domain_list": [],
+                    "set_flag": 'res'
+                }
+                compute_list = resources.compute_list
+                domain_list = []
+                for compute in compute_list:
+                    domain = compute.domain
+                    domain_ip = compute.domain_ip
+                    domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
+                if d_count <= 1:
+                    crp_data['domain_list'] = domain_list
+                crp_data = json.dumps(crp_data)
+                requests.delete(crp_url, data=crp_data)
+                # deploy.delete()
+            # 调用CRP 删除资源
+            namespace = None
+            compute_list = resources.compute_list
+            for compute in compute_list:
+                namespace = compute.namespace
+            os_ins_ip_list = resources.os_ins_ip_list
+            for os_ip in os_ins_ip_list:
+                os_ip_dict = {}
+                os_ip_dict["os_ins_id"] = os_ip["os_ins_id"]
+                os_ip_dict["os_vol_id"] = os_ip["os_vol_id"]
+                os_inst_ip_list.append(os_ip_dict)
+            crp_data = {
+                "resource_id": resources.res_id,
+                "resource_name": resources.resource_name,
+                "resource_type": resource_type,
+                "cloud": cloud,
+                "os_ins_ip_list": os_inst_ip_list,
+                "vid_list": resources.vid_list,
+                "set_flag": 'res',
+                'syswin_project': 'uop',
+                'namespace': namespace,
+            }
+            env_ = get_CRP_url(resources.env)
+            crp_url = '%s%s' % (env_, 'api/resource/deletes')
+            crp_data = json.dumps(crp_data)
+            requests.delete(crp_url, data=crp_data)
+            reservation_status = resources.reservation_status
+            #如果预留失败的直接删除数据库的记录
+            if reservation_status in ["set_fail","unreserved","approval_fail","revoke"]:
+                resources.delete()
+            else:
+                resources.reservation_status = "deleting"
+                resources.save()
+                if deploys:
+                    dep=deploys[0]
+                    dep.deploy_result = "deleting"
+                    dep.save()
+            #cmdb_p_code = resources.cmdb_p_code
+            #resources.is_deleted = 1
+            #resources.deleted_date = datetime.datetime.now()
+            #resources.save()
+            # 回写CMDB
+            #delete_cmdb1(cmdb_p_code)
+            #delete_uop(res_id)
+            #delete_cmdb2(res_id)
+        else:
+            ret = {
+                'code': 200,
+                'result': {
+                    'res': 'success',
+                    'msg': 'Resource not found.'
+                }
+            }
+            return ret, 200
+    except Exception as e:
+        Log.logger.error(str(e))
+        ret = {
+            'code': 500,
+            'result': {
+                'res': 'fail',
+                'msg': 'Delete resource application failed.'
+            }
+        }
+        return ret, 500
+    ret = {
+        'code': 200,
+        'result': {
+            'res': 'success',
+            'msg': 'Delete resource application success.'
+        }
+    }
+    return ret, 200
