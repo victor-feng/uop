@@ -962,7 +962,7 @@ class ResourceDeleteCallBack(Resource):
         set_flag = request_data.get('set_flag', '')
         try:
             os_inst_ip_dict={}
-            resources = ResourceModel.objects.filter(res_id=resource_id)
+            resources = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
             #set_flag == "reduce" 存在说明是缩容不是正常删除
             if set_flag == "reduce":
                 resource=resources[0]

@@ -70,7 +70,7 @@ def cmdb_graph_search(args):
             else:
                 param_str += "&total_count=" + args.total_count
 
-        resource_instance = ResourceModel.objects.filter(res_id=res_id).first()
+        resource_instance = ResourceModel.objects.filter(res_id=res_id,is_deleted=0).first()
         cmdb_p_code = resource_instance.cmdb_p_code
 
         if cmdb_p_code is None:
@@ -158,7 +158,7 @@ def cmdb2_graph_search(args):
         data["instance"] = tmp
         # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
-            resources = ResourceModel.objects.filter(department=args.department) if args.department != "admin" else ResourceModel.objects.all()
+            resources = ResourceModel.objects.filter(department=args.department,is_deleted=0) if args.department != "admin" else ResourceModel.objects.filter(is_deleted=0)
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
             data = package_data(data, resource_list)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)

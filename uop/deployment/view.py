@@ -464,7 +464,7 @@ class DeploymentListAPI(Resource):
                     "resources_id": '',
                     "domain_list": [],
                 }
-                resm = ResourceModel.objects.filter(res_id=deploy.resource_id)
+                resm = ResourceModel.objects.filter(res_id=deploy.resource_id,is_deleted=0)
                 if resm:
                     for res in resm:
                         crp_data['resources_id'] = res.res_id
@@ -476,7 +476,7 @@ class DeploymentListAPI(Resource):
                             domain_list.append({"domain": domain, 'domain_ip': domain_ip})
                             crp_data['domain_list'] = domain_list
                         # 调用CRP 删除nginx资源
-                        d_count = ResourceModel.objects.filter(domain=domain).count()
+                        d_count = ResourceModel.objects.filter(domain=domain,is_deleted=0).count()
                         #如果还有一个以上的工程使用这个domain 不删除
                         if d_count <= 1:
                             crp_data = json.dumps(crp_data)
@@ -651,7 +651,7 @@ class DeploymentAPI(Resource):
             for deploy in deploys:
                 if args.options == "rollback" and args.department == deploy.department:
                     flag = deploy.is_rollback
-                    repo = ResourceModel.objects.filter(res_id=deploy.resource_id)
+                    repo = ResourceModel.objects.filter(res_id=deploy.resource_id,is_deleted=0)
                     if repo:
                         for r in repo:
                             r.reservation_status = "set_success"
@@ -831,7 +831,7 @@ class CapacityAPI(Resource):
         initiator = args.initiator
         project_name = args.project_name
         try:
-            resources = ResourceModel.objects.filter(res_id=res_id)
+            resources = ResourceModel.objects.filter(res_id=res_id,is_deleted=0)
             if len(resources):
                 resource = resources[0]
                 compute_list = resource.compute_list

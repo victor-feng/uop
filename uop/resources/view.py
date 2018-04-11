@@ -2,25 +2,17 @@
 import json
 import requests
 import os
-import copy
-import time
-import random
 from uop.log import Log
-from flask import request,send_from_directory, make_response, current_app
-from flask import redirect
+from flask import request
 from flask import jsonify
 import uuid
-from urllib2 import unquote
 import datetime
-import hashlib
-from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
+from flask_restful import reqparse, Api, Resource
 from uop.resources.handler import *
-from uop.deployment.handler import get_resource_by_id, get_resource_by_id_mult
 from uop.resources import resources_blueprint
 from uop.models import (ResourceModel, DBIns, ComputeIns, Deployment,
                         NetWorkConfig,Approval)
 from uop.resources.errors import resources_errors
-from uop.scheduler_util import flush_crp_to_cmdb, flush_crp_to_cmdb_by_osid
 from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
@@ -57,7 +49,7 @@ class ResourceApplication(Resource):
                 business_name = info.get("business_name","")
                 module_name = info.get("module_name","")
                 res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type,
-                                                         business_name=business_name, module_name=module_name).count()
+                                                         business_name=business_name, module_name=module_name,is_deleted=0).count()
                 if res_count > 0:
                     res_exist_dict["project_name"] = project_name
                     res_exist_dict["resource_type"] = resource_type
@@ -122,7 +114,7 @@ class ResourceApplication(Resource):
                                                  user_name=user_name, user_id=user_id,env=env,
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
-                                                 cloud = cloud,resource_type = resource_type,domain=domain)
+                                                 cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -185,7 +177,7 @@ class ResourceApplication(Resource):
                     return res, code
             try:
                 for insname in ins_name_list:
-                    if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(env=env).count() > 0:
+                    if ResourceModel.objects(compute_list__match={'ins_name': insname}).filter(env=env,is_deleted=0).count() > 0:
                         code = 200
                         res = {
                             'code': code,
@@ -260,6 +252,7 @@ class ResourceApplication(Resource):
         page_size = int(args.page_size if args.page_size else 0)
         # agg_match = args.agg_match
         condition = {}
+        condition["is_deleted"] = 0
         if args.user_id:
             condition['user_id'] = args.user_id
         if args.resource_name:
@@ -460,7 +453,7 @@ class ResourceApplication(Resource):
                         domain = compute.domain
                         domain_ip = compute.domain_ip
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip})
-                    d_count = ResourceModel.objects.filter(domain=domain).count()
+                    d_count = ResourceModel.objects.filter(domain=domain,is_deleted=0).count()
                     if d_count <= 1:
                         crp_data['domain_list'] = domain_list
                     crp_data = json.dumps(crp_data)
@@ -493,7 +486,8 @@ class ResourceApplication(Resource):
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 cmdb_p_code = resources.cmdb_p_code
-                resources.delete()
+                resources.is_deleted=0
+                resources.save()
                 # 回写CMDB
                 delete_cmdb1(cmdb_p_code)
                 delete_uop(res_id)
@@ -682,7 +676,7 @@ class App(Resource):
         # args.self_model_id = ENTITY["project"]
         # instances = Aquery(args)["instance"] # 工程下所有的tomcat实例
         data = []
-        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id)# 本部门的工程实例
+        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
         if resources:
             data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status, "type": res.resource_type} for res in resources]
         response = response_data(200, "success", data)
@@ -1049,7 +1043,7 @@ class ResourceRecord(Resource):
     def get(cls, user_id):
         result_list = []
         try:
-            resources = ResourceModel.objects.filter(user_id=user_id)
+            resources = ResourceModel.objects.filter(user_id=user_id,is_deleted=0)
         except Exception as e:
             # print e
             Log.logger.error(str(e))
@@ -1417,6 +1411,7 @@ class ResourceType(Resource):
         project_type = args.project_type
         project_name = args.project_name
         condition['project_name'] = project_name
+        condition['is_deleted'] = 0
         app_val = ['app', 'kvm']
         database_val = ['mysql', 'mongodb', 'redis']
 

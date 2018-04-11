@@ -154,7 +154,7 @@ def do_transit_repo_items(items_sequence_list, property_json_mapper, request_dat
 
 
 def get_resources_all_pcode():
-    resources = ResourceModel.objects.all()
+    resources = ResourceModel.objects.filter(is_deleted=0)
     pcode_list = []
     for res in resources:
         code = res.cmdb_p_code
@@ -168,7 +168,7 @@ def filter_status_data(p_code, id, num):
         "vm_status":[]
     }
     # Log.logger.info("filter_status_data.p_code:{}".format(p_code))
-    res = ResourceModel.objects.filter(cmdb_p_code=p_code)
+    res = ResourceModel.objects.filter(cmdb_p_code=p_code,is_deleted=0)
     for r in res:
         osid_ip_list = r.os_ins_ip_list
         compute_list = r.compute_list

@@ -142,7 +142,7 @@ def get_from_cmdb2(args, filters, download=False):
             response["code"] = ret["code"]
             response["result"]["msg"] = ret["msg"]
         Log.logger.info(u"ret：{}".format(ret))
-        resources = ResourceModel.objects.filter(department=filters["dep"], env=filters["env"])
+        resources = ResourceModel.objects.filter(department=filters["dep"], env=filters["env"],is_deleted=0)
         cmdb2_resource_id_list = []
         for res in resources:
             for id in res.cmdb2_resource_id:
@@ -224,7 +224,7 @@ def get_from_uop(args):
         Log.logger.info("query:{}".format(query))
         resources = Statusvm.objects.filter(**query).order_by('-create_time')
         def get_cloud(res_id, flag=False):
-            res = ResourceModel.objects.filter(res_id=res_id)
+            res = ResourceModel.objects.filter(res_id=res_id,is_deleted=0)
             # Log.logger.info("res:{}".format(res))
             if res:
                 if not flag:
@@ -411,7 +411,7 @@ def delete_cmdb1(code):
 
 @async
 def delete_cmdb2(res_id):
-    resource = ResourceModel.objects.filter(res_id=res_id)
+    resource = ResourceModel.objects.filter(res_id=res_id,is_deleted=0)
     instance_list = []
     if resource:
         null = [instance_list.extend(res.cmdb2_resource_id) for res in resource if res.cmdb2_resource_id]
@@ -469,7 +469,7 @@ def get_deploy_counts():
         }
         for type in type_mapping:
             data = {}
-            count = ResourceModel.objects.filter(approval_status="success",resource_type__in=type_mapping[type]).count()
+            count = ResourceModel.objects.filter(approval_status="success",resource_type__in=type_mapping[type],is_deleted=0).count()
             data["count"] = count
             data["entity"] = type
             data["id"] = ""

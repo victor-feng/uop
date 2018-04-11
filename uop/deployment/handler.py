@@ -96,7 +96,7 @@ def get_resource_by_id_mult(p_codes):
 def get_resource_by_id(resource_id):
     err_msg = None
     resource_info = {}
-    resources = ResourceModel.objects.filter(res_id=resource_id)
+    resources = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
     if resources:
         resource = resources[0]
     try:
@@ -426,7 +426,7 @@ def get_database_info(resource,database_password):
         os_ins_ip_list=resource.os_ins_ip_list
         project_name = resource.project_name
         resource_type = resource.resource_type
-        resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"])
+        resources_app = ResourceModel.objects.filter(project_name=project_name,resource_type__in = ["app","kvm"],is_deleted=0)
         for res in resources_app:
             compute_list = res.compute_list
             for compute in compute_list:
