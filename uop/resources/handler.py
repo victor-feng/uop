@@ -523,7 +523,7 @@ def delete_resource_deploy(res_id):
         resources_obj = ResourceModel.objects.filter(res_id=res_id)
         if len(resources_obj):
             resources=resources_obj[0]
-            deploys = Deployment.objects.filter(resource_id=res_id).order_by( "-created_time")
+            deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
             for deploy in deploys:
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
@@ -580,10 +580,11 @@ def delete_resource_deploy(res_id):
             resources.reservation_status = "deleting"
             resources.save()
             Log.logger.info("222222222222222222222222222222")
-            dep=deploys[0]
-            dep.deploy_result= "deleting"
-            Log.logger.info("333333333333333333333333333333")
-            dep.save()
+            if deploys:
+                dep=deploys[0]
+                dep.deploy_result = "deleting"
+                Log.logger.info("333333333333333333333333333333")
+                dep.save()
             #cmdb_p_code = resources.cmdb_p_code
             #resources.is_deleted = 1
             #resources.deleted_date = datetime.datetime.now()
