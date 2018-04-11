@@ -17,7 +17,7 @@ from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1,get_counts,updata_deployment_info,delete_resource_deploy
+from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1,get_counts,updata_deployment_info,delete_resource_deploy,get_from_uop
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
