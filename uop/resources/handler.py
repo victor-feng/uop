@@ -520,9 +520,9 @@ def delete_resource_deploy(res_id):
     domain = None
     os_inst_ip_list = []
     try:
-        resources = ResourceModel.objects.filter(res_id=res_id)
-        if len(resources):
-            resources=resources[0]
+        resources_obj = ResourceModel.objects.filter(res_id=res_id)
+        if len(resources_obj):
+            resources=resources_obj[0]
             deploys = Deployment.objects.filter(resource_id=res_id).order_by( "-created_time")
             for deploy in deploys:
                 env_ = get_CRP_url(deploy.environment)
