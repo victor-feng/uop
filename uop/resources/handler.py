@@ -523,6 +523,8 @@ def delete_resource_deploy(res_id):
         resources_obj = ResourceModel.objects.filter(res_id=res_id)
         if len(resources_obj):
             resources=resources_obj[0]
+            resource_type=resources.resource_type
+            cloud = resources.cloud
             deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
             for deploy in deploys:
                 env_ = get_CRP_url(deploy.environment)
@@ -564,8 +566,8 @@ def delete_resource_deploy(res_id):
             crp_data = {
                 "resource_id": resources.res_id,
                 "resource_name": resources.resource_name,
-                "resource_type": resources.resource_type,
-                "cloud": resources.cloud,
+                "resource_type": resource_type,
+                "cloud": cloud,
                 "os_ins_ip_list": os_inst_ip_list,
                 "vid_list": resources.vid_list,
                 "set_flag": 'res',
@@ -576,15 +578,17 @@ def delete_resource_deploy(res_id):
             crp_url = '%s%s' % (env_, 'api/resource/deletes')
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
-            Log.logger.info("111111111111111111111111111")
-            resources.reservation_status = "deleting"
-            resources.save()
-            Log.logger.info("222222222222222222222222222222")
-            if deploys:
-                dep=deploys[0]
-                dep.deploy_result = "deleting"
-                Log.logger.info("333333333333333333333333333333")
-                dep.save()
+            reservation_status=resources.reservation_status
+            #除了k8s应用外如果预留失败的直接删除数据库的记录
+            if reservation_status == "set_fail" and resource_type != "app" and cloud == '2':
+                resources.delete()
+            else:
+                resources.reservation_status = "deleting"
+                resources.save()
+                if deploys:
+                    dep=deploys[0]
+                    dep.deploy_result = "deleting"
+                    dep.save()
             #cmdb_p_code = resources.cmdb_p_code
             #resources.is_deleted = 1
             #resources.deleted_date = datetime.datetime.now()
