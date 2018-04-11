@@ -1071,6 +1071,7 @@ class ResourceDeleteCallBack(Resource):
                 elif len(status_records) == del_count and "fail" in status_list:
                     resources.reservation_status = "delete_fail"
                     resources.save()
+
                     dep.deploy_result = "delete_fail"
                     dep.save()
         except Exception as e:
