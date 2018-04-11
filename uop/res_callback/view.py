@@ -1066,6 +1066,9 @@ class ResourceDeleteCallBack(Resource):
                     resource.deleted_date = datetime.datetime.now()
                     resource.reservation_status = "delete_success"
                     resource.save()
+                    for dep in deps:
+                        dep.deploy_result = "delete_success"
+                        dep.save()
                     # 回写CMDB
                     delete_cmdb1(cmdb_p_code)
                     delete_uop(resource_id)
