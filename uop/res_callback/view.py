@@ -972,8 +972,11 @@ class ResourceDeleteCallBack(Resource):
             cloud = resource.cloud
             resource_type = resource.resource_type
             deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-            dep = deps[0]
-            deploy_id = dep.deploy_id
+            if deps:
+                dep = deps[0]
+                deploy_id = dep.deploy_id
+            else:
+                deploy_id = resource_id
             if status == "success":
                 msg = "删除资源 %s 成功" % os_inst_ip_dict[os_inst_id]
             else:
@@ -1071,9 +1074,9 @@ class ResourceDeleteCallBack(Resource):
                 elif len(status_records) == del_count and "fail" in status_list:
                     resources.reservation_status = "delete_fail"
                     resources.save()
-
-                    dep.deploy_result = "delete_fail"
-                    dep.save()
+                    if dep:
+                       dep.deploy_result = "delete_fail"
+                       dep.save()
         except Exception as e:
             Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
             code = 500
