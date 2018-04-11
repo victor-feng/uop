@@ -576,10 +576,13 @@ def delete_resource_deploy(res_id):
             crp_url = '%s%s' % (env_, 'api/resource/deletes')
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
+            Log.logger.info("111111111111111111111111111")
             resources.reservation_status = "deleting"
             resources.save()
+            Log.logger.info("222222222222222222222222222222")
             dep=deploys[0]
             dep.deploy_result= "deleting"
+            Log.logger.info("333333333333333333333333333333")
             dep.save()
             #cmdb_p_code = resources.cmdb_p_code
             #resources.is_deleted = 1
