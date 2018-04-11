@@ -984,7 +984,6 @@ class ResourceDeleteCallBack(Resource):
             s_type = resource_type
             if resource_type == "app":
                 s_type = "docker"
-            status = status
             create_status_record(resource_id, deploy_id, s_type, msg, status, set_flag, unique_flag)
             status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
             for sd in status_records:
