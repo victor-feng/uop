@@ -486,7 +486,7 @@ class ResourceApplication(Resource):
                 crp_data = json.dumps(crp_data)
                 requests.delete(crp_url, data=crp_data)
                 cmdb_p_code = resources.cmdb_p_code
-                resources.is_deleted=0
+                resources.is_deleted = 1
                 resources.save()
                 # 回写CMDB
                 delete_cmdb1(cmdb_p_code)
