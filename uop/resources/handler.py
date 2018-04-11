@@ -581,7 +581,7 @@ def delete_resource_deploy(res_id):
             reservation_status = resources.reservation_status
             approval_status = resources.approval_status
             #如果预留失败的直接删除数据库的记录
-            if reservation_status in ["set_fail","reserving","unreserved"] or approval_status in ["failed","revoke"] :
+            if reservation_status in ["set_fail","reserving","unreserved","approval_fail","revoke"]:
                 resources.delete()
             else:
                 resources.reservation_status = "deleting"
