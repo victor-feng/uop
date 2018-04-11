@@ -578,9 +578,10 @@ def delete_resource_deploy(res_id):
             crp_url = '%s%s' % (env_, 'api/resource/deletes')
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
-            reservation_status=resources.reservation_status
+            reservation_status = resources.reservation_status
+            approval_status = resources.approval_status
             #如果预留失败的直接删除数据库的记录
-            if reservation_status == "set_fail" :
+            if reservation_status in ["set_fail","reserving","unreserved"] or approval_status in ["failed","revoke"] :
                 resources.delete()
             else:
                 resources.reservation_status = "deleting"
