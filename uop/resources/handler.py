@@ -579,8 +579,8 @@ def delete_resource_deploy(res_id):
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
             reservation_status=resources.reservation_status
-            #除了k8s应用外如果预留失败的直接删除数据库的记录
-            if reservation_status == "set_fail" and resource_type != "app" and cloud == '2':
+            #如果预留失败的直接删除数据库的记录
+            if reservation_status == "set_fail" :
                 resources.delete()
             else:
                 resources.reservation_status = "deleting"
