@@ -335,7 +335,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
-            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get("certificate", ""),
+            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get(, ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
@@ -403,17 +403,19 @@ def check_domain_port(resource,app_image):
                     app["o_port"] = compute.port
                     if deps.__len__() == 0 and compute.domain:
                         app["is_nginx"] = 1
-                    if cloud == "2" and resource_type == "app":
-                        if compute.domain != app.get("domain") or compute.domain_path != app.get("domain_path"):
-                            if compute.domain or compute.domain_path:
-                                app["ingress_flag"] = "update"
-                                app["is_nginx"] = 1
-                            elif not compute.domain and app.get("domain"):
-                                app["ingress_flag"] = "create"
-                                app["is_nginx"] = 1
-                            if not app.get("domain") and compute.domain:
-                                app["ingress_flag"] = "delete"
-                                app["is_nginx"] = 1
+                    if compute.domain != app.get("domain") or compute.domain_path != app.get("domain_path"):
+                        if compute.domain or compute.domain_path:
+                            app["ingress_flag"] = "update"
+                            app["is_nginx"] = 1
+                        elif not compute.domain and app.get("domain"):
+                            app["ingress_flag"] = "create"
+                            app["is_nginx"] = 1
+                        if not app.get("domain") and compute.domain:
+                            app["ingress_flag"] = "delete"
+                            app["is_nginx"] = 1
+                    if  not (cloud == "2" and resource_type == "app"):
+                        app["ingress_flag"] = ""
+
     except Exception as e:
         Log.logger.error("Check domain port error {e}".format(e=str(e)))
     return app_image
