@@ -1078,7 +1078,7 @@ class ResourceDeleteCallBack(Resource):
                        dep.deploy_result = "delete_fail"
                        dep.save()
         except Exception as e:
-            Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
+            Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e))
             code = 500
             ret = {
                 'code': code,
