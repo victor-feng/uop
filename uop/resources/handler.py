@@ -520,9 +520,10 @@ def delete_resource_deploy(res_id):
     domain = None
     os_inst_ip_list = []
     try:
-        resources = ResourceModel.objects.get(res_id=res_id)
+        resources = ResourceModel.objects.filter(res_id=res_id)
         if len(resources):
-            deploys = Deployment.objects.filter(resource_id=res_id)
+            resources=resources[0]
+            deploys = Deployment.objects.filter(resource_id=res_id).order_by( "-created_time")
             for deploy in deploys:
                 env_ = get_CRP_url(deploy.environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
@@ -575,14 +576,19 @@ def delete_resource_deploy(res_id):
             crp_url = '%s%s' % (env_, 'api/resource/deletes')
             crp_data = json.dumps(crp_data)
             requests.delete(crp_url, data=crp_data)
-            cmdb_p_code = resources.cmdb_p_code
-            resources.is_deleted = 1
-            resources.deleted_date = datetime.datetime.now()
+            resources.reservation_status = "deleting"
             resources.save()
+            dep=deploys[0]
+            dep.deploy_result= "deleting"
+            dep.save()
+            #cmdb_p_code = resources.cmdb_p_code
+            #resources.is_deleted = 1
+            #resources.deleted_date = datetime.datetime.now()
+            #resources.save()
             # 回写CMDB
-            delete_cmdb1(cmdb_p_code)
-            delete_uop(res_id)
-            delete_cmdb2(res_id)
+            #delete_cmdb1(cmdb_p_code)
+            #delete_uop(res_id)
+            #delete_cmdb2(res_id)
         else:
             ret = {
                 'code': 200,

@@ -13,6 +13,7 @@ from uop.res_callback.handler import *
 from transitions import Machine
 from uop.util import get_CRP_url
 from uop.log import Log
+from uop.resources.handler import delete_cmdb1,delete_cmdb2,delete_uop
 from uop.permission.handler import api_permission_control
 
 res_callback_api = Api(res_callback_blueprint, errors=res_callback_errors)
@@ -959,19 +960,36 @@ class ResourceDeleteCallBack(Resource):
         os_inst_id = request_data.get('os_inst_id')
         unique_flag = request_data.get('unique_flag')
         del_os_ins_ip_list = request_data.get('del_os_ins_ip_list',[])
-        set_flag = request_data.get('set_flag', '')
+        set_flag = request_data.get('set_flag')
+        status = request_data.get('status')
+        del_msg = request_data.get('msg')
+        status_list = []
+        os_inst_ip_dict = {}
         try:
-            os_inst_ip_dict={}
             resources = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
-            #set_flag == "reduce" 存在说明是缩容不是正常删除
+            resource = resources[0]
+            env = resource.env
+            cloud = resource.cloud
+            resource_type = resource.resource_type
+            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+            dep = deps[0]
+            deploy_id = dep.deploy_id
+            if status == "success":
+                msg = "删除资源 %s 成功" % os_inst_ip_dict[os_inst_id]
+            else:
+                msg = "删除资源 %s 失败，%s" % (os_inst_ip_dict[os_inst_id], del_msg)
+            s_type = resource_type
+            if resource_type == "app":
+                s_type = "docker"
+            status = status
+            create_status_record(resource_id, deploy_id, s_type, msg, status, set_flag, unique_flag)
+            status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
+            for sd in status_records:
+                status = sd.status
+                status_list.append(status)
+            del_count = len(del_os_ins_ip_list)
+            # set_flag == "reduce" 存在说明是缩容不是正常删除
             if set_flag == "reduce":
-                resource=resources[0]
-                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-                dep = deps[0]
-                deploy_id = dep.deploy_id
-                env = resource.env
-                cloud = resource.cloud
-                resource_type = resource.resource_type
                 compute_list=resource.compute_list
                 os_ins_list=resource.os_ins_list
                 os_ins_ip_list=resource.os_ins_ip_list
@@ -1003,15 +1021,7 @@ class ResourceDeleteCallBack(Resource):
                 resource.os_ins_list=new_os_ins_list
                 resource.os_ins_ip_list=new_os_ins_ip_list
                 resource.save()
-                msg = "删除资源 %s 成功" % os_inst_ip_dict[os_inst_id]
-                s_type = resource_type
-                if resource_type == "app":
-                    s_type = "docker"
-                status = "%s_reduce_success" % resource_type
-                create_status_record(resource_id, deploy_id, s_type,msg,status, set_flag, unique_flag)
-                status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
-                quantity=len(del_os_ins_ip_list)
-                if len(status_records) == quantity :
+                if len(status_records) == del_count and "fail" not in status_list:
                     #create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
                     # 要缩容的资源都删除完成,开始删除nginx配置
                     CPR_URL = get_CRP_url(env)
@@ -1041,8 +1051,28 @@ class ResourceDeleteCallBack(Resource):
                     result = requests.delete(url=CMDB_DEL_URL, headers=headers, data=data_str)
                     result = json.dumps(result.json())
                     Log.logger.debug(result)
-            else:
-                Log.logger.debug("UOP delete all instance and delete db record")
+                elif len(status_records) == del_count and "fail" in status_list:
+                    resources.reservation_status = "reduce_fail"
+                    resources.save()
+                    dep.deploy_result = "reduce_fail"
+                    dep.save()
+            # set_flag == "res" 存在说明是正常删除
+            elif set_flag == "res":
+                if len(status_records) == del_count and "fail" not in status_list:
+                    cmdb_p_code = resource.cmdb_p_code
+                    resource.is_deleted = 1
+                    resource.deleted_date = datetime.datetime.now()
+                    resource.reservation_status = "deleted"
+                    resource.save()
+                    # 回写CMDB
+                    delete_cmdb1(cmdb_p_code)
+                    delete_uop(resource_id)
+                    delete_cmdb2(resource_id)
+                elif len(status_records) == del_count and "fail" in status_list:
+                    resources.reservation_status = "delete_fail"
+                    resources.save()
+                    dep.deploy_result = "delete_fail"
+                    dep.save()
         except Exception as e:
             Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e.args))
             code = 500
