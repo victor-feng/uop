@@ -1442,7 +1442,7 @@ class ResourceType(Resource):
                 msg = 'successful'
         else:
             code = 403
-            msg = 'issing parameter'
+            msg = 'Missing parameter'
         res_content = {
             "msg": msg,
             "content": res_type_content,

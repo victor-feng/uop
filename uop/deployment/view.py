@@ -1057,14 +1057,14 @@ class RollBackAPI(Resource):
 
         deployments = {}
         history_version = []
-        resource = ResourceModel.objects.get(res_id=resource_id)
+        resource = ResourceModel.objects.get(res_id=resource_id, is_deleted=0)
         now_deploy_name = resource.deploy_name.strip().split('@')[0]
         deployments["now_deploy_name"] = now_deploy_name
         try:
             if distinguish_tag == "resource_manage":
                 deploys = Deployment.objects.filter(
                     resource_id=resource_id,
-                    deploy_result="deploy_fail",
+                    approve_status="success",
                     deploy_type="deploy").order_by('-created_time')
 
             elif distinguish_tag == "deploy_apply":
