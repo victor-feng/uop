@@ -253,6 +253,7 @@ class DeploymentListAPI(Resource):
                 appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
+            deploy_obj.app_image = str(args.app_image)
             deploy_obj.approve_status = 'success'
             message = 'approve_allow success'
             ##推送到crp
