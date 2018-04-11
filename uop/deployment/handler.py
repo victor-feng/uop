@@ -335,7 +335,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
-            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get(, ""),
+            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
