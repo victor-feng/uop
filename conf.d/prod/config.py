@@ -28,7 +28,7 @@ class ProdConfig(BaseConfig):
         'prod': PROD_CRP_URL,
     }
     CMDB_URL = "http://cmdb.syswin.com/"
-    CMDB2_URL = "http://cmdb2-test.syswin.com/"
+    CMDB2_URL = "http://cmdb2.syswin.com/"
     CMDB2_OPEN_USER = "uop"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
     CMDB2_ENTITY = {
