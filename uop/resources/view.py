@@ -1175,42 +1175,7 @@ class GetMyResourcesInfo(Resource):
         resource_database = args.mysqlandmongo
         resource_cache = args.cache
         resource_type = resource_database or resource_cache or resource_type
-        if APP_ENV == "development":
-            # uid, token = get_uid_token()
-            # params = {
-            #     "resource_type": resource_type,
-            #     "start_time": args.start_time,
-            #     "end_time": args.end_time,
-            #     "page_num": -1,  # 获取所有数据
-            #     'page_count': args.page_count if args.page_count else 10,
-            #     'item_name': args.project_id,
-            #     "resource_name": args.resource_name,
-            #     'ip': args.ip,
-            #     "uid": uid,
-            #     "token": token,
-            #     # "env": env,
-            #     "resource_status": args.resource_status,
-            # }
-            # filters = {
-            #     "dep": args.department,
-            #     "user": args.user_id,
-            #     "page_num": args.page_num if args.page_num else -1,
-            #     "page_count": args.page_count if args.page_count else 10,
-            #     "env": args.env,
-            #     "project_name":args.project_name,
-            #     "module_name":args.module_name,
-            #     "business_name":args.business_name,
-            # }
-            # data = get_from_cmdb2(params, filters,True)
-            data = get_from_uop(args)["result"]["data"]["object_list"]
-        else:
-            url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-                resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
-                args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
-            ret = requests.get(url)
-            result = ret.json().get('result', {})
-            res = result.get('res', {})
-            data = res.get("object_list", [])
+        data = get_from_uop(args)["result"]["data"]["object_list"]
         msg, excel_name = deal_myresource_to_excel(data, field_list)
         if msg == "success":
             download_dir = os.path.join(UPLOAD_FOLDER, 'excel')
