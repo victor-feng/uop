@@ -1062,7 +1062,7 @@ class GetMyResourcesInfo(Resource):
             page_count = request.args.get('page_count')
             ip = request.args.get('ip', "")
         result_list = []
-        if APP_ENV == "development":
+        # if APP_ENV in "development":
             # uid, token = get_uid_token()
             # params = {
             #     "resource_type": resource_type,
@@ -1086,11 +1086,11 @@ class GetMyResourcesInfo(Resource):
             #     "env": env
             # }
             # return get_from_cmdb2(params, filters)
-            return get_from_uop(args)
-        url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-            args.resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
-            args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
-        ret = requests.get(url)
+        return get_from_uop(args)
+        # url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
+        #     args.resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
+        #     args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
+        # ret = requests.get(url)
         # Log.logger.info("ret:{}".format(ret.json()))
         return ret.json()
 
