@@ -263,6 +263,7 @@ def get_from_uop(args):
             tmp_result['resource_status'] = pi.status
             tmp_result['view_id'] = pi.resource_view_id
             tmp_result['view_num'] = pi.view_num
+            tmp_result['resource_id'] = pi.resource_id
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
             # osid, ip = update_statusvm(pi)
