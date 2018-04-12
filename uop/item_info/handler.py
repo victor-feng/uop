@@ -214,15 +214,19 @@ def Aquery(args):
         res = Statusvm.objects.filter(business_name=history[instance_id])
         if res:
             instances = []
+            name = set()
             for r in res:
-                tmp = dict(instance_id=1, model_id=1, name=r.module_name, property=[{
+                rname = r.module_name
+                if rname not in name:
+                    tmp = dict(instance_id=1, model_id=1, name=rname, property=[{
 
-                        "code": "baseInfo",
-                        "name": u"名称",
-                        "value": r.module_name
+                            "code": "baseInfo",
+                            "name": u"名称",
+                            "value": r.module_name
 
-                }])
-                instances.append(tmp)
+                    }])
+                    instances.append(tmp)
+                    name.add(rname)
             return response_data(200, "success", {"instance": instances})
     data_list =  {
         "uid": uid,
