@@ -1144,18 +1144,6 @@ class GetMyResourcesInfo(Resource):
         response = ret.json()
         if response.get('code') == 200 and cloud == "2":
             updata_deployment_info(resource_name,env,url)
-        """
-        if response.get('code') == 200:
-            flush_crp_to_cmdb_by_osid(osid, env)
-            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
-            if operation == 'start':
-                status = 'startting'
-            elif operation == 'stop':
-                status = 'stopping'
-            elif operation == 'restart':
-                status = 'rebooting'
-            ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
-        """
         return response
 
     # @api_permission_control(request)
