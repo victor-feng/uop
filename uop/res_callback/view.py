@@ -1063,10 +1063,7 @@ class ResourceDeleteCallBack(Resource):
                 Log.logger.info("1111111111111111111111111111111111111111")
                 if len(status_records) == del_count and "fail" not in status_list:
                     cmdb_p_code = resource.cmdb_p_code
-                    resource.is_deleted = 1
-                    resource.deleted_date = datetime.datetime.now()
-                    resource.reservation_status = "delete_success"
-                    resource.save()
+                    resource.update(is_deleted=1,deleted_date=datetime.datetime.now(),reservation_status="delete_success")
                     for dep in deps:
                         dep.deploy_result = "delete_success"
                         dep.save()
