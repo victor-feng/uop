@@ -1060,6 +1060,7 @@ class ResourceDeleteCallBack(Resource):
                     dep.save()
             # set_flag == "res" 存在说明是正常删除
             elif set_flag == "res":
+                Log.logger.info("1111111111111111111111111111111111111111")
                 if len(status_records) == del_count and "fail" not in status_list:
                     cmdb_p_code = resource.cmdb_p_code
                     resource.is_deleted = 1
@@ -1073,6 +1074,7 @@ class ResourceDeleteCallBack(Resource):
                     delete_cmdb1(cmdb_p_code)
                     delete_uop(resource_id)
                     delete_cmdb2(resource_id)
+                    Log.logger.info("22222222222222222222222222222222222")
                 elif len(status_records) == del_count and "fail" in status_list:
                     resources.reservation_status = "delete_fail"
                     resources.save()
