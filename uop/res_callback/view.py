@@ -1054,27 +1054,29 @@ class ResourceDeleteCallBack(Resource):
                     result = json.dumps(result.json())
                     Log.logger.debug(result)
                 elif len(status_records) == del_count and "fail" in status_list:
-                    resources.reservation_status = "reduce_fail"
-                    resources.save()
+                    resource.reservation_status = "reduce_fail"
+                    resource.save()
                     dep.deploy_result = "reduce_fail"
                     dep.save()
             # set_flag == "res" 存在说明是正常删除
             elif set_flag == "res":
                 Log.logger.info("1111111111111111111111111111111111111111")
                 if len(status_records) == del_count and "fail" not in status_list:
+                    Log.logger.info("1111111111111111111111112222221111111111111111")
                     cmdb_p_code = resource.cmdb_p_code
                     resource.update(is_deleted=1,deleted_date=datetime.datetime.now(),reservation_status="delete_success")
                     for dep in deps:
                         dep.deploy_result = "delete_success"
                         dep.save()
                     # 回写CMDB
+                    Log.logger.info("111111111111000000001111111111111111111111111111")
                     delete_cmdb1(cmdb_p_code)
                     delete_uop(resource_id)
                     delete_cmdb2(resource_id)
                     Log.logger.info("22222222222222222222222222222222222")
                 elif len(status_records) == del_count and "fail" in status_list:
-                    resources.reservation_status = "delete_fail"
-                    resources.save()
+                    resource.reservation_status = "delete_fail"
+                    resource.save()
                     if dep:
                        dep.deploy_result = "delete_fail"
                        dep.save()
