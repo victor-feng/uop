@@ -200,12 +200,24 @@ def Aquery(args):
     :param data:
     :return:
     '''
+    history = {
+        "8a3022563add40dbb0130b38": "DevDefaultBusiness",
+        "a03ff39ce13140e499f2344d": "SitDefaultBusiness"
+    }
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
     url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
     url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
     if not uid or not token:
         uid, token = get_uid_token()
+    if instance_id in history.keys():
+        res = Statusvm.objects.filter(bussiness=history[instance_id])
+        if res:
+            instances = []
+            for r in res:
+                tmp = dict(instance_id=1, model_id=1, name=res.module_name, property=[{}])
+                instances.append(tmp)
+            return response_data(200, "success", instances)
     data_list =  {
         "uid": uid,
         "token": token,
@@ -369,13 +381,7 @@ def subgrath_data(args):
     next_model_id, last_model_id, property, uid, token, last_instance_id= \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     if last_instance_id in history.keys():
-        res = Statusvm.objects.filter(bussiness=history["last_instance_id"])
-        if res:
-            instances = []
-            for r in res:
-                tmp = dict(instance_id=1, model_id=1, name=res.module_name,property=[{}])
-                instances.append(tmp)
-            return response_data(200, "success", instances)
+        return response_data(200, "success", u"此业务用于存储历史数据，不能新建模块")
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
     data = get_relations(CMDB2_VIEWS["3"][0])
