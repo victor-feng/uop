@@ -57,6 +57,7 @@ class ProdConfig(BaseConfig):
         "5": ("B9", u"mysql --> 机房，展示mysql资源视图", "e5024d360b924e0c8de3c6a8"),
         "6": ("B10", u"mongodb--> 机房，展示mongodb资源视图", "9bc4a41eb6364022b2f2c093"),
         "7": ("B11", u"redis --> 机房，展示redis资源视图", "de90d618f7504723b677f196"),
+        "8": ("B12", u"物理机信息", "b593293378c74ba6827847d3"),
         # "5": ("B3", u"资源 --> 机房"),
     }
     UPLOAD_FOLDER = "/data/"
