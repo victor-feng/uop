@@ -1061,38 +1061,7 @@ class GetMyResourcesInfo(Resource):
             department = request.args.get('department', "")
             page_count = request.args.get('page_count')
             ip = request.args.get('ip', "")
-        result_list = []
-        # if APP_ENV in "development":
-            # uid, token = get_uid_token()
-            # params = {
-            #     "resource_type": resource_type,
-            #     "start_time": start_time,
-            #     "end_time": end_time,
-            #     "page_num": -1,  # 获取所有数据
-            #     'page_count': page_count,
-            #     'item_name': project_id,
-            #     "resource_name": resource_name,
-            #     'ip': ip,
-            #     # "env": env,
-            #     "resource_status": resource_status,
-            #     "uid": uid,
-            #     "token": token
-            # }
-            # filters = {
-            #     "dep": department,
-            #     "user": user_id,
-            #     "page_num": page_num,
-            #     "page_count": page_count,
-            #     "env": env
-            # }
-            # return get_from_cmdb2(params, filters)
         return get_from_uop(args)
-        # url = CMDB_URL + "cmdb/api/vmdocker/status/?resource_type={}&resource_name={}&item_name={}&start_time={}&end_time={}&resource_status={}&page_num={}&page_count={}&env={}&user_id={}&department={}&ip={}".format(
-        #     args.resource_type, args.resource_name, args.item_name, args.start_time, args.end_time,
-        #     args.resource_status, args.page_num, args.page_count, args.env, args.user_id, args.department, args.ip)
-        # ret = requests.get(url)
-        # Log.logger.info("ret:{}".format(ret.json()))
-        return ret.json()
 
     # @api_permission_control(request)
     def put(self):
