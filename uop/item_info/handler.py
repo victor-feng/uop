@@ -218,7 +218,7 @@ def Aquery(args):
             for r in res:
                 rname = r.module_name
                 if rname not in name:
-                    tmp = dict(instance_id=len(instances), model_id=1, name=rname, property=[{
+                    tmp = dict(instance_id=str(len(instances)), model_id=1, name=rname, property=[{
 
                             "code": "baseInfo",
                             "name": u"名称",
