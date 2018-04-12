@@ -223,7 +223,7 @@ def Aquery(args):
 
                 }])
                 instances.append(tmp)
-            return response_data(200, "success", {"instances": instances})
+            return response_data(200, "success", {"instance": instances})
     data_list =  {
         "uid": uid,
         "token": token,
