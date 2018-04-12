@@ -451,7 +451,7 @@ class Approval(db.DynamicDocument):
     approve_date = db.DateTimeField(required=False)
     # processing/success/failed
     approval_status = db.StringField(required=True)
-    annotations = db.StringField(max_length=50, required=False)
+    annotations = db.StringField(required=False)
     capacity_status = db.StringField(required=False, default='res')
 
     meta = {
