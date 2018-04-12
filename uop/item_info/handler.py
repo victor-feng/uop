@@ -211,7 +211,7 @@ def Aquery(args):
     if not uid or not token:
         uid, token = get_uid_token()
     if instance_id in history.keys():
-        res = Statusvm.objects.filter(bussiness=history[instance_id])
+        res = Statusvm.objects.filter(business_name=history[instance_id])
         if res:
             instances = []
             for r in res:
