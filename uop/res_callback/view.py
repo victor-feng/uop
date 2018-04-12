@@ -990,6 +990,8 @@ class ResourceDeleteCallBack(Resource):
                 status = sd.status
                 status_list.append(status)
             del_count = len(del_os_ins_ip_list)
+            if resource_type == "app" and cloud == "2":
+                del_count = 1
             # set_flag == "reduce" 存在说明是缩容不是正常删除
             if set_flag == "reduce":
                 compute_list=resource.compute_list
