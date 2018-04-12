@@ -441,7 +441,7 @@ def get_database_info(resource,database_password):
             ip = wvip if wvip else vip
         database_info["ip"] = ip
         database_info["port"] = port
-        database_info["database_user"] = project_name
+        database_info["database_user"] = "uop"+ project_name[:5]
         database_info["database_password"] = database_password
         database_info["ips"] = ip_list
         database_info["database"] = resource_type
