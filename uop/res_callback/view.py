@@ -1075,6 +1075,7 @@ class ResourceDeleteCallBack(Resource):
                     delete_cmdb2(resource_id)
                     Log.logger.info("22222222222222222222222222222222222")
                 elif len(status_records) == del_count and "fail" in status_list:
+                    Log.logger.info("44444444444444444444444444444444444444")
                     resource.reservation_status = "delete_fail"
                     resource.save()
                     if dep:
