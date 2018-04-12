@@ -9,7 +9,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb, Token, ModelCache
+from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm
 from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
 
@@ -362,8 +362,20 @@ def subgrath_data(args):
     :param args:
     :return:
     '''
+    history = {
+        "8a3022563add40dbb0130b38": "DevDefaultBusiness",
+         "a03ff39ce13140e499f2344d":"SitDefaultBusiness"
+    }
     next_model_id, last_model_id, property, uid, token, last_instance_id= \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
+    if last_instance_id in history.keys():
+        res = Statusvm.objects.filter(bussiness=history["last_instance_id"])
+        if res:
+            instances = []
+            for r in res:
+                tmp = dict(instance_id=1, model_id=1, name=res.module_name,property=[{}])
+                instances.append(tmp)
+            return response_data(200, "success", instances)
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
     data = get_relations(CMDB2_VIEWS["3"][0])
