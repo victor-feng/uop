@@ -215,7 +215,13 @@ def Aquery(args):
         if res:
             instances = []
             for r in res:
-                tmp = dict(instance_id=1, model_id=1, name=r.module_name, property=[{}])
+                tmp = dict(instance_id=1, model_id=1, name=r.module_name, property=[{
+
+                        "code": "baseInfo",
+                        "name": u"名称",
+                        "value": r.module_name
+
+                }])
                 instances.append(tmp)
             return response_data(200, "success", instances)
     data_list =  {
