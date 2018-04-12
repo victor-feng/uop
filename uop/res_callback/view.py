@@ -1060,7 +1060,7 @@ class ResourceDeleteCallBack(Resource):
                     dep.save()
             # set_flag == "res" 存在说明是正常删除
             elif set_flag == "res":
-                Log.logger.info("1111111111111111111111111111111111111111{}2222222222{}33333333333{}".format(len(status_records),del_count,status_list))
+                Log.logger.info("1111111111111111111111111111111111111111---{}----2222222222----{}----33333333333{}".format(len(status_records),del_count,status_list))
                 if len(status_records) == del_count and "fail" not in status_list:
                     Log.logger.info("1111111111111111111111112222221111111111111111")
                     cmdb_p_code = resource.cmdb_p_code
