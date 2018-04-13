@@ -219,7 +219,7 @@ def Aquery(args):
                 Log.logger.info("###### in res")
                 rname = r.module_name
                 if rname not in name:
-                    tmp = dict(instance_id=str(len(instances)), model_id=1, name=rname, property=[{
+                    tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
 
                             "code": "baseInfo",
                             "name": u"名称",
@@ -232,6 +232,27 @@ def Aquery(args):
         else:
             Log.logger.info("$$$$$$ not in res")
             return response_data(200, "success", {"instance": []})
+
+    if "@@" in instance_id:
+        res = Statusvm.objects.filter(module_name=instance_id.split("@@")[1])
+        if res:
+            instances = []
+            name = set()
+            for r in res:
+                Log.logger.info("###### in res")
+                rname = r.project_name
+                if rname not in name:
+                    tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
+
+                        "code": "baseInfo",
+                        "name": u"名称",
+                        "value": rname
+
+                    }])
+                    instances.append(tmp)
+                    name.add(rname)
+            return response_data(200, "success", {"instance": instances})
+        pass
     data_list =  {
         "uid": uid,
         "token": token,
