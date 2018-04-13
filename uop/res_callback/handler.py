@@ -358,7 +358,7 @@ def crp_data_cmdb(args, cmdb1_url):
             db_flag = True if args.get("db_info") else False
             save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else:
-            Log.logger.info("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
+            Log.logger.error("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 

@@ -591,7 +591,6 @@ class App(Resource):
             except Exception as exc:
                 return jsonify(response_data(200, "success", []))
             resources = ResourceModel.objects.filter(project_name=name, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(project_name=name,is_deleted=0)# 本部门的工程实例
-
         else:
             resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
         if resources:
