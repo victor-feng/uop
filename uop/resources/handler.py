@@ -223,9 +223,9 @@ def get_from_uop(args):
             end_time = datetime.datetime.strptime(str(end_time), "%Y-%m-%dT%H:%M:%S.000Z")
             query["create_time__lte"] = end_time
         Log.logger.info("query:{}".format(query))
-        skip_count = (page_num - 1) * page_count
+        skip_count = (int(page_num) - 1) * int(page_count)
         total_count = Statusvm.objects.filter(**query).count()
-        resources = Statusvm.objects.filter(**query).order_by('-create_time').skip(skip_count).limit(page_count)
+        resources = Statusvm.objects.filter(**query).order_by('-create_time').skip(skip_count).limit(int(page_count))
         def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id,is_deleted=0)
             # Log.logger.info("res:{}".format(res))
