@@ -153,7 +153,7 @@ def flush_crp_to_cmdb():
                         vms = Statusvm.objects.filter(osid=str(k))
                         if not vms:
                             q="-".join(str(k).split("-")[:-2])
-                            vms = Statusvm.objects.filter(resource_name__contains=q,update_time__ne=now)
+                            vms = Statusvm.objects.filter(resource_name__icontains=q,update_time__ne=now)
                         if vms:
                             vms[0].update(status=v[-1], osid=k, ip=v[0],update_time=now)
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
