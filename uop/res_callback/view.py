@@ -967,113 +967,114 @@ class ResourceDeleteCallBack(Resource):
         os_inst_ip_dict = {}
         try:
             resources = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
-            resource = resources[0]
-            env = resource.env
-            cloud = resource.cloud
-            resource_type = resource.resource_type
-            deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-            if deps:
-                dep = deps[0]
-                deploy_id = dep.deploy_id
-            else:
-                deploy_id = resource_id
-            if status == "success":
-                msg = "删除资源成功"
-            else:
-                msg = "删除资源失败，%s" % (del_msg)
-            s_type = resource_type
-            if resource_type == "app":
-                s_type = "docker"
-            create_status_record(resource_id, deploy_id, s_type, msg, status, set_flag, unique_flag)
-            status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
-            for sd in status_records:
-                status = sd.status
-                status_list.append(status)
-            del_count = len(del_os_ins_ip_list)
-            if resource_type == "app" and cloud == "2":
-                del_count = 1
-            # set_flag == "reduce" 存在说明是缩容不是正常删除
-            if set_flag == "reduce":
-                compute_list=resource.compute_list
-                os_ins_list=resource.os_ins_list
-                os_ins_ip_list=resource.os_ins_ip_list
-                cmdb_p_code=resource.cmdb_p_code
-                new_compute_list = []
-                new_os_ins_list = []
-                new_os_ins_ip_list = []
-                #更新resource表中的数据，把要删除的数据删除
-                for os_ins_ip in os_ins_ip_list:
-                    if os_ins_ip["os_ins_id"]  == os_inst_id:
-                        ip=os_ins_ip["ip"]
-                        os_inst_ip_dict[os_inst_id]=ip
-                    else:
-                        new_os_ins_ip_list.append(os_ins_ip)
-                for os_ins_id in os_ins_list:
-                    if os_ins_id !=os_inst_id:
-                        new_os_ins_list.append(os_ins_id)
-                for compute in compute_list:
-                    ips=compute.ips
-                    quantity=compute.quantity
-                    ip=os_inst_ip_dict[os_inst_id]
-                    if ip in ips:
-                        ips.remove(ip)
-                        quantity = quantity - 1
-                    compute.ips=ips
-                    compute.quantity=quantity
-                    new_compute_list.append(compute)
-                resource.compute_list=new_compute_list
-                resource.os_ins_list=new_os_ins_list
-                resource.os_ins_ip_list=new_os_ins_ip_list
-                resource.save()
-                if len(status_records) == del_count and "fail" not in status_list:
-                    #create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
-                    # 要缩容的资源都删除完成,开始删除nginx配置
-                    CPR_URL = get_CRP_url(env)
-                    url = CPR_URL + "api/deploy/deploys"
-                    deploy_to_crp(resource_id,url,set_flag,cloud)
-                    #要缩容的资源都删除完成,开始调用cmdb接口删除对应数据
-                    data={}
-                    ip_list=[]
-                    osid_list=[]
-                    for ip_ins in del_os_ins_ip_list:
-                        ip=ip_ins["ip"]
-                        os_id=ip_ins["os_ins_id"]
-                        ip_list.append(ip)
-                        osid_list.append(os_id)
-                    data["p_code"]=cmdb_p_code
-                    data["ip_list"]=ip_list
-                    data["osid_list"] = osid_list
-                    data_str=json.dumps(data)
-                    dirty = Statusvm.objects.filter(osid__in=osid_list)
-                    if dirty:
-                        for d in dirty:
-                            d.delete()
-                    CMDB_URL = current_app.config['CMDB_URL']
-                    CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
-                    headers = {'Content-Type': 'application/json', }
-                    Log.logger.debug("Data args is " + str(data))
-                    result = requests.delete(url=CMDB_DEL_URL, headers=headers, data=data_str)
-                    result = json.dumps(result.json())
-                    Log.logger.debug(result)
-                elif len(status_records) == del_count and "fail" in status_list:
-                    resource.update(reservation_status="reduce_fail")
-                    dep.update(deploy_result="delete_fail")
-            # set_flag == "res" 存在说明是正常删除
-            elif set_flag == "res":
-                if len(status_records) == del_count and "fail" not in status_list:
-                    cmdb_p_code = resource.cmdb_p_code
-                    resource.update(is_deleted=1,deleted_date=datetime.datetime.now(),reservation_status="delete_success")
-                    for dep in deps:
-                        dep.update(deploy_result="delete_success")
-                    # 回写CMDB
-                    delete_cmdb1(cmdb_p_code)
-                    delete_uop(resource_id)
-                    delete_cmdb2(resource_id)
-                elif len(status_records) == del_count and "fail" in status_list:
-                    resource.reservation_status = "delete_fail"
+            if resources:
+                resource = resources[0]
+                env = resource.env
+                cloud = resource.cloud
+                resource_type = resource.resource_type
+                deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
+                if deps:
+                    dep = deps[0]
+                    deploy_id = dep.deploy_id
+                else:
+                    deploy_id = resource_id
+                if status == "success":
+                    msg = "删除资源成功"
+                else:
+                    msg = "删除资源失败，%s" % (del_msg)
+                s_type = resource_type
+                if resource_type == "app":
+                    s_type = "docker"
+                create_status_record(resource_id, deploy_id, s_type, msg, status, set_flag, unique_flag)
+                status_records = StatusRecord.objects.filter(res_id=resource_id, unique_flag=unique_flag)
+                for sd in status_records:
+                    status = sd.status
+                    status_list.append(status)
+                del_count = len(del_os_ins_ip_list)
+                if resource_type == "app" and cloud == "2":
+                    del_count = 1
+                # set_flag == "reduce" 存在说明是缩容不是正常删除
+                if set_flag == "reduce":
+                    compute_list=resource.compute_list
+                    os_ins_list=resource.os_ins_list
+                    os_ins_ip_list=resource.os_ins_ip_list
+                    cmdb_p_code=resource.cmdb_p_code
+                    new_compute_list = []
+                    new_os_ins_list = []
+                    new_os_ins_ip_list = []
+                    #更新resource表中的数据，把要删除的数据删除
+                    for os_ins_ip in os_ins_ip_list:
+                        if os_ins_ip["os_ins_id"]  == os_inst_id:
+                            ip=os_ins_ip["ip"]
+                            os_inst_ip_dict[os_inst_id]=ip
+                        else:
+                            new_os_ins_ip_list.append(os_ins_ip)
+                    for os_ins_id in os_ins_list:
+                        if os_ins_id !=os_inst_id:
+                            new_os_ins_list.append(os_ins_id)
+                    for compute in compute_list:
+                        ips=compute.ips
+                        quantity=compute.quantity
+                        ip=os_inst_ip_dict[os_inst_id]
+                        if ip in ips:
+                            ips.remove(ip)
+                            quantity = quantity - 1
+                        compute.ips=ips
+                        compute.quantity=quantity
+                        new_compute_list.append(compute)
+                    resource.compute_list=new_compute_list
+                    resource.os_ins_list=new_os_ins_list
+                    resource.os_ins_ip_list=new_os_ins_ip_list
                     resource.save()
-                    if dep:
+                    if len(status_records) == del_count and "fail" not in status_list:
+                        #create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
+                        # 要缩容的资源都删除完成,开始删除nginx配置
+                        CPR_URL = get_CRP_url(env)
+                        url = CPR_URL + "api/deploy/deploys"
+                        deploy_to_crp(resource_id,url,set_flag,cloud)
+                        #要缩容的资源都删除完成,开始调用cmdb接口删除对应数据
+                        data={}
+                        ip_list=[]
+                        osid_list=[]
+                        for ip_ins in del_os_ins_ip_list:
+                            ip=ip_ins["ip"]
+                            os_id=ip_ins["os_ins_id"]
+                            ip_list.append(ip)
+                            osid_list.append(os_id)
+                        data["p_code"]=cmdb_p_code
+                        data["ip_list"]=ip_list
+                        data["osid_list"] = osid_list
+                        data_str=json.dumps(data)
+                        dirty = Statusvm.objects.filter(osid__in=osid_list)
+                        if dirty:
+                            for d in dirty:
+                                d.delete()
+                        CMDB_URL = current_app.config['CMDB_URL']
+                        CMDB_DEL_URL = CMDB_URL + 'cmdb/api/scale/'
+                        headers = {'Content-Type': 'application/json', }
+                        Log.logger.debug("Data args is " + str(data))
+                        result = requests.delete(url=CMDB_DEL_URL, headers=headers, data=data_str)
+                        result = json.dumps(result.json())
+                        Log.logger.debug(result)
+                    elif len(status_records) == del_count and "fail" in status_list:
+                        resource.update(reservation_status="reduce_fail")
                         dep.update(deploy_result="delete_fail")
+                # set_flag == "res" 存在说明是正常删除
+                elif set_flag == "res":
+                    if len(status_records) == del_count and "fail" not in status_list:
+                        cmdb_p_code = resource.cmdb_p_code
+                        resource.update(is_deleted=1,deleted_date=datetime.datetime.now(),reservation_status="delete_success")
+                        for dep in deps:
+                            dep.update(deploy_result="delete_success")
+                        # 回写CMDB
+                        delete_cmdb1(cmdb_p_code)
+                        delete_uop(resource_id)
+                        delete_cmdb2(resource_id)
+                    elif len(status_records) == del_count and "fail" in status_list:
+                        resource.reservation_status = "delete_fail"
+                        resource.save()
+                        if dep:
+                            dep.update(deploy_result="delete_fail")
         except Exception as e:
             Log.logger.error("[UOP] Delete resource callback  failed, Excepton: %s" % str(e))
             code = 500
