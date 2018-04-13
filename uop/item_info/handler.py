@@ -216,6 +216,7 @@ def Aquery(args):
             instances = []
             name = set()
             for r in res:
+                Log.logger.info("###### in res")
                 rname = r.module_name
                 if rname not in name:
                     tmp = dict(instance_id=str(len(instances)), model_id=1, name=rname, property=[{
@@ -228,6 +229,9 @@ def Aquery(args):
                     instances.append(tmp)
                     name.add(rname)
             return response_data(200, "success", {"instance": instances})
+        else:
+            Log.logger.info("$$$$$$ not in res")
+            return response_data(200, "success", {"instance": []})
     data_list =  {
         "uid": uid,
         "token": token,
