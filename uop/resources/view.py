@@ -585,7 +585,15 @@ class App(Resource):
         # args.self_model_id = ENTITY["project"]
         # instances = Aquery(args)["instance"] # 工程下所有的tomcat实例
         data = []
-        resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
+        if "@@" in args.project_id:
+            try:
+                name = args.project_id.split("@@")[1]
+            except Exception as exc:
+                return jsonify(response_data(200, "success", []))
+            resources = ResourceModel.objects.filter(project_name=name, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
+
+        else:
+            resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
         if resources:
             data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status, "type": res.resource_type} for res in resources]
         response = response_data(200, "success", data)
