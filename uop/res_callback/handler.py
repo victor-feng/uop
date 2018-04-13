@@ -189,8 +189,8 @@ def filter_status_data(p_code, id, num):
             meta["module_name"] = r.module_name
             meta["business_name"] = r.business_name
             meta["project_id"] = r.project_id
-            meta["resource_view_id"] = id
-            meta["view_num"] = num
+            meta["resource_view_id"] = "" if id == "@" else id
+            meta["view_num"] = "" if num == "@" else num
             if compute_list:
                 meta["domain"] = compute_list[0].domain
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
@@ -356,7 +356,11 @@ def crp_data_cmdb(args, cmdb1_url):
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
             db_flag = True if args.get("db_info") else False
-            save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
+            if cloud == 1:
+                CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+                push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+            else:
+                save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else:
             Log.logger.error("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
     except Exception as exc:
