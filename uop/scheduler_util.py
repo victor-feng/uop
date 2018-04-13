@@ -157,7 +157,7 @@ def flush_crp_to_cmdb():
                         if vms:
                             vms[0].update(status=v[-1], osid=k, ip=v[0],update_time=now)
                 ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
-                Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
+                #Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
                 Log.logger.info("flush_crp_to_cmdb crp->openstack result is null")
         except Exception as exc:
