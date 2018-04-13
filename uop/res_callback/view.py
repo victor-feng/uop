@@ -977,6 +977,7 @@ class ResourceDeleteCallBack(Resource):
                     dep = deps[0]
                     deploy_id = dep.deploy_id
                 else:
+                    dep = None
                     deploy_id = resource_id
                 if status == "success":
                     msg = "删除资源成功"
