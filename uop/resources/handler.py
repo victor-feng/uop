@@ -223,7 +223,9 @@ def get_from_uop(args):
             end_time = datetime.datetime.strptime(str(end_time), "%Y-%m-%dT%H:%M:%S.000Z")
             query["create_time__lte"] = end_time
         Log.logger.info("query:{}".format(query))
-        resources = Statusvm.objects.filter(**query).order_by('-create_time')
+        skip_count = (page_num - 1) * page_count
+        total_count = Statusvm.objects.filter(**query).count()
+        resources = Statusvm.objects.filter(**query).order_by('-create_time').skip(skip_count).limit(page_count)
         def get_cloud(res_id, flag=False):
             res = ResourceModel.objects.filter(res_id=res_id,is_deleted=0)
             # Log.logger.info("res:{}".format(res))
@@ -271,14 +273,14 @@ def get_from_uop(args):
             # tmp_result['resource_ip'] = ip
             result_list.append(tmp_result)
         # Log.logger.info("result_list:{}".format(result_list))
-        if page_num and page_count:
-            page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
-        else:
-            page_info = result_list
-        total_page = len(result_list)
+        # if page_num and page_count:
+        #     page_info, total_page = pageinit(result_list, int(page_num), int(page_count))
+        # else:
+        #     page_info = result_list
+        # total_page = len(result_list)
         content = {
-            "total_count": total_page,
-            "object_list": page_info,
+            "total_count": total_count,
+            "object_list": result_list,
             "current_page": page_num
         }
         res = response_data(200, "success", content)
