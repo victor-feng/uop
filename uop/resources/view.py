@@ -1048,6 +1048,7 @@ class GetMyResourcesInfo(Resource):
             resource_cache = request.args.get('cache', "")
             resource_type = resource_database or resource_cache or resource_type
             resource_name = request.args.get('resource_name', "")
+            domain = request.args.get('domain', "")
             project_name = request.args.get('project_name', "")
             item_name = request.args.get('item_name', "")
             module_name = request.args.get('module_name', "")
