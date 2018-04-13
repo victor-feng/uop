@@ -531,7 +531,8 @@ def delete_resource_deploy(res_id):
             cloud = resources.cloud
             deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
             for deploy in deploys:
-                env_ = get_CRP_url(deploy.environment)
+                environment = deploy.environment
+                env_ = get_CRP_url(environment)
                 crp_url = '%s%s' % (env_, 'api/deploy/deploys')
                 disconf_list = deploy.disconf_list
                 disconfs = []
@@ -542,7 +543,8 @@ def delete_resource_deploy(res_id):
                     "disconf_list": disconfs,
                     "resource_id": res_id,
                     "domain_list": [],
-                    "set_flag": 'res'
+                    "set_flag": 'res',
+                    "environment":environment,
                 }
                 compute_list = resources.compute_list
                 domain_list = []
