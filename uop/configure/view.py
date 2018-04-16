@@ -484,7 +484,7 @@ class ConfigureImage(Resource):
             url_ = '%s%s' % (CRP_URL, 'api/image/images')
             result = requests.get(url_, headers=headers)
             code = result.json().get('code')
-            msg = result.json().get('msg')
+            msg = result.json().get('result').get('msg')
             if code == 200:
                 images = result.json().get('result').get('res')
                 for image in images:
@@ -518,7 +518,7 @@ class ConfigureFlavor(Resource):
             url_ = '%s%s' % (CRP_URL, 'api/flavor/flavors')
             result = requests.get(url_, headers=headers)
             code = result.json().get('code')
-            msg = result.json().get('msg')
+            msg = result.json().get('result').get('msg')
             if code == 200:
                 flavors = result.json().get('result').get('res')
                 for flavor in flavors:
