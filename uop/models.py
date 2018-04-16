@@ -468,12 +468,13 @@ class Approval(db.DynamicDocument):
 
 class ItemInformation(db.DynamicDocument):
     user = db.StringField(required=True)
-    user_id = db.StringField(required=True)
-    item_id = db.StringField(required=True)
-    item_name = db.StringField(required=True, unique=True)
-    item_code = db.StringField(required=True)
-    item_depart = db.StringField(required=True)
+    user_id = db.StringField(required=True) #
+    item_id = db.StringField(required=True) # uuid
+    item_name = db.StringField(required=True, unique=True) # toonbase,
+    item_code = db.StringField(required=True) #类型：bussiness, module, project
+    item_depart = db.StringField(required=True) # 部门
     item_description = db.StringField(required=False)
+    item_relation = db.StringField(required=False) # 上层id
     create_date = db.DateTimeField(default=datetime.now)
     deleted = db.IntField(required=False, default=0)
 
