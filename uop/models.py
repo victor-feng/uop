@@ -617,3 +617,22 @@ class ConfigureK8sModel(db.Document):
                 'unique': True,
                 }]
             }
+
+class ConfOpenstackModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    env = db.StringField(required=False, max_length=50)
+    image_id = db.StringField(required=False)
+    image_name = db.StringField(required=False)
+    cloud = db.StringField(required=False)
+
+    config_map_name = db.StringField(required=False)
+
+
+
+    meta = {
+            "collection": "configure_k8s",
+            "index": [{
+                'fields': ['id'],
+                'unique': True,
+                }]
+            }
