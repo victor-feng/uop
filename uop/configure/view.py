@@ -290,7 +290,7 @@ class ConfigureNetwork(Resource):
                 network_info["cloud"] = info[2]
                 network_list.append(network_info)
         except Exception as e:
-            err_msg = e.args
+            err_msg = str(e)
             Log.logger.error('Uop get network list err: %s' % err_msg)
             ret = {
                 "code": 400,
@@ -403,6 +403,77 @@ class K8sNamespaceManage(Resource):
 
 
 
+class ConfigureImage(Resource):
+    # @api_permission_control(request)
+    def get(self):
+        data = {}
+        res_list = []
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('env', type=str)
+            args = parser.parse_args()
+            env_ = args.env
+            CRP_URL = get_CRP_url(env_)
+            headers = {'Content-Type': 'application/json'}
+            url_ = '%s%s' % (CRP_URL, 'api/openstack/image/images')
+            result = requests.get(url_, headers=headers)
+            code = result.json().get('code')
+            msg = result.json().get('msg')
+            if code == 200:
+                images = result.json().get('result').get('res')
+                for image in images:
+                    res = {}
+                    res["image_id"] = image.get("id")
+                    res["image_name"] = image.get("image_name")
+                    res["cloud"] = image.get("cloud")
+                    res_list.append(res)
+            data["res_list"] = res_list
+        except Exception as e:
+            code = 500
+            data = "Errot"
+            msg = 'Uop get image list err: %s' % str(e)
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
+class ConfigureFlavor(Resource):
+    # @api_permission_control(request)
+    def get(self):
+        data = {}
+        res_list = []
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('env', type=str)
+            args = parser.parse_args()
+            env_ = args.env
+            CRP_URL = get_CRP_url(env_)
+            headers = {'Content-Type': 'application/json'}
+            url_ = '%s%s' % (CRP_URL, 'api/openstack/flavor/flavors')
+            result = requests.get(url_, headers=headers)
+            code = result.json().get('code')
+            msg = result.json().get('msg')
+            if code == 200:
+                flavors = result.json().get('result').get('res')
+                for flavor in flavors:
+                    res = {}
+                    res["flavor_id"] = flavor.get("flavor_id")
+                    res["flavor_name"] = flavor.get("flavor_name")
+                    res["flavor_cpu"] = flavor.get("cpu")
+                    res["memory"] = flavor.get("memory")
+                    res["cloud"] = flavor.get("cloud")
+                    res_list.append(res)
+            data["res_list"] = res_list
+        except Exception as e:
+            code = 500
+            data = "Errot"
+            msg = 'Uop get flavor list err: %s' % str(e)
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
+
 
 
 configure_api.add_resource(ConfigureEnv, '/env')
@@ -410,3 +481,5 @@ configure_api.add_resource(Configure, '/')
 configure_api.add_resource(ConfigureNetwork, '/network')
 configure_api.add_resource(K8sNetworkApi, '/k8s/networks')
 configure_api.add_resource(K8sNamespaceManage, '/k8s/namespace')
+configure_api.add_resource(ConfigureImage, '/image')
+configure_api.add_resource(ConfigureFlavor, '/flavor')
