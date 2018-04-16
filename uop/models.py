@@ -623,9 +623,13 @@ class ConfOpenstackModel(db.Document):
     env = db.StringField(required=False, max_length=50)
     image_id = db.StringField(required=False)
     image_name = db.StringField(required=False)
+    image_type = db.StringField(required=False)
+    flavor_name = db.StringField(required=False)
+    flavor_id = db.StringField(required=False)
+    flavor_cpu = db.StringField(required=False)
+    flavor_memory = db.StringField(required=False)
+    flavor_type = db.StringField(required=False)
     cloud = db.StringField(required=False)
-
-    config_map_name = db.StringField(required=False)
 
 
 
