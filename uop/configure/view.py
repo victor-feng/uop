@@ -9,7 +9,7 @@ from uop.configure.handler import fuzzyfinder
 from uop.models import ConfigureEnvModel
 from uop.models import ConfigureNginxModel
 from uop.models import ConfigureDisconfModel
-from uop.models import NetWorkConfig,ConfigureK8sModel
+from uop.models import NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
 from uop.util import get_CRP_url,response_data
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -47,18 +47,18 @@ class Configure(Resource):
         env = args.env if args.env else 'dev'
         category = args.category
         Log.logger.info("[UOP] Get configs, env:%s, category: %s", env, category)
-        envs = []
+        results = []
         # nets = []
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                envs.append(dict(id=env.id,
+                results.append(dict(id=env.id,
                                  name=env.name,
                                  ip=env.ip))
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
-                envs.append(dict(id=net.id,
+                results.append(dict(id=net.id,
                                  name=net.name,
                                  sub_network=net.sub_network,
                                  vlan_id=net.vlan_id,
@@ -68,15 +68,37 @@ class Configure(Resource):
         elif category == 'namespace':
             ret = ConfigureK8sModel.objects.filter(env=env)
             for net in ret:
-                envs.append(dict(id=net.id,
+                results.append(dict(id=net.id,
                                  namespace_name=net.namespace_name,
                                  config_map_name=net.config_map_name,
                                 ))
+        elif category == "image":
+            ret = ConfOpenstackModel.objects.filter(env=env)
+            for net in ret:
+                results.append(dict(
+                    id = net.id,
+                    image_id = net.image_id,
+                    image_name = net.image_name,
+                    image_type = net.image_type,
+                    cloud = net.cloud,
+                ))
+        elif category == "flavor":
+            ret = ConfOpenstackModel.objects.filter(env=env)
+            for net in ret:
+                results.append(dict(
+                    id = net.id,
+                    flavor_id = net.flavor_id,
+                    flavor_name = net.flavor_name,
+                    flavor_type = net.flavor_type,
+                    flavor_cpu = net.flavor_cpu,
+                    flavor_memory = net.flavor_memory,
+                    cloud = net.cloud,
+                ))
 
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret:
-                envs.append(dict(id=env.id,
+                results.append(dict(id=env.id,
                                  name=env.name,
                                  username=env.username,
                                  password=env.password,
@@ -85,7 +107,7 @@ class Configure(Resource):
         res = {
             'code': 200,
             'result': {
-                'res': envs,
+                'res': results,
                 'msg': u'请求成功'
             }
         }
@@ -109,6 +131,14 @@ class Configure(Resource):
         parser.add_argument('namespace_name', type=str)
         parser.add_argument('config_map_name', type=str)
         parser.add_argument('cloud', type=str)
+        parser.add_argument('image_id', type=str)
+        parser.add_argument('image_name', type=str)
+        parser.add_argument('image_type', type=str)
+        parser.add_argument('flavor_id', type=str)
+        parser.add_argument('flavor_name', type=str)
+        parser.add_argument('flavor_type', type=str)
+        parser.add_argument('flavor_cpu', type=str)
+        parser.add_argument('flavor_memory', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -116,14 +146,14 @@ class Configure(Resource):
         name = args.name if args.name else ''
         username = args.username if args.username else 'dev'
         password = args.password if args.password else 'dev'
-        category = args.category if args.category else 'nginx'
+        category = args.category
         sub_network = args.sub_network if args.sub_network else ''
         vlan_id = args.vlan_id if args.vlan_id else ''
         networkName = args.networkName if args.networkName else ''
         tenantName = args.tenantName if args.tenantName else ''
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
-        cloud = args.cloud if args.cloud else ''
+        cloud = args.cloud if args.cloud else '2'
         Log.logger.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
@@ -148,6 +178,21 @@ class Configure(Resource):
                 namespace_name = namespace_name,
                 config_map_name = config_map_name,
             ).save()
+        elif category == "image":
+            ret = ConfOpenstackModel(
+                id=id,
+                image_id=args.image_id,
+                image_name=args.image_name,
+                image_type=args.image_type,
+                cloud=cloud).save()
+        elif category == "flavor":
+            ret=ConfOpenstackModel(id=id,
+                                   flavor_id=args.flavor_id,
+                                   flavor_name=args.flavor_name,
+                                   flavor_type=args.flavor_type,
+                                   flavor_cpu=args.flavor_cpu,
+                                   flavor_memory=args.flavor_memory,
+                                   cloud=cloud).save()
         else:
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -184,14 +229,21 @@ class Configure(Resource):
         parser.add_argument('namespace_name', type=str)
         parser.add_argument('config_map_name', type=str)
         parser.add_argument('cloud', type=str)
+        parser.add_argument('image_id', type=str)
+        parser.add_argument('image_name', type=str)
+        parser.add_argument('image_type', type=str)
+        parser.add_argument('flavor_id', type=str)
+        parser.add_argument('flavor_name', type=str)
+        parser.add_argument('flavor_type', type=str)
+        parser.add_argument('flavor_cpu', type=str)
+        parser.add_argument('flavor_memory', type=str)
         args = parser.parse_args()
-        category = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
         url = args.url if args.url else ''
         ip = args.ip if args.ip else ''
         name = args.name if args.name else ''
-        category = args.category if args.category else 'nginx'
+        category = args.category
         username = args.username if args.username else ''
         password = args.password if args.password else ''
         sub_network = args.sub_network if args.sub_network else ''
@@ -200,7 +252,7 @@ class Configure(Resource):
         tenantName = args.tenantName if args.tenantName else ''
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
-        cloud = args.cloud if args.cloud else ''
+        cloud = args.cloud if args.cloud else '2'
         Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
 
         if category == 'nginx':
@@ -212,6 +264,20 @@ class Configure(Resource):
         elif category == "namespace":
             ret = ConfigureK8sModel.objects(id = id)
             ret.update(env=env,namespace_name=namespace_name,config_map_name=config_map_name)
+        elif category == "image":
+            ret = ConfOpenstackModel.objects(id=id)
+            ret.update(image_id=args.image_id,
+                image_name=args.image_name,
+                image_type=args.image_type,
+                cloud=cloud)
+        elif category == "flavor":
+            ret = ConfOpenstackModel.objects(id=id)
+            ret.update(flavor_id=args.flavor_id,
+                    flavor_name=args.flavor_name,
+                    flavor_type=args.flavor_type,
+                    flavor_cpu=args.flavor_cpu,
+                    flavor_memory=args.flavor_memory,
+                    cloud=cloud)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
@@ -232,18 +298,18 @@ class Configure(Resource):
         parser.add_argument('category', type=str)
         parser.add_argument('id', type=str)
         args = parser.parse_args()
-        category = parser.parse_args()
         env = args.env if args.env else 'dev'
-        category = args.category if args.category else 'nginx'
+        category = args.category
         id = args.id if args.id else -1
         Log.logger.info("[UOP] Delete configs, env:%s, category: %s, id: %s", env, category, id)
-
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(id=id)
         elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
         elif category == "namespace":
             ret = ConfigureK8sModel.objects.filter(id=id)
+        elif category in ["image","flavor"]:
+            ret = ConfOpenstackModel.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
         if len(ret):
