@@ -415,7 +415,7 @@ class ConfigureImage(Resource):
             env_ = args.env
             CRP_URL = get_CRP_url(env_)
             headers = {'Content-Type': 'application/json'}
-            url_ = '%s%s' % (CRP_URL, 'api/openstack/image/images')
+            url_ = '%s%s' % (CRP_URL, 'api/image/images')
             result = requests.get(url_, headers=headers)
             code = result.json().get('code')
             msg = result.json().get('msg')
@@ -449,7 +449,7 @@ class ConfigureFlavor(Resource):
             env_ = args.env
             CRP_URL = get_CRP_url(env_)
             headers = {'Content-Type': 'application/json'}
-            url_ = '%s%s' % (CRP_URL, 'api/openstack/flavor/flavors')
+            url_ = '%s%s' % (CRP_URL, 'api/flavor/flavors')
             result = requests.get(url_, headers=headers)
             code = result.json().get('code')
             msg = result.json().get('msg')
