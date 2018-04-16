@@ -634,7 +634,7 @@ class ConfOpenstackModel(db.Document):
 
 
     meta = {
-            "collection": "configure_k8s",
+            "collection": "configure_openstack",
             "index": [{
                 'fields': ['id'],
                 'unique': True,
