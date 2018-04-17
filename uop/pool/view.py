@@ -180,6 +180,7 @@ class GetImageFlavor(Resource):
         try:
             opsk_images = ConfOpenstackModel.objects.filter(cloud=cloud,env=env,image_type=resource_type)
             opsk_flavors = ConfOpenstackModel.objects.filter(cloud=cloud, env=env, flavor_type=resource_type)
+            Log.logger.info("333333333333333333333333333333333333333333")
             for image in opsk_images:
                 image_info = {}
                 image_info["image_name"] = image.image_name
