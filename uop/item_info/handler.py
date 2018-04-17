@@ -473,7 +473,8 @@ def subgrath_data(args):
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
     try:
         if next_model_id in code_id.keys():
-            ii = ItemInformation(item_id=str(uuid.uuid1()),
+            id = str(uuid.uuid1())
+            ii = ItemInformation(item_id=id,
                                  item_code=code_id[next_model_id],
                                  item_depart=get_pro("department", property),
                                  user=get_pro("user", property),
@@ -483,15 +484,18 @@ def subgrath_data(args):
             ii.save()
         else:
             Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
-        return response_data(200, "success", [])
+
     except Exception as exc:
         Log.logger.error("Save ItemInformation error:{}".format(str(exc)))
         return response_data(200, "success", str(exc))
     #####
-    to_Cmdb2(args)
+    exchange_project_item_id = id if code_id[next_model_id] == "project" else False
+    to_Cmdb2(args, exchange_project_item_id=exchange_project_item_id)
+
+    return response_data(200, "success", [])
 
 @async
-def to_Cmdb2(args):
+def to_Cmdb2(args, exchange_project_item_id=False):
     next_model_id, last_model_id, property, uid, token, last_instance_id = \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     url = CMDB2_URL + "cmdb/openapi/graph/"
@@ -521,6 +525,13 @@ def to_Cmdb2(args):
     try:
         Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
+        if ret["code"] == 0 and exchange_project_item_id:
+            instances = ret["data"]["instances"]
+            cmdb2_project_id = [ins["instance_id"] for ins in instances if ins["model_id"] == filters["project"]][0]
+            project = ItemInformation.objects.filter(item_id=exchange_project_item_id)
+            project.item_id = cmdb2_project_id
+            project.save()
+            Log.logger.info(u"替换project的item_id成功：{}--->{}".format(exchange_project_item_id, cmdb2_project_id))
         # Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
