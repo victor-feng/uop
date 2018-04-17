@@ -471,6 +471,7 @@ def subgrath_data(args):
         return response_data(200, "success", u"此业务用于存储历史数据，不能新建模块")
     #####
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
+    Log.logger.info("The get_pro value is ".format(get_pro))
     try:
         if next_model_id in code_id.keys():
             newid = str(uuid.uuid1())
@@ -481,7 +482,9 @@ def subgrath_data(args):
                                  item_relation=last_instance_id,
                                  user_id=get_pro("user_id", property),
                                  item_name=get_pro("baseInfo", property))
+            Log.logger.info("The code_id value is ".format(code_id))
             ii.save()
+            Log.logger.info("Save stop.")
         else:
             Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
 

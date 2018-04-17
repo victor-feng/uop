@@ -422,7 +422,9 @@ class BusinessProject(Resource):
 
             #往cmdb2.0异步写入数据
             graph_data = []
+            Log.logger.debug("Start subgraph_data")
             graph_data = subgrath_data(args)
+            Log.logger.debug("End subgraph_data")
             if isinstance(graph_data, str):
                 response["code"] = 202
                 response["result"]["msg"] = graph_data
