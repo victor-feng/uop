@@ -55,6 +55,11 @@ class TestingConfig(BaseConfig):
         "redis": "de90d618f7504723b677f196",
         "mongodb": "9bc4a41eb6364022b2f2c093",
     }
+    UOPCODE_CMDB2 = {
+        "c73339db70cc4647b515eaca": "business",
+        "9e97b54a4a54472e9e913d4e": "module",
+        "59c0af57133442e7b34654a3": "project"
+    }
 
     # CMDB知识库变动时，改动此字典与 CMDB2_ENTITY 保持一致即可，为确保查询性能，稍有冗余，但同一起点的实体id只能有一个视图
     CMDB2_VIEWS = {
