@@ -208,100 +208,137 @@ def Aquery(args):
     }
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
-    url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
-    url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
-    if not uid or not token:
-        uid, token = get_uid_token()
-    if instance_id in history.keys():
-        res = Statusvm.objects.filter(business_name=history[instance_id])
-        if res:
-            instances = []
-            name = set()
-            for r in res:
-                Log.logger.info("###### in res")
-                rname = r.module_name
-                if rname not in name:
-                    tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
+    if APP_ENV == "development": # 走uop
+        '''
+        instance_id 对应Iteminformation的item_id, 如果不传默认查询所有业务
+        '''
+        get_model_id = lambda codes, v:[c[0] for c in codes.items() if c[1] == v][0]
+        if instance_id:
+            business = ItemInformation.objects.filter(item_code="business")
+            if business:
+                for b in business:
+                    instances = []
+                    Log.logger.info("###### in ItemInformation.get")
+                    rname = b.item_name
+                    tmp = dict(instance_id=b.item_id, model_id=get_model_id(code_id, "business"), name=rname, property=[{
+                                "code": "baseInfo",
+                                "name": u"名称",
+                                "value": rname
+
+                            }])
+                    instances.append(tmp)
+                    return response_data(200, "success", {"instance": instances})
+        else:
+            next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id])
+            if next_instances:
+                for ni in next_instances:
+                    instances = []
+                    Log.logger.info("###### in ItemInformation.get")
+                    rname = ni.item_name
+                    tmp = dict(instance_id=ni.item_id, model_id=get_model_id(code_id, ni.item_code), name=rname,
+                               property=[{
+                                   "code": "baseInfo",
+                                   "name": u"名称",
+                                   "value": rname
+
+                               }])
+                    instances.append(tmp)
+                    return response_data(200, "success", {"instance": instances})
+
+    else: # 其他环境暂时走CMDB2
+        url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
+        url_instance = CMDB2_URL + "cmdb/openapi/query/instance/"  # 如果传instance_id，调用这个直接拿到下一层数据
+        if not uid or not token:
+            uid, token = get_uid_token()
+        if instance_id in history.keys():
+            res = Statusvm.objects.filter(business_name=history[instance_id])
+            if res:
+                instances = []
+                name = set()
+                for r in res:
+                    Log.logger.info("###### in res")
+                    rname = r.module_name
+                    if rname not in name:
+                        tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
+                                "code": "baseInfo",
+                                "name": u"名称",
+                                "value": rname
+
+                        }])
+                        instances.append(tmp)
+                        name.add(rname)
+                return response_data(200, "success", {"instance": instances})
+            else:
+                Log.logger.info("$$$$$$ not in res")
+                return response_data(200, "success", {"instance": []})
+
+        if "@@" in instance_id:
+            res = Statusvm.objects.filter(module_name=instance_id.split("@@")[1])
+            if res:
+                instances = []
+                name = set()
+                for r in res:
+                    Log.logger.info("###### in res")
+                    rname = r.project_name
+                    if rname not in name:
+                        tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
 
                             "code": "baseInfo",
                             "name": u"名称",
                             "value": rname
 
-                    }])
-                    instances.append(tmp)
-                    name.add(rname)
-            return response_data(200, "success", {"instance": instances})
-        else:
-            Log.logger.info("$$$$$$ not in res")
-            return response_data(200, "success", {"instance": []})
-
-    if "@@" in instance_id:
-        res = Statusvm.objects.filter(module_name=instance_id.split("@@")[1])
-        if res:
-            instances = []
-            name = set()
-            for r in res:
-                Log.logger.info("###### in res")
-                rname = r.project_name
-                if rname not in name:
-                    tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
-
-                        "code": "baseInfo",
-                        "name": u"名称",
-                        "value": rname
-
-                    }])
-                    instances.append(tmp)
-                    name.add(rname)
-            return response_data(200, "success", {"instance": instances})
-        pass
-    data_list =  {
-        "uid": uid,
-        "token": token,
-        "sign":"",
-        "data":{
-            "instance":[{
-                "instance_id":"",
-                "name": name #工号
-            }],
-            "entity":{
-                "model_id": self_model_id
+                        }])
+                        instances.append(tmp)
+                        name.add(rname)
+                return response_data(200, "success", {"instance": instances})
+            pass
+        data_list =  {
+            "uid": uid,
+            "token": token,
+            "sign":"",
+            "data":{
+                "instance":[{
+                    "instance_id":"",
+                    "name": name #工号
+                }],
+                "entity":{
+                    "model_id": self_model_id
+                }
             }
         }
-    }
-    data_instance = {
-        "uid": uid,
-        "token": token,
-        "sign": "",
-        "data": {
-            "instance": {
-                "model_id": self_model_id ,
-                "instance_id": instance_id
+        data_instance = {
+            "uid": uid,
+            "token": token,
+            "sign": "",
+            "data": {
+                "instance": {
+                    "model_id": self_model_id ,
+                    "instance_id": instance_id
+                }
             }
         }
-    }
-    data_list_str = json.dumps(data_list)
-    data_instance_str = json.dumps(data_instance)
-    try:
-        if instance_id:
-            # Log.logger.info("url_instance request data:{}".format(data_instance))
-            ret = requests.post(url_instance, data=data_instance_str, timeout=5)
-            # Log.logger.info("url_instance return:{}".format(ret.json()))
-            if ret.json()["code"] == -1:
-                return response_data(500, u"请求参数错误，查看instance_id是否和model_id对应", "")
+        data_list_str = json.dumps(data_list)
+        data_instance_str = json.dumps(data_instance)
+        try:
+            if instance_id:
+                Log.logger.info("url_instance request data:{}".format(data_instance))
+                ret = requests.post(url_instance, data=data_instance_str, timeout=5)
+                Log.logger.info("url_instance return:{}".format(ret.json()))
+                if ret.json()["code"] == -1:
+                    return response_data(500, u"请求参数错误，查看instance_id是否和model_id对应", "")
+                else:
+                    data = analyze_data(ret.json()["data"], model_id)
             else:
-                data = analyze_data(ret.json()["data"], model_id)
-        else:
-            # Log.logger.info("url_list request data:{}".format(data_list))
-            ret = requests.post(url_list, data=data_list_str, timeout=5)
-            # Log.logger.info("url_list return:{}".format(ret.json()))
-            data = analyze_data(ret.json()["data"], model_id, flag=True)
-    except Exception as exc:
-        Log.logger.error("Aquery error:{}".format(str(exc)))
-        data = str(exc)
-    data.update({"uid": uid, "token": token})
-    result = response_data(200, "success", data)
-    return result
+                # Log.logger.info("url_list request data:{}".format(data_list))
+                ret = requests.post(url_list, data=data_list_str, timeout=5)
+                # Log.logger.info("url_list return:{}".format(ret.json()))
+                data = analyze_data(ret.json()["data"], model_id, flag=True)
+        except Exception as exc:
+            Log.logger.error("Aquery error:{}".format(str(exc)))
+            data = str(exc)
+        data.update({"uid": uid, "token": token})
+        result = response_data(200, "success", data)
+        return result
 
 
 #从B类视图中解析出A类数据
@@ -432,7 +469,7 @@ def subgrath_data(args):
                                  user=get_pro("user", property),
                                  item_relation=last_instance_id,
                                  user_id=get_pro("user_id", property),
-                                 item_name=get_pro("name", property))
+                                 item_name=get_pro("baseInfo", property))
             ii.save()
         else:
             Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
