@@ -541,6 +541,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
             cmdb2_project_id = [ins["instance_id"] for ins in instances if ins["model_id"] == filters["project"]][0]
             project = ItemInformation.objects.filter(item_id=exchange_project_item_id)
             project.item_id = cmdb2_project_id
+            Log.logger.info("Project item id is {}, project is {}".format(cmdb2_project_id, project))
             project.save()
             Log.logger.info(u"替换project的item_id成功：{}--->{}".format(exchange_project_item_id, cmdb2_project_id))
         # Log.logger.info("graph_data result: {}".format(ret))
