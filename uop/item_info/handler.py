@@ -6,12 +6,13 @@ import json
 import requests
 import os
 from uop.log import Log
-from uop.util import TimeToolkit, response_data
+from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm
+from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation
 from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
+import uuid
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 __all__ = [
@@ -24,6 +25,7 @@ CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 filters = configs[APP_ENV].CMDB2_ENTITY
+code_id = configs[APP_ENV].UOPCODE_CMDB2
 
 resource = {
     "tomcat": filters.get("tomcat"),
@@ -193,7 +195,7 @@ def get_entity_from_file(data):
     return single_entity
 
 
-#A类视图查询
+# A类视图查询
 def Aquery(args):
     '''
     A 类视图 查询
@@ -414,10 +416,36 @@ def subgrath_data(args):
         "8a3022563add40dbb0130b38": "DevDefaultBusiness",
         "a03ff39ce13140e499f2344d": "SitDefaultBusiness"
     }
-    next_model_id, last_model_id, property, uid, token, last_instance_id= \
+
+    next_model_id, last_model_id, property, uid, token, last_instance_id = \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     if last_instance_id in history.keys():
         return response_data(200, "success", u"此业务用于存储历史数据，不能新建模块")
+    #####
+    get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
+    try:
+        if next_model_id in code_id.keys():
+            ii = ItemInformation(item_id=str(uuid.uuid1()),
+                                 item_code=code_id[next_model_id],
+                                 item_depart=get_pro("department", property),
+                                 user=get_pro("user", property),
+                                 item_relation=last_instance_id,
+                                 user_id=get_pro("user_id", property),
+                                 item_name=get_pro("name", property))
+            ii.save()
+        else:
+            Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
+
+    except Exception as exc:
+        Log.logger.error("Save ItemInformation error:{}".format(str(exc)))
+
+    #####
+    to_Cmdb2(args)
+
+@async
+def to_Cmdb2(args):
+    next_model_id, last_model_id, property, uid, token, last_instance_id = \
+        args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
     url = CMDB2_URL + "cmdb/openapi/graph/"
     format_data, graph_data = {}, {}
     data = get_relations(CMDB2_VIEWS["3"][0])
@@ -449,7 +477,7 @@ def subgrath_data(args):
     except Exception as exc:
         ret = []
         Log.logger.error("graph_data: {}".format(graph_data))
-    return ret
+
 
 
 # 组装业务工程模块接口数据
