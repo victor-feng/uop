@@ -471,7 +471,7 @@ def subgrath_data(args):
         return response_data(200, "success", u"此业务用于存储历史数据，不能新建模块")
     #####
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
-    Log.logger.info("The get_pro value is ".format(get_pro))
+    Log.logger.info("The get_pro value is {}".format(get_pro))
     try:
         if next_model_id in code_id.keys():
             newid = str(uuid.uuid1())
@@ -482,7 +482,7 @@ def subgrath_data(args):
                                  item_relation=last_instance_id,
                                  user_id=get_pro("user_id", property),
                                  item_name=get_pro("baseInfo", property))
-            Log.logger.info("The code_id value is ".format(code_id))
+            Log.logger.info("The code_id value is {}".format(code_id))
             ii.save()
             Log.logger.info("Save stop.")
         else:
@@ -492,7 +492,7 @@ def subgrath_data(args):
         Log.logger.error("Save ItemInformation error:{}".format(str(exc)))
         return response_data(200, "success", str(exc))
     #####
-    Log.logger.info("Start save to cmdb2".format(args))
+    Log.logger.info("Start save to cmdb2 {}".format(args))
     exchange_project_item_id = newid
     to_Cmdb2(args, exchange_project_item_id) # 将CMDB2.0产生的id，返存到Iteminformation保存，后期不用CMDB2可以省去
 
@@ -507,12 +507,12 @@ def to_Cmdb2(args, exchange_project_item_id=False):
     data = get_relations(CMDB2_VIEWS["3"][0])
     if not uid and not token:
         data["uid"], data["token"] = get_uid_token()
-    Log.logger.info("The uid and token is ".format(data["uid"], data["token"]))
+    Log.logger.info("The uid and token is {}, {}".format(data["uid"], data["token"]))
     models_list = data["entity"]
     if isinstance(models_list, str):
         return models_list
     model = filter(lambda x:x["entity_id"] == next_model_id, models_list)[0]
-    Log.logger.info("The model is ".format(model))
+    Log.logger.info("The model is {}".format(model))
     item = {}
     nouse = map(lambda pro: item.setdefault(pro["code"], pro["value"]), property)
     up_level = {
@@ -522,7 +522,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
     if next_model_id == filters["yewu"]:# 要创建业务，默认放到  UOP临时部 下面
         up_level["instance_id"] = "0accd2ca0ed243e5914bf672" # uop临时部
     i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
-    Log.logger.info("The i, r is ".format(i, r))
+    Log.logger.info("The i, r is {}".format(i, r))
     data.pop("relations")
     data.pop("entity")
     data["data"] = {
@@ -531,7 +531,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
     }
     data_str = json.dumps(data)
     ret = []
-    Log.logger.info("The data_str is ".format(data_str))
+    Log.logger.info("The data_str is {}".format(data_str))
     try:
         Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
