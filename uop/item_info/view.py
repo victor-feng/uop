@@ -367,6 +367,7 @@ class CheckWarUrl(Resource):
         }
         return ret, code
 
+
 class BusinessProject(Resource):
     '''
     -业务模块工程-    资源视图
@@ -406,7 +407,7 @@ class BusinessProject(Resource):
         '''
         response = response_data(200, "success", "")
         parser = reqparse.RequestParser()
-        parser.add_argument('next_model_id', type=str) #新增的实例继承的实体id
+        parser.add_argument('next_model_id', type=str) # 新增的实例继承的实体id
         parser.add_argument('last_instance_id', type=str)  # 上一级别的实例id
         parser.add_argument('last_model_id', type=str)  # 上一级别的实例id
         parser.add_argument('property', type=list, location='json')
