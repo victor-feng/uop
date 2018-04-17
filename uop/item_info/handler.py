@@ -489,10 +489,10 @@ def subgrath_data(args):
             ii.save()
         else:
             Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
-
+        return response_data(200, "success", [])
     except Exception as exc:
         Log.logger.error("Save ItemInformation error:{}".format(str(exc)))
-
+        return response_data(200, "success", str(exc))
     #####
     to_Cmdb2(args)
 
