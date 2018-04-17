@@ -6,7 +6,7 @@ import json
 import requests
 import os
 from uop.log import Log
-from uop.util import TimeToolkit, response_data
+from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
 from datetime import datetime
 from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm
@@ -403,6 +403,7 @@ def get_entity(data):
 
 
 # 插入子图
+#@async
 def subgrath_data(args):
     '''
     插入子图数据，并返回图结果

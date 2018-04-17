@@ -411,9 +411,15 @@ class BusinessProject(Resource):
         parser.add_argument('last_model_id', type=str)  # 上一级别的实例id
         parser.add_argument('property', type=list, location='json')
         parser.add_argument('uid', type=str)
-        parser.add_argument('token', type=str)
+        parser.add_argument('token', type=str) #现在已经不用
         args = parser.parse_args()
         try:
+            #往uop写入数据
+
+
+
+
+            #往cmdb2.0异步写入数据
             graph_data = []
             graph_data = subgrath_data(args)
             if isinstance(graph_data, str):
