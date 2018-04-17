@@ -6,7 +6,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
-from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel
+from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -160,6 +160,17 @@ class GetK8sNamespace(Resource):
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
+
+class GetImageFlavor(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str, location="args")
+        parser.add_argument('env', type=str, location="args")
+
+        args = parser.parse_args()
+
+
 
 
 
