@@ -213,17 +213,17 @@ def Aquery(args):
         instance_id 对应Iteminformation的item_id, 如果不传默认查询所有业务
         '''
         get_model_id = lambda codes, v:[c[0] for c in codes.items() if c[1] == v][0]
-        if instance_id != "uop":
-            if self_model_id == "d8098981df71428784e65427": # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
+        if instance_id == "uop" or not instance_id:
+            if self_model_id == "d8098981df71428784e65427" or model_id == "9a544097f789495e8ee4f5eb": # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
                 return response_data(200, "success", {"instance": [
                     {
                         "instance_id": "uop", "name": "", "property": []
                     }
                 ]})
             business = ItemInformation.objects.filter(item_code="business")
+            instances = []
             if business:
                 for b in business:
-                    instances = []
                     Log.logger.info("###### in ItemInformation.get")
                     rname = b.item_name
                     tmp = dict(instance_id=b.item_id, model_id=get_model_id(code_id, "business"), name=rname, property=[{
@@ -237,24 +237,18 @@ def Aquery(args):
             else:
                 return response_data(200, "success", {"instance": []})
         else: # 从uop里查数据
-            if  model_id == "9a544097f789495e8ee4f5eb": # 兼容CMDB2.0查部门的接口，要查部门的id，这里返回uop
-                return response_data(200, "success", {"instance": [
-                    {
-                        "instance_id": "uop", "name": "", "property": []
-                    }
-                ]})
+
             next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id])
+            instances = []
             if next_instances:
                 for ni in next_instances:
-                    instances = []
                     Log.logger.info("###### in ItemInformation.get")
                     rname = ni.item_name
-                    tmp = dict(instance_id=ni.item_id, model_id=get_model_id(code_id, ni.item_code), name=rname,
+                    tmp = dict(instance_id=ni.item_id, model_id=model_id, name=rname,
                                property=[{
                                    "code": "baseInfo",
                                    "name": u"名称",
                                    "value": rname
-
                                }])
                     instances.append(tmp)
                     return response_data(200, "success", {"instance": instances})
