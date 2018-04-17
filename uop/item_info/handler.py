@@ -541,10 +541,12 @@ def to_Cmdb2(args, exchange_project_item_id=False):
             instances = ret["data"]["instance"]
             cmdb2_project_id = [ins["instance_id"] for ins in instances][0]
             project = ItemInformation.objects.filter(item_id=exchange_project_item_id)
-            project.item_id = cmdb2_project_id
-            Log.logger.info("Project item id is {}, project is {}".format(cmdb2_project_id, project))
-            project.save()
-            Log.logger.info(u"替换project的item_id成功：{}--->{}".format(exchange_project_item_id, cmdb2_project_id))
+            if project:
+                for pro in project:
+                    pro.item_id = cmdb2_project_id
+                    # Log.logger.info("Project item id is {}, project is {}".format(cmdb2_project_id, project))
+                    pro.save()
+                Log.logger.info(u"替换project的item_id成功：{}--->{}".format(exchange_project_item_id, cmdb2_project_id))
         # Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
