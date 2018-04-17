@@ -494,7 +494,7 @@ def subgrath_data(args):
 
     return response_data(200, "success", [])
 
-@async
+
 def to_Cmdb2(args, exchange_project_item_id=False):
     next_model_id, last_model_id, property, uid, token, last_instance_id = \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
@@ -513,6 +513,8 @@ def to_Cmdb2(args, exchange_project_item_id=False):
         "model_id": last_model_id,
         "instance_id": last_instance_id
     }
+    if next_model_id == filters["yewu"]:# 要创建业务，默认放到  UOP临时部 下面
+        up_level["instance_id"] = "0accd2ca0ed243e5914bf672" # uop临时部
     i, r = format_data_cmdb(data["relations"], item, model, {}, 0, up_level)
     data.pop("relations")
     data.pop("entity")
