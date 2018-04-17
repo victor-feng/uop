@@ -538,7 +538,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
         # Log.logger.info("graph_data result: {}".format(ret))
     except Exception as exc:
         ret = []
-        Log.logger.error("graph_data: {}".format(graph_data))
+        Log.logger.error("graph_data: {}".format(str(exc)))
 
 
 
