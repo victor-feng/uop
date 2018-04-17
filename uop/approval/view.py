@@ -289,6 +289,7 @@ class Reservation(Resource):
                         "volume_size": db_res.volume_size,
                         "image_id": db_res.image_id,
                         "network_id": db_res.network_id,
+                        "flavor":db_res.flavor_id,
                     }
                 )
             data['resource_list'] = res
@@ -425,6 +426,7 @@ class ReservationAPI(Resource):
                         "volume_size": db_res.volume_size,
                         "image_id": db_res.image_id,
                         "network_id": db_res.network_id,
+                        "flavor": db_res.flavor_id,
                     }
                 )
             data['resource_list'] = res
@@ -657,6 +659,7 @@ class CapacityReservation(Resource):
                         "volume_size": db_res.volume_size,
                         "image_id": db_res.image_id,
                         "network_id": db_res.network_id,
+                        "flavor": db_res.flavor_id,
                     }
                 )
             data['resource_list'] = res

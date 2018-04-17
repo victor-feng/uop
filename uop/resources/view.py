@@ -128,8 +128,9 @@ class ResourceApplication(Resource):
                     volume_size = resource.get('volume_size', 0)
                     network_id = resource.get('network_id')
                     image_id = resource.get('image_id')
+                    flavor_id = resource.get('flavor_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
                     resource_application.resource_list.append(db_ins)
 
             ins_name_list = []
@@ -540,8 +541,9 @@ class ResourceApplication(Resource):
                     volume_size = res.get('volume_size', 0)
                     network_id = res.get('network_id')
                     image_id = res.get('image_id')
+                    flavor_id = resource.get('flavor_id')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
                     resource.resource_list.append(db_ins)
                 resource.save()
             else:
@@ -688,6 +690,7 @@ class ResourceDetail(Resource):
                         "volume_size": db_res.volume_size,
                         "network_id": db_res.network_id,
                         "image_id": db_res.image_id,
+                        "flavor_id":db_res.flavor_id,
                     }
                 )
         com = []
@@ -834,8 +837,9 @@ class ResourceDetail(Resource):
             volume_size = resource.get('volume_size', 0)
             network_id = resource.get('network_id')
             image_id = resource.get('image_id')
+            flavor_id = resource.get('flavor_id')
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id)
+                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
             resource_application.resource_list.append(db_ins)
 
         for compute in compute_list:
