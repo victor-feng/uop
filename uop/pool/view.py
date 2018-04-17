@@ -197,6 +197,7 @@ class GetImageFlavor(Resource):
             data["image_list"] = image_list
             code = 200
             msg = "Get openstack image flavor success"
+            Log.logger.info("66666666666666666666666666666666666666 {}".format(data))
         except Exception as e:
             code = 500
             data = "Error"
