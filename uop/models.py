@@ -349,6 +349,7 @@ class DBIns(db.EmbeddedDocument):
     volume_size = db.IntField(required=False, default_value=0)
     network_id = db.StringField(required=False)
     image_id = db.StringField(required=False)
+    flavor_id = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'index': [
