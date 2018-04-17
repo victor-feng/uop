@@ -173,6 +173,7 @@ class GetImageFlavor(Resource):
         env = args.env
         cloud = args.cloud
         resource_type = args.resource_type
+        Log.logger.info("222222222222222222222222222222222 {}--{}--{}".format(env,cloud,resource_type))
         data = {}
         image_list = []
         flavor_list = []
