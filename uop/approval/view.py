@@ -276,11 +276,14 @@ class Reservation(Resource):
         if resource_list:
             res = []
             for db_res in resource_list:
+                res_type=db_res.ins_type
+                if res_type not in ["mysql","redis","mongodb"]:
+                    res_type = "other"
                 res.append(
                     {
                         "instance_name": db_res.ins_name,
                         "instance_id": db_res.ins_id,
-                        "instance_type": db_res.ins_type,
+                        "instance_type": res_type,
                         "cpu": db_res.cpu,
                         "mem": db_res.mem,
                         "disk": db_res.disk,
@@ -413,11 +416,14 @@ class ReservationAPI(Resource):
         if resource_list:
             res = []
             for db_res in resource_list:
+                res_type = db_res.ins_type
+                if res_type not in ["mysql", "redis", "mongodb"]:
+                    res_type = "other"
                 res.append(
                     {
                         "instance_name": db_res.ins_name,
                         "instance_id": db_res.ins_id,
-                        "instance_type": db_res.ins_type,
+                        "instance_type": res_type,
                         "cpu": db_res.cpu,
                         "mem": db_res.mem,
                         "disk": db_res.disk,
