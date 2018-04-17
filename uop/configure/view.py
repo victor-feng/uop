@@ -73,7 +73,7 @@ class Configure(Resource):
                                  config_map_name=net.config_map_name,
                                  env = net.env,
                                 ))
-        elif category == "image":
+        elif category in ["image","flavor"] :
             ret = ConfOpenstackModel.objects.filter(env=env)
             for net in ret:
                 results.append(dict(
@@ -81,23 +81,14 @@ class Configure(Resource):
                     image_id = net.image_id,
                     image_name = net.image_name,
                     image_type = net.image_type,
+                    flavor_id=net.flavor_id,
+                    flavor_name=net.flavor_name,
+                    flavor_type=net.flavor_type,
+                    flavor_cpu=net.flavor_cpu,
+                    flavor_memory=net.flavor_memory,
                     cloud = net.cloud,
                     env = net.env,
                 ))
-        elif category == "flavor":
-            ret = ConfOpenstackModel.objects.filter(env=env)
-            for net in ret:
-                results.append(dict(
-                    id = net.id,
-                    flavor_id = net.flavor_id,
-                    flavor_name = net.flavor_name,
-                    flavor_type = net.flavor_type,
-                    flavor_cpu = net.flavor_cpu,
-                    flavor_memory = net.flavor_memory,
-                    cloud = net.cloud,
-                    env = net.env,
-                ))
-
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret:
