@@ -101,6 +101,10 @@ class ResourceApplication(Resource):
             cloud = info.get("cloud","")
             resource_type = info.get("resource_type","")
             domain = info.get("domain", "")
+            expiry_date = info.get("expiry_date","long")
+            leader_emails = info.get("leader_emails",[])
+            cc_emails = info.get("cc_emails",[])
+            mail_content = info.get("mail_content","")
             res_info_dict["resource_id"] = res_id
             res_info_dict["resource_name"] = resource_name
             res_info_dict["project_id"] = cmdb2_project_id
@@ -114,7 +118,8 @@ class ResourceApplication(Resource):
                                                  user_name=user_name, user_id=user_id,env=env,
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
-                                                 cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0)
+                                                 cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0,
+                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -377,6 +382,12 @@ class ResourceApplication(Resource):
                 result['is_rollback'] = resource.is_rollback
                 result['cloud'] = resource.cloud
                 result['resource_type'] = resource.resource_type
+                result['user_id'] = resource.user_id
+                result['department'] = resource.department
+                result['expiry_date'] = resource.expiry_date
+                result['leader_emails'] = resource.leader_emails
+                result['cc_emails'] = resource.cc_emails
+                result['mail_content'] = resource.mail_content
 
                 if resource.resource_type in ['app', 'kvm']:
                     deploy_source_list = resource.compute_list
@@ -458,6 +469,10 @@ class ResourceApplication(Resource):
         parser.add_argument('cloud', type=str)
         parser.add_argument('resource_type', type=str)
         parser.add_argument('domain', type=str)
+        parser.add_argument('expiry_date', type=str)
+        parser.add_argument('mail_content', type=str)
+        parser.add_argument('leader_emails', type=list, location='json')
+        parser.add_argument('cc_emails', type=list, location='json')
         args = parser.parse_args()
         res_id = args.res_id
         resource_name = args.resource_name
@@ -479,28 +494,38 @@ class ResourceApplication(Resource):
         business_name = args.business_name
         cmdb2_project_id = args.cmdb2_project_id
         domain = args.domain
+        expiry_date = args.expiry_date
+        mail_content = args.mail_content
+        leader_emails = args.leader_emails
+        cc_emails = args.cc_emails
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
-                resource.resource_name=resource_name
-                resource.project=project
-                resource.project_id=project_id
-                resource.department=department
-                resource.user_name=user_name
-                resource.user_id=user_id
-                resource.env=env
-                resource.application_status=application_status
-                resource.approval_status = approval_status
-                resource.is_rollback = 0
-                resource.compute_list = []
-                resource.resource_list = []
-                resource.resource_type = resource_type
-                resource.cloud = cloud
-                resource.project_name = project_name
-                resource.module_name = module_name
-                resource.business_name = business_name
-                resource.cmdb2_project_id = cmdb2_project_id
-                resource.domain = domain
+                resource.update(
+                    resource_name=resource_name,
+                    project=project,
+                    project_id=project_id,
+                    department=department,
+                    user_name=user_name,
+                    user_id=user_id,
+                    env=env,
+                    application_status=application_status,
+                    approval_status=approval_status,
+                    is_rollback=0,
+                    compute_list=[],
+                    resource_list=[],
+                    resource_type=resource_type,
+                    cloud=cloud,
+                    project_name=project_name,
+                    module_name=module_name,
+                    business_name=business_name,
+                    cmdb2_project_id=cmdb2_project_id,
+                    domain=domain,
+                    cc_emails=cc_emails,
+                    expiry_date=expiry_date,
+                    mail_content=mail_content,
+                    leader_emails=leader_emails,
+                )
                 for compute in compute_list:
                     ins_name = compute.get('ins_name')
                     ins_id = str(uuid.uuid1())
@@ -651,6 +676,10 @@ class ResourceDetail(Resource):
         result['mongodb_network_name'] = ""
         result['resource_type'] = resource.resource_type
         result['cloud'] = resource.cloud
+        result['expiry_date'] = resource.expiry_date
+        result['leader_emails'] = resource.leader_emails
+        result['cc_emails'] = resource.cc_emails
+        result['mail_content'] = resource.mail_content
         docker_network_id = resource.docker_network_id
         mysql_network_id = resource.mysql_network_id
         redis_network_id = resource.redis_network_id
