@@ -237,6 +237,12 @@ def Aquery(args):
             else:
                 return response_data(200, "success", {"instance": []})
         else: # 从uop里查数据
+            if  self_model_id == "9a544097f789495e8ee4f5eb": # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
+                return response_data(200, "success", {"instance": [
+                    {
+                        "instance_id": "uop", "name": "", "property": []
+                    }
+                ]})
             next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id])
             if next_instances:
                 for ni in next_instances:
