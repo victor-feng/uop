@@ -169,35 +169,29 @@ class GetImageFlavor(Resource):
         parser.add_argument('cloud', type=str, location="args")
         parser.add_argument('resource_type', type=str, location="args")
         args = parser.parse_args()
-        Log.logger.info("11111111111111111111111111--{}".format(args))
         env = args.env
         cloud = args.cloud
         resource_type = args.resource_type
-        Log.logger.info("222222222222222222222222222222222 {}--{}--{}".format(env,cloud,resource_type))
         data = {}
         image_list = []
         flavor_list = []
         try:
             opsk_images = ConfOpenstackModel.objects.filter(cloud=cloud,env=env,image_type=resource_type)
             opsk_flavors = ConfOpenstackModel.objects.filter(cloud=cloud, env=env, flavor_type=resource_type)
-            Log.logger.info("333333333333333333333333333333333333333333")
             for image in opsk_images:
                 image_info = {}
                 image_info["image_name"] = image.image_name
                 image_info["image_id"] = image.image_id
                 image_list.append(image_info)
-            Log.logger.info("4444444444444444444444444444444444444444444")
             for flavor in opsk_flavors:
                 flavor_info = {}
                 flavor_info["flavor_id"] = flavor.flavor_id
                 flavor_info["flavor_name"] = flavor.flavor_name
-                flavor_list.append(flavor_list)
-            Log.logger.info("5555555555555555555555555555555555555555555555555")
+                flavor_list.append(flavor_info)
             data["flvor_list"] = flavor_list
             data["image_list"] = image_list
             code = 200
             msg = "Get openstack image flavor success"
-            Log.logger.info("66666666666666666666666666666666666666 {}".format(data))
         except Exception as e:
             code = 500
             data = "Error"
