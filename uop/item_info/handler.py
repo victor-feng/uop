@@ -473,8 +473,8 @@ def subgrath_data(args):
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
     try:
         if next_model_id in code_id.keys():
-            id = str(uuid.uuid1())
-            ii = ItemInformation(item_id=id,
+            newid = str(uuid.uuid1())
+            ii = ItemInformation(item_id=newid,
                                  item_code=code_id[next_model_id],
                                  item_depart=get_pro("department", property),
                                  user=get_pro("user", property),
@@ -489,8 +489,8 @@ def subgrath_data(args):
         Log.logger.error("Save ItemInformation error:{}".format(str(exc)))
         return response_data(200, "success", str(exc))
     #####
-    exchange_project_item_id = id if code_id[next_model_id] == "project" else False
-    to_Cmdb2(args, exchange_project_item_id=exchange_project_item_id)
+    exchange_project_item_id = newid
+    to_Cmdb2(args, exchange_project_item_id) # 将CMDB2.0产生的id，返存到Iteminformation保存，后期不用CMDB2可以省去
 
     return response_data(200, "success", [])
 
