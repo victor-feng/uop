@@ -186,11 +186,13 @@ class GetImageFlavor(Resource):
                 image_info["image_name"] = image.image_name
                 image_info["image_id"] = image.image_id
                 image_list.append(image_info)
+            Log.logger.info("4444444444444444444444444444444444444444444")
             for flavor in opsk_flavors:
                 flavor_info = {}
                 flavor_info["flavor_id"] = flavor.flavor_id
                 flavor_info["flavor_name"] = flavor.flavor_name
                 flavor_list.append(flavor_list)
+            Log.logger.info("5555555555555555555555555555555555555555555555555")
             data["flvor_list"] = flavor_list
             data["image_list"] = image_list
             code = 200
