@@ -181,7 +181,9 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'host_env':compute.host_env,
                     'language_env':compute.language_env,
                     'deploy_source':compute.deploy_source,
-                    'database_config':compute.database_config
+                    'database_config':compute.database_config,
+                    'flavor':str(compute.cpu) + str(compute.mem),
+                    'host_mapping':compute.host_mapping
                 }
             )
         except AttributeError as e:
@@ -335,14 +337,14 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             match_one = filter(lambda x: x["ins_id"] == old_compute_list[i].ins_id, compute_list)[0]
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
-            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=o.cpu, mem=o.mem, certificate=match_one.get("certificate", ""),
+            compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
                                  network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
-                                 ready_probe_path=o.ready_probe_path,lb_methods=o.lb_methods,namespace=o.namespace,domain_path=match_one.get("domain_path"),
-                                 host_mapping=o.host_mapping )
+                                 ready_probe_path=o.ready_probe_path,lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
+                                 host_mapping=match_one.get("host_mapping"))
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:

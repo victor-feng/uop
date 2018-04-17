@@ -71,6 +71,7 @@ class Configure(Resource):
                 results.append(dict(id=net.id,
                                  namespace_name=net.namespace_name,
                                  config_map_name=net.config_map_name,
+                                 env = net.env,
                                 ))
         elif category == "image":
             ret = ConfOpenstackModel.objects.filter(env=env)
@@ -81,6 +82,7 @@ class Configure(Resource):
                     image_name = net.image_name,
                     image_type = net.image_type,
                     cloud = net.cloud,
+                    env = net.env,
                 ))
         elif category == "flavor":
             ret = ConfOpenstackModel.objects.filter(env=env)
@@ -93,6 +95,7 @@ class Configure(Resource):
                     flavor_cpu = net.flavor_cpu,
                     flavor_memory = net.flavor_memory,
                     cloud = net.cloud,
+                    env = net.env,
                 ))
 
         else:  # disconf
@@ -184,7 +187,7 @@ class Configure(Resource):
                 image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
-                cloud=cloud).save()
+                cloud=cloud,env=env).save()
         elif category == "flavor":
             ret=ConfOpenstackModel(id=id,
                                    flavor_id=args.flavor_id,
@@ -192,7 +195,7 @@ class Configure(Resource):
                                    flavor_type=args.flavor_type,
                                    flavor_cpu=args.flavor_cpu,
                                    flavor_memory=args.flavor_memory,
-                                   cloud=cloud).save()
+                                   cloud=cloud,env=env).save()
         else:
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -269,7 +272,8 @@ class Configure(Resource):
             ret.update(image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
-                cloud=cloud)
+                cloud=cloud,
+                env=env)
         elif category == "flavor":
             ret = ConfOpenstackModel.objects(id=id)
             ret.update(flavor_id=args.flavor_id,
@@ -277,7 +281,8 @@ class Configure(Resource):
                     flavor_type=args.flavor_type,
                     flavor_cpu=args.flavor_cpu,
                     flavor_memory=args.flavor_memory,
-                    cloud=cloud)
+                    cloud=cloud,
+                    env=env)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)

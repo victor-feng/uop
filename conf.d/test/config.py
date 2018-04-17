@@ -29,7 +29,7 @@ class TestingConfig(BaseConfig):
     }
     
     CMDB_URL = "http://cmdb-test.syswin.com/"
-    CMDB2_URL = "http://cmdb2.syswin.com/"
+    CMDB2_URL = "http://cmdb2-test.syswin.com/"
     CMDB2_OPEN_USER = "uop"
     #CMDB2_VIEWS = {
     #    "1": ("B7", u"工程 --> 物理机"),

@@ -1146,6 +1146,7 @@ class GetMyResourcesInfo(Resource):
         parser.add_argument('page_num', type=str, location='json')
         parser.add_argument('page_count', type=str, location='json')
         parser.add_argument('field_list', type=list, default=[], location='json')
+        parser.add_argument('domain', type=str, location='json')
         args = parser.parse_args()
         field_list = args.field_list
         resource_type = args.resource_type

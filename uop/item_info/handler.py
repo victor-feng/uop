@@ -405,6 +405,7 @@ def get_entity(data):
 
 
 # 插入子图
+#@async
 def subgrath_data(args):
     '''
     插入子图数据，并返回图结果

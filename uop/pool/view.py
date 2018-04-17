@@ -6,7 +6,7 @@ from flask_restful import reqparse, Api, Resource
 from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
-from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel
+from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -160,6 +160,39 @@ class GetK8sNamespace(Resource):
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
+
+class GetImageFlavor(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str, location="args")
+        parser.add_argument('cloud', type=str, location="args")
+        parser.add_argument('resource_type', type=str, location="args")
+        args = parser.parse_args()
+        env = args.env
+        cloud = args.cloud
+        resource_type = args.resource_type
+        data = {}
+        res_list = []
+        try:
+            opsk_images = ConfOpenstackModel.objects.filter(cloud=cloud,env=env,image_type=resource_type)
+            opsk_flavors = ConfOpenstackModel.objects.filter(cloud=cloud, env=env, flavor_type=resource_type)
+            for image in opsk_images:
+                info = {}
+                info["image_name"] = image.image_name
+                info["image_id"] = image.image_id
+
+        except Exception as e:
+            code = 500
+            data = "Error"
+            msg = "Get k8s namespace info error %s" % str(e)
+            Log.logger.error(msg)
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
+
+
 
 
 

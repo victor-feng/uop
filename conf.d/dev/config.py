@@ -30,7 +30,7 @@ class DevelopmentConfig(BaseConfig):
     }
     #CMDB_URL = "http://cmdb-dev.syswin.com/"
     CMDB_URL = "http://172.28.20.124:6000/"
-    CMDB2_URL = "http://cmdb2.syswin.com/"
+    CMDB2_URL = "http://cmdb2-test.syswin.com/"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
     CMDB2_OPEN_USER = "uop"
 
