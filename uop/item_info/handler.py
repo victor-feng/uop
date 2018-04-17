@@ -233,7 +233,7 @@ def Aquery(args):
 
                             }])
                     instances.append(tmp)
-                    return response_data(200, "success", {"instance": instances})
+                return response_data(200, "success", {"instance": instances})
             else:
                 return response_data(200, "success", {"instance": []})
         else: # 从uop里查数据
@@ -251,7 +251,7 @@ def Aquery(args):
                                    "value": rname
                                }])
                     instances.append(tmp)
-                    return response_data(200, "success", {"instance": instances})
+                return response_data(200, "success", {"instance": instances})
             else:
                 return response_data(200, "success", {"instance": []})
 
