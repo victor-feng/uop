@@ -525,6 +525,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
     try:
         Log.logger.info("graph_data request: {}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
+        Log.logger.info("graph_data result: {}".format(ret))
         if ret["code"] == 0 and exchange_project_item_id:
             instances = ret["data"]["instances"]
             cmdb2_project_id = [ins["instance_id"] for ins in instances if ins["model_id"] == filters["project"]][0]
