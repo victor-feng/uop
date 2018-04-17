@@ -173,19 +173,29 @@ class GetImageFlavor(Resource):
         cloud = args.cloud
         resource_type = args.resource_type
         data = {}
-        res_list = []
+        image_list = []
+        flavor_list = []
         try:
             opsk_images = ConfOpenstackModel.objects.filter(cloud=cloud,env=env,image_type=resource_type)
             opsk_flavors = ConfOpenstackModel.objects.filter(cloud=cloud, env=env, flavor_type=resource_type)
             for image in opsk_images:
-                info = {}
-                info["image_name"] = image.image_name
-                info["image_id"] = image.image_id
-
+                image_info = {}
+                image_info["image_name"] = image.image_name
+                image_info["image_id"] = image.image_id
+                image_list.append(image_info)
+            for flavor in opsk_flavors:
+                flavor_info = {}
+                flavor_info["flavor_id"] = flavor.flavor_id
+                flavor_info["flavor_name"] = flavor.flavor_name
+                flavor_list.append(flavor_list)
+            data["flvor_list"] = flavor_list
+            data["image_list"] = image_list
+            code = 200
+            msg = "Get openstack image flavor success"
         except Exception as e:
             code = 500
             data = "Error"
-            msg = "Get k8s namespace info error %s" % str(e)
+            msg = "Get openstack image flavor info error %s" % str(e)
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
@@ -210,3 +220,4 @@ pool_api.add_resource(StatisticAPI, '/statistics')
 pool_api.add_resource(NetworksAPI, '/networks')
 pool_api.add_resource(K8sNetworkApi, '/k8s/network')
 pool_api.add_resource(GetK8sNamespace, '/k8s/getnamespace')
+pool_api.add_resource(GetImageFlavor, '/getimgflavors')
