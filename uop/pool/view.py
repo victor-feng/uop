@@ -169,6 +169,7 @@ class GetImageFlavor(Resource):
         parser.add_argument('cloud', type=str, location="args")
         parser.add_argument('resource_type', type=str, location="args")
         args = parser.parse_args()
+        Log.logger.info("11111111111111111111111111--{}".format(args))
         env = args.env
         cloud = args.cloud
         resource_type = args.resource_type
