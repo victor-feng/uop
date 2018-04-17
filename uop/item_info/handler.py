@@ -213,7 +213,13 @@ def Aquery(args):
         instance_id 对应Iteminformation的item_id, 如果不传默认查询所有业务
         '''
         get_model_id = lambda codes, v:[c[0] for c in codes.items() if c[1] == v][0]
-        if instance_id:
+        if instance_id != "uop":
+            if self_model_id == "d8098981df71428784e65427": # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
+                return response_data(200, "success", {"instance": [
+                    {
+                        "instance_id": "uop", "name": "", "property": []
+                    }
+                ]})
             business = ItemInformation.objects.filter(item_code="business")
             if business:
                 for b in business:
@@ -228,7 +234,9 @@ def Aquery(args):
                             }])
                     instances.append(tmp)
                     return response_data(200, "success", {"instance": instances})
-        else:
+            else:
+                return response_data(200, "success", {"instance": []})
+        else: # 从uop里查数据
             next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id])
             if next_instances:
                 for ni in next_instances:
@@ -244,6 +252,8 @@ def Aquery(args):
                                }])
                     instances.append(tmp)
                     return response_data(200, "success", {"instance": instances})
+            else:
+                return response_data(200, "success", {"instance": []})
 
     else: # 其他环境暂时走CMDB2
         url_list = CMDB2_URL + "cmdb/openapi/instance/list/"
