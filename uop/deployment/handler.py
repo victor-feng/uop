@@ -160,10 +160,6 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     if compute_list:
         compute = compute_list[0]
         namespace = compute.namespace
-        cpu = compute.cpu
-        mem = compute.mem
-        flavor = str(cpu) + str(mem)
-        data["flavor"] = flavor
         if namespace:
             data["namespace"] = namespace
     if appinfo:  # 判断nginx信息，没有则不推送dns配置
@@ -185,7 +181,9 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'host_env':compute.host_env,
                     'language_env':compute.language_env,
                     'deploy_source':compute.deploy_source,
-                    'database_config':compute.database_config
+                    'database_config':compute.database_config,
+                    'flavor':str(compute.cpu) + str(compute.mem),
+                    'host_mapping':compute.host_mapping
                 }
             )
         except AttributeError as e:
