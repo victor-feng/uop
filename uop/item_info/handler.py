@@ -553,7 +553,6 @@ def to_Cmdb2(args, exchange_project_item_id=False):
         Log.logger.error("graph_data: {}".format(str(exc)))
 
 
-
 # 组装业务工程模块接口数据
 def package_data(ret, ut):
     '''

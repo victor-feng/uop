@@ -354,15 +354,16 @@ def crp_data_cmdb(args, cmdb1_url):
     try:
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
+        CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
         if ret["code"] == 0:
             db_flag = True if args.get("db_info") else False
             if cloud == 1:
-                CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
                 push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             else:
                 save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
-        else:
-            Log.logger.error("post 'graph data' to cmdb/openapi/graph/ result:{}".format(ret))
+        else: # 即便CMDB2失败，保存我的资源到UOP表
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+            Log.logger.error("[CMDB2.0 graph error]:{}".format(ret))
     except Exception as exc:
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
