@@ -188,7 +188,7 @@ class GetImageFlavor(Resource):
                 flavor_info["flavor_id"] = flavor.flavor_id
                 flavor_info["flavor_name"] = flavor.flavor_name
                 flavor_list.append(flavor_info)
-            data["flvor_list"] = flavor_list
+            data["flavor_list"] = flavor_list
             data["image_list"] = image_list
             code = 200
             msg = "Get openstack image flavor success"
