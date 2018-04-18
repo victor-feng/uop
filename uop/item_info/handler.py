@@ -618,9 +618,8 @@ def fix_instance(args):
         if item_ins:
             item_ins = item_ins[0]
             # item_ins.item_name = str(item_name[0])
-            # Log.logger.info("Item name is {}".format(item_ins))
             # item_ins.save()
-            item_ins.update_one(item_name=str(item_name[0]))
+            item_ins.update_one(set__item_name=str(item_name[0]))
     except Exception as e:
         Log.logger.error("Save uop is wrong ".format(e))
 
