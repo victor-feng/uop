@@ -611,10 +611,12 @@ def fix_instance(args):
         args.model_id, args.instance_id, args.property, args.uid, args.token
     Log.logger.info("The item value is {}".format(item))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
-    b = [i['value'] if i["value"] else "" for i in item]
+    item_name = [i['value'] if i["value"] else "" for i in item]
+    Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
         item_ins = ItemInformation.objects.filter(item_id=instance_id)
-        item_ins.item_name = str(b[0])
+        Log.logger.info("The item_ins is {}".format(item_ins))
+        item_ins.item_name = str(item_name[0])
         item_ins.save()
     except Exception as e:
         Log.logger.error("Save uop is wrong ".format(e))
