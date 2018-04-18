@@ -614,12 +614,12 @@ def fix_instance(args):
     item_name = [i['value'] if i["value"] else "" for i in item]
     Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
-        item_ins = ItemInformation.objects.filter(item_id=instance_id)
-        if item_ins:
-            item_ins = item_ins[0]
+        # item_ins = ItemInformation.objects.filter(item_id=instance_id)
+        # if item_ins:
+            # item_ins = item_ins[0]
             # item_ins.item_name = str(item_name[0])
             # item_ins.save()
-            item_ins.update_one(set__item_name=str(item_name[0]))
+        ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(item_name[0]))
     except Exception as e:
         Log.logger.error("Save uop is wrong ".format(e))
 
