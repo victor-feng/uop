@@ -609,6 +609,10 @@ def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     model_id, instance_id, item, uid, token = \
         args.model_id, args.instance_id, args.property, args.uid, args.token
+    Log.logger.info("The item value is {}".format(item))
+    # 修改uop数据
+    item_ins = ItemInformation.objects.filter(item_id=instance_id)
+
     if not uid or not token:
         uid, token = get_uid_token()
     entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
