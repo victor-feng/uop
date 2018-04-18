@@ -212,7 +212,7 @@ class ResourceApplication(Resource):
                     "code": code,
                     "result": {
                         'res': 'fail',
-                        'msg': 'Create resource application fail. ' + e.message
+                        'msg': 'Create resource application fail. ' + str(e)
                     }
                 }
                 return res, code
