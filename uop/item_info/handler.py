@@ -478,7 +478,7 @@ def subgrath_data(args):
             name = get_pro("baseInfo", property)
             flag = ItemInformation.objects.filter(item_name=name)
             if flag:
-                return response_data(500, "fail", u"名为{}的已存在{}".format(name, code_id[next_model_id]))
+                return response_data(500, u"名为{}的已存在{}".format(name, code_id[next_model_id]), "fail")
             ii = ItemInformation(item_id=newid,
                                  item_code=code_id[next_model_id],
                                  item_depart=get_pro("department", property),
