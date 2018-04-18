@@ -224,7 +224,7 @@ def Aquery(args):
             instances = []
             if business:
                 for b in business:
-                    Log.logger.info("###### in ItemInformation.get")
+                    # Log.logger.info("###### in ItemInformation.get")
                     rname = b.item_name
                     tmp = dict(instance_id=b.item_id, model_id=get_model_id(code_id, "business"), name=rname, property=[{
                                 "code": "baseInfo",
@@ -242,7 +242,7 @@ def Aquery(args):
             instances = []
             if next_instances:
                 for ni in next_instances:
-                    Log.logger.info("###### in ItemInformation.get")
+                    # Log.logger.info("###### in ItemInformation.get")
                     rname = ni.item_name
                     tmp = dict(instance_id=ni.item_id, model_id=model_id, name=rname,
                                property=[{
@@ -266,7 +266,7 @@ def Aquery(args):
                 instances = []
                 name = set()
                 for r in res:
-                    Log.logger.info("###### in res")
+                    # Log.logger.info("###### in res")
                     rname = r.module_name
                     if rname not in name:
                         tmp = dict(instance_id=str(len(instances)) + "@@", model_id=1, name=rname, property=[{
@@ -279,7 +279,7 @@ def Aquery(args):
                         name.add(rname)
                 return response_data(200, "success", {"instance": instances})
             else:
-                Log.logger.info("$$$$$$ not in res")
+                # Log.logger.info("$$$$$$ not in res")
                 return response_data(200, "success", {"instance": []})
 
         if "@@" in instance_id:
@@ -475,6 +475,10 @@ def subgrath_data(args):
     try:
         if next_model_id in code_id.keys():
             newid = str(uuid.uuid1())
+            name = get_pro("baseInfo", property)
+            flag = ItemInformation.objects.filter(item_name=name)
+            if flag:
+                return response_data(500, "fail", u"名为{}的已存在{}".format(name, code_id[next_model_id]))
             ii = ItemInformation(item_id=newid,
                                  item_code=code_id[next_model_id],
                                  item_depart=get_pro("department", property),
