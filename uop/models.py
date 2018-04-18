@@ -428,7 +428,7 @@ class ResourceModel(db.DynamicDocument):
 
     expiry_date = db.StringField(required=False) #其他资源过期时间
     leader_emails = db.ListField(db.StringField(requeired=False)) #其他资源领导邮件
-    cc_emals = db.ListField(db.StringField(requeired=False)) #其他资源抄送邮件
+    cc_emails = db.ListField(db.StringField(requeired=False)) #其他资源抄送邮件
     mail_content = db.StringField(required=False)
 
 
