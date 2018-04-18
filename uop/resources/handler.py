@@ -242,7 +242,7 @@ def get_from_uop(args):
                         if isinstance(r.compute_list, int):
                             return False
                         for app in r.compute_list:
-                            return app.domain, app.domain_ip,app.namespace
+                            return app.domain, app.domain_ip,app.namespace,app.domain_path
                     return False
             return False if flag else "1"
 
@@ -251,8 +251,8 @@ def get_from_uop(args):
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
-            domain, domain_ip,namespace = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else (pi.domain, pi.domain_ip,None)
-            tmp_result['domain'] = domain
+            domain, domain_ip,namespace,domain_path = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else (pi.domain, pi.domain_ip,None,None)
+            tmp_result['domain'] = domain + "/" + "domain_path"
             tmp_result['domain_ip'] = domain_ip
             tmp_result['namespace'] = namespace
             tmp_result['resource_type'] = pi.os_type
