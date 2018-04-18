@@ -11,7 +11,7 @@ from flask_restful import reqparse, Api, Resource
 from uop.resources.handler import *
 from uop.resources import resources_blueprint
 from uop.models import (ResourceModel, DBIns, ComputeIns, Deployment,
-                        NetWorkConfig,Approval)
+                        NetWorkConfig,Approval,ConfOpenstackModel)
 from uop.resources.errors import resources_errors
 from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
@@ -681,6 +681,8 @@ class ResourceDetail(Resource):
         result['leader_emails'] = resource.leader_emails
         result['cc_emails'] = resource.cc_emails
         result['mail_content'] = resource.mail_content
+        result['image_name'] = ""
+        result['flavor_name'] = ""
         docker_network_id = resource.docker_network_id
         mysql_network_id = resource.mysql_network_id
         redis_network_id = resource.redis_network_id
@@ -701,12 +703,19 @@ class ResourceDetail(Resource):
             network = NetWorkConfig.objects.filter(vlan_id=mongodb_network_id).first()
             mongodb_network_name = network.name
             result['mongodb_network_name'] = mongodb_network_name
-
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         res = []
         if resource_list:
             for db_res in resource_list:
+                image_id = db_res.image_id
+                flavor_id = db_res.flavor_id
+                if image_id:
+                    opsk_image = ConfOpenstackModel.objects.get(image_id=image_id)
+                    result['image_name'] = opsk_image.image_name
+                if flavor_id:
+                    opsk_flavor = ConfOpenstackModel.objects.get(flavor_id=flavor_id)
+                    result['flavor_name'] = opsk_flavor.flavor_name
                 res.append(
                     {
                         "res_name": db_res.ins_name,
@@ -719,8 +728,8 @@ class ResourceDetail(Resource):
                         "version": db_res.version,
                         "volume_size": db_res.volume_size,
                         "network_id": db_res.network_id,
-                        "image_id": db_res.image_id,
-                        "flavor_id":db_res.flavor_id,
+                        "image_id": image_id,
+                        "flavor_id": flavor_id,
                     }
                 )
         com = []
