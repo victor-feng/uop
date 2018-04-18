@@ -94,6 +94,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('mysql_network_id', type=str)
             parser.add_argument('redis_network_id', type=str)
             parser.add_argument('mongodb_network_id', type=str)
+            parser.add_argument('network_id', type=str)
             parser.add_argument('networkName', type=str)
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
@@ -110,6 +111,7 @@ class ApprovalInfo(Resource):
             lb_methods = args.lb_methods
             namespace = args.namespace
             host_mapping = args.host_mapping
+            network_id = args.network_id
             if host_mapping is not None:
                 host_mapping=json.dumps(host_mapping)
             network_id_dict={
@@ -156,7 +158,10 @@ class ApprovalInfo(Resource):
                         com.host_mapping = host_mapping
                 if resource_list:
                     for res_obj in resource_list:
-                        res_obj.network_id = network_id_dict.get(res_obj.ins_type)
+                        if network_id:
+                            res_obj.network_id = network_id
+                        else:
+                            res_obj.network_id = network_id_dict.get(res_obj.ins_type)
                 resource.save()
                 code = 200
             else:
