@@ -709,6 +709,7 @@ class ResourceDetail(Resource):
         if resource_list:
             for db_res in resource_list:
                 image_id = db_res.image_id
+                network_id = db_res.network_id
                 flavor_id = db_res.flavor_id
                 if image_id:
                     opsk_image = ConfOpenstackModel.objects.get(image_id=image_id)
@@ -716,6 +717,10 @@ class ResourceDetail(Resource):
                 if flavor_id:
                     opsk_flavor = ConfOpenstackModel.objects.get(flavor_id=flavor_id)
                     result['flavor_name'] = opsk_flavor.flavor_name
+                if network_id:
+                    network = NetWorkConfig.objects.filter(vlan_id=network_id).first()
+                    network_name = network.name
+                    result['network_name'] = network_name
                 res.append(
                     {
                         "res_name": db_res.ins_name,
