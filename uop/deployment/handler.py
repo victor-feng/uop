@@ -348,6 +348,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  host_mapping=match_one.get("host_mapping"))
             old_compute_list.insert(i, compute)
             res.save()
+            Log.logger.info("22222222222222222222222222222222222222222222222222222222")
         if cmdb_url:
             Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm")
             data = {"osid_domain": cmdb_data}
@@ -360,7 +361,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                 Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm: {}".format(ret.json()))
         return appinfo
     except Exception as e:
-        Log.logger.error("attach domain_ip to appinfo error:{}".format(e.args))
+        Log.logger.error("attach domain_ip to appinfo error:{}".format(str(e)))
         return appinfo
 
 
