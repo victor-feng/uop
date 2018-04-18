@@ -609,9 +609,15 @@ def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     model_id, instance_id, item, uid, token = \
         args.model_id, args.instance_id, args.property, args.uid, args.token
-    Log.logger.info("The item value is {}".format(item))
+    Log.logger.info("The item value is {}".format(item))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
-    item_ins = ItemInformation.objects.filter(item_id=instance_id)
+    b = [i['value'] if i["value"] else "" for i in item]
+    try:
+        item_ins = ItemInformation.objects.filter(item_id=instance_id)
+        item_ins.item_name = str(b[0])
+        item_ins.save()
+    except Exception as e:
+        Log.logger.error("Save uop is wrong ".format(e))
 
     if not uid or not token:
         uid, token = get_uid_token()
