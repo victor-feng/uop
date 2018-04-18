@@ -429,7 +429,7 @@ class BusinessProject(Resource):
                 response["code"] = 202
                 response["result"]["msg"] = graph_data
             else:
-                response["result"]["data"] = graph_data
+                response = graph_data
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)
