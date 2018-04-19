@@ -257,8 +257,9 @@ class DeploymentListAPI(Resource):
             deploy_obj.approve_status = 'success'
             message = 'approve_allow success'
             ##推送到crp
+            deploy_type = "deploy"
             err_msg, result = deploy_to_crp(deploy_obj, args.environment,
-                                            args.database_password, appinfo, disconf_server_info)
+                                            args.database_password, appinfo, disconf_server_info,deploy_type)
             if err_msg:
                 deploy_obj.deploy_result = 'deploy_fail'
                 message = 'deploy_fail'
@@ -595,10 +596,11 @@ class DeploymentListAPI(Resource):
                     appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
                 ##推送到crp
                 deploy.approve_status = 'success'
+                deploy_type = "deploy"
                 err_msg, result = deploy_to_crp(deploy,
                                                 environment,
                                                 database_password,
-                                                appinfo, disconf_server_info)
+                                                appinfo, disconf_server_info,deploy_type)
                 if err_msg:
                     deploy.deploy_result = 'deploy_fail'
                 # 更新状态

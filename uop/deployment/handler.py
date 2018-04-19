@@ -141,14 +141,14 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, environment, database_password, appinfo,
-                  disconf_server_info):
+                  disconf_server_info,deploy_type):
     resource_id = deploy_item.resource_id
     res_obj = ResourceModel.objects.get(res_id=resource_id)
     data = {
         "deploy_id": deploy_item.deploy_id,
         "appinfo": appinfo,
         "disconf_server_info": disconf_server_info,
-        "deploy_type": "deploy",
+        "deploy_type": deploy_type,
         "dns": [],
         "environment": environment,
         "cloud":res_obj.cloud,

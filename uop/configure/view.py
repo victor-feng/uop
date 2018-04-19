@@ -142,8 +142,8 @@ class Configure(Resource):
         parser.add_argument('flavor_id', type=str)
         parser.add_argument('flavor_name', type=str)
         parser.add_argument('flavor_type', type=str)
-        parser.add_argument('flavor_cpu', type=str)
-        parser.add_argument('flavor_memory', type=str)
+        parser.add_argument('flavor_cpu', type=int)
+        parser.add_argument('flavor_memory', type=int)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -240,8 +240,8 @@ class Configure(Resource):
         parser.add_argument('flavor_id', type=str)
         parser.add_argument('flavor_name', type=str)
         parser.add_argument('flavor_type', type=str)
-        parser.add_argument('flavor_cpu', type=str)
-        parser.add_argument('flavor_memory', type=str)
+        parser.add_argument('flavor_cpu', type=int)
+        parser.add_argument('flavor_memory', type=int)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
