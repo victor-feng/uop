@@ -139,8 +139,10 @@ class ResourceApplication(Resource):
                     network_id = resource.get('network_id')
                     image_id = resource.get('image_id')
                     flavor_id = resource.get('flavor_id')
+                    volume_exp_size = resource.get("volume_exp_size")
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
+                                   image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
                     resource_application.resource_list.append(db_ins)
 
             ins_name_list = []
@@ -575,9 +577,11 @@ class ResourceApplication(Resource):
                     volume_size = res.get('volume_size', 0)
                     network_id = res.get('network_id')
                     image_id = res.get('image_id')
-                    flavor_id = resource.get('flavor_id')
+                    flavor_id = res.get('flavor_id')
+                    volume_exp_size = res.get('volume_exp_size')
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
+                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
+                                   image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
                     resource.resource_list.append(db_ins)
                 resource.save()
             else:
@@ -744,6 +748,7 @@ class ResourceDetail(Resource):
                         "network_id": db_res.network_id,
                         "image_id": image_id,
                         "flavor_id": flavor_id,
+                        "volume_exp_size":db_res.volume_exp_size,
                     }
                 )
         com = []
@@ -891,8 +896,10 @@ class ResourceDetail(Resource):
             network_id = resource.get('network_id')
             image_id = resource.get('image_id')
             flavor_id = resource.get('flavor_id')
+            volume_exp_size = resource.get("volume_exp_size")
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,image_id=image_id,flavor_id=flavor_id)
+                           quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
+                           image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
             resource_application.resource_list.append(db_ins)
 
         for compute in compute_list:
