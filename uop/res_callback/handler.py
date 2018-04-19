@@ -430,6 +430,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
     physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
     project_model = filter(lambda x: x["code"] == "project", models_list)[0]
+    module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
     instances, relations = [], []
 
     ## 一次预留生成的所有应用资源对应一个tomcat实例
@@ -440,9 +441,22 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
         "model_id": project_model["entity_id"],
         "_id": ""
     }
-    tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
-    instances.append(tomcat)
-    relations.extend(r)
+    module_level = {
+        "instance_id": raw["module_id"],
+        "model_id": module_model["entity_id"],
+        "_id": ""
+    }
+    if raw["module_id"]:
+        # module
+        other_res, r = format_data_cmdb(relations_model, raw, module_model, {}, len(instances), module_level)
+        instances.append(other_res)
+        relations.extend(r)
+    else:
+        #project
+        tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
+        instances.append(tomcat)
+        relations.extend(r)
+
 
     # docker数据解析
     for ct in raw["container"]:

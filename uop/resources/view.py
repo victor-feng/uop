@@ -84,6 +84,8 @@ class ResourceApplication(Resource):
             module_name = info.get("module_name","")
             business_name = info.get("business_name","")
             cmdb2_project_id = info.get("cmdb2_project_id","")
+            cmdb2_module_id = info.get("cmdb2_module_id", "")
+
 
             project = info.get("project","")
             project_id = info.get("project_id","")
@@ -109,10 +111,12 @@ class ResourceApplication(Resource):
             res_info_dict["resource_id"] = res_id
             res_info_dict["resource_name"] = resource_name
             res_info_dict["project_id"] = cmdb2_project_id
+            res_info_dict["module_id"] = cmdb2_module_id
             res_info_list.append(res_info_dict)
             resource_application = ResourceModel(resource_name=resource_name, project=project, department=department,
                                                  department_id=department_id, res_id=res_id, project_id=project_id,
                                                  cmdb2_project_id=cmdb2_project_id,
+                                                 cmdb2_module_id = cmdb2_module_id,
                                                  project_name=project_name,
                                                  module_name=module_name,
                                                  business_name=business_name,
@@ -375,6 +379,7 @@ class ResourceApplication(Resource):
                 result['module_name'] = resource.module_name
                 result['business_name'] = resource.business_name
                 result['cmdb2_project_id'] = resource.cmdb2_project_id
+                result['cmdb2_module_id'] = resource.cmdb2_module_id
 
                 result['project_id'] = resource.project_id
                 result['id'] = resource.res_id
@@ -457,6 +462,7 @@ class ResourceApplication(Resource):
         parser.add_argument('module_name', type=str)
         parser.add_argument('business_name', type=str)
         parser.add_argument('cmdb2_project_id', type=str)
+        parser.add_argument('cmdb2_module_id', type=str)
         parser.add_argument('project', type=str)
         parser.add_argument('project_id', type=str)
         parser.add_argument('department', type=str)
@@ -494,6 +500,7 @@ class ResourceApplication(Resource):
         module_name = args.module_name
         business_name = args.business_name
         cmdb2_project_id = args.cmdb2_project_id
+        cmdb2_module_id =  args.cmdb2_module_id
         domain = args.domain
         expiry_date = args.expiry_date
         mail_content = args.mail_content
@@ -521,6 +528,7 @@ class ResourceApplication(Resource):
                     module_name=module_name,
                     business_name=business_name,
                     cmdb2_project_id=cmdb2_project_id,
+                    cmdb2_module_id=cmdb2_module_id,
                     domain=domain,
                     cc_emails=cc_emails,
                     expiry_date=expiry_date,
@@ -665,6 +673,7 @@ class ResourceDetail(Resource):
         result['module_name'] = resource.module_name
         result['business_name'] = resource.business_name
         result['cmdb2_project_id'] = resource.cmdb2_project_id
+        result['cmdb2_module_id'] = resource.cmdb2_module_id
         result['user_id'] = resource.user_id
         result['domain'] = resource.domain
         result['env'] = resource.env

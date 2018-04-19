@@ -48,6 +48,7 @@ class DevelopmentConfig(BaseConfig):
         "mysql": "e5024d360b924e0c8de3c6a8",
         "redis": "de90d618f7504723b677f196",
         "mongodb": "9bc4a41eb6364022b2f2c093",
+        "nginx": "3671f248bdc74d2fb6aa590c",
     }
     UOPCODE_CMDB2 = {
         "c73339db70cc4647b515eaca": "business",
@@ -61,11 +62,13 @@ class DevelopmentConfig(BaseConfig):
         "2": ("B6", u"部门 --> 资源，用于分级展示业务模块工程", "9a544097f789495e8ee4f5eb"),
         "3": ("B5", u"人 --> 部门 --> 工程", "d8098981df71428784e65427"),
 
+
         "4": ("B8", u"tomcat --> 机房，展示tomcat资源视图", "d1b11a713e8842b2b93fe397"),
         "5": ("B9", u"mysql --> 机房，展示mysql资源视图", "e5024d360b924e0c8de3c6a8"),
         "6": ("B10", u"mongodb--> 机房，展示mongodb资源视图", "9bc4a41eb6364022b2f2c093"),
         "7": ("B11", u"redis --> 机房，展示redis资源视图", "de90d618f7504723b677f196"),
         "8": ("B12", u"物理机信息", "b593293378c74ba6827847d3"),
+        "9": ("B13", u"模块 --> 物理机，用于拿到各层间实体关系信息", "9e97b54a4a54472e9e913d4e"),
         # "5": ("B3", u"资源 --> 机房"),
     }
 

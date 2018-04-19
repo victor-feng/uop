@@ -257,6 +257,7 @@ class Reservation(Resource):
         data['unit_id'] = resource.project_id
         data['unit_name'] = resource.project
         data["project_id"] = resource.cmdb2_project_id if resource.cmdb2_project_id else "db821c4428dd48758cde720c" #全量数据测试工程
+        data["module_id"] = resource.cmdb2_module_id
         data['unit_des'] = ''
         data['user_id'] = resource.user_id
         data['username'] = resource.user_name
@@ -637,6 +638,7 @@ class CapacityReservation(Resource):
         data['resource_name'] = resource.resource_name
         data['domain'] = resource.domain
         data['project_id'] = resource.cmdb2_project_id
+        data['module_id'] = resource.cmdb2_module_id
         data['department_id'] = resource.department_id
         data['env'] = resource.env
         data['docker_network_id'] = resource.docker_network_id

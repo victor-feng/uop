@@ -187,7 +187,7 @@ def get_relations():
     :return:
     '''
     uid, token = get_uid_token()
-    for id in [view[0] for num, view in CMDB2_VIEWS.items() if num in ["1","2","3"]]:
+    for id in [view[0] for num, view in CMDB2_VIEWS.items() if num in ["1","2","3","9"]]:
         get_one_view(uid, token, id)
 
 
