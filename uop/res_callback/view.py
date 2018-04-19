@@ -3,6 +3,7 @@ import copy
 import requests
 import json
 import datetime
+import traceback
 from flask import request, current_app
 from flask_restful import reqparse, Api, Resource
 from uop.models import  ResourceModel, StatusRecord,OS_ip_dic,Deployment, Statusvm
@@ -884,7 +885,8 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.save()
 
         except Exception as e:
-            Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
+            msg = traceback.format_exc()
+            Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(msg))
             code = 500
             ret = {
                 'code': code,
