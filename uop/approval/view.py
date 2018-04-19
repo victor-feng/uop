@@ -7,6 +7,7 @@ import datetime
 import requests
 import random
 from flask import request
+from flask import current_app
 from flask_restful import reqparse, Api, Resource
 from uop.log import Log
 from uop.approval import approval_blueprint
@@ -15,12 +16,16 @@ from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
 from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
+from uop.deployment.handler import attach_domain_ip,deploy_to_crp,deal_disconf_info
+
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
 
 # CPR_URL = current_app.config['CRP_URL']
 # CPR_URL = configs[APP_ENV].CRP_URL
 BASE_K8S_IMAGE = configs[APP_ENV].BASE_K8S_IMAGE
+K8S_NGINX_PORT = configs[APP_ENV].K8S_NGINX_PORT
+K8S_NGINX_IPS = configs[APP_ENV].K8S_NGINX_IPS
 
 
 class ApprovalList(Resource):
@@ -912,61 +917,93 @@ class RollBackReservation(Resource):
         data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            env = resource.env
-            cloud = resource.cloud
-            resource_name=resource.resource_name
-            res_compute_list = resource.compute_list
-            project_name = resource.project_name
-            for res_compute in res_compute_list:
+            deploy = models.Deployment.objects.get(deploy_id=deploy_id)
+            compute_list = resource.compute_list
+            if compute_list:
                 for compute in compute_list:
-                    if res_compute["ins_id"] == compute["ins_id"]:
-                        res_compute["url"] = compute["url"]
-                        res_compute["port"] = compute["port"]
-                        res_compute["domain"] = compute["domain"]
-                        res_compute["domain_path"] = compute["domain_path"]
-                        res_compute["database_config"] = compute["database_config"]
-            resource.save()
-            # ----------
-            appinfo = []
-            docker_list = []
-            for compute in compute_list:
-                domain_ip = compute.get('domain_ip')
+                    domain_ip = compute.domain_ip
+            environment = deploy.environment
+            database_password = deploy.database_password
+            cloud = resource.cloud
+            resource_type = resource.resource_type
+            # 获取disconf信息
+            disconf_server_info = deal_disconf_info(deploy)
+            # 将computer信息如IP，更新到数据库
+            app_image = eval(deploy.app_image)
+            for app in app_image:
                 if domain_ip:
-                    appinfo.append(compute)
-                docker_list.append(
-                    {
-                        'url': compute.get("url"),
-                        'ins_name': compute.get("ins_name"),
-                        'ip': compute.get("ips"),
-                        'health_check': compute.get("health_check",0),
-                        'host_env': compute.get("host_env"),
-                        'language_env': compute.get("language_env"),
-                        'deploy_source': compute.get("deploy_source"),
-                        'database_config': compute.get("database_config")
-                    }
-                )
-            data["appinfo"] = appinfo
-            data['docker'] = docker_list
-            data["mysql"] = []
-            data["mongodb"] = []
-            data["dns"] = []
-            data["disconf_server_info"] =[]
-            data["deploy_id"] = deploy_id
-            data["deploy_type"] = "rollback"
-            data["cloud"] = cloud
-            data["resource_name"] = resource_name
-            data["deploy_name"] = deploy_name
-            data["project_name"] = project_name
-            data["environment"] = env
-            CPR_URL = get_CRP_url(env)
-            url = CPR_URL + "api/deploy/deploys"
-            headers = {
-                'Content-Type': 'application/json',
-            }
-            data_str = json.dumps(data)
-            Log.logger.debug("Data args is " + str(data))
-            result = requests.post(url=url, headers=headers, data=data_str)
-            Log.logger.debug("Result is " + str(result))
+                    app["domain_ip"] = domain_ip
+            cmdb_url = current_app.config['CMDB_URL']
+            appinfo = attach_domain_ip(app_image, resource, cmdb_url)
+            if cloud == '2' and resource_type == "app":
+                appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
+            ##推送到crp
+            deploy.approve_status = 'success'
+            deploy_type = "rollback"
+            err_msg, result = deploy_to_crp(deploy,
+                                            environment,
+                                            database_password,
+                                            appinfo, disconf_server_info, deploy_type)
+            if err_msg:
+                deploy.deploy_result = 'rollback_fail'
+            # 更新状态
+            deploy.deploy_result = 'rollbacking'
+            deploy.save()
+            # env = resource.env
+            # cloud = resource.cloud
+            # resource_name=resource.resource_name
+            # res_compute_list = resource.compute_list
+            # project_name = resource.project_name
+            # for res_compute in res_compute_list:
+            #     for compute in compute_list:
+            #         if res_compute["ins_id"] == compute["ins_id"]:
+            #             res_compute["url"] = compute["url"]
+            #             res_compute["port"] = compute["port"]
+            #             res_compute["domain"] = compute["domain"]
+            #             res_compute["domain_path"] = compute["domain_path"]
+            #             res_compute["database_config"] = compute["database_config"]
+            # resource.save()
+            # # ----------
+            # appinfo = []
+            # docker_list = []
+            # for compute in compute_list:
+            #     domain_ip = compute.get('domain_ip')
+            #     if domain_ip:
+            #         appinfo.append(compute)
+            #     docker_list.append(
+            #         {
+            #             'url': compute.get("url"),
+            #             'ins_name': compute.get("ins_name"),
+            #             'ip': compute.get("ips"),
+            #             'health_check': compute.get("health_check",0),
+            #             'host_env': compute.get("host_env"),
+            #             'language_env': compute.get("language_env"),
+            #             'deploy_source': compute.get("deploy_source"),
+            #             'database_config': compute.get("database_config")
+            #         }
+            #     )
+            # data["appinfo"] = appinfo
+            # data['docker'] = docker_list
+            # data["mysql"] = []
+            # data["mongodb"] = []
+            # data["dns"] = []
+            # data["disconf_server_info"] =[]
+            # data["deploy_id"] = deploy_id
+            # data["deploy_type"] = "rollback"
+            # data["cloud"] = cloud
+            # data["resource_name"] = resource_name
+            # data["deploy_name"] = deploy_name
+            # data["project_name"] = project_name
+            # data["environment"] = env
+            # CPR_URL = get_CRP_url(env)
+            # url = CPR_URL + "api/deploy/deploys"
+            # headers = {
+            #     'Content-Type': 'application/json',
+            # }
+            # data_str = json.dumps(data)
+            # Log.logger.debug("Data args is " + str(data))
+            # result = requests.post(url=url, headers=headers, data=data_str)
+            # Log.logger.debug("Result is " + str(result))
         except Exception as e:
             code = 500
             res = "Failed the rollback post data to crp. %s" % e
