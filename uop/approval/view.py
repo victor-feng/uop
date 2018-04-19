@@ -264,7 +264,7 @@ class Reservation(Resource):
             CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
-            res = "failed to connect CRP service."
+            res = "failed to connect CRP service.{}".format(str(e))
             code = 500
             ret = {
                 "code": code,
@@ -407,7 +407,7 @@ class ReservationAPI(Resource):
             CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
-            res = "failed to connect CRP service."
+            res = "failed to connect CRP service.{}".format(str(e))
             code = 500
             ret = {
                 "code": code,
