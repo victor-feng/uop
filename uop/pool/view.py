@@ -187,8 +187,8 @@ class GetImageFlavor(Resource):
                 flavor_info = {}
                 flavor_info["flavor_id"] = flavor.flavor_id
                 flavor_info["flavor_name"] = flavor.flavor_name
-                flavor_info["flavor_cpu"] = int(flavor.flavor_cpu)
-                flavor_info["flavor_memory"] = int(flavor.flavor_memory)
+                flavor_info["flavor_cpu"] = flavor.flavor_cpu
+                flavor_info["flavor_memory"] = flavor.flavor_memory
                 flavor_list.append(flavor_info)
             data["flavor_list"] = flavor_list
             data["image_list"] = image_list
