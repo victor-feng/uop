@@ -918,10 +918,6 @@ class RollBackReservation(Resource):
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy = models.Deployment.objects.get(deploy_id=deploy_id)
-            compute_list = resource.compute_list
-            if compute_list:
-                for compute in compute_list:
-                    domain_ip = compute.domain_ip
             environment = deploy.environment
             database_password = deploy.database_password
             cloud = resource.cloud
@@ -930,9 +926,6 @@ class RollBackReservation(Resource):
             disconf_server_info = deal_disconf_info(deploy)
             # 将computer信息如IP，更新到数据库
             app_image = eval(deploy.app_image)
-            for app in app_image:
-                if domain_ip:
-                    app["domain_ip"] = domain_ip
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             if cloud == '2' and resource_type == "app":
