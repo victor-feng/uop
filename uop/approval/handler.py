@@ -136,4 +136,4 @@ def deal_crp_data(resource,set_flag,quantity=0):
                 }
             )
         data['compute_list'] = com
-        return data
+    return data
