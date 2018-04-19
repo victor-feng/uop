@@ -522,8 +522,8 @@ class ResourceApplication(Resource):
                     application_status=application_status,
                     approval_status=approval_status,
                     is_rollback=0,
-                    compute_list=[],
-                    resource_list=[],
+                    #compute_list=[],
+                    #resource_list=[],
                     resource_type=resource_type,
                     cloud=cloud,
                     project_name=project_name,
@@ -537,6 +537,8 @@ class ResourceApplication(Resource):
                     mail_content=mail_content,
                     leader_emails=leader_emails,
                 )
+                resource.compute_list = []
+                resource.resource_list = []
                 if compute_list:
                     for compute in compute_list:
                         ins_name = compute.get('ins_name')
