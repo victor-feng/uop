@@ -362,7 +362,7 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            db_flag = True if args.get("db_info") else False
+            db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
             if cloud == 1:
                 push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             else:
