@@ -842,6 +842,8 @@ class RollBackReservation(Resource):
             disconf_server_info = deal_disconf_info(deploy)
             # 将computer信息如IP，更新到数据库
             app_image = eval(deploy.app_image)
+            for app in app_image:
+                app["domain_ip"] = None
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             if cloud == '2' and resource_type == "app":
