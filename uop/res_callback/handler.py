@@ -293,6 +293,9 @@ def crp_data_cmdb(args, cmdb1_url):
     assert(isinstance(args, dict))
     Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
+    CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+    res_id = args.get('resource_id')
+    resource = ResourceModel.objects.get(res_id=res_id)
     try:
         url = CMDB2_URL + "cmdb/openapi/graph/"
         module_id = args.get("module_id")
@@ -302,12 +305,10 @@ def crp_data_cmdb(args, cmdb1_url):
         else:
             data = get_relations(CMDB2_VIEWS["1"][0]) # B7
         models_list = data["entity"]
-        res_id=args.get('resource_id')
         status = args.get('status')
         error_msg = args.get('error_msg')
         set_flag = args.get('set_flag')
         resource_type = args.get('resource_type')
-        resource = ResourceModel.objects.get(res_id=res_id)
         physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
         env = resource.env
         cloud = resource.cloud
@@ -359,7 +360,6 @@ def crp_data_cmdb(args, cmdb1_url):
         ret = []
 
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
-        CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
             db_flag = True if args.get("db_info") else False
