@@ -884,7 +884,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.save()
 
         except Exception as e:
-            Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(e.args))
+            Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % str(str(e)))
             code = 500
             ret = {
                 'code': code,
