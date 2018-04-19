@@ -440,9 +440,9 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     ## 一次预留生成的所有应用资源对应一个tomcat实例
     raw["baseinfo"] = raw["resource_name"]
     raw["create_date"] = raw["created_time"]
+    module_id = raw["module_id"]
 
-
-    if raw["module_id"]:
+    if module_id:
         # module
         module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
         module_level = {
@@ -498,7 +498,11 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             "disk": db_contents["disk"],
             "create_date": raw.get("created_time", "")
         }
-        up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
+        if module_id:
+            up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), module_level,
+                                        physical_server_model_id)
+        else:
+            up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
         instances.append(up_db)
         relations.extend(r)
         for index, db in enumerate(db_contents["instance"]):
