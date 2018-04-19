@@ -537,52 +537,54 @@ class ResourceApplication(Resource):
                     mail_content=mail_content,
                     leader_emails=leader_emails,
                 )
-                for compute in compute_list:
-                    ins_name = compute.get('ins_name')
-                    ins_id = str(uuid.uuid1())
-                    cpu = compute.get('cpu')
-                    mem = compute.get('mem')
-                    url = compute.get('url')
-                    domain = compute.get('domain')
-                    domain_ip = compute.get('domain_ip')
-                    quantity = compute.get('quantity')
-                    port = compute.get('port')
-                    meta_str = compute.get('meta')
-                    health_check = compute.get('health_check', 0)
-                    network_id = compute.get('network_id')
-                    networkName = compute.get('networkName')
-                    tenantName = compute.get('tenantName')
-                    host_env = compute.get("host_env")
-                    language_env = compute.get("language_env")
-                    deploy_source = compute.get("deploy_source")
-                    database_config = compute.get("database_config")
-                    ready_probe_path = compute.get("ready_probe_path")
-                    domain_path = compute.get("domain_path")
-                    compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
-                                             domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
-                                             health_check=health_check,network_id=network_id,networkName=networkName,
-                                             tenantName=tenantName,host_env=host_env
-                                             ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
-                                             ready_probe_path=ready_probe_path,domain_path=domain_path)
-                    resource.compute_list.append(compute_ins)
-                for res in resource_list:
-                    ins_name = res.get('res_name', '未知名称')
-                    ins_id = str(uuid.uuid1())
-                    ins_type = res.get('res_type')
-                    cpu = res.get('cpu')
-                    mem = res.get('mem')
-                    disk = res.get('disk')
-                    quantity = res.get('quantity')
-                    version = res.get('version')
-                    volume_size = res.get('volume_size', 0)
-                    network_id = res.get('network_id')
-                    image_id = res.get('image_id')
-                    flavor_id = res.get('flavor_id')
-                    volume_exp_size = res.get('volume_exp_size')
-                    db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
-                                   quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
-                                   image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
-                    resource.resource_list.append(db_ins)
+                if compute_list:
+                    for compute in compute_list:
+                        ins_name = compute.get('ins_name')
+                        ins_id = str(uuid.uuid1())
+                        cpu = compute.get('cpu')
+                        mem = compute.get('mem')
+                        url = compute.get('url')
+                        domain = compute.get('domain')
+                        domain_ip = compute.get('domain_ip')
+                        quantity = compute.get('quantity')
+                        port = compute.get('port')
+                        meta_str = compute.get('meta')
+                        health_check = compute.get('health_check', 0)
+                        network_id = compute.get('network_id')
+                        networkName = compute.get('networkName')
+                        tenantName = compute.get('tenantName')
+                        host_env = compute.get("host_env")
+                        language_env = compute.get("language_env")
+                        deploy_source = compute.get("deploy_source")
+                        database_config = compute.get("database_config")
+                        ready_probe_path = compute.get("ready_probe_path")
+                        domain_path = compute.get("domain_path")
+                        compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
+                                                 domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
+                                                 health_check=health_check,network_id=network_id,networkName=networkName,
+                                                 tenantName=tenantName,host_env=host_env
+                                                 ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
+                                                 ready_probe_path=ready_probe_path,domain_path=domain_path)
+                        resource.compute_list.append(compute_ins)
+                if resource_list:
+                    for res in resource_list:
+                        ins_name = res.get('res_name', '未知名称')
+                        ins_id = str(uuid.uuid1())
+                        ins_type = res.get('res_type')
+                        cpu = res.get('cpu')
+                        mem = res.get('mem')
+                        disk = res.get('disk')
+                        quantity = res.get('quantity')
+                        version = res.get('version')
+                        volume_size = res.get('volume_size', 0)
+                        network_id = res.get('network_id')
+                        image_id = res.get('image_id')
+                        flavor_id = res.get('flavor_id')
+                        volume_exp_size = res.get('volume_exp_size')
+                        db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
+                                       quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
+                                       image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
+                        resource.resource_list.append(db_ins)
                 resource.save()
             else:
                 ret = {
