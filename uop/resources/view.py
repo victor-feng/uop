@@ -139,7 +139,7 @@ class ResourceApplication(Resource):
                     network_id = resource.get('network_id')
                     image_id = resource.get('image_id')
                     flavor_id = resource.get('flavor_id')
-                    volume_exp_size = resource.get("volume_exp_size")
+                    volume_exp_size = resource.get("volume_exp_size",0)
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
                                    image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
@@ -582,7 +582,7 @@ class ResourceApplication(Resource):
                         network_id = res.get('network_id')
                         image_id = res.get('image_id')
                         flavor_id = res.get('flavor_id')
-                        volume_exp_size = res.get('volume_exp_size')
+                        volume_exp_size = res.get('volume_exp_size',0)
                         db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                        quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
                                        image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
@@ -900,7 +900,7 @@ class ResourceDetail(Resource):
             network_id = resource.get('network_id')
             image_id = resource.get('image_id')
             flavor_id = resource.get('flavor_id')
-            volume_exp_size = resource.get("volume_exp_size")
+            volume_exp_size = resource.get("volume_exp_size",0)
             db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                            quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
                            image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
