@@ -766,9 +766,10 @@ class ResourceStatusProviderCallBack(Resource):
                 os_inst_id = instance.get('os_inst_id', '')
                 instance_type = instance.get('instance_type')
                 quantity = int(instance.get('quantity', '0'))
-                cur_instance_type = mapping_type_status.get(instance_type, '')
+                ins_type = mapping_type_status.get(instance_type, '')
+                cur_instance_type = 'other' if not ins_type else ins_type
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
-                if len(deps) >0:
+                if len(deps) > 0:
                     dep = deps[0]
                     deploy_id = dep.deploy_id
                 status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type,set_flag=set_flag)
