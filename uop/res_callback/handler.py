@@ -293,70 +293,71 @@ def crp_data_cmdb(args, cmdb1_url):
     assert(isinstance(args, dict))
     Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
-    url = CMDB2_URL + "cmdb/openapi/graph/"
-    module_id = args.get("module_id")
-    if module_id:
-        #其他资源
-        data = get_relations(CMDB2_VIEWS["9"][0])  # B13
-    else:
-        data = get_relations(CMDB2_VIEWS["1"][0]) # B7
-    models_list = data["entity"]
-    res_id=args.get('resource_id')
-    status = args.get('status')
-    error_msg = args.get('error_msg')
-    set_flag = args.get('set_flag')
-    resource_type = args.get('resource_type')
-    resource = ResourceModel.objects.get(res_id=res_id)
-    physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
-    env = resource.env
-    cloud = resource.cloud
-    flag = False
-    if status != "ok":
-        return
-    if set_flag in ["increase", "reduce"]:
-        if cloud == "2" and resource_type == "app":
-            flag = True
-        if not flag: # 按照常规扩缩容
-            Log.logger.info("Virtual cloud increase".format(data))
-            instances, relations = [], []
-            statusvm = Statusvm.objects.filter(resource_id=res_id)
-            docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
-            if statusvm:
-                for sv in statusvm:
-                    tomcat_instance_id = sv.resource_view_id
-            tomcat_level = {
-                "instance_id": tomcat_instance_id,
-                "model_id": CMDB2_ENTITY["tomcat"],
-                "_id": ""
-            }
-            for ct in args["container"]:
-                attach = {
-                    "image_name": ct.get("image_url", ""),
-                    "create_date": args.get("created_time", "")
-                }
-                for index, ins in enumerate(ct["instance"]):
-                    ins["baseinfo"] = ins.get("instance_name")
-                    i, r = format_data_cmdb(data["relations"], ins, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
-                    instances.append(i)
-                    relations.extend(r)
-        else:
-            Log.logger.info("Docker cloud increase".format(data))
-            instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
-    else:
-        instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
-    uid, token = get_uid_token()
-    data = {
-        "uid": uid,
-        "token": token,
-        "sign":"",
-        "data": {
-            "relation": relations,
-            "instance": instances
-        }
-    }
-    data_str = json.dumps(data)
-    ret = []
     try:
+        url = CMDB2_URL + "cmdb/openapi/graph/"
+        module_id = args.get("module_id")
+        if module_id:
+            #其他资源
+            data = get_relations(CMDB2_VIEWS["9"][0])  # B13
+        else:
+            data = get_relations(CMDB2_VIEWS["1"][0]) # B7
+        models_list = data["entity"]
+        res_id=args.get('resource_id')
+        status = args.get('status')
+        error_msg = args.get('error_msg')
+        set_flag = args.get('set_flag')
+        resource_type = args.get('resource_type')
+        resource = ResourceModel.objects.get(res_id=res_id)
+        physical_server_model_id = filter(lambda x: x["code"] == "host", models_list)[0]["entity_id"]
+        env = resource.env
+        cloud = resource.cloud
+        flag = False
+        if status != "ok":
+            return
+        if set_flag in ["increase", "reduce"]:
+            if cloud == "2" and resource_type == "app":
+                flag = True
+            if not flag: # 按照常规扩缩容
+                Log.logger.info("Virtual cloud increase".format(data))
+                instances, relations = [], []
+                statusvm = Statusvm.objects.filter(resource_id=res_id)
+                docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
+                if statusvm:
+                    for sv in statusvm:
+                        tomcat_instance_id = sv.resource_view_id
+                tomcat_level = {
+                    "instance_id": tomcat_instance_id,
+                    "model_id": CMDB2_ENTITY["tomcat"],
+                    "_id": ""
+                }
+                for ct in args["container"]:
+                    attach = {
+                        "image_name": ct.get("image_url", ""),
+                        "create_date": args.get("created_time", "")
+                    }
+                    for index, ins in enumerate(ct["instance"]):
+                        ins["baseinfo"] = ins.get("instance_name")
+                        i, r = format_data_cmdb(data["relations"], ins, docker_model, attach, len(instances), tomcat_level, physical_server_model_id)
+                        instances.append(i)
+                        relations.extend(r)
+            else:
+                Log.logger.info("Docker cloud increase".format(data))
+                instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
+        else:
+            instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
+        uid, token = get_uid_token()
+        data = {
+            "uid": uid,
+            "token": token,
+            "sign":"",
+            "data": {
+                "relation": relations,
+                "instance": instances
+            }
+        }
+        data_str = json.dumps(data)
+        ret = []
+
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
         ret = requests.post(url, data=data_str, timeout=5).json()
@@ -370,6 +371,7 @@ def crp_data_cmdb(args, cmdb1_url):
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             Log.logger.error("[CMDB2.0 graph error]:{}".format(ret))
     except Exception as exc:
+        #即使往cmdb2写入数据失败，也往uop里面写入数据
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
 
