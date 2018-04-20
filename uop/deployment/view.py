@@ -1031,7 +1031,7 @@ class CapacityInfoAPI(Resource):
                 "code": 400,
                 "result": {
                     "res": "failed",
-                    "msg": e.args
+                    "msg": str(e)
                 }
             }
             return res, 400
