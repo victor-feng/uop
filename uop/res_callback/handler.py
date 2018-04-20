@@ -437,36 +437,21 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
     instances, relations = [], []
 
-    ## 一次预留生成的所有应用资源对应一个tomcat实例
+    # 一次预留生成的所有应用资源对应一个tomcat实例
     raw["baseinfo"] = raw["resource_name"]
     raw["create_date"] = raw["created_time"]
 
-
-    if raw["module_id"]:
-        # module
-        module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
-        module_level = {
-            "instance_id": raw["module_id"],
-            "model_id": module_model["entity_id"],
-            "_id": ""
-        }
-        other_res, r = format_data_cmdb(relations_model, raw, module_model, {}, len(instances), module_level)
-        instances.append(other_res)
-        relations.extend(r)
-    else:
-        #project
-        docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
-        tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
-        project_model = filter(lambda x: x["code"] == "project", models_list)[0]
-        project_level = {
-            "instance_id": raw["project_id"],
-            "model_id": project_model["entity_id"],
-            "_id": ""
-        }
-        tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
-        instances.append(tomcat)
-        relations.extend(r)
-
+    docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
+    tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
+    project_model = filter(lambda x: x["code"] == "project", models_list)[0]
+    project_level = {
+        "instance_id": raw["project_id"],
+        "model_id": project_model["entity_id"],
+        "_id": ""
+    }
+    tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
+    instances.append(tomcat)
+    relations.extend(r)
 
     # docker数据解析
     for ct in raw["container"]:
@@ -498,9 +483,24 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             "disk": db_contents["disk"],
             "create_date": raw.get("created_time", "")
         }
-        up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
-        instances.append(up_db)
-        relations.extend(r)
+
+        if raw["module_id"]:
+            # module
+            module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
+            module_level = {
+                "instance_id": raw["module_id"],
+                "model_id": module_model["entity_id"],
+                "_id": ""
+            }
+
+            up_db, r = format_data_cmdb(relations_model, raw, module_model, {}, len(instances), module_level)
+            instances.append(up_db)
+            relations.extend(r)
+        else:
+            up_db, r = format_data_cmdb(relations_model, db_contents, db_model, attach, len(instances), project_level, physical_server_model_id)
+            instances.append(up_db)
+            relations.extend(r)
+
         for index, db in enumerate(db_contents["instance"]):
             db["baseinfo"] = db.get("instance_name")
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
@@ -511,6 +511,15 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
 
 def judge_value_format(item, pro, attach):
+    """
+    :param item: crp data
+    :param pro:  cmdb entity data
+    :param attach: {
+                        "image_name": ct.get("image_url", ""),
+                        "create_date": args.get("created_time", "")
+                }
+    :return:
+    """
     value_type = {
         "string": "",
         "int": 0,
