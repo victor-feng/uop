@@ -346,7 +346,7 @@ def crp_data_cmdb(args, cmdb1_url):
                 Log.logger.info("Docker cloud increase".format(data))
                 instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
         else:
-            Log.logger.info("Start post datas to cmdb2")
+            Log.logger.info("Start post datas to cmdb2,models_list is {}".format(models_list))
             instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
         uid, token = get_uid_token()
         data = {
