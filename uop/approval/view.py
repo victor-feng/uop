@@ -256,9 +256,8 @@ class Reservation(Resource):
             }
             return ret, code
         vid_list = resource.vid_list
-        number = vid_list.__str__()
         #说明是对已有资源配置的审批
-        if number > 0:
+        if vid_list > 0:
             set_flag = "config"
             data = deal_crp_data(resource, set_flag,quantity=0)
         else:
