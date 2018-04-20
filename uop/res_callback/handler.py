@@ -431,8 +431,8 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     构建crp资源预留后返回的数据，已实现tomcat--->容器的存储
     目前按照code， 取实体信息，后期code
     :param url:
-    :param raw:
-    :param models_list:
+    :param raw: crp data
+    :param models_list: entity list
     :param relations:
     :return:
     '''
@@ -518,7 +518,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 def judge_value_format(item, pro, attach):
     """
     :param item: crp data
-    :param pro:  cmdb entity data
+    :param pro:  cmdb entity parameters data
     :param attach: {
                         "image_name": ct.get("image_url", ""),
                         "create_date": args.get("created_time", "")
@@ -530,6 +530,7 @@ def judge_value_format(item, pro, attach):
         "int": 0,
         "double": 0
     }
+    Log.logger.info("The item data is {}".format(item))
     if isinstance(item, list):
         if item:
             item = item[0]
