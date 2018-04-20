@@ -256,7 +256,6 @@ class Reservation(Resource):
             }
             return ret, code
         vid_list = resource.vid_list
-        Log.logger.info("1111111111111111111111111111111111111111111111111111111111111111111--{}".format(vid_list))
         #说明是对已有资源配置的审批
         if vid_list:
             set_flag = "config"
