@@ -582,6 +582,14 @@ class ResourceProviderCallBack(Resource):
                     Log.logger.info("CMDB return:{}".format(ret))
             else:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+        #修改violume
+        if set_flag == "config":
+            resource_list = resource.resource_list
+            for res in resource_list:
+                if res.quantity > 0:
+                    volume_size = res.volume_size
+                    volume_exp_size = res.volume_exp_size
+                    res.volume_size = volume_size + volume_exp_size
         os_ids = []
         os_ip_list = []
         os_ins_list = resource.os_ins_list
@@ -627,15 +635,6 @@ class ResourceProviderCallBack(Resource):
             rvip = value.get("rvip")
             vip = value.get("vip")
             port = value.get("port")
-            if set_flag == "config":
-                volume_size = value.get("volume_size",0)
-                volume_exp_size = value.get("volume_exp_size",0)
-                #更新卷的大小
-                volume_size = volume_size + volume_exp_size
-                resource_list = resource.resource_list
-                for res in resource_list:
-                    if res.quantity > 0:
-                        res.volume_size = volume_size
             if wid:
                 vid_list.append(wid)
             if rid:
