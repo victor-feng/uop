@@ -767,10 +767,11 @@ class ResourceProviderCallBack(Resource):
             if set_flag == "config" and status == "success":
                 resource_list = resource.resource_list
                 for res in resource_list:
-                    if res.quantity > 0:
-                        volume_size = res.volume_size
-                        volume_exp_size = res.volume_exp_size
-                        res.volume_size = volume_size + volume_exp_size
+                    volume_size = res.volume_size
+                    volume_exp_size = res.volume_exp_size
+                    res.volume_size = volume_size + volume_exp_size
+                    res.volume_exp_size = 0
+                    res.save()
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type = "config"
