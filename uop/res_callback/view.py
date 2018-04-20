@@ -198,7 +198,6 @@ mapping_type_status = {
 mapping_scale_info = {
     'increase' : '扩容',
     'reduce' : '缩容',
-    'config' : '配置',
     'res': '预留',
 }
 
@@ -582,14 +581,6 @@ class ResourceProviderCallBack(Resource):
                     Log.logger.info("CMDB return:{}".format(ret))
             else:
                 resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-        #修改violume
-        if set_flag == "config":
-            resource_list = resource.resource_list
-            for res in resource_list:
-                if res.quantity > 0:
-                    volume_size = res.volume_size
-                    volume_exp_size = res.volume_exp_size
-                    res.volume_size = volume_size + volume_exp_size
         os_ids = []
         os_ip_list = []
         os_ins_list = resource.os_ins_list
@@ -760,6 +751,65 @@ class ResourceProviderCallBack(Resource):
             }
         }
         return res, 200
+
+
+    def put(self):
+        request_data = json.loads(request.data)
+        resource_id = request_data.get('resource_id')
+        status = request_data.get('status')
+        msg = request_data.get('msg')
+        set_flag = request_data.get('set_flag')
+        resource_type = request_data.get('resource_type')
+        code = 200
+        try:
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            # 修改violume
+            if set_flag == "config":
+                resource_list = resource.resource_list
+                for res in resource_list:
+                    if res.quantity > 0:
+                        volume_size = res.volume_size
+                        volume_exp_size = res.volume_exp_size
+                        res.volume_size = volume_size + volume_exp_size
+            status_record = StatusRecord()
+            status_record.res_id = resource_id
+            status_record.s_type = "config"
+            status_record.set_flag = set_flag
+            status_record.created_time = datetime.datetime.now()
+            if status == "success":
+                status_record.status = "config_success"
+                status_record.msg = "%s资源配置成功" % resource_type
+            else:
+                status_record.status = "config_success"
+                status_record.msg = "%s资源配置失败，错误日志为：%s" % (resource_type,msg)
+            status_record.save()
+            resource.reservation_status = status_record.status
+            resource.save()
+        except Exception as e:
+            Log.logger.error("[UOP] PUT resource callback  failed, Excepton: %s" % str(e))
+            code = 500
+            ret = {
+                'code': code,
+                'result': {
+                    'res': 'fail',
+                    'msg': "Resource delete error.",
+                }
+            }
+            return ret, code
+
+        res = {
+            "code": code,
+            "result": {
+                "res": "success",
+                "msg": "Resource put success",
+            }
+        }
+        return res, code
+
+
+
+
+
 
 
 class ResourceStatusProviderCallBack(Resource):

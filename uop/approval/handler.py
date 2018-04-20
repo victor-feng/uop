@@ -41,7 +41,7 @@ def resource_reduce(resource,number,ips):
     msg = requests.delete(crp_url, data=crp_data)
     return  msg
 
-def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
+def deal_crp_data(resource,set_flag):
 
     data = dict()
     data['set_flag'] = set_flag
@@ -67,8 +67,6 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
     data['resource_type'] = resource.resource_type
     data['syswin_project'] = 'uop'
     data['project_name'] = resource.project_name
-    if os_ins_ip_list is not None:
-        data["os_ins_ip_list"] = os_ins_ip_list
     # data['cmdb_repo_id'] = item_info.item_id
     resource_list = resource.resource_list
     compute_list = resource.compute_list
@@ -76,8 +74,6 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
         res = []
         for db_res in resource_list:
             res_type = db_res.ins_type
-            if  quantity is None:
-                quantity = db_res.quantity
             res.append(
                 {
                     "instance_name": db_res.ins_name,
@@ -86,7 +82,7 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
                     "cpu": db_res.cpu,
                     "mem": db_res.mem,
                     "disk": db_res.disk,
-                    "quantity": quantity,
+                    "quantity": db_res.quantity,
                     "version": db_res.version,
                     "volume_size": db_res.volume_size,
                     "image_id": db_res.image_id,
@@ -106,8 +102,6 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
             ready_probe_path = db_com.ready_probe_path
             if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
                 url = BASE_K8S_IMAGE
-            if quantity is None:
-                quantity = db_com.quantity
             com.append(
                 {
                     "instance_name": db_com.ins_name,
@@ -115,7 +109,7 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
                     "cpu": db_com.cpu,
                     "mem": db_com.mem,
                     "image_url": url,
-                    "quantity": quantity,
+                    "quantity": db_com.quantity,
                     "domain": db_com.domain,
                     "port": db_com.port,
                     "domain_ip": db_com.domain_ip,

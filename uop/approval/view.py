@@ -257,29 +257,51 @@ class Reservation(Resource):
             return ret, code
         os_ins_ip_list = resource.os_ins_ip_list
         #说明是对已有资源配置的审批
+        headers = {'Content-Type': 'application/json'}
         if os_ins_ip_list:
-            set_flag = "config"
-            os_ins_ip_list=[eval(os_ins.to_json()) for os_ins in os_ins_ip_list]
-            data = deal_crp_data(resource, set_flag,os_ins_ip_list,quantity=0)
+            flavor = None
+            volume_size = None
+            volume_exp_size = None
+            os_ins_ip_list = [eval(os_ins.to_json()) for os_ins in os_ins_ip_list]
+            resource_list = resource.resource_list
+            resource_id = resource.resource_id
+            resource_type = resource.resource_type
+            if resource_list:
+                flavor = resource_list[0].flavor_id
+                volume_size = resource_list[0].volume_size
+                volume_exp_size = resource_list[0].volume_exp_size
+            data=dict()
+            data["set_flag"] = "config"
+            data["os_ins_ip_list"] = os_ins_ip_list
+            data["flavor"] =  flavor if flavor else ''
+            data["cloud"] = resource.cloud
+            data["volume_size"] = volume_size if volume_size else 0
+            data["volume_exp_size"] = volume_exp_size if volume_exp_size else 0
+            data["syswin_project"] = "uop"
+            data["resource_id"] = resource_id
+            data["resource_type"] = resource_type
+            env = resource.env
+            CPR_URL = get_CRP_url(env)
+            data_str=json.dumps(data)
+            msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         else:
             set_flag = "res"
             data = deal_crp_data(resource,set_flag)
-        Log.logger.info("Data args is %s",data)
-        data_str = json.dumps(data)
-        headers = {'Content-Type': 'application/json'}
-        try:
-            CPR_URL = get_CRP_url(data['env'])
-            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
-        except Exception as e:
-            res = "failed to connect CRP service.{}".format(str(e))
-            code = 500
-            ret = {
-                "code": code,
-                "result": {
-                    "res": res
+            Log.logger.info("Data args is %s",data)
+            data_str = json.dumps(data)
+            try:
+                CPR_URL = get_CRP_url(data['env'])
+                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+            except Exception as e:
+                res = "failed to connect CRP service.{}".format(str(e))
+                code = 500
+                ret = {
+                    "code": code,
+                    "result": {
+                        "res": res
+                    }
                 }
-            }
-            return ret, code
+                return ret, code
         if msg.status_code != 202:
             code = msg.status_code
             res = "Failed to reserve resource."
