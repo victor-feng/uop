@@ -764,7 +764,7 @@ class ResourceProviderCallBack(Resource):
         try:
             resource = ResourceModel.objects.get(res_id=resource_id)
             # 修改violume
-            if set_flag == "config":
+            if set_flag == "config" and status == "success":
                 resource_list = resource.resource_list
                 for res in resource_list:
                     if res.quantity > 0:
