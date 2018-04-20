@@ -5,6 +5,7 @@ import copy
 import requests
 import datetime
 import time
+import traceback
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm, HostsCache
 from uop.deployment.handler import attach_domain_ip
 from uop.util import async, response_data, TimeToolkit
@@ -373,7 +374,8 @@ def crp_data_cmdb(args, cmdb1_url):
     except Exception as exc:
         #即使往cmdb2写入数据失败，也往uop里面写入数据
         push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
-        Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(str(exc)))
+        msg = traceback.format_exc()
+        Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(msg))
 
 
 def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
@@ -494,7 +496,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
                 "_id": ""
             }
 
-            up_db, r = format_data_cmdb(relations_model, raw, module_model, {}, len(instances), module_level)
+            up_db, r = format_data_cmdb(relations_model, raw, db_model, {}, len(instances), module_level, physical_server_model_id)
             instances.append(up_db)
             relations.extend(r)
         else:
