@@ -41,7 +41,7 @@ def resource_reduce(resource,number,ips):
     msg = requests.delete(crp_url, data=crp_data)
     return  msg
 
-def deal_crp_data(resource,set_flag,quantity=0):
+def deal_crp_data(resource,set_flag,quantity=None):
 
     data = dict()
     data['set_flag'] = set_flag
@@ -74,10 +74,8 @@ def deal_crp_data(resource,set_flag,quantity=0):
         res = []
         for db_res in resource_list:
             res_type = db_res.ins_type
-            if not quantity:
+            if  quantity is None:
                 quantity = db_res.quantity
-            # if res_type not in ["mysql","redis","mongodb"]:
-            #    res_type = "other"
             res.append(
                 {
                     "instance_name": db_res.ins_name,
@@ -106,7 +104,7 @@ def deal_crp_data(resource,set_flag,quantity=0):
             ready_probe_path = db_com.ready_probe_path
             if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
                 url = BASE_K8S_IMAGE
-            if not quantity:
+            if quantity is None:
                 quantity = db_com.quantity
             com.append(
                 {
