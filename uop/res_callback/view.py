@@ -662,6 +662,7 @@ class ResourceProviderCallBack(Resource):
             dep = deps[0]
             deploy_id = dep.deploy_id
         else:
+            dep = None
             deploy_id = None
         status_record = StatusRecord()
         status_record.res_id = resource_id
