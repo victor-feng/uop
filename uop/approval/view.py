@@ -264,7 +264,7 @@ class Reservation(Resource):
             volume_exp_size = None
             os_ins_ip_list = [eval(os_ins.to_json()) for os_ins in os_ins_ip_list]
             resource_list = resource.resource_list
-            resource_id = resource.resource_id
+            resource_id = resource.res_id
             resource_type = resource.resource_type
             if resource_list:
                 flavor = resource_list[0].flavor_id
