@@ -68,7 +68,7 @@ def deal_crp_data(resource,set_flag,os_ins_ip_list=None,quantity=None):
     data['syswin_project'] = 'uop'
     data['project_name'] = resource.project_name
     if os_ins_ip_list is not None:
-        data["project_name"] = json.dumps(os_ins_ip_list)
+        data["os_ins_ip_list"] = os_ins_ip_list
     # data['cmdb_repo_id'] = item_info.item_id
     resource_list = resource.resource_list
     compute_list = resource.compute_list

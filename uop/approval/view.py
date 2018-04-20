@@ -259,6 +259,7 @@ class Reservation(Resource):
         #说明是对已有资源配置的审批
         if os_ins_ip_list:
             set_flag = "config"
+            os_ins_ip_list=[eval(os_ins.to_json()) for os_ins in os_ins_ip_list]
             data = deal_crp_data(resource, set_flag,os_ins_ip_list,quantity=0)
         else:
             set_flag = "res"
