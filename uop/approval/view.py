@@ -836,8 +836,6 @@ class RollBackReservation(Resource):
         resource_id = args.resource_id
         deploy_id = args.deploy_id
         deploy_name = args.deploy_name
-        compute_list = args.compute_list
-        data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy = models.Deployment.objects.get(deploy_id=deploy_id)
@@ -861,7 +859,7 @@ class RollBackReservation(Resource):
             err_msg, result = deploy_to_crp(deploy,
                                             environment,
                                             database_password,
-                                            appinfo, disconf_server_info, deploy_type)
+                                            appinfo, disconf_server_info, deploy_type,deploy_name)
             if err_msg:
                 deploy.deploy_result = 'rollback_fail'
             # 更新状态
