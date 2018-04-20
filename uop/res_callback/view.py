@@ -661,6 +661,8 @@ class ResourceProviderCallBack(Resource):
         if len(deps) > 0:
             dep = deps[0]
             deploy_id = dep.deploy_id
+        else:
+            deploy_id = None
         status_record = StatusRecord()
         status_record.res_id = resource_id
         status_record.s_type = "set"
