@@ -346,6 +346,7 @@ def crp_data_cmdb(args, cmdb1_url):
                 Log.logger.info("Docker cloud increase".format(data))
                 instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
         else:
+            Log.logger.info("Start post datas to cmdb2")
             instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
         uid, token = get_uid_token()
         data = {
@@ -470,6 +471,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
     # 中间件、虚拟机数据解析
     virtual_server_model = filter(lambda x: x["code"] == "virtual_device", models_list)[0]
+    Log.logger.info("The virtual server model is {}".format(virtual_server_model))
     for db_name, db_contents in raw["db_info"].items():
         # Log.logger.info("now analyze {} data".format(db_name))
         db_model = filter(lambda x: x["code"] == db_name, models_list)[0] # db_name 设置保持与cmdb一致

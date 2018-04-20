@@ -748,6 +748,7 @@ class ResourceProviderCallBack(Resource):
             }
             return ret, code
         # 异步存到CMDB2
+        Log.logger.info("Start save to CMDB2")
         CMDB_URL = current_app.config['CMDB_URL']
         crp_data_cmdb(request_data, CMDB_URL)
 
