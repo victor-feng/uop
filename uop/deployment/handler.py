@@ -141,7 +141,7 @@ def get_resource_by_id(resource_id):
 
 
 def deploy_to_crp(deploy_item, environment, database_password, appinfo,
-                  disconf_server_info,deploy_type):
+                  disconf_server_info,deploy_type,deploy_name=None):
     resource_id = deploy_item.resource_id
     res_obj = ResourceModel.objects.get(res_id=resource_id)
     data = {
@@ -154,7 +154,8 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         "cloud":res_obj.cloud,
         "resource_name":res_obj.resource_name,
         "project_name": res_obj.project_name,
-        "resource_id": resource_id
+        "resource_id": resource_id,
+        "deploy_name": deploy_name,
     }
     compute_list = res_obj.compute_list
     if compute_list:

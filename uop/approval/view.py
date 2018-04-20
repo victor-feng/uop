@@ -17,6 +17,7 @@ from uop.util import get_CRP_url
 from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
 from uop.deployment.handler import attach_domain_ip,deploy_to_crp,deal_disconf_info
+from uop.approval.handler import resource_reduce,deal_crp_data
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -32,7 +33,7 @@ class ApprovalList(Resource):
 
     #@api_permission_control(request)
     def post(self):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         try:
@@ -87,7 +88,7 @@ class ApprovalInfo(Resource):
 
     #@api_permission_control(request)
     def put(self, res_id):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         try:
@@ -188,7 +189,7 @@ class ApprovalInfo(Resource):
 
     #@api_permission_control(request)
     def get(self, res_id):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         try:
@@ -232,7 +233,7 @@ class Reservation(Resource):
         预留审批通过，往crp发送数据
         :return:
         """
-        code = 0
+        code = 200
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
@@ -240,10 +241,8 @@ class Reservation(Resource):
         parser.add_argument('compute_list', type=list, location='json')
         args = parser.parse_args()
         resource_id = args.resource_id
-        new_computelist = args.compute_list
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            # item_info = models.ItemInformation.objects.get(item_name=resource.project)
         except Exception as e:
             Log.logger.error(str(e))
             code = 410
@@ -256,95 +255,14 @@ class Reservation(Resource):
                 }
             }
             return ret, code
-
-        data = dict()
-        data['set_flag'] = 'res'
-        data['unit_id'] = resource.project_id
-        data['unit_name'] = resource.project
-        data["project_id"] = resource.cmdb2_project_id if resource.cmdb2_project_id else "db821c4428dd48758cde720c" #全量数据测试工程
-        data["module_id"] = resource.cmdb2_module_id
-        data['unit_des'] = ''
-        data['user_id'] = resource.user_id
-        data['username'] = resource.user_name
-        data['department'] = resource.department
-        data['created_time'] = str(resource.created_date)
-        data['resource_id'] = resource.res_id
-        data['resource_name'] = resource.resource_name
-        data['domain'] = resource.domain
-        data['env'] = resource.env
-        data['docker_network_id'] = resource.docker_network_id
-        data['mysql_network_id'] = resource.mysql_network_id
-        data['redis_network_id'] = resource.redis_network_id
-        data['mongodb_network_id'] = resource.mongodb_network_id
-        data['mongodb_network_id'] = resource.mongodb_network_id
-        data['cloud'] = resource.cloud
-        data['resource_type'] = resource.resource_type
-        data['syswin_project'] = 'uop'
-        data['project_name'] = resource.project_name
-        # data['cmdb_repo_id'] = item_info.item_id
-        resource_list = resource.resource_list
-        compute_list = resource.compute_list
-        if resource_list:
-            res = []
-            for db_res in resource_list:
-                res_type=db_res.ins_type
-                #if res_type not in ["mysql","redis","mongodb"]:
-                #    res_type = "other"
-                res.append(
-                    {
-                        "instance_name": db_res.ins_name,
-                        "instance_id": db_res.ins_id,
-                        "instance_type": res_type,
-                        "cpu": db_res.cpu,
-                        "mem": db_res.mem,
-                        "disk": db_res.disk,
-                        "quantity": db_res.quantity,
-                        "version": db_res.version,
-                        "volume_size": db_res.volume_size,
-                        "image_id": db_res.image_id,
-                        "network_id": db_res.network_id,
-                        "flavor":db_res.flavor_id,
-                    }
-                )
-            data['resource_list'] = res
-        if compute_list:
-            com = []
-            for db_com in compute_list:
-                meta = json.dumps(db_com.docker_meta)
-                deploy_source = db_com.deploy_source
-                host_env = db_com.host_env
-                url = db_com.url
-                ready_probe_path = db_com.ready_probe_path
-                if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
-                    url = BASE_K8S_IMAGE
-                com.append(
-                    {
-                        "instance_name": db_com.ins_name,
-                        "instance_id": db_com.ins_id,
-                        "cpu": db_com.cpu,
-                        "mem": db_com.mem,
-                        "image_url": url,
-                        "quantity": db_com.quantity,
-                        "domain": db_com.domain,
-                        "port": db_com.port,
-                        "domain_ip": db_com.domain_ip,
-                        "meta": meta,
-                        "health_check": db_com.health_check,
-                        "network_id": db_com.network_id,
-                        "networkName": db_com.networkName,
-                        "tenantName": db_com.tenantName,
-                        "host_env":db_com.host_env,
-                        "language_env":db_com.language_env,
-                        "deploy_source":db_com.deploy_source,
-                        "database_config":db_com.database_config,
-                        "lb_methods":db_com.lb_methods,
-                        "namespace":db_com.namespace,
-                        "ready_probe_path":db_com.ready_probe_path,
-                        "domain_path": db_com.domain_path,
-                        "host_mapping": db_com.host_mapping,
-                    }
-                )
-            data['compute_list'] = com
+        vid_list = resource.vid_list
+        #说明是对已有资源配置的审批
+        if vid_list:
+            set_flag = "config"
+            data = deal_crp_data(resource, set_flag,quantity=0)
+        else:
+            set_flag = "res"
+            data = deal_crp_data(resource,set_flag)
         Log.logger.info("Data args is %s",data)
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
@@ -352,7 +270,7 @@ class Reservation(Resource):
             CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
-            res = "failed to connect CRP service."
+            res = "failed to connect CRP service.{}".format(str(e))
             code = 500
             ret = {
                 "code": code,
@@ -378,6 +296,92 @@ class Reservation(Resource):
         return ret, code
 
 
+    def put(self):
+        """
+        其他资源编辑审批通过，往crp发送数据
+        :return:
+        """
+        code = 200
+        res = ""
+        msg = {}
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_id', type=str)
+        args = parser.parse_args()
+        resource_id = args.resource_id
+        try:
+            resource = models.ResourceModel.objects.get(res_id=resource_id)
+        except Exception as e:
+            Log.logger.error(str(e))
+            code = 410
+            res = "Failed to find the rsource"
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res,
+                    "msg": msg
+                }
+            }
+            return ret, code
+        #其他资源的修改
+        vid_list = resource.vid_list
+        number = vid_list.__str__()
+        try:
+            if number > 0:
+                #对已经预留好的资源进程修改
+                resource_list = resource.resource_list
+                for res in resource_list:
+                    quantity = res.quantity
+                if number < quantity: #扩容
+                    quantity = quantity - number
+                    set_flag = "increase"
+                    data=deal_crp_data(resource,set_flag,quantity)
+                    data_str = json.dumps(data)
+                    CPR_URL = get_CRP_url(data['env'])
+                    headers = {'Content-Type': 'application/json'}
+                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                elif number > quantity: #缩容
+                    ips=[]
+                    quantity = number - quantity
+                    for os_ins in resource.os_ins_ip_list:
+                        ip = os_ins.ip
+                        ips.append(ip)
+                    msg=resource_reduce(resource,quantity,ips)
+                else:#既不扩容也不缩容
+                    set_flag = "res"
+                    quantity = "0"
+                    data = deal_crp_data(resource, set_flag, quantity)
+                    data_str = json.dumps(data)
+                    CPR_URL = get_CRP_url(data['env'])
+                    headers = {'Content-Type': 'application/json'}
+                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+        except Exception as e:
+            res = "UOP put resource failed.{}".format(str(e))
+            code = 500
+            ret = {
+                "code": code,
+                "result": {
+                    "res": res
+                }
+            }
+            return ret, code
+        if msg.status_code != 202:
+            code = msg.status_code
+            res = "Failed to reserve resource."
+        else:
+            resource.reservation_status = "reserving"
+            resource.save()
+            code = 200
+            res = "Success in reserving resource."
+        ret = {
+            "code": code,
+            "result": {
+                "res": res
+            }
+        }
+        return ret, code
+
+
+
 class ReservationAPI(Resource):
     """
     预留失败时，重新预留往crp发送数据
@@ -385,7 +389,7 @@ class ReservationAPI(Resource):
 
     #@api_permission_control(request)
     def put(self, res_id):
-        code = 0
+        code =200
         res = ""
         msg = {}
         try:
@@ -401,97 +405,15 @@ class ReservationAPI(Resource):
                 }
             }
             return ret, code
-        data = dict()
-        data['set_flag'] = 'res'
-        data['unit_id'] = resource.project_id
-        data['unit_name'] = resource.project
-        data['unit_des'] = ''
-        data['user_id'] = resource.user_id
-        data['username'] = resource.user_name
-        data['department'] = resource.department
-        data['created_time'] = str(resource.created_date)
-        data['resource_id'] = resource.res_id
-        data['resource_name'] = resource.resource_name
-        data['domain'] = resource.domain
-        data['env'] = resource.env
-        data['docker_network_id'] = resource.docker_network_id
-        data['mysql_network_id'] = resource.mysql_network_id
-        data['redis_network_id'] = resource.redis_network_id
-        data['mongodb_network_id'] = resource.mongodb_network_id
-        data['cloud'] = resource.cloud
-        data['resource_type'] = resource.resource_type
-        data['syswin_project'] = 'uop'
-        data['project_name'] = resource.project_name
-        resource_list = resource.resource_list
-        compute_list = resource.compute_list
-        if resource_list:
-            res = []
-            for db_res in resource_list:
-                res_type = db_res.ins_type
-                #if res_type not in ["mysql", "redis", "mongodb"]:
-                #    res_type = "other"
-                res.append(
-                    {
-                        "instance_name": db_res.ins_name,
-                        "instance_id": db_res.ins_id,
-                        "instance_type": res_type,
-                        "cpu": db_res.cpu,
-                        "mem": db_res.mem,
-                        "disk": db_res.disk,
-                        "quantity": db_res.quantity,
-                        "version": db_res.version,
-                        "volume_size": db_res.volume_size,
-                        "image_id": db_res.image_id,
-                        "network_id": db_res.network_id,
-                        "flavor": db_res.flavor_id,
-                    }
-                )
-            data['resource_list'] = res
-        if compute_list:
-            com = []
-            for db_com in compute_list:
-                meta = json.dumps(db_com.docker_meta)
-                host_env = db_com.host_env
-                deploy_source = db_com.deploy_source
-                url = db_com.url
-                ready_probe_path = db_com.ready_probe_path
-                if host_env == "docker" and deploy_source == "image" and not ready_probe_path:
-                    url = BASE_K8S_IMAGE
-                com.append(
-                    {
-                        "instance_name": db_com.ins_name,
-                        "instance_id": db_com.ins_id,
-                        "cpu": db_com.cpu,
-                        "mem": db_com.mem,
-                        "image_url": url,
-                        "quantity": db_com.quantity,
-                        "domain": db_com.domain,
-                        "port": db_com.port,
-                        "meta": meta,
-                        "health_check": db_com.health_check,
-                        "network_id": db_com.network_id,
-                        "networkName": db_com.networkName,
-                        "tenantName": db_com.tenantName,
-                        "host_env":db_com.host_env,
-                        "language_env": db_com.language_env,
-                        "deploy_source": db_com.deploy_source,
-                        "database_config": db_com.database_config,
-                        "lb_methods": db_com.lb_methods,
-                        "namespace": db_com.namespace,
-                        "ready_probe_path": db_com.ready_probe_path,
-                        "domain_path": db_com.domain_path,
-                        "host_mapping": db_com.host_mapping,
-                    }
-                )
-            data['compute_list'] = com
-
+        set_flag = "res"
+        data = deal_crp_data(resource,set_flag)
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
             CPR_URL = get_CRP_url(data['env'])
             msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
-            res = "failed to connect CRP service."
+            res = "failed to connect CRP service.{}".format(str(e))
             code = 500
             ret = {
                 "code": code,
@@ -603,7 +525,7 @@ class CapacityReservation(Resource):
 
     #@api_permission_control(request)
     def post(self):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         parser = reqparse.RequestParser()
@@ -659,7 +581,6 @@ class CapacityReservation(Resource):
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         resource_type = resource.resource_type
-        resource_name = resource.resource_name
         number = 0
         if resource_list:
             res = []
@@ -742,29 +663,30 @@ class CapacityReservation(Resource):
                     CPR_URL = get_CRP_url(data['env'])
                     msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
                 elif approval.capacity_status == 'reduce':
-                    reduce_list = []
-                    for os_ins in resource.os_ins_ip_list:
-                        if os_ins.ip in ips:
-                            reduce_list.append(os_ins)
-                    reduce_list = random.sample(reduce_list, number)
-                    os_inst_id_list = []
-                    reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
-                    for os_ip_dict in reduce_list:
-                        os_inst_id = os_ip_dict["os_ins_id"]
-                        os_inst_id_list.append(os_inst_id)
-                    crp_data = {
-                        "resource_id": resource.res_id,
-                        "resource_name": resource_name,
-                        "os_ins_ip_list": reduce_list,
-                        "resource_type": resource_type,
-                        "cloud": cloud,
-                        "set_flag": 'reduce',
-                        'syswin_project': 'uop'
-                    }
-                    env_ = get_CRP_url(resource.env)
-                    crp_url = '%s%s' % (env_, 'api/resource/deletes')
-                    crp_data = json.dumps(crp_data)
-                    msg = requests.delete(crp_url, data=crp_data)
+                    msg=resource_reduce(resource,number,ips)
+                    # reduce_list = []
+                    # for os_ins in resource.os_ins_ip_list:
+                    #     if os_ins.ip in ips:
+                    #         reduce_list.append(os_ins)
+                    # reduce_list = random.sample(reduce_list, number)
+                    # os_inst_id_list = []
+                    # reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
+                    # for os_ip_dict in reduce_list:
+                    #     os_inst_id = os_ip_dict["os_ins_id"]
+                    #     os_inst_id_list.append(os_inst_id)
+                    # crp_data = {
+                    #     "resource_id": resource.res_id,
+                    #     "resource_name": resource_name,
+                    #     "os_ins_ip_list": reduce_list,
+                    #     "resource_type": resource_type,
+                    #     "cloud": cloud,
+                    #     "set_flag": 'reduce',
+                    #     'syswin_project': 'uop'
+                    # }
+                    # env_ = get_CRP_url(resource.env)
+                    # crp_url = '%s%s' % (env_, 'api/resource/deletes')
+                    # crp_data = json.dumps(crp_data)
+                    # msg = requests.delete(crp_url, data=crp_data)
         except Exception as e:
             res = "failed to connect CRP service."
             code = 500
@@ -797,7 +719,7 @@ class RollBackInfoAPI(Resource):
     # 审批过后更新审批表的信息
     #@api_permission_control(request)
     def put(self):
-        code = 0
+        code = 200
         res = ""
         msg = {}
         try:
@@ -913,15 +835,9 @@ class RollBackReservation(Resource):
         resource_id = args.resource_id
         deploy_id = args.deploy_id
         deploy_name = args.deploy_name
-        compute_list = args.compute_list
-        data = {}
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy = models.Deployment.objects.get(deploy_id=deploy_id)
-            compute_list = resource.compute_list
-            if compute_list:
-                for compute in compute_list:
-                    domain_ip = compute.domain_ip
             environment = deploy.environment
             database_password = deploy.database_password
             cloud = resource.cloud
@@ -931,8 +847,7 @@ class RollBackReservation(Resource):
             # 将computer信息如IP，更新到数据库
             app_image = eval(deploy.app_image)
             for app in app_image:
-                if domain_ip:
-                    app["domain_ip"] = domain_ip
+                app["domain_ip"] = None
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             if cloud == '2' and resource_type == "app":
@@ -943,7 +858,7 @@ class RollBackReservation(Resource):
             err_msg, result = deploy_to_crp(deploy,
                                             environment,
                                             database_password,
-                                            appinfo, disconf_server_info, deploy_type)
+                                            appinfo, disconf_server_info, deploy_type,deploy_name)
             if err_msg:
                 deploy.deploy_result = 'rollback_fail'
             # 更新状态

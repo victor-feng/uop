@@ -362,7 +362,7 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
-            db_flag = True if args.get("db_info") else False
+            db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
             if cloud == 1:
                 push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             else:
@@ -440,6 +440,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     # 一次预留生成的所有应用资源对应一个tomcat实例
     raw["baseinfo"] = raw["resource_name"]
     raw["create_date"] = raw["created_time"]
+    module_id = raw["module_id"]
 
     docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
     tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
