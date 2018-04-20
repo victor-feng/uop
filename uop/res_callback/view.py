@@ -198,6 +198,8 @@ mapping_type_status = {
 mapping_scale_info = {
     'increase' : '扩容',
     'reduce' : '缩容',
+    'config' : '配置',
+    'res': '预留',
 }
 
 mapping_msg_info = {
@@ -625,6 +627,15 @@ class ResourceProviderCallBack(Resource):
             rvip = value.get("rvip")
             vip = value.get("vip")
             port = value.get("port")
+            if set_flag == "config":
+                volume_size = value.get("volume_size",0)
+                volume_exp_size = value.get("volume_exp_size",0)
+                #更新卷的大小
+                volume_size = volume_size + volume_exp_size
+                resource_list = resource.resource_list
+                for res in resource_list:
+                    if res.quantity > 0:
+                        res.volume_size = volume_size
             if wid:
                 vid_list.append(wid)
             if rid:
@@ -660,23 +671,23 @@ class ResourceProviderCallBack(Resource):
                 if set_flag == "res":
                     status_record.status = "set_success"
                     status_record.msg = "%s资源创建成功" % mapping_msg_info.get(resource_type,resource_type)
-                if set_flag in ["increase","reduce"]:
+                if set_flag in ["increase","reduce","config"]:
                     if resource_type == "app":
                         status_record.status = "%s_success" % set_flag
-                        status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info[set_flag])
+                        status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag))
                         dep.deploy_result = "%s_success" % set_flag
                     else:
                         status_record.status = "%s_success" % set_flag
-                        status_record.msg = "%s资源%s成功,开始部署应用" % (mapping_msg_info.get(resource_type,resource_type), mapping_scale_info[set_flag])
+                        status_record.msg = "%s资源%s成功,开始部署应用" % (mapping_msg_info.get(resource_type,resource_type), mapping_scale_info.get(set_flag,set_flag))
                     status_record.deploy_id = deploy_id
                     dep.save()
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
                     status_record.msg = "%s资源创建失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),error_msg)
-                elif set_flag in ["increase","reduce"]:
+                elif set_flag in ["increase","reduce","config"]:
                     status_record.status = "%s_fail" % set_flag
-                    status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info[set_flag],error_msg)
+                    status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag),error_msg)
                     status_record.deploy_id = deploy_id
                     dep.deploy_result = "%s_fail" % set_flag
                     dep.save()
@@ -685,19 +696,19 @@ class ResourceProviderCallBack(Resource):
                 if set_flag == "res":
                     status_record.status = "set_success"
                     status_record.msg = "预留成功"
-                if set_flag == "increase":
-                    status_record.status = "increase_success"
-                    status_record.msg = "docker扩容成功"
+                if set_flag in ["increase","config"]:
+                    status_record.status = "%s_success" % set_flag
+                    status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag))
                     status_record.deploy_id = deploy_id
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
                     status_record.msg = "预留失败,错误日志为: %s" % error_msg
-                elif set_flag == "increase":
-                    status_record.status = "increase_fail"
-                    status_record.msg = "扩容失败,错误日志为: %s" % error_msg
+                elif set_flag in ["increase","config"]:
+                    status_record.status = "%s_fail" % set_flag
+                    status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag),error_msg)
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "increase_fail"
+                    dep.deploy_result = "%s_fail" % set_flag
                     dep.save()
         status_record.save()
         resource.reservation_status = status_record.status
@@ -766,8 +777,9 @@ class ResourceStatusProviderCallBack(Resource):
                 os_inst_id = instance.get('os_inst_id', '')
                 instance_type = instance.get('instance_type')
                 quantity = int(instance.get('quantity', '0'))
-                ins_type = mapping_type_status.get(instance_type, '')
-                cur_instance_type = 'other' if not ins_type else ins_type
+                #ins_type = mapping_type_status.get(instance_type, '')
+                #cur_instance_type = 'other' if not ins_type else ins_type
+                cur_instance_type = mapping_type_status.get(instance_type, instance_type)
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                 if len(deps) > 0:
                     dep = deps[0]
