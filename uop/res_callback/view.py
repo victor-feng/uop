@@ -780,7 +780,7 @@ class ResourceProviderCallBack(Resource):
                 status_record.status = "config_success"
                 status_record.msg = "%s资源配置成功" % resource_type
             else:
-                status_record.status = "config_success"
+                status_record.status = "config_fail"
                 status_record.msg = "%s资源配置失败，错误日志为：%s" % (resource_type,msg)
             status_record.save()
             resource.reservation_status = status_record.status
