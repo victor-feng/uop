@@ -677,12 +677,14 @@ class ResourceProviderCallBack(Resource):
                     if resource_type == "app":
                         status_record.status = "%s_success" % set_flag
                         status_record.msg = "%s资源%s成功" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag))
-                        dep.deploy_result = "%s_success" % set_flag
+                        if dep:
+                            dep.deploy_result = "%s_success" % set_flag
                     else:
                         status_record.status = "%s_success" % set_flag
                         status_record.msg = "%s资源%s成功,开始部署应用" % (mapping_msg_info.get(resource_type,resource_type), mapping_scale_info.get(set_flag,set_flag))
                     status_record.deploy_id = deploy_id
-                    dep.save()
+                    if dep:
+                        dep.save()
             else:
                 if set_flag == "res":
                     status_record.status = "set_fail"
@@ -691,8 +693,9 @@ class ResourceProviderCallBack(Resource):
                     status_record.status = "%s_fail" % set_flag
                     status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag),error_msg)
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "%s_fail" % set_flag
-                    dep.save()
+                    if dep:
+                        dep.deploy_result = "%s_fail" % set_flag
+                        dep.save()
         else:
             if status == 'ok':
                 if set_flag == "res":
@@ -710,8 +713,9 @@ class ResourceProviderCallBack(Resource):
                     status_record.status = "%s_fail" % set_flag
                     status_record.msg = "%s资源%s失败,错误日志为: %s" % (mapping_msg_info.get(resource_type,resource_type),mapping_scale_info.get(set_flag,set_flag),error_msg)
                     status_record.deploy_id = deploy_id
-                    dep.deploy_result = "%s_fail" % set_flag
-                    dep.save()
+                    if dep:
+                        dep.deploy_result = "%s_fail" % set_flag
+                        dep.save()
         status_record.save()
         resource.reservation_status = status_record.status
         resource.save()
