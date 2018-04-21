@@ -210,6 +210,7 @@ def filter_status_data(p_code, id, num):
             vm = Statusvm.objects.filter(osid=meta["osid"])
             if not vm:
                 Statusvm.created_status(**meta)
+    Log.logger.info("Save to cmdb1.0 data is {}".format(data))
     return data
 
 
@@ -365,12 +366,15 @@ def crp_data_cmdb(args, cmdb1_url):
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
         ret = requests.post(url, data=data_str, timeout=5).json()
         if ret["code"] == 0:
+            Log.logger.info("Save to CMDB2.0 successfully")
             db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
             if cloud == 1:
                 push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             else:
+                # save uop and cmdb1
                 save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else: # 即便CMDB2失败，保存我的资源到UOP表
+            Log.logger.info("Save to CMDB2.0 failed and save to uop and save to cmdb1.0")
             push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             Log.logger.error("[CMDB2.0 graph error]:{}".format(ret))
     except Exception as exc:
