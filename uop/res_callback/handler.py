@@ -301,8 +301,9 @@ def crp_data_cmdb(args, cmdb1_url):
         url = CMDB2_URL + "cmdb/openapi/graph/"
         module_id = args.get("module_id")
         if module_id:
-            #其他资源
+            # 其他资源
             data = get_relations(CMDB2_VIEWS["9"][0])  # B13
+            Log.logger.info("Get relations for B13..{}".format(data))
         else:
             data = get_relations(CMDB2_VIEWS["1"][0]) # B7
         models_list = data["entity"]
