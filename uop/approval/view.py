@@ -306,10 +306,13 @@ class Reservation(Resource):
             code = msg.status_code
             res = "Failed to reserve resource."
         else:
-            resource.reservation_status = "reserving"
+            if os_ins_ip_list:
+                resource.reservation_status = "configing"
+            else:
+                resource.reservation_status = "reserving"
             resource.save()
             code = 200
-            res = "Success in reserving resource."
+            res = "Success in reserving or configing resource."
         ret = {
             "code": code,
             "result": {
