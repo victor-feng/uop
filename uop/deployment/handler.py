@@ -341,6 +341,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             host_mapping=match_one.get("host_mapping",[])
             if not isinstance(host_mapping,list):
                 host_mapping=eval(host_mapping)
+            Log.logger.info("1111111111111111111111111111111111111111111111111111111111111")
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
@@ -349,6 +350,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=o.ready_probe_path,lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping)
+            Log.logger.info("1111111111111111111111111111111111111111111111111111111111111222222222222222222222222222222")
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:
