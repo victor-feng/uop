@@ -1003,7 +1003,7 @@ class CapacityInfoAPI(Resource):
             approve_suggestion = deployment.approve_suggestion
             capacity_info = deployment.capacity_info
             if capacity_info:
-                capacity_info_dict = eval(capacity_info)
+                capacity_info_dict = json.loads(capacity_info)
             else:
                 capacity_info_dict = {}
             capacity_info_dict["approve_suggestion"]=approve_suggestion
