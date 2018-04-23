@@ -64,7 +64,7 @@ class ApprovalList(Resource):
                                 approval_status=approval_status).save()
 
                 resource = models.ResourceModel.objects.get(res_id=resource_id)
-                resource.approval_status = "processing"
+                resource.approval_status = approval_status
                 resource.save()
                 code = 200
         except Exception as e:
