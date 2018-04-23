@@ -886,6 +886,7 @@ class RollBackReservation(Resource):
                 deploy.deploy_result = 'rollback_fail'
             # 更新状态
             deploy.deploy_result = 'rollbacking'
+            deploy.approve_status = 'rollback_success'
             deploy.save()
             # env = resource.env
             # cloud = resource.cloud
