@@ -224,7 +224,7 @@ def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
-    data = filter_status_data(p_code, id, num)
+    data = filter_status_data(p_code, id, num)  # save to uop
     # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         ret = requests.post(url, data=json.dumps(data)).json()
