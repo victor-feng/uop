@@ -389,6 +389,8 @@ class DeploymentListAPI(Resource):
             message = save_to_db(args)
             if message == 'save_to_db success':
                 setattr(args, 'dep_id', args.uid)
+                Log.logger.info("11111111111111111111111111111111111--{}".format(args.app_image))
+                Log.logger.info("222222222222222222222222222222222222222222222222222222--{}".format(type(args.app_image)))
                 return admin_approve_allow(args)
 
         try:
