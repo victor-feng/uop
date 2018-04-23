@@ -345,7 +345,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=o.ready_probe_path,lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
-                                 host_mapping=json.dumps(match_one.get("host_mapping",[])))
+                                 host_mapping=json.dumps(match_one.get("host_mapping",[]) if isinstance(match_one.get("host_mapping",[]),list) else match_one.get("host_mapping",[])))
             old_compute_list.insert(i, compute)
             res.save()
         if cmdb_url:
