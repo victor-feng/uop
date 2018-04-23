@@ -38,6 +38,12 @@ def transition_state_logger(func):
 
 # Transit request_data from the JSON nest structure to the chain structure with items_sequence and porerty_json_mapper
 def transit_request_data(items_sequence, porerty_json_mapper, request_data):
+    """
+    :param items_sequence:  []
+    :param porerty_json_mapper:  {}
+    :param request_data:
+    :return:
+    """
     if request_data is None:
         return
     if not (isinstance(items_sequence, list) or isinstance(items_sequence, dict) or isinstance(items_sequence, set)) \
@@ -48,7 +54,7 @@ def transit_request_data(items_sequence, porerty_json_mapper, request_data):
     if isinstance(items_sequence, list) or isinstance(items_sequence, set):
         for one_item_sequence in items_sequence:
             if isinstance(one_item_sequence, dict):
-                item_mapper_keys = one_item_sequence.keys()
+                item_mapper_keys = one_item_sequence.keys()  # deploy_instance
             elif isinstance(one_item_sequence, basestring):
                 item_mapper_keys = [one_item_sequence]
             else:

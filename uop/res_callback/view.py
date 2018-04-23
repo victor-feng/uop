@@ -548,6 +548,7 @@ class ResourceProviderCallBack(Resource):
                         j.ips = ips
                         j.quantity = len(ips)
                         # 往cmdb写入数据
+            Log.logger.info("Save to cmdb request data is {}".format(request_data))
             property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
                                                           request_data)
             Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
