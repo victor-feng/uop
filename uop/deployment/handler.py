@@ -340,7 +340,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             old_compute_list.remove(old_compute_list[i])
             aaa=json.dumps(match_one.get("host_mapping",[]) if isinstance(match_one.get("host_mapping",[]),list) else match_one.get("host_mapping",[]))
             bbb=match_one.get("host_mapping",[])
-            Log.logger.info("33333333333333333333333333333--{}--{}".format(bbb),type(bbb))
+            Log.logger.info("33333333333333333333333333333--{}--{}".format(bbb,type(bbb)))
             Log.logger.info("444444444444444444444444444443--{}".format(aaa))
             Log.logger.info("555555555555555555555555555555555555--{}".format(type(aaa)))
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
