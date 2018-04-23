@@ -299,6 +299,7 @@ def get_from_uop(args):
 
 @async
 def delete_uop(res_id):
+    Log.logger.info("Start delete statusvm res id is {}".format(res_id))
     res = Statusvm.objects.filter(resource_id=res_id)
     try:
         if res:
