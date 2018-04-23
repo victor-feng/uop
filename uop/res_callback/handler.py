@@ -397,11 +397,13 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0] if not db_flag else \
         [ins for ins in instances if ins["_id"] == 2][0]
+    Log.logger.info("###Instance is {}".format(instance))
     if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
         view_id = str(instance["instance_id"])
         view_num = get_view_num(
                 [view[0] for index, view in CMDB2_VIEWS.items() if view[2] == str(instance["model_id"])]
         ),
+        Log.logger.info("###The view num is {}".format(view_num))
         view_num = view_num[0] if isinstance(view_num, tuple) else view_num
     if set_flag in ["increase"] and not flag: # 虚拟化云的扩容
         sv = Statusvm.objects.filter(resource_id=res_id)
