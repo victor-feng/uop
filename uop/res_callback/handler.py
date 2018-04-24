@@ -504,6 +504,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
         if raw["module_id"]:
             # module
+            Log.logger.info("Raw modele id is exist {}".format(raw['module_id']))
             module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
             module_level = {
                 "instance_id": raw["module_id"],
@@ -520,6 +521,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
             relations.extend(r)
 
         for index, db in enumerate(db_contents["instance"]):
+            Log.logger.info("============")
             db["baseinfo"] = db.get("instance_name")
             i, r = format_data_cmdb(relations_model, db, virtual_server_model, virtual_server, len(instances), up_db, physical_server_model_id)
             instances.append(i)
