@@ -124,7 +124,7 @@ class ResourceApplication(Resource):
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
                                                  cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0,
-                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content)
+                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content,updated_date=created_date)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -351,9 +351,9 @@ class ResourceApplication(Resource):
             total_count = ResourceModel.objects.filter(**condition).count()
             if page_num and page_size:
                 skip_count = (page_num - 1) * args.page_size
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(page_size)
+                resources = ResourceModel.objects.filter(**condition).order_by('-updated_date').skip(skip_count).limit(page_size)
             else:
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+                resources = ResourceModel.objects.filter(**condition).order_by('-updated_date')
             res["total_count"]=total_count
         except Exception as e:
             err_msg=str(e.args)
@@ -536,6 +536,7 @@ class ResourceApplication(Resource):
                     expiry_date=expiry_date,
                     mail_content=mail_content,
                     leader_emails=leader_emails,
+                    updated_date = datetime.datetime.now(),
                 )
                 resource.compute_list = []
                 resource.resource_list = []

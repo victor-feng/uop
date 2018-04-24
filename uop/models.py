@@ -405,7 +405,6 @@ class ResourceModel(db.DynamicDocument):
     res_id = db.StringField(required=True, unique=True)
     user_name = db.StringField(required=False)
     user_id = db.StringField(required=False)
-    # created_date = db.DateTimeField(default=datetime.now())
     created_date = db.DateTimeField(required=False)
     domain = db.StringField(required=False)
     env = db.StringField(required=True, unique_with= 'resource_name')
@@ -432,6 +431,7 @@ class ResourceModel(db.DynamicDocument):
     leader_emails = db.ListField(db.StringField(requeired=False)) #其他资源领导邮件
     cc_emails = db.ListField(db.StringField(requeired=False)) #其他资源抄送邮件
     mail_content = db.StringField(required=False)
+    updated_date = db.DateTimeField(required=False)
 
 
 
