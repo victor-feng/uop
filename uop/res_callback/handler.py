@@ -392,12 +392,22 @@ def crp_data_cmdb(args, cmdb1_url):
 
 
 def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
-    Log.logger.info("CMDB2.O instance_id: {}".format(instances))
+    Log.logger.info("CMDB2.O instance_id: {}\n db_flag: {}".format(instances,db_flag))
     resource = ResourceModel.objects(res_id=res_id)
     res = ResourceModel.objects.get(res_id=res_id)
     get_view_num = lambda x: x[0] if x else ""
     instance = [ins for ins in instances if ins["_id"] == 1][0] if not db_flag else \
         [ins for ins in instances if ins["_id"] == 2][0]
+    """
+    创建nginx时
+    instance =
+    {
+        u'instance_id': u'039776ce4e8e4e97bdba0c44',
+        u'model_id': u'3671f248bdc74d2fb6aa590c',
+        u'_id': 1,
+        u'parameters': [{u'code': u'baseInfo', u'value_type': u'string', u'value': u'nginx-dev-75372000'}]
+        }
+    """
     Log.logger.info("###Instance is {}".format(instance))
     if res.cloud == "2" or set_flag not in ["increase", "reduce"]: # 所有资源的第一次预留，和k8s的扩容
         view_id = str(instance["instance_id"])
