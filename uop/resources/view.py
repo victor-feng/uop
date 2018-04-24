@@ -729,10 +729,10 @@ class ResourceDetail(Resource):
                 network_id = db_res.network_id
                 flavor_id = db_res.flavor_id
                 if image_id:
-                    opsk_image = ConfOpenstackModel.objects.get(image_id=image_id)
+                    opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
                     result['image_name'] = opsk_image.image_name
                 if flavor_id:
-                    opsk_flavor = ConfOpenstackModel.objects.get(flavor_id=flavor_id)
+                    opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
                     result['flavor_name'] = opsk_flavor.flavor_name
                 if network_id:
                     network = NetWorkConfig.objects.filter(vlan_id=network_id).first()
