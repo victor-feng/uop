@@ -280,28 +280,26 @@ class Reservation(Resource):
             data["syswin_project"] = "uop"
             data["resource_id"] = resource_id
             data["resource_type"] = resource_type
-            env = resource.env
-            CPR_URL = get_CRP_url(env)
+            data['env'] = resource.env
             data_str=json.dumps(data)
-            msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         else:
             set_flag = "res"
             data = deal_crp_data(resource,set_flag)
             Log.logger.info("Data args is %s",data)
             data_str = json.dumps(data)
-            try:
-                CPR_URL = get_CRP_url(data['env'])
-                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
-            except Exception as e:
-                res = "failed to connect CRP service.{}".format(str(e))
-                code = 500
-                ret = {
+        try:
+            CPR_URL = get_CRP_url(data['env'])
+            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+        except Exception as e:
+            res = "failed to connect CRP service.{}".format(str(e))
+            code = 500
+            ret = {
                     "code": code,
                     "result": {
                         "res": res
                     }
                 }
-                return ret, code
+            return ret, code
         if msg.status_code != 202:
             code = msg.status_code
             res = "Failed to reserve resource."
