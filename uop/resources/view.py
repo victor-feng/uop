@@ -124,7 +124,7 @@ class ResourceApplication(Resource):
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
                                                  cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0,
-                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content)
+                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content,updated_date=created_date)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -269,7 +269,7 @@ class ResourceApplication(Resource):
         if args.user_id:
             condition['user_id'] = args.user_id
         if args.resource_name:
-            condition['resource_name'] = args.resource_name
+            condition['resource_name__icontains'] = args.resource_name
         if args.project:
             condition['project'] = args.project
         if args.start_time and args.end_time:
@@ -286,7 +286,7 @@ class ResourceApplication(Resource):
         if args.env:
             condition['env'] = args.env
         if args.instance_status:
-            condition["approval_status__in"] = ["success", "failed", "revoke"]
+            condition["approval_status__in"] = ["success", "failed", "revoke","config_revoke"]
         if args.department:
             condition["department"]=args.department
         if args.cloud:
@@ -294,7 +294,7 @@ class ResourceApplication(Resource):
         if args.resource_type:
             condition["resource_type"] = args.resource_type
         if args.project_name:
-            condition["project_name"] = args.project_name
+            condition["project_name__icontains"] = args.project_name
         if args.module_name:
             condition["module_name"] = args.module_name
         if args.reservation_status:
@@ -351,9 +351,9 @@ class ResourceApplication(Resource):
             total_count = ResourceModel.objects.filter(**condition).count()
             if page_num and page_size:
                 skip_count = (page_num - 1) * args.page_size
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date').skip(skip_count).limit(page_size)
+                resources = ResourceModel.objects.filter(**condition).order_by('-updated_date').skip(skip_count).limit(page_size)
             else:
-                resources = ResourceModel.objects.filter(**condition).order_by('-created_date')
+                resources = ResourceModel.objects.filter(**condition).order_by('-updated_date')
             res["total_count"]=total_count
         except Exception as e:
             err_msg=str(e.args)
@@ -536,6 +536,7 @@ class ResourceApplication(Resource):
                     expiry_date=expiry_date,
                     mail_content=mail_content,
                     leader_emails=leader_emails,
+                    updated_date = datetime.datetime.now(),
                 )
                 resource.compute_list = []
                 resource.resource_list = []
@@ -972,13 +973,18 @@ class ResourceDetail(Resource):
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
+                os_ins_ip_list = resources.os_ins_ip_list
                 department = resources.department
                 flag = resources.is_rollback
                 if args.department == department:  # 相同账户可以撤回或者删除自己的申请
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
-                        resources.approval_status="revoke"
-                        resources.reservation_status = "revoke"
+                        if os_ins_ip_list:
+                            resources.approval_status = "config_revoke"
+                            resources.reservation_status = "config_revoke"
+                        else:
+                            resources.approval_status="revoke"
+                            resources.reservation_status = "revoke"
                         resources.save()
                         ret = {
                             'code': 200,

@@ -214,7 +214,7 @@ def Aquery(args):
         '''
         get_model_id = lambda codes, v:[c[0] for c in codes.items() if c[1] == v][0]
         if instance_id == "uop" or not instance_id:
-            if self_model_id == "d8098981df71428784e65427" or model_id == "9a544097f789495e8ee4f5eb": # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
+            if self_model_id == filters.get("Person") or model_id == filters.get("department"): # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
                 return response_data(200, "success", {"instance": [
                     {
                         "instance_id": "uop", "name": "", "property": []
@@ -701,14 +701,4 @@ def delete_instance(args):
         "instance": instance
     })
     return data
-
-
-
-
-
-
-
-
-
-
 

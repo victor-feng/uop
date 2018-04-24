@@ -143,7 +143,11 @@ class ApprovalInfo(Resource):
                 else:
                     approval.approval_status = "failed"
                     resource.approval_status = "failed"
-                    resource.reservation_status = "approval_fail"
+                    os_ins_ip_list = resource.os_ins_ip_list
+                    if os_ins_ip_list:
+                        resource.reservation_status = "approval_config_fail"
+                    else:
+                        resource.reservation_status = "approval_fail"
                 approval.save()
                 if docker_network_id:
                     resource.docker_network_id = docker_network_id.strip()
@@ -280,39 +284,34 @@ class Reservation(Resource):
             data["syswin_project"] = "uop"
             data["resource_id"] = resource_id
             data["resource_type"] = resource_type
-            env = resource.env
-            CPR_URL = get_CRP_url(env)
+            data['env'] = resource.env
             data_str=json.dumps(data)
-            msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         else:
             set_flag = "res"
             data = deal_crp_data(resource,set_flag)
-            Log.logger.info("Data args is %s",data)
             data_str = json.dumps(data)
-            try:
-                CPR_URL = get_CRP_url(data['env'])
+        try:
+            Log.logger.info("Data args is %s", data)
+            CPR_URL = get_CRP_url(data['env'])
+            if os_ins_ip_list:
+                msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                resource.reservation_status = "configing"
+            else:
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
-            except Exception as e:
-                res = "failed to connect CRP service.{}".format(str(e))
-                code = 500
-                ret = {
+                resource.reservation_status = "reserving"
+            resource.save()
+            code = 200
+            res = "Success in reserving or configing resource."
+        except Exception as e:
+            res = "failed to connect CRP service.{}".format(str(e))
+            code = 500
+            ret = {
                     "code": code,
                     "result": {
                         "res": res
                     }
                 }
-                return ret, code
-        if msg.status_code != 202:
-            code = msg.status_code
-            res = "Failed to reserve resource."
-        else:
-            if os_ins_ip_list:
-                resource.reservation_status = "configing"
-            else:
-                resource.reservation_status = "reserving"
-            resource.save()
-            code = 200
-            res = "Success in reserving or configing resource."
+            return ret, code
         ret = {
             "code": code,
             "result": {
@@ -634,12 +633,7 @@ class CapacityReservation(Resource):
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
                 meta = json.dumps(db_com.docker_meta) if db_com.docker_meta else ""
-                deploy_source = db_com.deploy_source
-                host_env = db_com.host_env
                 url = db_com.url
-                ready_probe_path = db_com.ready_probe_path
-                if host_env == "docker" and deploy_source == "image" and  not ready_probe_path:
-                    url = BASE_K8S_IMAGE
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
