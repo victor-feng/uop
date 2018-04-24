@@ -308,8 +308,11 @@ class Reservation(Resource):
         else:
             if os_ins_ip_list:
                 resource.reservation_status = "configing"
+                Log.logger.info("11111111111111111111111111111111111111111111111111111111111111111{}".format(os_ins_ip_list))
             else:
                 resource.reservation_status = "reserving"
+                Log.logger.info(
+                    "2222222222222222222222222222222222222222222222222222222222222222222222222222222222222{}".format(os_ins_ip_list))
             resource.save()
             code = 200
             res = "Success in reserving or configing resource."
