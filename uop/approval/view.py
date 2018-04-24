@@ -289,7 +289,10 @@ class Reservation(Resource):
             data_str = json.dumps(data)
         try:
             CPR_URL = get_CRP_url(data['env'])
-            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+            if os_ins_ip_list:
+                msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+            else:
+                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
         except Exception as e:
             res = "failed to connect CRP service.{}".format(str(e))
             code = 500
