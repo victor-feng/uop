@@ -356,6 +356,7 @@ def crp_data_cmdb(args, cmdb1_url):
         else:
             Log.logger.info("Start post datas to cmdb2,models_list is {}".format(models_list))
             instances, relations = post_datas_cmdb(url, args, models_list, data["relations"])
+            Log.logger.info("End post datas to cmdb2,instance is {}\n relations is {}\n".format(instances, relations))
         uid, token = get_uid_token()
         data = {
             "uid": uid,
@@ -683,6 +684,7 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
         rels.extend(r)
     # 添加普通上下层关系
     if up_level:
+        Log.logger.info("##################")
         r = [
             dict(rel, start_id=i["_id"], end_instance_id=up_level.get("instance_id",""), end_id=up_level.get("_id",""))
             for rel in relations if
