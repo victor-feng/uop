@@ -504,14 +504,13 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
 
         if raw["module_id"]:
             # module
-            Log.logger.info("Raw modele id is exist {}".format(raw['module_id']))
+            Log.logger.info("Raw modele id is exist {}, raw data is {}".format(raw['module_id'], raw))
             module_model = filter(lambda x: x["code"] == "Module", models_list)[0]
             module_level = {
                 "instance_id": raw["module_id"],
                 "model_id": module_model["entity_id"],
                 "_id": ""
             }
-
             up_db, r = format_data_cmdb(relations_model, raw, db_model, {}, len(instances), module_level, physical_server_model_id)
             instances.append(up_db)
             relations.extend(r)
