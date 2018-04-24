@@ -285,9 +285,9 @@ class Reservation(Resource):
         else:
             set_flag = "res"
             data = deal_crp_data(resource,set_flag)
-            Log.logger.info("Data args is %s",data)
             data_str = json.dumps(data)
         try:
+            Log.logger.info("Data args is %s", data)
             CPR_URL = get_CRP_url(data['env'])
             if os_ins_ip_list:
                 msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
