@@ -512,6 +512,7 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
                 "_id": ""
             }
             up_db, r = format_data_cmdb(relations_model, raw, db_model, {}, len(instances), module_level, physical_server_model_id)
+            Log.logger.info("up_db is {}, r is {}".format(up_db, r))
             instances.append(up_db)
             relations.extend(r)
         else:
