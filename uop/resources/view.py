@@ -973,13 +973,18 @@ class ResourceDetail(Resource):
             # parser.add_argument('resource_name', type=str, location='args')
             resources = ResourceModel.objects.get(res_id=res_id)
             if len(resources):
+                os_ins_ip_list = resources.os_ins_ip_list
                 department = resources.department
                 flag = resources.is_rollback
                 if args.department == department:  # 相同账户可以撤回或者删除自己的申请
                     if args.options == "rollback":
                         resources.is_rollback = 0 if flag == 1 else 1
-                        resources.approval_status="revoke"
-                        resources.reservation_status = "revoke"
+                        if os_ins_ip_list:
+                            resources.approval_status = "config_revoke"
+                            resources.reservation_status = "config_revoke"
+                        else:
+                            resources.approval_status="revoke"
+                            resources.reservation_status = "revoke"
                         resources.save()
                         ret = {
                             'code': 200,
