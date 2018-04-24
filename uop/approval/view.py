@@ -291,8 +291,13 @@ class Reservation(Resource):
             CPR_URL = get_CRP_url(data['env'])
             if os_ins_ip_list:
                 msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                resource.reservation_status = "configing"
             else:
                 msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                resource.reservation_status = "reserving"
+            resource.save()
+            code = 200
+            res = "Success in reserving or configing resource."
         except Exception as e:
             res = "failed to connect CRP service.{}".format(str(e))
             code = 500
@@ -303,17 +308,6 @@ class Reservation(Resource):
                     }
                 }
             return ret, code
-        if msg.status_code != 202:
-            code = msg.status_code
-            res = "Failed to reserve resource."
-        else:
-            if os_ins_ip_list:
-                resource.reservation_status = "configing"
-            else:
-                resource.reservation_status = "reserving"
-            resource.save()
-            code = 200
-            res = "Success in reserving or configing resource."
         ret = {
             "code": code,
             "result": {
