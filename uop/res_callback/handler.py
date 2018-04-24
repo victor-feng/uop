@@ -617,7 +617,8 @@ def get_host_instance_id(name_ip):
         host.save()
     except Exception as exc:
         psid = ""
-        Log.logger.error("data error:{}".format(str(exc)))
+        msg = traceback.format_exc()
+        Log.logger.error("data error:{}".format(msg))
     return psid
 
 
