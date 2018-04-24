@@ -655,10 +655,12 @@ def format_data_cmdb(relations, item, model, attach, index, up_level, physical_s
             )(model["parameters"], item, attach)
         )
     }
-    if item.get("physical_server") and physical_server_model_id: #  添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+    if item.get("physical_server") and physical_server_model_id:  # 添加物理机的关系,目前没有物理机，暂时传名字作为id，后期用接口查物理机id
+        Log.logger.info("crp data item is {}".format(item))
         psid = get_host_instance_id(item.get("physical_server"))
         host_instance_id = psid if psid else host_instance_id
-        Log.logger.info("physical_server_model_id is {} \n.".format(physical_server_model_id))
+        Log.logger.info("physical_server_model_id is {} , Host instance id is {}\n.".format(
+            physical_server_model_id, host_instance_id))
         r = [
             dict(
                 rel, start_id = i["_id"],
