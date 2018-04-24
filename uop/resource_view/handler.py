@@ -4,6 +4,7 @@
 '''
 import json
 import requests
+import traceback
 from flask import current_app
 from uop.log import Log
 from uop.models import ResourceModel, Statusvm
@@ -163,7 +164,8 @@ def cmdb2_graph_search(args):
             data = package_data(data, resource_list)
         result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
     except Exception as exc:
-        Log.logger.error("cmdb2_graph_search error:{}".format(str(exc)))
+        msg = traceback.format_exc()
+        Log.logger.error("cmdb2_graph_search error:{}".format(msg))
         result = response_data(200, str(exc), "")
     return result
 
