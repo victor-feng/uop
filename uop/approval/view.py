@@ -633,12 +633,7 @@ class CapacityReservation(Resource):
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
                 meta = json.dumps(db_com.docker_meta) if db_com.docker_meta else ""
-                deploy_source = db_com.deploy_source
-                host_env = db_com.host_env
                 url = db_com.url
-                ready_probe_path = db_com.ready_probe_path
-                if host_env == "docker" and deploy_source == "image" and  not ready_probe_path:
-                    url = BASE_K8S_IMAGE
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
                     if capacity_.capacity_id == approval_id:
