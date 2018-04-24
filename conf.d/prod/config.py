@@ -6,6 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEV_CRP_URL = "http://crp-dev.syswin.com/"
 TEST_CRP_URL = "http://crp.syswin.com/"
+PREP_CRP_URL = "http://crp-dx.syswin.com/"
 PROD_CRP_URL = "http://crp-dx.syswin.com/"
 
 
@@ -24,7 +25,7 @@ class ProdConfig(BaseConfig):
     CRP_URL = {
         'dev': TEST_CRP_URL,
         'test': TEST_CRP_URL,
-        'prep': PROD_CRP_URL,
+        'prep': PREP_CRP_URL,
         'prod': PROD_CRP_URL,
     }
     CMDB_URL = "http://cmdb.syswin.com/"
