@@ -61,9 +61,9 @@ class DeploymentListAPI(Resource):
         if args.deploy_type:
             condition['deploy_type'] = args.deploy_type
         if args.project_name:
-            condition['project_name'] = args.project_name
+            condition['project_name__icontains'] = args.project_name
         if args.resource_name:
-            condition['resource_name'] = args.resource_name
+            condition['resource_name__icontains'] = args.resource_name
         if args.deploy_result:
             condition['deploy_result'] = args.deploy_result
         if args.environment:

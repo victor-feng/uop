@@ -269,7 +269,7 @@ class ResourceApplication(Resource):
         if args.user_id:
             condition['user_id'] = args.user_id
         if args.resource_name:
-            condition['resource_name'] = args.resource_name
+            condition['resource_name__icontains'] = args.resource_name
         if args.project:
             condition['project'] = args.project
         if args.start_time and args.end_time:
@@ -294,7 +294,7 @@ class ResourceApplication(Resource):
         if args.resource_type:
             condition["resource_type"] = args.resource_type
         if args.project_name:
-            condition["project_name"] = args.project_name
+            condition["project_name__icontains"] = args.project_name
         if args.module_name:
             condition["module_name"] = args.module_name
         if args.reservation_status:
