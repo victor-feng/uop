@@ -220,7 +220,7 @@ def Aquery(args):
                         "instance_id": "uop", "name": "", "property": []
                     }
                 ]})
-            business = ItemInformation.objects.filter(item_code="business")
+            business = ItemInformation.objects.filter(item_code="business").order_by("-create_date")
             instances = []
             if business:
                 for b in business:
@@ -238,7 +238,7 @@ def Aquery(args):
                 return response_data(200, "success", {"instance": []})
         else: # 从uop里查数据
 
-            next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id])
+            next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id]).order_by("-create_date")
             instances = []
             if next_instances:
                 for ni in next_instances:

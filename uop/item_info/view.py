@@ -416,11 +416,6 @@ class BusinessProject(Resource):
         parser.add_argument('token', type=str) #现在已经不用
         args = parser.parse_args()
         try:
-            #往uop写入数据
-
-
-
-
             #往cmdb2.0异步写入数据
             graph_data = []
             Log.logger.debug("Start subgraph_data")
