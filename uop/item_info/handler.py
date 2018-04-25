@@ -696,6 +696,7 @@ def fix_instance(args):
     data.update({
         "instance": instance
     })
+    Log.logger.info("DATA IS {}".format(data))
     return data
 
 
