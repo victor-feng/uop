@@ -155,7 +155,7 @@ def cmdb2_graph_search(args):
         # Log.logger.info("=======data is {}".format(data))
         for ins in data["instance"]:
 
-            if ins["entity_id"] == CMDB2_ENTITY["virtual_device"]:
+            if ins["entity_id"] in [CMDB2_ENTITY["virtual_device"], CMDB2_ENTITY["tomcat"]]:
                 for para in ins['parameters']:
                     if para['code'] == 'create_date':
                         Log.logger.info("Before modify time is {}".format(para['value']))

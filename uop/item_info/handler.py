@@ -609,7 +609,7 @@ def fix_instance(args):
     url = CMDB2_URL + "cmdb/openapi/graph/"
     model_id, instance_id, item, uid, token = \
         args.model_id, args.instance_id, args.property, args.uid, args.token
-    Log.logger.info("The item value is {}".format(item))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
+    Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
     item_name = [i['value'] if i["value"] else "" for i in item]
     Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
@@ -626,6 +626,7 @@ def fix_instance(args):
     if not uid or not token:
         uid, token = get_uid_token()
     entity = get_relations(CMDB2_VIEWS["3"][0])["entity"]  # B7
+    Log.logger.info("The entity is {}".format(entity))
     get_fix_model = lambda x: x[0] if x else "CMDB模型有变动，在视图{}未找到实体{}的信息，请联系管理员".format(CMDB2_VIEWS["3"][0], model_id)
     fix_model = get_fix_model(filter(lambda x: x["entity_id"] == model_id, entity))
     get_value = lambda item, pro, code: judge_value_format([{i.get("code"): i.get("value")}for i in item if i.get("code") == code], pro, {})
