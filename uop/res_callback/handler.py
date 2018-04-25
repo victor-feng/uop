@@ -605,8 +605,9 @@ def judge_value_format(item, pro, attach):
                     Log.logger.info("The ret is {}".format(ret))
                     return ret
                 except Exception as exc:
-                    Log.logger.error("The time error is {}".format(exc))
-                    return int(str(time.time()).split(".")[0])
+                    ret = int(str(time.time()).split(".")[0])
+                    Log.logger.error("The time error is {}, the return is {}".format(exc, ret))
+                    return ret
         else:
             return value_type.get(str(pro["value_type"]))  # 统一空值类型
     else:
