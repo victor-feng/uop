@@ -5,6 +5,7 @@
 import json
 import requests
 import traceback
+import time
 from flask import current_app
 from uop.log import Log
 from uop.models import ResourceModel, Statusvm
@@ -155,19 +156,27 @@ def cmdb2_graph_search(args):
             if ins["entity_id"] in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]:
                 if ins["instance_id"] not in idlist: # 去除缩容减少的，后期删CMDB2
                     continue
+            if ins["entity_id"] == [CMDB2_ENTITY["virtual_device"]]:
+                for para in ins['parameters']:
+                    if para['code'] == 'create_date':
+                        para['value'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(para['value']))
+
             tmp.append(ins)
+        Log.logger.info("The modify time is {}".format(tmp))
         data["instance"] = tmp
-        # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]  in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
+        # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]
+        #   in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
         if view_num == CMDB2_VIEWS["2"][0]: # B6,获取层级结构
             resources = ResourceModel.objects.filter(department=args.department,is_deleted=0) if args.department != "admin" else ResourceModel.objects.filter(is_deleted=0)
             resource_list = [{"env": res.env, "res_list": res.cmdb2_resource_id} for res in resources if res.cmdb2_resource_id] if resources else []
             data = package_data(data, resource_list)
-        result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data) if not data else response_data(200, "success", data)
+        result = response_data(200, "按照视图名称{}，未找到任何资源，请确认:\n1、是否CMDB中已定义该试图；\n2、该视图确实没有资源".format(view_num), data)\
+            if not data else response_data(200, "success", data)
     except Exception as exc:
         msg = traceback.format_exc()
         Log.logger.error("cmdb2_graph_search error:{}".format(msg))
         result = response_data(200, str(exc), "")
-    Log.logger.info("Get the result is {}".format(result))
+    # Log.logger.info("Get the result is {}".format(result))
     return result
 
 
