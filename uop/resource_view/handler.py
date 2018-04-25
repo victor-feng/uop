@@ -159,10 +159,10 @@ def cmdb2_graph_search(args):
             if ins["entity_id"] == [CMDB2_ENTITY["virtual_device"]]:
                 for para in ins['parameters']:
                     if para['code'] == 'create_date':
+                        Log.logger.info("Before modify time is {}".format(para['value']))
                         para['value'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(para['value']))
-
+                        Log.logger.info("After modify time is {}".format(para['value']))
             tmp.append(ins)
-        Log.logger.info("The modify time is {}".format(tmp))
         data["instance"] = tmp
         # data["instance"] = [ins for ins in data["instance"] if ins["instance_id"]  in idlist and ins["entity_id"]
         #   in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]]
