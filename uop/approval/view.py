@@ -70,6 +70,7 @@ class ApprovalList(Resource):
                 else:
                     approval_status = "processing"
                 resource.approval_status = approval_status
+                resource.reservation_status = approval_status
                 resource.save()
                 code = 200
         except Exception as e:
