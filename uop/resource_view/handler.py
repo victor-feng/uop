@@ -152,6 +152,7 @@ def cmdb2_graph_search(args):
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
         idlist = list(get_instance_id_list(res_id))
         tmp = []
+        Log.logger.info("=======data is {}".format(data))
         for ins in data["instance"]:
             if ins["entity_id"] in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]:
                 if ins["instance_id"] not in idlist: # 去除缩容减少的，后期删CMDB2
