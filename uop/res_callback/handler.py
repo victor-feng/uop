@@ -203,7 +203,7 @@ def filter_status_data(p_code, id, num):
                 for res in resource_list:
                     quantity = res.quantity
                     if quantity > 0:
-                        meta["volume_size"] = res.volume_size
+                        meta["volume_size"] = str(res.volume_size)
             if compute_list:
                 domain = compute_list[0].domain
                 domain_path = compute_list[0].domain_path
