@@ -157,6 +157,7 @@ def cmdb2_graph_search(args):
             if ins["entity_id"] in [CMDB2_ENTITY["container"], CMDB2_ENTITY["virtual_device"]]:
                 if ins["instance_id"] not in idlist: # 去除缩容减少的，后期删CMDB2
                     continue
+        for ins in data["instance"]:
             if ins["entity_id"] == [CMDB2_ENTITY["virtual_device"]]:
                 for para in ins['parameters']:
                     if para['code'] == 'create_date':
