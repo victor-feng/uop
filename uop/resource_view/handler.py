@@ -167,6 +167,7 @@ def cmdb2_graph_search(args):
         msg = traceback.format_exc()
         Log.logger.error("cmdb2_graph_search error:{}".format(msg))
         result = response_data(200, str(exc), "")
+    Log.logger.info("Get the result is {}".format(result))
     return result
 
 
