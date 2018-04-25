@@ -572,6 +572,7 @@ def judge_value_format(item, pro, attach):
             )
         ))  # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
         one = item.get(code) if item.get(code) else attach.get(code)
+        Log.logger.info("The one is {}".format(one))
         if one:
             # Log.logger.info("one data:{}".format(one))
             if str(pro["value_type"]) == "string":
@@ -582,7 +583,9 @@ def judge_value_format(item, pro, attach):
                 try:
                     time_str = one.split('.')[0]
                     time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
-                    return TimeToolkit.local2utctime(time_date)
+                    ret = TimeToolkit.local2utctime(time_date)
+                    Log.logger.info("The ret is {}".format(ret))
+                    return ret
                 except Exception as exc:
                     return int(str(time.time()).split(".")[0])
         else:
