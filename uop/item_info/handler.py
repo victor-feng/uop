@@ -248,47 +248,59 @@ def Aquery(args):
                 for ni in next_instances:
                     # Log.logger.info("###### in ItemInformation.get")
                     rname = ni.item_name
-                    project_status = ni.project_status
-                    Chinese_name = ni.Chinese_name
-                    version = ni.version
-                    OPS = ni.OPS
-                    DEV = ni.DEV
-                    tmp = dict(
-                                instance_id=ni.item_id,
-                                model_id=model_id,
-                                name=rname,
-                                property=[
-                                    {
-                                       "code": "baseInfo",
-                                       "name": u"名称",
-                                       "value": rname
-                                    },
-                                    {
-                                        "code": "status",
-                                        "name": u"工程状态",
-                                        "value": project_status
-                                    },
-                                    {
-                                        "code": "Chinese_name",
-                                        "name": u"工程状态",
-                                        "value": Chinese_name
-                                    },
-                                    {
-                                        "code": "version",
-                                        "name": u"工程状态",
-                                        "value": version
-                                    },
-                                    {
-                                        "code": "OPS",
-                                        "name": u"工程状态",
-                                        "value": OPS
-                                    },
-                                    {
-                                        "code": "DEV",
-                                        "name": u"工程状态",
-                                        "value": DEV
-                                    }
-                                ])
+                    try:
+                        project_status = ni.project_status
+                        Chinese_name = ni.Chinese_name
+                        version = ni.version
+                        OPS = ni.OPS
+                        DEV = ni.DEV
+                        tmp = dict(
+                                    instance_id=ni.item_id,
+                                    model_id=model_id,
+                                    name=rname,
+                                    property=[
+                                        {
+                                           "code": "baseInfo",
+                                           "name": u"名称",
+                                           "value": rname
+                                        },
+                                        {
+                                            "code": "status",
+                                            "name": u"工程状态",
+                                            "value": project_status
+                                        },
+                                        {
+                                            "code": "Chinese_name",
+                                            "name": u"工程状态",
+                                            "value": Chinese_name
+                                        },
+                                        {
+                                            "code": "version",
+                                            "name": u"工程状态",
+                                            "value": version
+                                        },
+                                        {
+                                            "code": "OPS",
+                                            "name": u"工程状态",
+                                            "value": OPS
+                                        },
+                                        {
+                                            "code": "DEV",
+                                            "name": u"工程状态",
+                                            "value": DEV
+                                        }
+                                    ])
+                    except Exception as e:
+                        tmp = dict(
+                            instance_id=ni.item_id,
+                            model_id=model_id,
+                            name=rname,
+                            property=[
+                                {
+                                    "code": "baseInfo",
+                                    "name": u"名称",
+                                    "value": rname
+                                }])
                     instances.append(tmp)
                 return response_data(200, "success", {"instance": instances})
             else:

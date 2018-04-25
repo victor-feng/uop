@@ -396,7 +396,8 @@ class BusinessProject(Resource):
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)
-            Log.logger.error("get data from CMDB2.0 error:{}".format(str(exc)))
+            msg = traceback.format_exc()
+            Log.logger.error("get data from CMDB2.0 error:{}".format(msg))
         return jsonify(response)
 
     def post(self):
