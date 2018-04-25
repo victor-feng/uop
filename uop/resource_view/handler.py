@@ -152,7 +152,7 @@ def cmdb2_graph_search(args):
         data = requests.post(url, data=data_str, timeout=300).json()["data"]
         idlist = list(get_instance_id_list(res_id))
         tmp = []
-        Log.logger.info("=======data is {}".format(data))
+        # Log.logger.info("=======data is {}".format(data))
         for ins in data["instance"]:
 
             if ins["entity_id"] == CMDB2_ENTITY["virtual_device"]:

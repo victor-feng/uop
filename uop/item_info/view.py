@@ -3,6 +3,7 @@
 import json
 import requests
 import datetime
+import traceback
 from uop.log import Log
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from flask import current_app, jsonify
@@ -451,7 +452,8 @@ class BusinessProject(Resource):
         except Exception as exc:
             response["code"] = 500
             response["result"]["msg"] = str(exc)
-            Log.logger.error(u"修改业务模块工程出错:{}".format(str(exc)))
+            msg = traceback.format_exc()
+            Log.logger.error(u"修改业务模块工程出错:{}".format(msg))
         return jsonify(response)
 
     def delete(self):
