@@ -100,6 +100,13 @@ class Statusvm(db.DynamicDocument):
     domain_ip = db.StringField(required=False)
     department = db.StringField(required=False)
 
+    volume_size = db.StringField(required=False)
+    namespace = db.StringField(required=False)
+    wvip = db.StringField(required=False)
+    rvip = db.StringField(required=False)
+    vip = db.StringField(required=False)
+
+
     meta = {
             'collection': 'status_vm',
             'indexes': [

@@ -179,6 +179,7 @@ def filter_status_data(p_code, id, num):
     for r in res:
         osid_ip_list = r.os_ins_ip_list
         compute_list = r.compute_list
+        resource_list = r.resource_list
         view_id, view_num = "", ""
         # Log.logger.info("filter_status_data.p_code:{}".format(osid_ip_list))
         if r.cloud == "2" and r.resource_type == "app":
@@ -198,20 +199,37 @@ def filter_status_data(p_code, id, num):
             meta["project_id"] = r.project_id
             meta["resource_view_id"] = "" if id == "@" else id
             meta["view_num"] = "" if num == "@" else num
+            if resource_list:
+                for res in resource_list:
+                    quantity = res.quantity
+                    if quantity > 0:
+                        meta["volume_size"] = res.volume_size
             if compute_list:
-                meta["domain"] = compute_list[0].domain
+                domain = compute_list[0].domain
+                domain_path = compute_list[0].domain_path
+                if domain_path:
+                    domain = domain + "/" + domain_path
+                meta["domain"] = domain
+                meta["namespace"] = compute_list[0].namespace
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')
             try:
                 meta["cpu"] = str(oi.cpu)
                 meta["mem"] = str(oi.mem)
+                meta["wvip"] = oi.wvip
+                meta["rvip"] = oi.rvip
+                meta["vip"] = oi.vip
             except:
                 meta["cpu"] = "2"
                 meta["mem"] = "4"
+                meta["wvip"] = oi.ip
+                meta["rvip"] = oi.ip
+                meta["vip"] = oi.ip
             meta["env"] = r.env
             meta["osid"] = oi.os_ins_id
             meta["ip"] = oi.ip
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
+            meta["cloud"] = r.cloud
             data["vm_status"].append(meta)
             vm = Statusvm.objects.filter(osid=meta["osid"])
             if not vm:
