@@ -240,18 +240,55 @@ def Aquery(args):
                 return response_data(200, "success", {"instance": []})
         else: # 从uop里查数据
 
-            next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id]).order_by("-create_date")
+            next_instances = ItemInformation.objects.filter(item_relation=instance_id, item_code=code_id[model_id]).\
+                order_by("-create_date")
             instances = []
+            Log.logger.info("NEXT INSTANCE IS {}".format(next_instances))
             if next_instances:
                 for ni in next_instances:
                     # Log.logger.info("###### in ItemInformation.get")
                     rname = ni.item_name
-                    tmp = dict(instance_id=ni.item_id, model_id=model_id, name=rname,
-                               property=[{
-                                   "code": "baseInfo",
-                                   "name": u"名称",
-                                   "value": rname
-                               }])
+                    project_status = ni.project_status
+                    Chinese_name = ni.Chinese_name
+                    version = ni.version
+                    OPS = ni.OPS
+                    DEV = ni.DEV
+                    tmp = dict(
+                                instance_id=ni.item_id,
+                                model_id=model_id,
+                                name=rname,
+                                property=[
+                                    {
+                                       "code": "baseInfo",
+                                       "name": u"名称",
+                                       "value": rname
+                                    },
+                                    {
+                                        "code": "status",
+                                        "name": u"工程状态",
+                                        "value": project_status
+                                    },
+                                    {
+                                        "code": "Chinese_name",
+                                        "name": u"工程状态",
+                                        "value": Chinese_name
+                                    },
+                                    {
+                                        "code": "version",
+                                        "name": u"工程状态",
+                                        "value": version
+                                    },
+                                    {
+                                        "code": "OPS",
+                                        "name": u"工程状态",
+                                        "value": OPS
+                                    },
+                                    {
+                                        "code": "DEV",
+                                        "name": u"工程状态",
+                                        "value": DEV
+                                    }
+                                ])
                     instances.append(tmp)
                 return response_data(200, "success", {"instance": instances})
             else:
