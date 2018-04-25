@@ -590,7 +590,7 @@ def judge_value_format(item, pro, attach):
             )
         ))  # 由于CMDB模型code经常变动，会有一些字段存不进去的bug，后期处理
         one = item.get(code) if item.get(code) else attach.get(code)
-        Log.logger.info("The one is {}".format(one))
+        Log.logger.info("The one is {}, type is {}".format(one, type(one)))
         if one:
             # Log.logger.info("one data:{}".format(one))
             if str(pro["value_type"]) == "string":
@@ -605,6 +605,7 @@ def judge_value_format(item, pro, attach):
                     Log.logger.info("The ret is {}".format(ret))
                     return ret
                 except Exception as exc:
+                    Log.logger.error("The time error is {}".format(exc))
                     return int(str(time.time()).split(".")[0])
         else:
             return value_type.get(str(pro["value_type"]))  # 统一空值类型
