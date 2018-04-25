@@ -64,6 +64,11 @@ class ApprovalList(Resource):
                                 approval_status=approval_status).save()
 
                 resource = models.ResourceModel.objects.get(res_id=resource_id)
+                os_ins_ip_list = resource.os_ins_ip_list
+                if os_ins_ip_list:
+                    approval_status = "config_processing"
+                else:
+                    approval_status = "processing"
                 resource.approval_status = approval_status
                 resource.save()
                 code = 200
