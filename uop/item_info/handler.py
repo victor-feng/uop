@@ -220,7 +220,7 @@ def Aquery(args):
                         "instance_id": "uop", "name": "", "property": []
                     }
                 ]})
-            business = ItemInformation.objects.filter(item_code="business")
+            business = ItemInformation.objects.filter(item_code="business").order_by("-create_date")
             instances = []
             if business:
                 for b in business:
