@@ -803,7 +803,7 @@ class ResourceProviderCallBack(Resource):
                 'code': code,
                 'result': {
                     'res': 'fail',
-                    'msg': "Resource delete error.",
+                    'msg': "Resource put error.",
                 }
             }
             return ret, code
