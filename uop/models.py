@@ -481,6 +481,7 @@ class Approval(db.DynamicDocument):
         'index_background': True
     }
 
+
 class ItemInformation(db.DynamicDocument):
     user = db.StringField(required=True)
     user_id = db.StringField(required=True)
@@ -492,7 +493,7 @@ class ItemInformation(db.DynamicDocument):
     item_relation = db.StringField(required=False) # 上层id
     create_date = db.DateTimeField(default=datetime.now)
     deleted = db.IntField(required=False, default=0)
-
+    # project_property = db.ListField(db.EmbeddedDocumentField())  # 工程下的属性
 
     meta = {
         'collection': 'item_information',

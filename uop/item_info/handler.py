@@ -5,6 +5,7 @@
 import json
 import requests
 import os
+import traceback
 from uop.log import Log
 from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
@@ -611,17 +612,40 @@ def fix_instance(args):
         args.model_id, args.instance_id, args.property, args.uid, args.token
     Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
-    item_name = [i['value'] if i["value"] else "" for i in item]
-    Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
+    # item_name = [i['value'] if i["code"] == "baseInfo" else "" for i in item]
+    baseInfo = (filter(lambda x: x['code'] == "baseInfo", item)[0]).get("value")
+    project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
+    Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
+    version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
+    OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
+    DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
+
+    # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
-        # item_ins = ItemInformation.objects.filter(item_id=instance_id)
-        # if item_ins:
-            # item_ins = item_ins[0]
-            # item_ins.item_name = str(item_name[0])
-            # item_ins.save()
-        ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(item_name[0]))
+        """
+        item = [
+        {u'code': u'baseInfo', u'value': u'victorfeng'},
+        {u'code': u'status', u'value': u'victor'},
+        {u'code': u'Chinese_name', u'value': u'victor'},
+        {u'code': u'version', u'value': u'victor'},
+        {u'code': u'OPS', u'value': u'victor'},
+        {u'code': u'DEV', u'value': u'victor'}
+        ]
+        """
+        item_ins = ItemInformation.objects.filter(item_id=instance_id)
+        if item_ins:
+            item_ins = item_ins[0]
+            item_ins.item_name = str(baseInfo)
+            item_ins.project_status = str(project_status)
+            item_ins.Chinese_name = str(Chinese_name)
+            item_ins.version = str(version)
+            item_ins.OPS = str(OPS)
+            item_ins.DEV = str(DEV)
+            item_ins.save()
+        # ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(item_name[0]))
     except Exception as e:
-        Log.logger.error("Save uop is wrong ".format(e))
+        msg = traceback.format_exc()
+        Log.logger.error("Save uop is wrong ".format(msg))
 
     if not uid or not token:
         uid, token = get_uid_token()
