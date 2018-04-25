@@ -213,6 +213,7 @@ def Aquery(args):
         '''
         instance_id 对应Iteminformation的item_id, 如果不传默认查询所有业务
         '''
+        Log.logger.info("APP ENV IS {}".format(APP_ENV))
         get_model_id = lambda codes, v:[c[0] for c in codes.items() if c[1] == v][0]
         if instance_id == "uop" or not instance_id:
             if self_model_id == filters.get("Person") or model_id == filters.get("department"): # 兼容CMDB2.0查部门的接口，返回部门的id，这里返回uop
