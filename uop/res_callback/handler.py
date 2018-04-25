@@ -600,7 +600,7 @@ def judge_value_format(item, pro, attach):
             else:  # 时间戳
                 try:
                     time_str = one.split('.')[0]
-                    time_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+                    time_date = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
                     ret = TimeToolkit.local2utctime(time_date)
                     Log.logger.info("The ret is {}".format(ret))
                     return ret
