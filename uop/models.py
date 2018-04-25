@@ -105,6 +105,7 @@ class Statusvm(db.DynamicDocument):
     wvip = db.StringField(required=False)
     rvip = db.StringField(required=False)
     vip = db.StringField(required=False)
+    cloud = db.StringField(required=False)
 
 
     meta = {

@@ -768,6 +768,7 @@ class ResourceProviderCallBack(Resource):
             # 修改violume
             if set_flag == "config" and status == "success":
                 resource_list = resource.resource_list
+                os_ins_ip_list = resource.os_ins_ip_list
                 for res in resource_list:
                     volume_size = res.volume_size
                     volume_exp_size = res.volume_exp_size
@@ -775,13 +776,18 @@ class ResourceProviderCallBack(Resource):
                     res.volume_exp_size = 0
                     res.save()
                 #修改Statusvm表数据
+                for res in resource_list:
+                    volume_size = res.volume_size
+                    cpu = res.cpu
+                    mem = res.mem
                 vms = Statusvm.objects.filter(resource_id=resource_id)
                 for vm in vms:
-                    for res in resource_list:
-                        volume_size = res.volume_size
-                        cpu = res.cpu
-                        mem = res.mem
-                    vm.update(volume_size=str(volume_size),cpu=str(cpu),mem=str(mem))
+                    vm.update(volume_size=str(volume_size) if volume_size else "0",
+                              cpu=str(cpu) if cpu else "2",
+                              mem=str(mem) if mem else "2")
+                for os_ins in os_ins_ip_list:
+                    os_ins.cpu = str(cpu) if cpu else "2"
+                    os_ins.mem = str(mem) if mem else "2"
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type = "config"
