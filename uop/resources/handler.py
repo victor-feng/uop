@@ -273,7 +273,7 @@ def get_from_uop(args):
             tmp_result['view_num'] = pi.view_num
             tmp_result['resource_id'] = pi.resource_id
             tmp_result['env'] = pi.env
-            tmp_result['cloud'] = get_cloud(pi.resource_id)
+            tmp_result['cloud'] = pi.cloud if pi.cloud else get_cloud(pi.resource_id)
             tmp_result['volume_size'] = pi.volume_size
             tmp_result['namespace'] = pi.namespace
             tmp_result['wvip'] = pi.wvip
