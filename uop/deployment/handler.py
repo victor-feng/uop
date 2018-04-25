@@ -184,7 +184,9 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'deploy_source':compute.deploy_source,
                     'database_config':compute.database_config,
                     'flavor':str(compute.cpu) + str(compute.mem),
-                    'host_mapping':compute.host_mapping
+                    'host_mapping':compute.host_mapping,
+                    'networkName':compute.networkName,
+                    'tenantName':compute.tenantName,
                 }
             )
         except AttributeError as e:
@@ -347,7 +349,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
-                                 network_id=o.network_id,networkName=o.networkName,tenantName=o.tenantName,
+                                 network_id=o.network_id,networkName=match_one.get("networkName", ""),tenantName=match_one.get("tenantName", ""),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=o.ready_probe_path,lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping)

@@ -252,7 +252,7 @@ def get_from_uop(args):
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
             domain, domain_ip,namespace,domain_path = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else (pi.domain, pi.domain_ip,None,None)
-            if domain_path:
+            if domain_path and "/" not in domain:
                 domain = domain + "/" + domain_path
             tmp_result['domain'] = domain
             tmp_result['domain_ip'] = domain_ip
@@ -274,6 +274,11 @@ def get_from_uop(args):
             tmp_result['resource_id'] = pi.resource_id
             tmp_result['env'] = pi.env
             tmp_result['cloud'] = get_cloud(pi.resource_id)
+            tmp_result['volume_size'] = pi.volume_size
+            tmp_result['namespace'] = pi.namespace
+            tmp_result['wvip'] = pi.wvip
+            tmp_result['rvip'] = pi.rvip
+            tmp_result['vip'] = pi.vip
             # osid, ip = update_statusvm(pi)
             # tmp_result['osid'] = osid
             # tmp_result['resource_ip'] = ip

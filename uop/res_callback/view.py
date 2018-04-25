@@ -774,6 +774,14 @@ class ResourceProviderCallBack(Resource):
                     res.volume_size = volume_size + volume_exp_size
                     res.volume_exp_size = 0
                     res.save()
+                #修改Statusvm表数据
+                vms = Statusvm.objects.filter(resource_id=resource_id)
+                for vm in vms:
+                    for res in resource_list:
+                        volume_size = res.volume_size
+                        cpu = res.cpu
+                        mem = res.mem
+                    vm.update(volume_size=volume_size,cpu=str(cpu),mem=str(mem))
             status_record = StatusRecord()
             status_record.res_id = resource_id
             status_record.s_type = "config"
