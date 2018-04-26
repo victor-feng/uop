@@ -528,7 +528,14 @@ def subgrath_data(args):
                                  user=get_pro("user", property),
                                  item_relation=last_instance_id,
                                  user_id=get_pro("user_id", property),
-                                 item_name=get_pro("baseInfo", property))
+                                 item_name=get_pro("baseInfo", property),
+
+                                 project_status=get_pro("project_status", property),
+                                 Chinese_name=get_pro("Chinese_name", property),
+                                 version=get_pro("version", property),
+                                 OPS=get_pro("OPS", property),
+                                 DEV=get_pro("DEV", property)
+                                 )
             Log.logger.info("The code_id value is {}".format(code_id))
             ii.save()
             Log.logger.info("Save stop.")
