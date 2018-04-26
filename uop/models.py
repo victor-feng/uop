@@ -29,7 +29,6 @@ class ModelCache(db.Document):
     cache_date = db.DateTimeField()
     meta = {
         'indexes': [
-            'entity',
             {
                 'fields': ['cache_date'],
                 'expireAfterSeconds': 60 * 60 * 24
