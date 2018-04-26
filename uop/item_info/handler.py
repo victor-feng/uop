@@ -671,7 +671,7 @@ def fix_instance(args):
     Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
     # item_name = [i['value'] if i["code"] == "baseInfo" else "" for i in item]
-    get_pro = lambda x, field: [x['value'] for i in x if i['code'] == field][0]
+    get_pro = lambda x, field: [i['value'] for i in x if i['code'] == field][0]
     baseInfo = ""
     project_status = ""
     Chinese_name = ""
