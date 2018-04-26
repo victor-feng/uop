@@ -690,6 +690,7 @@ def fix_instance(args):
         ]
         """
         item_ins = ItemInformation.objects.filter(item_id=instance_id)
+        """
         if item_ins:
             item_ins = item_ins[0]
             if baseInfo:
@@ -705,7 +706,20 @@ def fix_instance(args):
             if DEV:
                 item_ins.DEV = str(DEV)
             item_ins.update()
-        # ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(item_name[0]))
+        """
+        if baseInfo:
+            ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(baseInfo))
+        if project_status:
+            ItemInformation.objects(item_id=instance_id).update_one(set__project_status=str(project_status))
+        if Chinese_name:
+            ItemInformation.objects(item_id=instance_id).update_one(set__Chinese_name=str(Chinese_name))
+        if version:
+            ItemInformation.objects(item_id=instance_id).update_one(set__version=str(version))
+        if OPS:
+            ItemInformation.objects(item_id=instance_id).update_one(set__OPS=str(OPS))
+        if DEV:
+            ItemInformation.objects(item_id=instance_id).update_one(set__DEV=str(DEV))
+
     except Exception as e:
         msg = traceback.format_exc()
         Log.logger.error("Save uop is wrong ".format(msg))
