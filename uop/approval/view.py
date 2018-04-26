@@ -16,8 +16,8 @@ from uop.approval.errors import approval_errors
 from uop.util import get_CRP_url
 from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
-from uop.deployment.handler import attach_domain_ip,deploy_to_crp,deal_disconf_info
-from uop.approval.handler import resource_reduce,deal_crp_data
+from uop.deployment.handler import attach_domain_ip, deploy_to_crp, deal_disconf_info
+from uop.approval.handler import resource_reduce, deal_crp_data
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -31,28 +31,26 @@ K8S_NGINX_IPS = configs[APP_ENV].K8S_NGINX_IPS
 
 class ApprovalList(Resource):
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def post(self):
         code = 200
         res = ""
         msg = {}
         try:
             parser = reqparse.RequestParser()
-
-            parser.add_argument('resource_id', type=str)
-            parser.add_argument('project_id', type=str)
-            parser.add_argument('department', type=str)
-            parser.add_argument('user_id', type=str)
-            parser.add_argument('approval_info_list', type=list,location ="json")
+            parser.add_argument(
+                'approval_info_list',
+                type=list,
+                location="json")
             args = parser.parse_args()
 
             approval_info_list = args.approval_info_list
             for info in approval_info_list:
                 approval_id = str(uuid.uuid1())
-                resource_id = info.get("resource_id","")
-                project_id = info.get("project_id","")
-                department = info.get("department","")
-                user_id = info.get("user_id","")
+                resource_id = info.get("resource_id", "")
+                project_id = info.get("project_id", "")
+                department = info.get("department", "")
+                user_id = info.get("user_id", "")
                 create_date = datetime.datetime.now()
                 # approve_uid
                 # approve_date
@@ -74,7 +72,8 @@ class ApprovalList(Resource):
                 resource.save()
                 code = 200
         except Exception as e:
-            Log.logger.exception("[UOP] ApprovalList failed, Exception: %s", e.args)
+            Log.logger.exception(
+                "[UOP] ApprovalList failed, Exception: %s", e.args)
             code = 500
             res = "Failed to add a approval"
 
@@ -92,7 +91,7 @@ class ApprovalList(Resource):
 
 class ApprovalInfo(Resource):
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def put(self, res_id):
         code = 200
         res = ""
@@ -111,7 +110,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('tenantName', type=str)
             parser.add_argument('lb_methods', type=str)
             parser.add_argument('namespace', type=str)
-            parser.add_argument('host_mapping', type=list,location='json')
+            parser.add_argument('host_mapping', type=list, location='json')
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -125,20 +124,21 @@ class ApprovalInfo(Resource):
             host_mapping = args.host_mapping
             network_id = args.network_id
             if host_mapping is not None:
-                host_mapping=json.dumps(host_mapping)
-            network_id_dict={
-                "docker":docker_network_id,
-                "mysql":mysql_network_id,
-                "redis":redis_network_id,
-                "mongodb":mongodb_network_id
+                host_mapping = json.dumps(host_mapping)
+            network_id_dict = {
+                "docker": docker_network_id,
+                "mysql": mysql_network_id,
+                "redis": redis_network_id,
+                "mongodb": mongodb_network_id
             }
 
-            approvals = models.Approval.objects.filter(capacity_status="res",resource_id=res_id).order_by("-create_date")
+            approvals = models.Approval.objects.filter(
+                capacity_status="res", resource_id=res_id).order_by("-create_date")
             resource = models.ResourceModel.objects.get(res_id=res_id)
             resource_list = resource.resource_list
             compute_list = resource.compute_list
             if approvals:
-                approval=approvals[0]
+                approval = approvals[0]
                 approval.approve_uid = args.approve_uid
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.annotations
@@ -177,7 +177,8 @@ class ApprovalInfo(Resource):
                         if network_id:
                             res_obj.network_id = network_id
                         else:
-                            res_obj.network_id = network_id_dict.get(res_obj.ins_type)
+                            res_obj.network_id = network_id_dict.get(
+                                res_obj.ins_type)
                 resource.save()
                 code = 200
             else:
@@ -185,7 +186,7 @@ class ApprovalInfo(Resource):
                 res = "A resource with that ID no longer exists"
         except Exception as e:
             code = 500
-            res = "Failed to approve the resource. %s" %str(e)
+            res = "Failed to approve the resource. %s" % str(e)
         finally:
             ret = {
                 "code": code,
@@ -197,13 +198,15 @@ class ApprovalInfo(Resource):
 
         return ret, code
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def get(self, res_id):
         code = 200
         res = ""
         msg = {}
         try:
-            approval = models.Approval.filter(capacity_status="res").objects.get(resource_id=res_id)
+            approval = models.Approval.filter(
+                capacity_status="res").objects.get(
+                resource_id=res_id)
 
             if approval:
                 msg["creator_id"] = approval.creator_id
@@ -237,7 +240,7 @@ class Reservation(Resource):
     预留审批
     """
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def post(self):
         """
         预留审批通过，往crp发送数据
@@ -266,13 +269,14 @@ class Reservation(Resource):
             }
             return ret, code
         os_ins_ip_list = resource.os_ins_ip_list
-        #说明是对已有资源配置的审批
+        # 说明是对已有资源配置的审批
         headers = {'Content-Type': 'application/json'}
         if os_ins_ip_list:
             flavor = None
             volume_size = None
             volume_exp_size = None
-            os_ins_ip_list = [eval(os_ins.to_json()) for os_ins in os_ins_ip_list]
+            os_ins_ip_list = [eval(os_ins.to_json())
+                              for os_ins in os_ins_ip_list]
             resource_list = resource.resource_list
             resource_id = resource.res_id
             resource_type = resource.resource_type
@@ -280,10 +284,10 @@ class Reservation(Resource):
                 flavor = resource_list[0].flavor_id
                 volume_size = resource_list[0].volume_size
                 volume_exp_size = resource_list[0].volume_exp_size
-            data=dict()
+            data = dict()
             data["set_flag"] = "config"
             data["os_ins_ip_list"] = os_ins_ip_list
-            data["flavor"] =  flavor if flavor else ''
+            data["flavor"] = flavor if flavor else ''
             data["cloud"] = resource.cloud
             data["volume_size"] = volume_size if volume_size else 0
             data["volume_exp_size"] = volume_exp_size if volume_exp_size else 0
@@ -291,19 +295,25 @@ class Reservation(Resource):
             data["resource_id"] = resource_id
             data["resource_type"] = resource_type
             data['env'] = resource.env
-            data_str=json.dumps(data)
+            data_str = json.dumps(data)
         else:
             set_flag = "res"
-            data = deal_crp_data(resource,set_flag)
+            data = deal_crp_data(resource, set_flag)
             data_str = json.dumps(data)
         try:
             Log.logger.info("Data args is %s", data)
             CPR_URL = get_CRP_url(data['env'])
             if os_ins_ip_list:
-                msg = requests.put(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                msg = requests.put(
+                    CPR_URL + "api/resource/sets",
+                    data=data_str,
+                    headers=headers)
                 resource.reservation_status = "configing"
             else:
-                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                msg = requests.post(
+                    CPR_URL + "api/resource/sets",
+                    data=data_str,
+                    headers=headers)
                 resource.reservation_status = "reserving"
             resource.save()
             code = 200
@@ -312,11 +322,11 @@ class Reservation(Resource):
             res = "failed to connect CRP service.{}".format(str(e))
             code = 500
             ret = {
-                    "code": code,
-                    "result": {
-                        "res": res
-                    }
+                "code": code,
+                "result": {
+                    "res": res
                 }
+            }
             return ret, code
         ret = {
             "code": code,
@@ -325,7 +335,6 @@ class Reservation(Resource):
             }
         }
         return ret, code
-
 
     def put(self):
         """
@@ -353,38 +362,44 @@ class Reservation(Resource):
                 }
             }
             return ret, code
-        #其他资源的修改
+        # 其他资源的修改
         vid_list = resource.vid_list
         number = vid_list.__str__()
         try:
             if number > 0:
-                #对已经预留好的资源进程修改
+                # 对已经预留好的资源进程修改
                 resource_list = resource.resource_list
                 for res in resource_list:
                     quantity = res.quantity
-                if number < quantity: #扩容
+                if number < quantity:  # 扩容
                     quantity = quantity - number
                     set_flag = "increase"
-                    data=deal_crp_data(resource,set_flag,quantity)
+                    data = deal_crp_data(resource, set_flag, quantity)
                     data_str = json.dumps(data)
                     CPR_URL = get_CRP_url(data['env'])
                     headers = {'Content-Type': 'application/json'}
-                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
-                elif number > quantity: #缩容
-                    ips=[]
+                    msg = requests.post(
+                        CPR_URL + "api/resource/sets",
+                        data=data_str,
+                        headers=headers)
+                elif number > quantity:  # 缩容
+                    ips = []
                     quantity = number - quantity
                     for os_ins in resource.os_ins_ip_list:
                         ip = os_ins.ip
                         ips.append(ip)
-                    msg=resource_reduce(resource,quantity,ips)
-                else:#既不扩容也不缩容
+                    msg = resource_reduce(resource, quantity, ips)
+                else:  # 既不扩容也不缩容
                     set_flag = "res"
                     quantity = "0"
                     data = deal_crp_data(resource, set_flag, quantity)
                     data_str = json.dumps(data)
                     CPR_URL = get_CRP_url(data['env'])
                     headers = {'Content-Type': 'application/json'}
-                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                    msg = requests.post(
+                        CPR_URL + "api/resource/sets",
+                        data=data_str,
+                        headers=headers)
         except Exception as e:
             res = "UOP put resource failed.{}".format(str(e))
             code = 500
@@ -412,15 +427,14 @@ class Reservation(Resource):
         return ret, code
 
 
-
 class ReservationAPI(Resource):
     """
     预留失败时，重新预留往crp发送数据
     """
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def put(self, res_id):
-        code =200
+        code = 200
         res = ""
         msg = {}
         try:
@@ -437,12 +451,16 @@ class ReservationAPI(Resource):
             }
             return ret, code
         set_flag = "res"
-        data = deal_crp_data(resource,set_flag)
+        data = deal_crp_data(resource, set_flag)
         data_str = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
         try:
             CPR_URL = get_CRP_url(data['env'])
-            msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+            msg = requests.post(
+                CPR_URL +
+                "api/resource/sets",
+                data=data_str,
+                headers=headers)
         except Exception as e:
             res = "failed to connect CRP service.{}".format(str(e))
             code = 500
@@ -472,9 +490,8 @@ class ReservationAPI(Resource):
         return ret, code
 
 
-
 class CapacityInfoAPI(Resource):
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def put(self):
         code = 0
         res = ""
@@ -497,8 +514,9 @@ class CapacityInfoAPI(Resource):
                 approval.approve_date = datetime.datetime.now()
                 approval.annotations = args.approve_suggestion
                 docker_network_id = args.docker_network_id
-                #更新nova docker 的network_id
-                resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
+                # 更新nova docker 的network_id
+                resource = models.ResourceModel.objects.get(
+                    res_id=approval.resource_id)
                 # resource.deploy_name = deploy_name
                 compute_list = resource.compute_list
                 if compute_list:
@@ -507,26 +525,31 @@ class CapacityInfoAPI(Resource):
                         com.save()
                 resource.save()
                 if args.agree:
-                    approval.approval_status = "%s_success" % (approval.capacity_status)
+                    approval.approval_status = "%s_success" % (
+                        approval.capacity_status)
                     compute_list = resource.compute_list
                     for compute_ in compute_list:
                         capacity_list = compute_.capacity_list
                         for capacity_ in capacity_list:
                             if capacity_.capacity_id == approval_id:
                                 capacity_.network_id = docker_network_id.strip()
-                    deployment.approve_status = "%s_success" % (approval.capacity_status)
+                    deployment.approve_status = "%s_success" % (
+                        approval.capacity_status)
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "increasing"
                     elif approval.capacity_status == "reduce":
                         deployment.deploy_result = "reducing"
                     # 管理员审批通过后修改resource表deploy_name,更新当前版本
                     deploy_name = deployment.deploy_name
-                    resource = models.ResourceModel.objects.get(res_id=approval.resource_id)
+                    resource = models.ResourceModel.objects.get(
+                        res_id=approval.resource_id)
                     resource.deploy_name = deploy_name
                     resource.save()
                 else:
-                    approval.approval_status = "%s_failed" % (approval.capacity_status)
-                    deployment.approve_status = "%s_failed" % (approval.capacity_status)
+                    approval.approval_status = "%s_failed" % (
+                        approval.capacity_status)
+                    deployment.approve_status = "%s_failed" % (
+                        approval.capacity_status)
                     if approval.capacity_status == "increase":
                         deployment.deploy_result = "not_increased"
                     elif approval.capacity_status == "reduce":
@@ -554,7 +577,7 @@ class CapacityInfoAPI(Resource):
 
 class CapacityReservation(Resource):
 
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def post(self):
         code = 200
         res = ""
@@ -638,7 +661,8 @@ class CapacityReservation(Resource):
             com = []
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
-                meta = json.dumps(db_com.docker_meta) if db_com.docker_meta else ""
+                meta = json.dumps(
+                    db_com.docker_meta) if db_com.docker_meta else ""
                 url = db_com.url
                 capacity_list = db_com.capacity_list
                 for capacity_ in capacity_list:
@@ -646,7 +670,8 @@ class CapacityReservation(Resource):
                         if resource.cloud == "2" and resource_type == "app":
                             number = capacity_.end_number
                         else:
-                            number = abs(capacity_.begin_number - capacity_.end_number)
+                            number = abs(
+                                capacity_.begin_number - capacity_.end_number)
                         com.append(
                             {
                                 "instance_name": db_com.ins_name,
@@ -663,7 +688,7 @@ class CapacityReservation(Resource):
                                 "network_id": db_com.network_id,
                                 "networkName": db_com.networkName,
                                 "tenantName": db_com.tenantName,
-                                "host_env":db_com.host_env,
+                                "host_env": db_com.host_env,
                                 "language_env": db_com.language_env,
                                 "deploy_source": db_com.deploy_source,
                                 "database_config": db_com.database_config,
@@ -671,7 +696,7 @@ class CapacityReservation(Resource):
                                 "namespace": db_com.namespace,
                                 "ready_probe_path": db_com.ready_probe_path,
                                 "domain_path": db_com.domain_path,
-                                "host_mapping":db_com.host_mapping,
+                                "host_mapping": db_com.host_mapping,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
@@ -683,13 +708,19 @@ class CapacityReservation(Resource):
             cloud = resource.cloud
             if cloud == '2' and resource_type == "app":
                 CPR_URL = get_CRP_url(data['env'])
-                msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                msg = requests.post(
+                    CPR_URL + "api/resource/sets",
+                    data=data_str,
+                    headers=headers)
             else:
                 if approval.capacity_status == 'increase':
                     CPR_URL = get_CRP_url(data['env'])
-                    msg = requests.post(CPR_URL + "api/resource/sets", data=data_str, headers=headers)
+                    msg = requests.post(
+                        CPR_URL + "api/resource/sets",
+                        data=data_str,
+                        headers=headers)
                 elif approval.capacity_status == 'reduce':
-                    msg=resource_reduce(resource,number,ips)
+                    msg = resource_reduce(resource, number, ips)
                     # reduce_list = []
                     # for os_ins in resource.os_ins_ip_list:
                     #     if os_ins.ip in ips:
@@ -743,7 +774,7 @@ class CapacityReservation(Resource):
 class RollBackInfoAPI(Resource):
 
     # 审批过后更新审批表的信息
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def put(self):
         code = 200
         res = ""
@@ -756,7 +787,8 @@ class RollBackInfoAPI(Resource):
             parser.add_argument('approve_suggestion', type=str)
             args = parser.parse_args()
             deploy_id = args.deploy_id
-            approvals = models.Approval.objects.filter(approval_id=deploy_id).order_by('-create_date')
+            approvals = models.Approval.objects.filter(
+                approval_id=deploy_id).order_by('-create_date')
             deployment = models.Deployment.objects.get(deploy_id=deploy_id)
             deployment.approve_suggestion = args.approve_suggestion
             if approvals:
@@ -797,7 +829,7 @@ class RollBackInfoAPI(Resource):
 
 class RollBackReservation(Resource):
     # 获取回滚的详情
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('deploy_id', type=str, location='args')
@@ -809,7 +841,7 @@ class RollBackReservation(Resource):
             resource_id = deployment.resource_id
             resource = models.ResourceModel.objects.get(res_id=resource_id)
             deploy_name = deployment.deploy_name
-            deploy_name=deploy_name.strip().split('@')[0]
+            deploy_name = deploy_name.strip().split('@')[0]
             resource_id = deployment.resource_id
             resource_name = deployment.resource_name
             project_id = deployment.project_id
@@ -847,7 +879,7 @@ class RollBackReservation(Resource):
             return results, 200
 
     # 将回滚的数据发送到crp
-    #@api_permission_control(request)
+    # @api_permission_control(request)
     def post(self):
         code = 200
         res = ""
@@ -877,14 +909,18 @@ class RollBackReservation(Resource):
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             if cloud == '2' and resource_type == "app":
-                appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
-            ##推送到crp
+                appinfo = [
+                    dict(
+                        app,
+                        nginx_port=K8S_NGINX_PORT,
+                        ips=K8S_NGINX_IPS) for app in appinfo]
+            # 推送到crp
             deploy.approve_status = 'success'
             deploy_type = "rollback"
             err_msg, result = deploy_to_crp(deploy,
                                             environment,
                                             database_password,
-                                            appinfo, disconf_server_info, deploy_type,deploy_name)
+                                            appinfo, disconf_server_info, deploy_type, deploy_name)
             if err_msg:
                 deploy.deploy_result = 'rollback_fail'
             # 更新状态
