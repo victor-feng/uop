@@ -4,6 +4,7 @@ import requests
 import json
 import datetime
 import traceback
+import uuid
 from flask import request, current_app
 from flask_restful import reqparse, Api, Resource
 from uop.models import  ResourceModel, StatusRecord,OS_ip_dic,Deployment, Statusvm
@@ -565,7 +566,7 @@ class ResourceProviderCallBack(Resource):
                     if set_flag in ["increase","reduce"]:
                         if cloud == "2" and resource_type == "app":
                             resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-                    else:
+                        else:
                             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
                             old_pcode = copy.deepcopy(resource.cmdb_p_code)
                             app_cluster_name = ""
@@ -581,8 +582,11 @@ class ResourceProviderCallBack(Resource):
                             data = json.dumps(cmdb_req)
                             ret = requests.post(CMDB_STATUS_URL, data=data)
                             Log.logger.info("CMDB return:{}".format(ret))
-                else:
-                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+                    else:
+                        resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+        else:
+            pcode = str(uuid.uuid1())
+            resource.cmdb_p_code = pcode
         os_ids = []
         os_ip_list = []
         os_ins_list = resource.os_ins_list
