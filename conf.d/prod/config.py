@@ -70,12 +70,16 @@ class ProdConfig(BaseConfig):
         "7": ("B11", u"redis --> 机房，展示redis资源视图", "de90d618f7504723b677f196"),
         "8": ("B12", u"物理机信息", "b593293378c74ba6827847d3"),
 
-        "9": ("B14", u"nginx --> 机房，展示nginx资源视图", "48e86b9bed2a4989b20b530b"),
-        "10": ("B15", u"rabbitmq --> 机房，展示rabbitmq资源视图", "60d41ca62c11467584337f32"),
-        "11": ("B16", u"codis --> 机房，展示codis资源视图", "32e9a7713b4c4e27ba8347ff"),
-        "12": ("B17", u"apache --> 机房，展示apache资源视图", "ef87b30bb73a4a7186455688"),
-        "13": ("B18", u"zookeeper --> 机房，展示zookeeper资源视图", "81d657590e6a4c0f88e0d3a7"),
-        "14": ("B19", u"mycat --> 机房，展示mycat资源视图", "75f75002322d4f929f80e0b6")
+        "9": ("B13", u"模块 --> 物理机，用于拿到各层间实体关系信息", "9e97b54a4a54472e9e913d4e"),
+
+        "10": ("B14", u"nginx --> 机房，展示nginx资源视图", "48e86b9bed2a4989b20b530b"),
+        "11": ("B15", u"rabbitmq --> 机房，展示rabbitmq资源视图", "60d41ca62c11467584337f32"),
+        "12": ("B16", u"codis --> 机房，展示codis资源视图", "32e9a7713b4c4e27ba8347ff"),
+        "13": ("B17", u"apache --> 机房，展示apache资源视图", "ef87b30bb73a4a7186455688"),
+        "14": ("B18", u"zookeeper --> 机房，展示zookeeper资源视图", "81d657590e6a4c0f88e0d3a7"),
+        "15": ("B19", u"mycat --> 机房，展示mycat资源视图", "75f75002322d4f929f80e0b6"),
+
+
         # "5": ("B3", u"资源 --> 机房"),
     }
     UPLOAD_FOLDER = "/data/"
