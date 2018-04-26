@@ -722,7 +722,7 @@ def fix_instance(args):
 
     except Exception as e:
         msg = traceback.format_exc()
-        Log.logger.error("Save uop is wrong ".format(msg))
+        Log.logger.info("Save uop is wrong ".format(msg))
 
     if not uid or not token:
         uid, token = get_uid_token()
