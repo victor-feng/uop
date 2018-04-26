@@ -671,7 +671,7 @@ def fix_instance(args):
     Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
     # item_name = [i['value'] if i["code"] == "baseInfo" else "" for i in item]
-    get_pro = lambda x, field: [i['value'] for i in x if i['code'] == field][0]
+    get_pro = lambda x, field: [['value'] for i in x if i['code'] == field][0]
     baseInfo = ""
     project_status = ""
     Chinese_name = ""
@@ -679,60 +679,22 @@ def fix_instance(args):
     OPS = ""
     DEV = ""
     if len(item) != 1:  # 只修改业务
-        # project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
-        # Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
-        # version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
-        # OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
-        # DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
         project_status = get_pro(item, "status")
         Chinese_name = get_pro(item, "Chinese_name")
         version = get_pro(item, "version")
         OPS = get_pro(item, "OPS")
         DEV = get_pro(item, "DEV")
-    baseInfo = (filter(lambda x: x['code'] == "baseInfo", item)[0]).get("value")
+    baseInfo = get_pro(item, "baseInfo")
 
     # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
-        """
-        item = [
-        {u'code': u'baseInfo', u'value': u'victorfeng'},
-        {u'code': u'status', u'value': u'victor'},
-        {u'code': u'Chinese_name', u'value': u'victor'},
-        {u'code': u'version', u'value': u'victor'},
-        {u'code': u'OPS', u'value': u'victor'},
-        {u'code': u'DEV', u'value': u'victor'}
-        ]
-        """
-        item_ins = ItemInformation.objects.filter(item_id=instance_id)
-        """
-        if item_ins:
-            item_ins = item_ins[0]
-            if baseInfo:
-                item_ins.item_name = str(baseInfo)
-            if project_status:
-                item_ins.project_status = str(project_status)
-            if Chinese_name:
-                item_ins.Chinese_name = str(Chinese_name)
-            if version:
-                item_ins.version = str(version)
-            if OPS:
-                item_ins.OPS = str(OPS)
-            if DEV:
-                item_ins.DEV = str(DEV)
-            item_ins.update()
-        """
-        if baseInfo:
-            ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(baseInfo))
-        if project_status:
-            ItemInformation.objects(item_id=instance_id).update_one(set__project_status=str(project_status))
-        if Chinese_name:
-            ItemInformation.objects(item_id=instance_id).update_one(set__Chinese_name=str(Chinese_name))
-        if version:
-            ItemInformation.objects(item_id=instance_id).update_one(set__version=str(version))
-        if OPS:
-            ItemInformation.objects(item_id=instance_id).update_one(set__OPS=str(OPS))
-        if DEV:
-            ItemInformation.objects(item_id=instance_id).update_one(set__DEV=str(DEV))
+
+        ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(baseInfo))
+        ItemInformation.objects(item_id=instance_id).update_one(set__project_status=str(project_status))
+        ItemInformation.objects(item_id=instance_id).update_one(set__Chinese_name=str(Chinese_name))
+        ItemInformation.objects(item_id=instance_id).update_one(set__version=str(version))
+        ItemInformation.objects(item_id=instance_id).update_one(set__OPS=str(OPS))
+        ItemInformation.objects(item_id=instance_id).update_one(set__DEV=str(DEV))
 
     except Exception as e:
         msg = traceback.format_exc()
