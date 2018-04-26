@@ -39,11 +39,15 @@ class ResourceView(Resource):
             if args.cmdb == 1:
                 if CMDB_URL:
                     result = cmdb_graph_search(args)
+                else:
+                    result = {}
             elif args.cmdb == 2:
                 result = cmdb2_graph_search(args)
             else:
                 if CMDB_URL:
                     result = cmdb_graph_search(args)
+                else:
+                    result = {}
                 #result = response_data(500, "args.cmdb:{}".format(args.cmdb), "")
         except Exception as exc:
             Log.logger.error("get graph from cmdb error: {}".format(str(exc)))

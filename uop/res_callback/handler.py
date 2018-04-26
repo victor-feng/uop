@@ -320,7 +320,10 @@ def crp_data_cmdb(args, cmdb1_url):
     assert(isinstance(args, dict))
     Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
-    CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+    if cmdb1_url:
+        CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+    else:
+        CMDB_STATUS_URL = None
     res_id = args.get('resource_id')
     resource = ResourceModel.objects.get(res_id=res_id)
     try:
@@ -442,8 +445,10 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
                 view_id, view_num = s.resource_view_id, s.view_num
                 break
     Log.logger.info("resource_view_id:{}, view_num{}".format(view_id, view_num))
-    CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
-
+    if cmdb1_url:
+        CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
+    else:
+        CMDB_STATUS_URL = None
     push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
     def get_ip(ins):
         try:
