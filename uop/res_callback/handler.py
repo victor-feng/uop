@@ -655,7 +655,10 @@ def get_host_instance_id(name_ip):
         Log.logger.info("cmdb2_graph_search request data:{}".format(data))
         ret_data = requests.post(url, data=data_str, timeout=5).json()["data"]
         Log.logger.info("####data:{}".format(ret_data))
-        psid = ret_data["instance"][0]["instance_id"]
+        if ret_data["instance"]:
+            psid =  ret_data["instance"][0]["instance_id"]
+        else:
+            psid = ""
         host = HostsCache(instance_id=psid, name=name, ip=ip, cache_date=TimeToolkit.local2utctimestamp(datetime.datetime.now()))
         host.save()
     except Exception as exc:
