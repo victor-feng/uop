@@ -271,22 +271,22 @@ def Aquery(args):
                                         },
                                         {
                                             "code": "Chinese_name",
-                                            "name": u"工程状态",
+                                            "name": u"中文名",
                                             "value": Chinese_name
                                         },
                                         {
                                             "code": "version",
-                                            "name": u"工程状态",
+                                            "name": u"版本号",
                                             "value": version
                                         },
                                         {
                                             "code": "OPS",
-                                            "name": u"工程状态",
+                                            "name": u"运维负责人",
                                             "value": OPS
                                         },
                                         {
                                             "code": "DEV",
-                                            "name": u"工程状态",
+                                            "name": u"业务负责人",
                                             "value": DEV
                                         }
                                     ])
@@ -685,7 +685,6 @@ def fix_instance(args):
         OPS = get_pro(item, "OPS")
         DEV = get_pro(item, "DEV")
     baseInfo = get_pro(item, "baseInfo")
-
     # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
 
