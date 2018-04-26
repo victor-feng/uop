@@ -291,16 +291,8 @@ def Aquery(args):
                                         }
                                     ])
                     except Exception as e:
-                        tmp = dict(
-                            instance_id=ni.item_id,
-                            model_id=model_id,
-                            name=rname,
-                            property=[
-                                {
-                                    "code": "baseInfo",
-                                    "name": u"名称",
-                                    "value": rname
-                                }])
+                        msg = traceback.format_exc()
+                        Log.logger.info("========={}".format(msg))
                     instances.append(tmp)
                 return response_data(200, "success", {"instance": instances})
             else:
