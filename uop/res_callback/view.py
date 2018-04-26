@@ -584,9 +584,9 @@ class ResourceProviderCallBack(Resource):
                             Log.logger.info("CMDB return:{}".format(ret))
                     else:
                         resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-        else:
-            pcode = str(uuid.uuid1())
-            resource.cmdb_p_code = pcode
+            else:
+                pcode = str(uuid.uuid1())
+                resource.cmdb_p_code = pcode
         os_ids = []
         os_ip_list = []
         os_ins_list = resource.os_ins_list

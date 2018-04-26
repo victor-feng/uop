@@ -28,7 +28,8 @@ class TestingConfig(BaseConfig):
         'prod': PROD_CRP_URL,
     }
     
-    CMDB_URL = "http://cmdb-test.syswin.com/" #如果是None 不走cmdb1,0
+    #CMDB_URL = "http://cmdb-test.syswin.com/" #如果是None 不走cmdb1,0
+    CMDB_URL = None
     CMDB2_URL = "http://cmdb2-test.syswin.com/"
     CMDB2_OPEN_USER = "uop"
     #CMDB2_VIEWS = {
