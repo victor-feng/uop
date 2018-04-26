@@ -492,18 +492,25 @@ def post_datas_cmdb(url, raw, models_list, relations_model):
     raw["baseinfo"] = raw["resource_name"]
     raw["create_date"] = raw["created_time"]
     module_id = raw["module_id"]
-
-    docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
-    tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
-    project_model = filter(lambda x: x["code"] == "project", models_list)[0]
-    project_level = {
-        "instance_id": raw["project_id"],
-        "model_id": project_model["entity_id"],
-        "_id": ""
-    }
-    tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
-    instances.append(tomcat)
-    relations.extend(r)
+    try:
+        docker_model = filter(lambda x: x["code"] == "container", models_list)[0]
+        tomcat_model = filter(lambda x: x["code"] == "tomcat", models_list)[0]
+        project_model = filter(lambda x: x["code"] == "project", models_list)[0]
+    except IndexError as e:
+        docker_model = []
+        tomcat_model = []
+        project_model = []
+        Log.logger.info(e)
+    if project_model:
+        project_level = {
+            "instance_id": raw["project_id"],
+            "model_id": project_model["entity_id"],
+            "_id": ""
+        }
+    if tomcat_model:
+        tomcat, r = format_data_cmdb(relations_model, raw, tomcat_model, {}, len(instances), project_level)
+        instances.append(tomcat)
+        relations.extend(r)
 
     # docker数据解析
     for ct in raw["container"]:
