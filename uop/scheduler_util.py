@@ -111,8 +111,9 @@ def _delete_res(res_id):
             cmdb_p_code = resources.cmdb_p_code
             resources.delete()
             # 回写CMDB
-            cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
-            requests.delete(cmdb_url)   
+            if CMDB_URL:
+                cmdb_url = '%s%s%s'%(CMDB_URL, 'cmdb/api/repores_delete/', cmdb_p_code)
+                requests.delete(cmdb_url)
     except Exception as e:
         Log.logger.info('---- Scheduler_utuls  _delete_res  function Exception info is %s'%(e))
 
@@ -146,7 +147,7 @@ def flush_crp_to_cmdb():
                     meta = {k:v for k, v in ret.items()}
                     osid_status.append(meta)
                 #Log.logger.info("####meta:{}".format(meta))
-            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+
             if osid_status:
                 for os in osid_status:
                     for k, v in os.items():
@@ -156,7 +157,9 @@ def flush_crp_to_cmdb():
                             vms = Statusvm.objects.filter(resource_name__icontains=q,update_time__ne=now)
                         if vms:
                             vms[0].update(status=v[-1], osid=k, ip=v[0],update_time=now)
-                ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
+                if CMDB_URL:
+                    cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+                    ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
                 #Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
                 Log.logger.info("flush_crp_to_cmdb crp->openstack result is null")
@@ -171,8 +174,9 @@ def flush_crp_to_cmdb_by_osid(osid, env):
     Log.logger.info("flush_crp_to_cmdb_by_osid crp result is:{}".format(ret))
     if ret.get('code') == 200:
         status = ret["result"]["vm_state"]
-        cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
-        ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
+        if CMDB_URL:
+            cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
+            ret = requests.put(cmdb_url, data=json.dumps({"osid_status": [{osid: status}]})).json()
         Log.logger.info("flush_crp_to_cmdb_by_osid cmdb result is:{}".format(ret))
 
 

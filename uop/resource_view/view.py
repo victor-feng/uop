@@ -35,12 +35,15 @@ class ResourceView(Resource):
             parser.add_argument('department', type=str)
             args = parser.parse_args()
             Log.logger.info("get graph from CMDB{}.0".format(args.cmdb))
+            CMDB_URL = current_app.config['CMDB_URL']
             if args.cmdb == 1:
-                result = cmdb_graph_search(args)
+                if CMDB_URL:
+                    result = cmdb_graph_search(args)
             elif args.cmdb == 2:
                 result = cmdb2_graph_search(args)
             else:
-                result = cmdb_graph_search(args)
+                if CMDB_URL:
+                    result = cmdb_graph_search(args)
                 #result = response_data(500, "args.cmdb:{}".format(args.cmdb), "")
         except Exception as exc:
             Log.logger.error("get graph from cmdb error: {}".format(str(exc)))
