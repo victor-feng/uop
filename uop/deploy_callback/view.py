@@ -175,18 +175,19 @@ class DeployCallback(Resource):
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
             CMDB_URL = current_app.config['CMDB_URL']
-            deployment_url = CMDB_URL + "cmdb/api/repo/%s/" % p_code
-            Log.logger.info('deploy status: {}, {}'.format(dep.deploy_result, p_code))
-            data = {
-                'property_list': [
-                    {
-                        "type": "string",
-                        "name": "部署状态",
-                        "value": dep.deploy_result
-                    }
-                ]
-            }
-            req = requests.put(deployment_url, data=json.dumps(data))
+            if CMDB_URL:
+                deployment_url = CMDB_URL + "cmdb/api/repo/%s/" % p_code
+                Log.logger.info('deploy status: {}, {}'.format(dep.deploy_result, p_code))
+                data = {
+                    'property_list': [
+                        {
+                            "type": "string",
+                            "name": "部署状态",
+                            "value": dep.deploy_result
+                        }
+                    ]
+                }
+                req = requests.put(deployment_url, data=json.dumps(data))
         except Exception as e:
             code = 500
             ret = {

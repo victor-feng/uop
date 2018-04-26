@@ -421,8 +421,9 @@ def deal_data(data,field_list):
 
 @async
 def delete_cmdb1(code):
-    cmdb_url = '%s%s%s' % (CMDB_URL, 'cmdb/api/repores_delete/', code)
-    requests.delete(cmdb_url)
+    if CMDB_URL:
+        cmdb_url = '%s%s%s' % (CMDB_URL, 'cmdb/api/repores_delete/', code)
+        requests.delete(cmdb_url)
 
 
 @async

@@ -136,20 +136,21 @@ class ItemInfo(Resource):
             data["property_list"] = property_list
             data_str = json.dumps(data)
             CMDB_URL = current_app.config['CMDB_URL']
-            CMDB_API = CMDB_URL+'cmdb/api/'
-            res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)
-            ret = eval(res.content.decode('unicode_escape'))
-            if res.status_code == 200:
-                item = ItemInformation.objects.get(item_id=item_id)
-                if args.item_code:
-                   item.item_code = args.item_code
-                if args.item_name:
-                    item.item_name = args.item_name
-                if args.item_department:
-                    item.item_depart = args.item_department
-                if args.item_description:
-                    item.item_description = args.item_description
-                item.save()
+            if CMDB_URL:
+                CMDB_API = CMDB_URL+'cmdb/api/'
+                res = requests.put(CMDB_API + "repo/" + item_id + "/", data=data_str)
+                ret = eval(res.content.decode('unicode_escape'))
+                if res.status_code == 200:
+                    item = ItemInformation.objects.get(item_id=item_id)
+                    if args.item_code:
+                       item.item_code = args.item_code
+                    if args.item_name:
+                        item.item_name = args.item_name
+                    if args.item_department:
+                        item.item_depart = args.item_department
+                    if args.item_description:
+                        item.item_description = args.item_description
+                    item.save()
 
         except Exception as e:
             code = 500
@@ -172,8 +173,9 @@ class ItemInfo(Resource):
                     status = 0
                     msg = '部署单元删除成功'
                     CMDB_URL = current_app.config['CMDB_URL']
-                    CMDB_API = CMDB_URL+'cmdb/api/'
-                    res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
+                    if CMDB_URL:
+                        CMDB_API = CMDB_URL+'cmdb/api/'
+                        res = requests.delete(CMDB_API + "repo_delete/" + item_id + "/")
                 else:
                     code = 200
                     status = 1
@@ -208,18 +210,18 @@ class ItemPostInfo(Resource):
             parser.add_argument('item_department', type=str)
             parser.add_argument('item_description', type=str)
             args = parser.parse_args()
-
-            CMDB_URL = current_app.config['CMDB_URL']
-            CMDB_API = CMDB_URL+'cmdb/api/'
-            req = CMDB_API + "repo_detail?item_id=person_item&p_code=user_id&value=" + args.user_id
-            res = requests.get(req)
-            ret = eval(res.content.decode('unicode_escape'))
             user_p_code = None
-            if res.status_code == 200:
-                Log.logger.info("[UOP] Get resust: %s", ret.get("result"))
-                result_res = ret.get("result").get("res")
-                if len(result_res) > 0:
-                    user_p_code = result_res[0].get("p_code")
+            CMDB_URL = current_app.config['CMDB_URL']
+            if CMDB_URL:
+                CMDB_API = CMDB_URL+'cmdb/api/'
+                req = CMDB_API + "repo_detail?item_id=person_item&p_code=user_id&value=" + args.user_id
+                res = requests.get(req)
+                ret = eval(res.content.decode('unicode_escape'))
+                if res.status_code == 200:
+                    Log.logger.info("[UOP] Get resust: %s", ret.get("result"))
+                    result_res = ret.get("result").get("res")
+                    if len(result_res) > 0:
+                        user_p_code = result_res[0].get("p_code")
 
             data = {}
             data["name"] = args.item_name
@@ -245,26 +247,26 @@ class ItemPostInfo(Resource):
             data_str = json.dumps(data)
 
             CMDB_URL = current_app.config['CMDB_URL']
-            CMDB_API = CMDB_URL+'cmdb/api/'
-            res = requests.post(CMDB_API + "repo/", data=data_str)
-            ret = eval(res.content.decode('unicode_escape'))
-            if res.status_code == 200:
-                if ItemInformation.objects.filter(item_name = args.item_name).count() ==0:
-                    ItemInformation(
-                        user = args.user_name,
-                        user_id = args.user_id,
-                        item_id = ret.get("result").get("id"),
-                        item_name = args.item_name,
-                        item_depart= args.item_department,
-                        item_description = args.item_description,
-                        item_code = args.item_code).save()
-                else:
-                    ret = {
-                        'code': 2017,
-                        'result': {
-                            'msg': '部署单元名称重复',
-                        }
+            if CMDB_URL:
+                CMDB_API = CMDB_URL+'cmdb/api/'
+                res = requests.post(CMDB_API + "repo/", data=data_str)
+                ret = eval(res.content.decode('unicode_escape'))
+            if ItemInformation.objects.filter(item_name = args.item_name).count() ==0:
+                ItemInformation(
+                    user = args.user_name,
+                    user_id = args.user_id,
+                    item_id = ret.get("result").get("id"),
+                    item_name = args.item_name,
+                    item_depart= args.item_department,
+                    item_description = args.item_description,
+                    item_code = args.item_code).save()
+            else:
+                ret = {
+                    'code': 2017,
+                    'result': {
+                        'msg': '部署单元名称重复',
                     }
+                }
         except Exception as e:
             code = 500
 
