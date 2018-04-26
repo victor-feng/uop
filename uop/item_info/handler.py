@@ -522,20 +522,29 @@ def subgrath_data(args):
             flag = ItemInformation.objects.filter(item_name=name)
             if flag:
                 return response_data(500, u"名为{}的已存在{}".format(name, code_id[next_model_id]), "fail")
-            ii = ItemInformation(item_id=newid,
-                                 item_code=code_id[next_model_id],
-                                 item_depart=get_pro("department", property),
-                                 user=get_pro("user", property),
-                                 item_relation=last_instance_id,
-                                 user_id=get_pro("user_id", property),
-                                 item_name=get_pro("baseInfo", property),
+            if len(property) == 4:
+                ii = ItemInformation(item_id=newid,
+                                     item_code=code_id[next_model_id],
+                                     item_depart=get_pro("department", property),
+                                     user=get_pro("user", property),
+                                     item_relation=last_instance_id,
+                                     user_id=get_pro("user_id", property),
+                                     item_name=get_pro("baseInfo", property))
+            else:
+                ii = ItemInformation(item_id=newid,
+                                     item_code=code_id[next_model_id],
+                                     item_depart=get_pro("department", property),
+                                     user=get_pro("user", property),
+                                     item_relation=last_instance_id,
+                                     user_id=get_pro("user_id", property),
+                                     item_name=get_pro("baseInfo", property),
 
-                                 project_status=get_pro("status", property),
-                                 Chinese_name=get_pro("Chinese_name", property),
-                                 version=get_pro("version", property),
-                                 OPS=get_pro("OPS", property),
-                                 DEV=get_pro("DEV", property)
-                                 )
+                                     project_status=get_pro("status", property),
+                                     Chinese_name=get_pro("Chinese_name", property),
+                                     version=get_pro("version", property),
+                                     OPS=get_pro("OPS", property),
+                                     DEV=get_pro("DEV", property)
+                                     )
             Log.logger.info("The code_id value is {}".format(code_id))
             ii.save()
             Log.logger.info("Save stop.")
@@ -662,6 +671,7 @@ def fix_instance(args):
     Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
     # item_name = [i['value'] if i["code"] == "baseInfo" else "" for i in item]
+    get_pro = lambda x, field: [x['value'] for i in x if i['code'] == field][0]
     baseInfo = ""
     project_status = ""
     Chinese_name = ""
@@ -669,11 +679,16 @@ def fix_instance(args):
     OPS = ""
     DEV = ""
     if len(item) != 1:  # 只修改业务
-        project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
-        Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
-        version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
-        OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
-        DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
+        # project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
+        # Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
+        # version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
+        # OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
+        # DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
+        project_status = get_pro(item, "status")
+        Chinese_name = get_pro(item, "Chinese_name")
+        version = get_pro(item, "version")
+        OPS = get_pro(item, "OPS")
+        DEV = get_pro(item, "DEV")
     baseInfo = (filter(lambda x: x['code'] == "baseInfo", item)[0]).get("value")
 
     # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
