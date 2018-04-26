@@ -603,7 +603,7 @@ def delete_resource_deploy(res_id):
                     resources.reservation_status = "deleting"
                     resources.save()
                 else:
-                    resources.update(is_deleted=1)
+                    resources.update(is_deleted=1,deleted_date=datetime.datetime.now(),reservation_status="delete_success")
             else:
                 resources.reservation_status = "deleting"
                 resources.save()
