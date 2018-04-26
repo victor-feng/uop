@@ -663,12 +663,13 @@ def fix_instance(args):
     Log.logger.info("The item value is {}，model id is {}".format(item, model_id))  # [{u'code': u'baseInfo', u'value': u'victorfeng'}]
     # 修改uop数据
     # item_name = [i['value'] if i["code"] == "baseInfo" else "" for i in item]
+    if len(item) != 1:  # 只修改业务
+        project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
+        Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
+        version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
+        OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
+        DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
     baseInfo = (filter(lambda x: x['code'] == "baseInfo", item)[0]).get("value")
-    project_status = (filter(lambda x: x['code'] == "status", item)[0]).get("value")
-    Chinese_name = (filter(lambda x: x['code'] == "Chinese_name", item)[0]).get("value")
-    version = (filter(lambda x: x['code'] == "version", item)[0]).get("value")
-    OPS = (filter(lambda x: x['code'] == "OPS", item)[0]).get("value")
-    DEV = (filter(lambda x: x['code'] == "DEV", item)[0]).get("value")
 
     # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
