@@ -228,10 +228,8 @@ class NginxApi(Resource):
                 domain = res.domain
                 app["domain"] = domain
                 app["domain_ip"] = domain_ip
-
-
-
-
+                app["nginx_port"] = nginx_port
+                app["ips"] = ips
         except Exception as e:
             msg = "Update nginx info error {e}".format(e=str(e))
             code = 500

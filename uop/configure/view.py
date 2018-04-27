@@ -52,9 +52,10 @@ class Configure(Resource):
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                results.append(dict(id=env.id,
-                                name=env.name,
-                                ip=env.ip))
+                if not env.type:
+                    results.append(dict(id=env.id,
+                                    name=env.name,
+                                    ip=env.ip))
         elif category == 'k8s_nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
