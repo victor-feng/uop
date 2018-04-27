@@ -41,8 +41,8 @@ class Configure(Resource):
     @classmethod
     def get(cls):
         parser = reqparse.RequestParser()
-        parser.add_argument('env', type=str,loaction="args")
-        parser.add_argument('category', type=str,loaction="args")
+        parser.add_argument('env', type=str,location="args")
+        parser.add_argument('category', type=str,location="args")
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         category = args.category
