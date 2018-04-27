@@ -274,11 +274,11 @@ class Configure(Resource):
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
         cloud = args.cloud if args.cloud else '2'
-        Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
+        Log.logger.info("[UOP] Modify configs, env:%s, category: %s,args: %s", env, category,args)
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
-            ret.update(name=name, ip=ip,type=args.type,port=args.port)
+            ret.update(name=name, ip=ip,type=args.type,port=args.port,env=env)
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName,cloud=cloud)
