@@ -41,8 +41,8 @@ class Configure(Resource):
     @classmethod
     def get(cls):
         parser = reqparse.RequestParser()
-        parser.add_argument('env', type=str)
-        parser.add_argument('category', type=str)
+        parser.add_argument('env', type=str,location="args")
+        parser.add_argument('category', type=str,location="args")
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         category = args.category
@@ -52,17 +52,19 @@ class Configure(Resource):
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                results.append(dict(id=env.id,
-                                name=env.name,
-                                ip=env.ip))
+                if not env.nginx_type:
+                    results.append(dict(id=env.id,
+                                    name=env.name,
+                                    ip=env.ip))
         elif category == 'k8s_nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                results.append(dict(id=env.id,
-                                    name=env.name,
-                                    ip=env.ip,
-                                    type=env.type,
-                                    port=env.port))
+                if env.nginx_type == "k8s":
+                    results.append(dict(id=env.id,
+                                        name=env.name,
+                                        ip=env.ip,
+                                        nginx_type=env.nginx_type,
+                                        port=env.port))
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
@@ -152,7 +154,7 @@ class Configure(Resource):
         parser.add_argument('flavor_type', type=str)
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
-        parser.add_argument('type', type=str)
+        parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -177,7 +179,7 @@ class Configure(Resource):
                                       ip=ip,
                                       name=name,
                                       id=id,
-                                      type=args.type,
+                                      nginx_type=args.nginx_type,
                                       port=args.port).save()
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig(env=env,
@@ -254,7 +256,7 @@ class Configure(Resource):
         parser.add_argument('flavor_type', type=str)
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
-        parser.add_argument('type', type=str)
+        parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -272,11 +274,11 @@ class Configure(Resource):
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
         cloud = args.cloud if args.cloud else '2'
-        Log.logger.info("[UOP] Modify configs, env:%s, category: %s", env, category)
+        Log.logger.info("[UOP] Modify configs, env:%s, category: %s,args: %s", env, category,args)
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
-            ret.update(name=name, ip=ip,type=args.type,port=args.port)
+            ret.update(name=name,ip=ip,nginx_type=args.nginx_type,port=args.port,env=env)
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName,cloud=cloud)

@@ -227,6 +227,7 @@ class DeploymentListAPI(Resource):
             cloud = resource.cloud
             resource_type = resource.resource_type
             resource.deploy_name = args.deploy_name
+            resource.updated_date = datetime.datetime.now()
             resource.save()
             # disconf配置
             # 1、将disconf信息更新到数据库

@@ -7,7 +7,7 @@ from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
 from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel,ResourceModel
-from uop.util import get_CRP_url, get_network_used
+from uop.util import get_CRP_url, get_network_used,async
 from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.util import response_data
@@ -214,24 +214,40 @@ class NginxApi(Resource):
         parser.add_argument('domain_ip', type=str, location="json")
         args = parser.parse_args()
         env = args.env
-        domain_ip = args.cloud
-        code = 200
-        data = "Success"
+        domain_ip = args.domain_ip
         appinfo=[]
         app={}
+        Data = dict()
         try:
             nginx_info = get_k8s_nginx(env)
             ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
             nginx_port = nginx_info.get("nginx_port") if nginx_info.get("nginx_port") else K8S_NGINX_PORT
-            resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env)
+            resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env,approval_status="success",is_deleted=0)
             for res in resources:
                 domain = res.domain
-                app["domain"] = domain
-                app["domain_ip"] = domain_ip
-
-
-
-
+                if domain:
+                    app["domain"] = domain
+                    app["domain_ip"] = domain_ip
+                    app["nginx_port"] = nginx_port
+                    app["ips"] = ips
+                    appinfo.append(app)
+            Data["appinfo"] = appinfo
+            Data["action"] = "update_nginx"
+            data_str = json.dumps(Data)
+            CPR_URL = get_CRP_url(env)
+            url = CPR_URL + "api/deploy/deploys"
+            Log.logger.debug("Data args is " + str(Data))
+            Log.logger.debug("URL args is " + url)
+            headers = {'Content-Type': 'application/json', }
+            resp = requests.put(url=url, headers=headers, data=data_str)
+            if resp.json().get("code") == 200:
+                data = "Success"
+                code = 200
+                msg = "Update nginx info success"
+            else:
+                data = "Failed"
+                code = 400
+                msg = "Update nginx info Failed"
         except Exception as e:
             msg = "Update nginx info error {e}".format(e=str(e))
             code = 500
@@ -257,8 +273,10 @@ class NginxApi(Resource):
 
 
 
+
 pool_api.add_resource(StatisticAPI, '/statistics')
 pool_api.add_resource(NetworksAPI, '/networks')
 pool_api.add_resource(K8sNetworkApi, '/k8s/network')
 pool_api.add_resource(GetK8sNamespace, '/k8s/getnamespace')
 pool_api.add_resource(GetImageFlavor, '/getimgflavors')
+pool_api.add_resource(NginxApi, '/nginx')

@@ -187,6 +187,9 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'host_mapping':compute.host_mapping,
                     'networkName':compute.networkName,
                     'tenantName':compute.tenantName,
+                    'replicas': compute.quantity,
+                    'ready_probe_path':compute.ready_probe_path,
+                    'port': compute.port,
                 }
             )
         except AttributeError as e:
@@ -465,7 +468,7 @@ def get_k8s_nginx(env):
     nginx_info={}
     nginx_ips=[]
     try:
-        nginxs=ConfigureNginxModel.objects.filter(env=env,type="k8s")
+        nginxs=ConfigureNginxModel.objects.filter(env=env,nginx_type="k8s")
         for ng in nginxs:
             nginx_port = ng.port
             nginx_ips.append(ng.ip)
