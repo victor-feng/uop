@@ -381,6 +381,7 @@ class OS_ip_dic(db.EmbeddedDocument):
     rvip = db.StringField(required=False)
     vip = db.StringField(required=False)
     port = db.StringField(required=False)
+    physical_server = db.StringField(required=False)
 
     meta = {
         'collection': 'os_ip_dic',

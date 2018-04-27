@@ -514,9 +514,16 @@ def updata_deployment_info(resource_name,env,url):
                 for os_ins in os_ins_ip_list:
                     cpu = getattr(os_ins, "cpu")
                     mem = getattr(os_ins, "mem")
+                    physical_server = getattr(os_ins, "physical_server")
                     one = osid_ip.pop()
                     os_ins_list.append(OS_ip_dic(
-                            ip=one[1], os_ins_id=one[0], os_type="docker", cpu=cpu, mem=mem, instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "")
+                            ip=one[1],
+                            os_ins_id=one[0],
+                            os_type="docker",
+                            cpu=cpu,
+                            mem=mem,
+                            instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
+                            physical_server=physical_server)
                     )
                 for compute in compute_list:
                     compute.ips = ips

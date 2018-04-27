@@ -314,13 +314,130 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         Log.logger.error("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
 
+def format_put_data_cmdb(data, req_data):
+    """
+    :param data: resource data
+    :param req_data: crp callback data
+    :return:
+    """
+    Log.logger.info("The transfor data is {}".format(data))
+    instance = []
+    request_data = {}
+    db_info_dict = {}
+    instance_dict = {}
+
+    os_ins = data.os_ins_ip_list[0]
+    ip = os_ins.ip
+    os_ins_id = os_ins.os_ins_id
+    physical_server = os_ins.physical_server
+    port = os_ins.port
+
+    resource_id = req_data.resource_id
+    set_flag = req_data.set_flag
+    resource_type = req_data.resource_type
+
+    created_time = data.created_date
+    module_id = data.cmdb2_module_id
+    cloud = data.cloud
+    user_id = data.user_id
+    env = data.env
+    department = data.department
+    project_id = data.project_id
+    department_id = data.department_id
+    resource_name = data.resource_name
+    container = data.compute_list
+    username = data.user_name
+
+    db_info = data.resource_list[0]
+    image_id = db_info.image_id
+    volume_size = db_info.volume_size
+    network_id = db_info.network_id
+    volume_exp_size = db_info.volume_exp_size
+    ins_id = db_info.ins_id
+    disk = db_info.disk
+    cpu = db_info.cpu
+    cluster_name = db_info.ins_name
+    quantity = db_info.quantity
+    instance_type = db_info.ins_type
+    version = db_info.version
+    cluster_id = db_info.ins_id
+    cluster_type = db_info.ins_type
+    flavor = db_info.flavor_id
+    mem = db_info.mem
+
+    password = '123456'
+    status = 'ok'
+    syswin_project = 'uop'
+    instance_name = ''
+    resource_list = data.resource_list
+
+    request_data['resource_id'] = resource_id
+    request_data['set_flag'] = set_flag
+    request_data['created_time'] = created_time
+    request_data['module_id'] = module_id
+    request_data['cloud'] = cloud
+    request_data['user_id'] = user_id
+    request_data['env'] = env
+    request_data['department'] = department
+    request_data['department_id'] = department_id
+    request_data['username'] = username
+    request_data['resource_name'] = resource_name
+    request_data['container'] = container
+    request_data['syswin_project'] = syswin_project
+    request_data['status'] = status
+    request_data['resource_type'] = resource_type
+    request_data['project_id'] = project_id
+
+    for i in xrange(len(resource_list)):
+        resource_list[i]["ins_name"] += '_{}'.format(i)
+        instance_name = resource_list[i]["ins_name"]
+        instance_dict["username"] = username
+        instance_dict["ip"] = ip
+        instance_dict["instance_name"] = instance_name
+        instance_dict["instance_type"] = instance_type
+        instance_dict["os_inst_id"] = os_ins_id
+        instance_dict["password"] = password
+        instance_dict["physical_server"] = physical_server
+        instance_dict["port"] = port
+        instance.append(instance_dict)
+        instance_dict = {}
+
+    Log.logger.info("Instance dict is {}".format(instance))
+
+    db_info_dict[resource_type] = {
+        "username": username,
+        "image_id": image_id,
+        "volume_size": volume_size,
+        "network_id": network_id,
+        "volume_exp_size": volume_exp_size,
+        "ins_id": ins_id,
+        "disk": disk,
+        "cpu": cpu,
+        "cluster_name": cluster_name,
+        "instance": instance,
+        "version": version,
+        "cluster_id": cluster_id,
+        "cluster_type": cluster_type,
+        "flavor": flavor,
+        "password": password,
+        "mem": mem,
+        "port": port,
+        "quantity": quantity
+    }
+
+    request_data['db_info'] = db_info_dict
+    Log.logger.info("The request data is {}".format(request_data))
+    return request_data
+
+
 # 解析crp传回来的数据录入CMDB2.0
 @async
-def crp_data_cmdb(args, cmdb1_url, method):
-    assert(isinstance(args, dict))
+def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
     if method == 'PUT':
         Log.logger.info("===data:{}".format(args))
+        args = format_put_data_cmdb(args, req_data)
     else:
+        assert (isinstance(args, dict))
         Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
     if cmdb1_url:

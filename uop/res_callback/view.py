@@ -647,8 +647,9 @@ class ResourceProviderCallBack(Resource):
                 ip = instance.get('ip')
                 os_type = instance.get('instance_type')
                 os_vol_id = instance.get('os_vol_id')
+                physical_server = instance.get('physical_server')
                 os_ip_dic = OS_ip_dic(ip=ip, os_ins_id=os_ins_id, os_type=os_type, cpu=cpu, mem=mem,
-                                      os_vol_id=os_vol_id,wvip=wvip,rvip=rvip,vip=vip,port=port)
+                                      os_vol_id=os_vol_id,wvip=wvip,rvip=rvip,vip=vip,port=port,physical_server=physical_server)
                 os_ip_list.append(os_ip_dic)
                 os_ids.append(os_ins_id)
             if os_ins_ids:
@@ -763,7 +764,6 @@ class ResourceProviderCallBack(Resource):
         }
         return res, 200
 
-
     def put(self):
         request_data = json.loads(request.data)
         resource_id = request_data.get('resource_id')
@@ -806,10 +806,15 @@ class ResourceProviderCallBack(Resource):
                 status_record.status = "config_success"
                 status_record.msg = "%s资源配置成功" % resource_type
                 # 异步更新到cmdb2
-                Log.logger.info("Modify the configure result save to cmdb2 STARTED")
+                res_data = ResourceModel.objects.filter(res_id=resource_id)
                 CMDB_URL = current_app.config['CMDB_URL']
-                crp_data_cmdb(request_data, CMDB_URL, 'PUT')
-                Log.logger.info("Modify the configure result save to cmdb2 DOWN")
+                Log.logger.info("Modify the configure result save to cmdb2 STARTED")
+                if res_data:
+                    origin_data = res_data[0]
+                    crp_data_cmdb(origin_data, CMDB_URL, 'PUT', request_data)
+                    Log.logger.info("Modify the configure result save to cmdb2 DOWN")
+                else:
+                    Log.logger.info("The resource is not exist!!!")
             else:
                 status_record.status = "config_fail"
                 status_record.msg = "%s资源配置失败，错误日志为：%s" % (resource_type,msg)
