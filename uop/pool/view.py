@@ -214,7 +214,7 @@ class NginxApi(Resource):
         parser.add_argument('domain_ip', type=str, location="json")
         args = parser.parse_args()
         env = args.env
-        domain_ip = args.cloud
+        domain_ip = args.domain_ip
         appinfo=[]
         app={}
         Data = dict()
