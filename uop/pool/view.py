@@ -12,7 +12,7 @@ from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.util import response_data
 from uop.deployment.handler import get_k8s_nginx
-
+from config import configs, APP_ENV
 
 pool_api = Api(pool_blueprint, errors=pool_errors)
 
