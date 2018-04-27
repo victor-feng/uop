@@ -222,7 +222,7 @@ class NginxApi(Resource):
             nginx_info = get_k8s_nginx(env)
             ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
             nginx_port = nginx_info.get("nginx_port") if nginx_info.get("nginx_port") else K8S_NGINX_PORT
-            resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env,approval_status="success")
+            resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env,approval_status="success",is_deleted=0)
             for res in resources:
                 domain = res.domain
                 if domain:
