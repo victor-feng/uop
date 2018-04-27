@@ -238,28 +238,22 @@ class NginxApi(Resource):
             url = CPR_URL + "api/deploy/deploys"
             Log.logger.debug("Data args is " + str(Data))
             Log.logger.debug("URL args is " + url)
-            post_to_crp(url,data_str)
-            data = "Success"
-            code = 200
-            msg = "Update nginx info success"
+            headers = {'Content-Type': 'application/json', }
+            resp = requests.put(url=url, headers=headers, data=data_str)
+            if resp.json.get("code") == 200:
+                data = "Success"
+                code = 200
+                msg = "Update nginx info success"
+            else:
+                data = "Failed"
+                code = 400
+                msg = "Update nginx info Failed"
         except Exception as e:
             msg = "Update nginx info error {e}".format(e=str(e))
             code = 500
             data= "Error"
         ret = response_data(code, msg, data)
         return ret, code
-
-#@async
-def post_to_crp(url,data_str):
-    try:
-        headers = {'Content-Type': 'application/json', }
-        resp = requests.put(url=url, headers=headers, data=data_str)
-    except requests.exceptions.ReadTimeout as e:
-        msg = "Update nginx info success"
-        Log.logger.info(msg)
-    except Exception as e:
-        err_msg = "Post to crp update nginx info error {e}".format(e=str(e))
-        Log.logger.error(err_msg)
 
 
 
