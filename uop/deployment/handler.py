@@ -187,6 +187,10 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'host_mapping':compute.host_mapping,
                     'networkName':compute.networkName,
                     'tenantName':compute.tenantName,
+                    'replicas': compute.quantity,
+                    'ready_probe_path':compute.ready_probe_path,
+                    'image_url':compute.url,
+                    'port': compute.port,
                 }
             )
         except AttributeError as e:
