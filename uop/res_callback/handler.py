@@ -316,9 +316,12 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
 
 # 解析crp传回来的数据录入CMDB2.0
 @async
-def crp_data_cmdb(args, cmdb1_url):
+def crp_data_cmdb(args, cmdb1_url, method):
     assert(isinstance(args, dict))
-    Log.logger.info("###data:{}".format(args))
+    if method == 'PUT':
+        Log.logger.info("===data:{}".format(args))
+    else:
+        Log.logger.info("###data:{}".format(args))
     # models_list = get_entity_from_file(args)
     if cmdb1_url:
         CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'

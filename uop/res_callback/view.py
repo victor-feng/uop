@@ -747,7 +747,7 @@ class ResourceProviderCallBack(Resource):
         # 异步存到CMDB2
         Log.logger.info("Start save to CMDB2")
         CMDB_URL = current_app.config['CMDB_URL']
-        crp_data_cmdb(request_data, CMDB_URL)
+        crp_data_cmdb(request_data, CMDB_URL, 'POST')
         Log.logger.info("End save to CMDB2")
 
         res = {
@@ -801,6 +801,11 @@ class ResourceProviderCallBack(Resource):
             if status == "success":
                 status_record.status = "config_success"
                 status_record.msg = "%s资源配置成功" % resource_type
+                # 异步更新到cmdb2
+                Log.logger.info("Modify the configure result save to cmdb2 STARTED")
+                CMDB_URL = current_app.config['CMDB_URL']
+                crp_data_cmdb(request_data, CMDB_URL, 'PUT')
+                Log.logger.info("Modify the configure result save to cmdb2 DOWN")
             else:
                 status_record.status = "config_fail"
                 status_record.msg = "%s资源配置失败，错误日志为：%s" % (resource_type,msg)
