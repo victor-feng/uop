@@ -316,11 +316,11 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
 
 def format_put_data_cmdb(data, req_data):
     """
-    :param data: resource data
+    :param data: resource model
     :param req_data: crp callback data
     :return:
     """
-    Log.logger.info("The transfor data is {}".format(data))
+    Log.logger.info("The transfor data is {}, req_data is {}".format(data, req_data))
     instance = []
     request_data = {}
     db_info_dict = {}
