@@ -373,7 +373,7 @@ def format_put_data_cmdb(data, req_data):
 
     request_data['resource_id'] = resource_id
     request_data['set_flag'] = set_flag
-    request_data['created_time'] = created_time
+    request_data['created_time'] = created_time.strftime("%Y-%m-%d %H:%M:%S")
     request_data['module_id'] = module_id
     request_data['cloud'] = cloud
     request_data['user_id'] = user_id
