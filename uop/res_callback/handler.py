@@ -332,7 +332,7 @@ def format_put_data_cmdb(data, req_data):
     physical_server = os_ins.physical_server
     port = os_ins.port
 
-    resource_id = req_data.get('res_id', '')
+    resource_id = req_data.get('resource_id', '')
     set_flag = req_data.get('set_flag', '')
     resource_type = req_data.get('resource_type', '')
 
