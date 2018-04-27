@@ -215,10 +215,9 @@ class NginxApi(Resource):
         args = parser.parse_args()
         env = args.env
         domain_ip = args.cloud
-        code = 200
-        data = "Success"
         appinfo=[]
         app={}
+        Data = dict()
         try:
             nginx_info = get_k8s_nginx(env)
             ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
@@ -230,6 +229,20 @@ class NginxApi(Resource):
                 app["domain_ip"] = domain_ip
                 app["nginx_port"] = nginx_port
                 app["ips"] = ips
+                appinfo.append(app)
+            Data["appinfo"] = appinfo
+            Data["action"] = "update_nginx"
+            data_str = json.dumps(Data)
+            CPR_URL = get_CRP_url(env)
+            url = CPR_URL + "api/deploy/deploys"
+            Log.logger.debug("Data args is " + str(Data))
+            Log.logger.debug("URL args is " + url)
+            headers = {'Content-Type': 'application/json', }
+            resp = requests.put(url=url, headers=headers, data=data_str)
+            if resp.json().get("code") == 200:
+                data = "Success"
+                code = 200
+                msg = "Update nginx info success"
         except Exception as e:
             msg = "Update nginx info error {e}".format(e=str(e))
             code = 500
