@@ -7,7 +7,7 @@ from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
 from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel,ResourceModel
-from uop.util import get_CRP_url, get_network_used
+from uop.util import get_CRP_url, get_network_used,async
 from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.util import response_data
@@ -238,18 +238,26 @@ class NginxApi(Resource):
             url = CPR_URL + "api/deploy/deploys"
             Log.logger.debug("Data args is " + str(Data))
             Log.logger.debug("URL args is " + url)
-            headers = {'Content-Type': 'application/json', }
-            resp = requests.put(url=url, headers=headers, data=data_str)
-            if resp.json().get("code") == 200:
-                data = "Success"
-                code = 200
-                msg = "Update nginx info success"
+            post_to_crp(url,data_str)
+            data = "Success"
+            code = 200
+            msg = "Update nginx info success"
         except Exception as e:
             msg = "Update nginx info error {e}".format(e=str(e))
             code = 500
             data= "Error"
         ret = response_data(code, msg, data)
         return ret, code
+
+@async
+def post_to_crp(url,data_str):
+    try:
+        headers = {'Content-Type': 'application/json', }
+        resp = requests.put(url=url, headers=headers, data=data_str,timeout=10)
+    except Exception as e:
+        err_msg = "Post to crp update nginx info error {e}".format(e=str(e))
+        Log.logger.error(err_msg)
+
 
 
 
