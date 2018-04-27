@@ -6,15 +6,19 @@ from flask_restful import reqparse, Api, Resource
 from flask import request
 from uop.pool import pool_blueprint
 from uop.pool.errors import pool_errors
-from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
+from uop.models import ConfigureEnvModel,NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel,ResourceModel
 from uop.util import get_CRP_url, get_network_used
 from uop.log import Log
 from uop.permission.handler import api_permission_control
 from uop.util import response_data
-
+from uop.deployment.handler import get_k8s_nginx
+from config import configs, APP_ENV
 
 pool_api = Api(pool_blueprint, errors=pool_errors)
 
+
+K8S_NGINX_PORT = configs[APP_ENV].K8S_NGINX_PORT
+K8S_NGINX_IPS = configs[APP_ENV].K8S_NGINX_IPS
 
 class NetworksAPI(Resource):
     # @api_permission_control(request)
@@ -201,6 +205,41 @@ class GetImageFlavor(Resource):
             Log.logger.error(msg)
         ret = response_data(code, msg, data)
         return ret, code
+
+class NginxApi(Resource):
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str, location="json")
+        parser.add_argument('domain_ip', type=str, location="json")
+        args = parser.parse_args()
+        env = args.env
+        domain_ip = args.cloud
+        code = 200
+        data = "Success"
+        appinfo=[]
+        app={}
+        try:
+            nginx_info = get_k8s_nginx(env)
+            ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
+            nginx_port = nginx_info.get("nginx_port") if nginx_info.get("nginx_port") else K8S_NGINX_PORT
+            resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env)
+            for res in resources:
+                domain = res.domain
+                app["domain"] = domain
+                app["domain_ip"] = domain_ip
+
+
+
+
+        except Exception as e:
+            msg = "Update nginx info error {e}".format(e=str(e))
+            code = 500
+            data= "Error"
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
 
 
 

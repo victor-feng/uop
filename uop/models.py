@@ -547,6 +547,8 @@ class ConfigureNginxModel(db.Document):
     env = db.StringField(required=False, max_length=50)
     name = db.StringField(required=False, max_length=50)
     ip = db.StringField(required=False, max_length=50)
+    port = db.StringField(required=False, max_length=50)
+    type = db.StringField(required=False, max_length=50) # k8s 标示是k8s的nginx，空标示是正常的nginx
 
     meta = {
             "collection": "configure_nginx",
