@@ -240,7 +240,7 @@ class NginxApi(Resource):
             Log.logger.debug("URL args is " + url)
             headers = {'Content-Type': 'application/json', }
             resp = requests.put(url=url, headers=headers, data=data_str)
-            if resp.json.get("code") == 200:
+            if resp.json().get("code") == 200:
                 data = "Success"
                 code = 200
                 msg = "Update nginx info success"
