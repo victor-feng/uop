@@ -249,11 +249,11 @@ class NginxApi(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
-@async
+#@async
 def post_to_crp(url,data_str):
     try:
         headers = {'Content-Type': 'application/json', }
-        resp = requests.put(url=url, headers=headers, data=data_str,timeout=1)
+        resp = requests.put(url=url, headers=headers, data=data_str)
     except requests.exceptions.ReadTimeout as e:
         msg = "Update nginx info success"
         Log.logger.info(msg)
