@@ -202,6 +202,9 @@ class GetImageFlavor(Resource):
         ret = response_data(code, msg, data)
         return ret, code
 
+class NginxApi(Resource):
+    pass
+
 
 
 

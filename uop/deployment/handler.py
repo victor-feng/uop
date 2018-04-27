@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 from flask import current_app
-from uop.models import  ResourceModel, ComputeIns,Deployment
+from uop.models import  ResourceModel, ComputeIns,Deployment,ConfigureNginxModel
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
 from uop.log import Log
@@ -459,4 +459,20 @@ def get_database_info(resource,database_password):
         err_msg = "Uop get database info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
     return database_info
+
+
+def get_k8s_nginx(env):
+    nginx_info={}
+    nginx_ips=[]
+    try:
+        nginxs=ConfigureNginxModel.objects.filter(env=env)
+        for ng in nginxs:
+            nginx_port = ng.port
+            nginx_ips.append(ng.ip)
+        nginx_info["nginx_ips"] = nginx_ips
+        nginx_info["nginx_port"] = nginx_port
+    except Exception as e:
+        err_msg = "Uop get nginx info error {e}".format(e=str(e))
+        Log.logger.error(err_msg)
+    return nginx_info
 

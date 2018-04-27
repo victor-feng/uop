@@ -12,7 +12,7 @@ from uop.models import  ResourceModel, DisconfIns, Deployment, Approval, Capacit
 from uop.deployment.errors import deploy_errors
 from uop.disconf.disconf_api import *
 from uop.util import get_CRP_url
-from uop.deployment.handler import  get_resource_by_id, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip,check_domain_port
+from uop.deployment.handler import  get_k8s_nginx, deploy_to_crp, deal_disconf_info, disconf_write_to_file, attach_domain_ip,check_domain_port
 from uop.log import Log
 from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
@@ -250,7 +250,10 @@ class DeploymentListAPI(Resource):
             appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
-                appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
+                nginx_info = get_k8s_nginx(args.environment)
+                ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
+                nginx_port = nginx_info.get("nginx_port") if nginx_info.get("nginx_port") else K8S_NGINX_PORT
+                appinfo = [dict(app, nginx_port=nginx_port, ips=ips) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
             deploy_obj.app_image = str(args.app_image)
