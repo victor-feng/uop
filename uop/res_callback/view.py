@@ -391,7 +391,11 @@ class ResourceProviderTransitions(object):
         item_property = json.loads(resp_repo_item.text)
         code = item_property.get('code')
         if 2002 == code:
-            p_code = item_property.get('result').get('res')[0].get('p_code')
+            res=item_property.get('result').get('res')
+            if res:
+                p_code = res[0].get('p_code')
+            else:
+                p_code = str(uuid.uuid1())
             self.pcode_mapper['physical_server'] = p_code
             Log.logger.debug("Add Item physical_server(%s): p_code(%s) for self.pcode_mapper"
                              % (physical_server, p_code))
