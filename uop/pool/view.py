@@ -253,7 +253,7 @@ class NginxApi(Resource):
 def post_to_crp(url,data_str):
     try:
         headers = {'Content-Type': 'application/json', }
-        resp = requests.put(url=url, headers=headers, data=data_str,timeout=10)
+        resp = requests.put(url=url, headers=headers, data=data_str,timeout=1)
     except Exception as e:
         err_msg = "Post to crp update nginx info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
