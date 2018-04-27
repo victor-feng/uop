@@ -55,7 +55,8 @@ class Configure(Resource):
                 results.append(dict(id=env.id,
                                  name=env.name,
                                  ip=env.ip,
-                                 type=env.type))
+                                 type=env.type,
+                                 port=env.port))
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
@@ -146,6 +147,7 @@ class Configure(Resource):
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('type', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -169,7 +171,8 @@ class Configure(Resource):
                                       ip=ip,
                                       name=name,
                                       id=id,
-                                      type=args.type).save()
+                                      type=args.type,
+                                      port=args.port).save()
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig(env=env,
                                 name=name,
@@ -246,6 +249,7 @@ class Configure(Resource):
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('type', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
@@ -266,7 +270,7 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
-            ret.update(name=name, ip=ip,type=args.type)
+            ret.update(name=name, ip=ip,type=args.type,port=args.port)
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName,cloud=cloud)
