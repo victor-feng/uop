@@ -52,18 +52,18 @@ class Configure(Resource):
         if category == 'nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                if not env.type:
+                if not env.nginx_type:
                     results.append(dict(id=env.id,
                                     name=env.name,
                                     ip=env.ip))
         elif category == 'k8s_nginx':
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
-                if env.type == "k8s":
+                if env.nginx_type == "k8s":
                     results.append(dict(id=env.id,
                                         name=env.name,
                                         ip=env.ip,
-                                        type=env.type,
+                                        nginx_type=env.nginx_type,
                                         port=env.port))
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
@@ -154,7 +154,7 @@ class Configure(Resource):
         parser.add_argument('flavor_type', type=str)
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
-        parser.add_argument('type', type=str)
+        parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -179,7 +179,7 @@ class Configure(Resource):
                                       ip=ip,
                                       name=name,
                                       id=id,
-                                      type=args.type,
+                                      nginx_type=args.nginx_type,
                                       port=args.port).save()
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig(env=env,
@@ -256,7 +256,7 @@ class Configure(Resource):
         parser.add_argument('flavor_type', type=str)
         parser.add_argument('flavor_cpu', type=int)
         parser.add_argument('flavor_memory', type=int)
-        parser.add_argument('type', type=str)
+        parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
@@ -278,7 +278,7 @@ class Configure(Resource):
 
         if category == 'nginx':
             ret = ConfigureNginxModel.objects(id=id)
-            ret.update(name=name, ip=ip,type=args.type,port=args.port,env=env)
+            ret.update(name=name,ip=ip,nginx_type=args.nginx_type,port=args.port,env=env)
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects(id=id)
             ret.update(name=name, sub_network=sub_network, vlan_id=vlan_id,networkName=networkName,tenantName=tenantName,cloud=cloud)

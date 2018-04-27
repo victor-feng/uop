@@ -465,7 +465,7 @@ def get_k8s_nginx(env):
     nginx_info={}
     nginx_ips=[]
     try:
-        nginxs=ConfigureNginxModel.objects.filter(env=env,type="k8s")
+        nginxs=ConfigureNginxModel.objects.filter(env=env,nginx_type="k8s")
         for ng in nginxs:
             nginx_port = ng.port
             nginx_ips.append(ng.ip)
