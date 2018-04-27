@@ -225,11 +225,12 @@ class NginxApi(Resource):
             resources = ResourceModel.objects.filter(resource_type="app",cloud="2",env=env,approval_status="success")
             for res in resources:
                 domain = res.domain
-                app["domain"] = domain
-                app["domain_ip"] = domain_ip
-                app["nginx_port"] = nginx_port
-                app["ips"] = ips
-                appinfo.append(app)
+                if domain:
+                    app["domain"] = domain
+                    app["domain_ip"] = domain_ip
+                    app["nginx_port"] = nginx_port
+                    app["ips"] = ips
+                    appinfo.append(app)
             Data["appinfo"] = appinfo
             Data["action"] = "update_nginx"
             data_str = json.dumps(Data)
