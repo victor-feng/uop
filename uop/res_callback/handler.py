@@ -353,14 +353,14 @@ def format_put_data_cmdb(data, req_data):
     volume_size = db_info.volume_size
     network_id = db_info.network_id
     volume_exp_size = db_info.volume_exp_size
-    ins_id = db_info.ins_id
+    ins_id = resource_id
     disk = db_info.disk
     cpu = db_info.cpu
     cluster_name = db_info.ins_name
     quantity = db_info.quantity
     instance_type = db_info.ins_type
     version = db_info.version
-    cluster_id = db_info.ins_id
+    cluster_id = resource_id
     cluster_type = db_info.ins_type
     flavor = db_info.flavor_id
     mem = db_info.mem
