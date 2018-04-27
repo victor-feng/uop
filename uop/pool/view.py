@@ -254,6 +254,9 @@ def post_to_crp(url,data_str):
     try:
         headers = {'Content-Type': 'application/json', }
         resp = requests.put(url=url, headers=headers, data=data_str,timeout=1)
+    except requests.exceptions.ReadTimeout as e:
+        msg = "Update nginx info success"
+        Log.logger.info(msg)
     except Exception as e:
         err_msg = "Post to crp update nginx info error {e}".format(e=str(e))
         Log.logger.error(err_msg)
