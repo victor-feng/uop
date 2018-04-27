@@ -53,10 +53,16 @@ class Configure(Resource):
             ret = ConfigureNginxModel.objects.filter(env=env)
             for env in ret:
                 results.append(dict(id=env.id,
-                                 name=env.name,
-                                 ip=env.ip,
-                                 type=env.type,
-                                 port=env.port))
+                                name=env.name,
+                                ip=env.ip))
+        elif category == 'k8s_nginx':
+            ret = ConfigureNginxModel.objects.filter(env=env)
+            for env in ret:
+                results.append(dict(id=env.id,
+                                    name=env.name,
+                                    ip=env.ip,
+                                    type=env.type,
+                                    port=env.port))
         elif category in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(env=env)
             for net in ret:
