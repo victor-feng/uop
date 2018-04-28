@@ -83,16 +83,6 @@ res_mapping={
     "cloud":u"云版本",
     "physical_server":u"宿主机名字",
     "replicas":u"副本数",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-    "":u"",
-
 }
 
 os_type_mapping={
@@ -112,33 +102,34 @@ def get_resource_detail(resource_name,env):
     vms=Statusvm.objects.filter(resource_name=resource_name,env=env)
     if vms:
         vm_one=vms[0]
-        resource_info[res_mapping["resource_name"]] = vm_one.resource_name
-        resource_info[res_mapping["business_name"]] = vm_one.business_name
-        resource_info[res_mapping["module_name"]] = vm_one.module_name
-        resource_info[res_mapping["project_name"]] = vm_one.project_name
-        resource_info[res_mapping["department"]] = vm_one.department
-        resource_info[res_mapping["user_id"]] = vm_one.user_id
-        resource_info[res_mapping["os_type"]] = os_type_mapping.get(vm_one.os_type, vm_one.os_type)
-        resource_info[res_mapping["replicas"]] = len(vms)
-        resource_info[res_mapping["cloud"]] = vm_one.cloud
-        resource_info[res_mapping["domain"]] = vm_one.domain
-        resource_info[res_mapping["wvip"]] = vm_one.wvip
-        resource_info[res_mapping["rvip"]] = vm_one.rvip
-        resource_info[res_mapping["vip"]] = vm_one.vip
-        resource_info[res_mapping["create_time"]] = str(vm_one.create_time)
-        host_info[res_mapping["physical_server"]] = vm_one.physical_server
+        resource_info["resource_name"] = vm_one.resource_name
+        resource_info["business_name"] = vm_one.business_name
+        resource_info["module_name"] = vm_one.module_name
+        resource_info["project_name"] = vm_one.project_name
+        resource_info["department"] = vm_one.department
+        resource_info["user_id"] = vm_one.user_id
+        resource_info["os_type"] = os_type_mapping.get(vm_one.os_type, vm_one.os_type)
+        resource_info["replicas"] = len(vms)
+        resource_info["cloud"] = vm_one.cloud
+        resource_info["domain"] = vm_one.domain
+        resource_info["wvip"] = vm_one.wvip
+        resource_info["rvip"] = vm_one.rvip
+        resource_info["vip"] = vm_one.vip
+        resource_info["create_time"] = str(vm_one.create_time)
+        host_info["physical_server"] = vm_one.physical_server
         for vm in vms:
             detail_info = OrderedDict()
-            detail_info[res_mapping["ip"]] = vm.ip
-            detail_info[res_mapping["cpu"]] = vm.cpu
-            detail_info[res_mapping["mem"]] = vm.mem
-            detail_info[res_mapping["volume_size"]] = vm.volume_size
-            detail_info[res_mapping["namespace"]] = vm.namespace
+            detail_info["ip"] = vm.ip
+            detail_info["cpu"] = vm.cpu
+            detail_info["mem"] = vm.mem
+            detail_info["volume_size"] = vm.volume_size
+            detail_info["namespace"] = vm.namespace
             detail_list.append(detail_info)
 
         data["resource_info"] = resource_info
         data["detail_info"] = detail_list
         data["host_info"] = host_info
+        data["res_mapping"] = res_mapping
 
     return data
 
