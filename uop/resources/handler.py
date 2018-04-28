@@ -96,7 +96,7 @@ os_type_mapping={
 
 def get_resource_detail(resource_name,env):
 
-    data = {}
+    data = OrderedDict()
     resource_info = OrderedDict()
     detail_list=[]
     vms=Statusvm.objects.filter(resource_name=resource_name,env=env)
@@ -133,7 +133,7 @@ def get_resource_detail(resource_name,env):
         data["resource_info"] = resource_info
         data["detail_info"] = detail_list
         data["res_mapping"] = res_mapping
-
+    Log.logger.info("The sorted data is {}".format(data))
     return data
 
 
