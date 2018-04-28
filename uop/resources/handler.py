@@ -102,9 +102,6 @@ def get_resource_detail(resource_name,env):
     if vms:
         vm_one=vms[0]
         domain=vm_one.domain
-        domain_path = vm_one.domain_path
-        if domain and "/" not in domain and domain_path:
-            domain = domain + "/" +domain_path
         resource_info["resource_name"] = vm_one.resource_name
         resource_info["business_name"] = vm_one.business_name
         resource_info["module_name"] = vm_one.module_name
