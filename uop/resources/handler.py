@@ -83,6 +83,7 @@ res_mapping={
     "cloud":u"云版本",
     "physical_server":u"宿主机名称",
     "replicas":u"副本数",
+    "os_inst_id":u"虚机id或pod名称",
 }
 
 os_type_mapping={
@@ -120,9 +121,10 @@ def get_resource_detail(resource_name,env):
         for vm in vms:
             detail_info = OrderedDict()
             detail_info["ip"] = vm.ip
-            detail_info["cpu"] = vm.cpu
-            detail_info["mem"] = vm.mem
+            detail_info["cpu"] = vm.cpu + "核"
+            detail_info["mem"] = vm.mem + "G"
             detail_info["status"] = vm.status
+            detail_info["os_inst_id"] = vm.osid
             detail_info["volume_size"] = vm.volume_size
             detail_info["namespace"] = vm.namespace
             detail_info["physical_server"] = vm_one.physical_server
