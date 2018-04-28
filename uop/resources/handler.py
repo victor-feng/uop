@@ -510,22 +510,22 @@ def updata_deployment_info(resource_name,env,url):
                 compute_list = resource.compute_list
                 os_ins_list = []
                 ips=[]
-                osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"))for res in res_list]
+                osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"),res.get("node_name"))for res in res_list]
                 vmid_ip = osid_ip
                 for os_ins in os_ins_ip_list:
                     cpu = getattr(os_ins, "cpu")
                     mem = getattr(os_ins, "mem")
-                    physical_server = getattr(os_ins, "physical_server")
-                    one = osid_ip.pop()
-                    os_ins_list.append(OS_ip_dic(
-                            ip=one[1],
-                            os_ins_id=one[0],
-                            os_type="docker",
-                            cpu=cpu,
-                            mem=mem,
-                            instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
-                            physical_server=physical_server)
-                    )
+                    if osid_ip:
+                        one = osid_ip.pop()
+                        os_ins_list.append(OS_ip_dic(
+                                ip=one[1],
+                                os_ins_id=one[0],
+                                os_type="docker",
+                                cpu=cpu,
+                                mem=mem,
+                                instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
+                                physical_server=one[3])
+                        )
                 for compute in compute_list:
                     compute.ips = ips
                     compute.save()
@@ -534,8 +534,9 @@ def updata_deployment_info(resource_name,env,url):
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
-                    one = vmid_ip.pop()
-                    vm.update(status=one[2], osid=one[0], ip=one[1])
+                    if vmid_ip:
+                        one = vmid_ip.pop()
+                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3])
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
