@@ -503,7 +503,6 @@ def updata_deployment_info(resource_name,env,url):
             ret = requests.get(info_url)
             response = ret.json()
             res_list = response["result"]["data"]["res_list"]
-            Log.logger.info("##Deployment info is {}".format(res_list))
             if response.get('code') == 200:
                 resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
                 os_ins_ip_list = resource.os_ins_ip_list
@@ -517,6 +516,7 @@ def updata_deployment_info(resource_name,env,url):
                     mem = getattr(os_ins, "mem")
                     if osid_ip:
                         one = osid_ip.pop()
+                        ips.append(one[1])
                         os_ins_list.append(OS_ip_dic(
                                 ip=one[1],
                                 os_ins_id=one[0],
@@ -534,6 +534,7 @@ def updata_deployment_info(resource_name,env,url):
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
+                    Log.logger.info("##vmid_ip info is {}".format(vmid_ip))
                     if vmid_ip:
                         one = vmid_ip.pop()
                         vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3])
