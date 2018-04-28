@@ -534,7 +534,6 @@ def updata_deployment_info(resource_name,env,url):
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
-                    Log.logger.info("##vmid_ip info is {}".format(vmid_ip))
                     if vmid_ip:
                         one = vmid_ip.pop()
                         vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3])
