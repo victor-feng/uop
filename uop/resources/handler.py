@@ -122,6 +122,7 @@ def get_resource_detail(resource_name,env):
             detail_info["ip"] = vm.ip
             detail_info["cpu"] = vm.cpu
             detail_info["mem"] = vm.mem
+            detail_info["status"] = vm.status
             detail_info["volume_size"] = vm.volume_size
             detail_info["namespace"] = vm.namespace
             detail_info["physical_server"] = vm_one.physical_server
