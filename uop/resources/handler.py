@@ -97,11 +97,14 @@ def get_resource_detail(resource_name,env):
 
     data = {}
     resource_info = OrderedDict()
-    host_info = OrderedDict()
     detail_list=[]
     vms=Statusvm.objects.filter(resource_name=resource_name,env=env)
     if vms:
         vm_one=vms[0]
+        domain=vm_one.domain
+        domain_path = vm_one.domain_path
+        if domain and "/" not in domain and domain_path:
+            domain = domain + "/" +domain_path
         resource_info["resource_name"] = vm_one.resource_name
         resource_info["business_name"] = vm_one.business_name
         resource_info["module_name"] = vm_one.module_name
@@ -111,12 +114,12 @@ def get_resource_detail(resource_name,env):
         resource_info["os_type"] = os_type_mapping.get(vm_one.os_type, vm_one.os_type)
         resource_info["replicas"] = len(vms)
         resource_info["cloud"] = vm_one.cloud
-        resource_info["domain"] = vm_one.domain
+        resource_info["domain"] = domain
         resource_info["wvip"] = vm_one.wvip
         resource_info["rvip"] = vm_one.rvip
         resource_info["vip"] = vm_one.vip
         resource_info["create_time"] = str(vm_one.create_time)
-        host_info["physical_server"] = vm_one.physical_server
+
         for vm in vms:
             detail_info = OrderedDict()
             detail_info["ip"] = vm.ip
@@ -124,11 +127,11 @@ def get_resource_detail(resource_name,env):
             detail_info["mem"] = vm.mem
             detail_info["volume_size"] = vm.volume_size
             detail_info["namespace"] = vm.namespace
+            detail_info["physical_server"] = vm_one.physical_server
             detail_list.append(detail_info)
 
         data["resource_info"] = resource_info
         data["detail_info"] = detail_list
-        data["host_info"] = host_info
         data["res_mapping"] = res_mapping
 
     return data
