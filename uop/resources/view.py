@@ -48,9 +48,10 @@ class ResourceApplication(Resource):
                 resource_type = info.get("resource_type", "")
                 business_name = info.get("business_name","")
                 module_name = info.get("module_name","")
+                resource_name = info.get("resource_name", "")
                 if resource_type in ["app","kvm","mysql","redis","mongodb"]:
                     res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type,
-                                                         business_name=business_name, module_name=module_name,is_deleted=0).count()
+                                                         business_name=business_name, module_name=module_name,resource_name=resource_name,is_deleted=0).count()
                     if res_count > 0:
                         res_exist_dict["project_name"] = project_name
                         res_exist_dict["resource_type"] = resource_type
