@@ -166,7 +166,7 @@ class DeployCallback(Resource):
                 compute.port = o_port
             resource.save()
         #如果k8s应用部署成功，修改resource和statusvm表
-        if cloud == 2 and args.result == "success" and res_type == "docker":
+        if cloud == "2" and args.result == "success" and res_type == "docker":
             resource_name = dep.resource_name
             env = dep.environment
             url = get_CRP_url(env)
