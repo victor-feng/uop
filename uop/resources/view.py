@@ -1380,6 +1380,7 @@ class MyResourceDetailInfo(Resource):
         resource_name = args.resource_name
         env = args.env
         code = 200
+        data={}
         try:
             data=get_resource_detail(resource_name,env)
             msg = "Get resource detail info success"
