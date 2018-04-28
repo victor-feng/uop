@@ -81,7 +81,7 @@ res_mapping={
     "rvip":u"写ip",
     "vip":u"虚拟ip",
     "cloud":u"云版本",
-    "physical_server":u"宿主机名字",
+    "physical_server":u"宿主机名称",
     "replicas":u"副本数",
 }
 
