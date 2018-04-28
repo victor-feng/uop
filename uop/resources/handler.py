@@ -503,6 +503,7 @@ def updata_deployment_info(resource_name,env,url):
             ret = requests.get(info_url)
             response = ret.json()
             res_list = response["result"]["data"]["res_list"]
+            Log.logger.info("##Deployment info is {}".format(res_list))
             if response.get('code') == 200:
                 resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
                 os_ins_ip_list = resource.os_ins_ip_list
