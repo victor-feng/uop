@@ -8,6 +8,7 @@ import copy
 import time
 import random
 import datetime
+from collections import  OrderedDict
 from uop.log import Log
 from uop.util import async, response_data
 from config import APP_ENV, configs
@@ -57,6 +58,99 @@ field_dict={
 	"resource_config":u"配置",
 	"resource_status":u"状态",
 }
+
+
+
+res_mapping={
+    "resource_name":u"资源名称",
+    "business_name":u"业务",
+    "module_name":u"模块",
+    "project_name":u"工程",
+    "domain":u"域名",
+    "cpu":u"cpu",
+    "mem":u"内存",
+    "ip":u"ip",
+    "os_type":u"资源类型",
+    "status":u"状态",
+    "create_time":u"创建时间",
+    "department":u"部门",
+    "user_id":u"用户",
+    "volume_size":u"卷",
+    "namespace":u"命名空间",
+    "wvip":u"读ip",
+    "rvip":u"写ip",
+    "vip":u"虚拟ip",
+    "cloud":u"云版本",
+    "physical_server":u"宿主机名字",
+    "replicas":u"副本数",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+    "":u"",
+
+}
+
+os_type_mapping={
+    "app":"容器云应用",
+    "kvm":"虚拟化云应用",
+    "mysql":"mysql数据库",
+    "mongodb":"mongodb数据库",
+}
+
+
+def get_resource_detail(resource_name,env):
+
+    data = {}
+    resource_info = OrderedDict()
+    host_info = OrderedDict()
+    detail_list=[]
+    vms=Statusvm.objects.filter(resource_name=resource_name,env=env)
+    if vms:
+        vm_one=vms[0]
+        resource_info[res_mapping["resource_name"]] = vm_one.resource_name
+        resource_info[res_mapping["business_name"]] = vm_one.business_name
+        resource_info[res_mapping["module_name"]] = vm_one.module_name
+        resource_info[res_mapping["project_name"]] = vm_one.project_name
+        resource_info[res_mapping["department"]] = vm_one.department
+        resource_info[res_mapping["user_id"]] = vm_one.user_id
+        resource_info[res_mapping["os_type"]] = os_type_mapping.get(vm_one.os_type, vm_one.os_type)
+        resource_info[res_mapping["replicas"]] = len(vms)
+        resource_info[res_mapping["cloud"]] = vm_one.cloud
+        resource_info[res_mapping["domain"]] = vm_one.domain
+        resource_info[res_mapping["wvip"]] = vm_one.wvip
+        resource_info[res_mapping["rvip"]] = vm_one.rvip
+        resource_info[res_mapping["vip"]] = vm_one.vip
+        resource_info[res_mapping["create_time"]] = vm.create_time
+        host_info[res_mapping["physical_server"]] = vm.physical_server
+        for vm in vms:
+            detail_info = OrderedDict()
+            detail_info[res_mapping["ip"]] = vm.ip
+            detail_info[res_mapping["cpu"]] = vm.cpu
+            detail_info[res_mapping["mem"]] = vm.mem
+            detail_info[res_mapping["volume_size"]] = vm.volume_size
+            detail_info[res_mapping["namespace"]] = vm.namespace
+            detail_list.append(detail_info)
+
+        data["resource_info"] = resource_info
+        data["detail_info"] = detail_list
+        data["host_info"] = host_info
+
+    return data
+
+
+
+
+
+
+
+
+
+
 
 class ExcelException(object):
     pass

@@ -17,7 +17,8 @@ from uop.util import get_CRP_url, response_data, pageinit
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.permission.handler import api_permission_control
-from uop.resources.handler import deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1,get_counts,updata_deployment_info,delete_resource_deploy,get_from_uop
+from uop.resources.handler import (deal_myresource_to_excel, get_from_cmdb2, delete_cmdb2, delete_cmdb1,
+                                   get_counts,updata_deployment_info,delete_resource_deploy,get_from_uop,get_resource_detail)
 from uop.item_info.handler import get_uid_token, Aquery
 import sys
 reload(sys)
@@ -48,10 +49,10 @@ class ResourceApplication(Resource):
                 resource_type = info.get("resource_type", "")
                 business_name = info.get("business_name","")
                 module_name = info.get("module_name","")
-                resource_name = info.get("resource_name", "")
+                env = info.get("env", "")
                 if resource_type in ["app","kvm","mysql","redis","mongodb"]:
                     res_count = ResourceModel.objects.filter(project_name=project_name, resource_type=resource_type,
-                                                         business_name=business_name, module_name=module_name,resource_name=resource_name,is_deleted=0).count()
+                                                         business_name=business_name, module_name=module_name,env=env,is_deleted=0).count()
                     if res_count > 0:
                         res_exist_dict["project_name"] = project_name
                         res_exist_dict["resource_type"] = resource_type
@@ -1367,6 +1368,33 @@ class ResourceType(Resource):
         return res_content
 
 
+
+
+class MyResourceDetailInfo(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('resource_name', type=str)
+        parser.add_argument('env', type=str)
+        args = parser.parse_args()
+        resource_name = args.resource_name
+        env = args.env
+        code = 200
+        try:
+            data=get_resource_detail(resource_name,env)
+            msg = "Get resource detail info success"
+        except Exception as e:
+            code = 500
+            msg = "Get resource detail info error {e}".format(e=str(e))
+        return  response_data(code,msg,data)
+
+
+
+
+
+
+
+
 resources_api.add_resource(ResourceApplication, '/')
 resources_api.add_resource(ResourceDetail, '/<string:res_id>/')
 resources_api.add_resource(App, '/app/')
@@ -1377,3 +1405,4 @@ resources_api.add_resource(Dockerlogs, '/get_myresources/docker/logs/')
 resources_api.add_resource(testdeltecmdb, '/testdeltecmdb/')
 resources_api.add_resource(Statistic, '/statistic/')
 resources_api.add_resource(ResourceType, '/project')
+resources_api.add_resource(MyResourceDetailInfo, '/myresourceinfo')
