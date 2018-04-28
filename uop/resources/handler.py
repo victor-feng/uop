@@ -125,7 +125,7 @@ def get_resource_detail(resource_name,env):
         resource_info[res_mapping["wvip"]] = vm_one.wvip
         resource_info[res_mapping["rvip"]] = vm_one.rvip
         resource_info[res_mapping["vip"]] = vm_one.vip
-        resource_info[res_mapping["create_time"]] = vm_one.create_time
+        resource_info[res_mapping["create_time"]] = str(vm_one.create_time)
         host_info[res_mapping["physical_server"]] = vm_one.physical_server
         for vm in vms:
             detail_info = OrderedDict()
