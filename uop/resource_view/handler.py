@@ -232,6 +232,7 @@ def attach_resource_env(next_instance, resources, relation, id):
 
 def get_instance_id_list(id):
     sv = Statusvm.objects.filter(resource_view_id=id)
+    res_id = ''
     if sv:
         for s in sv:
             res_id = s.resource_id
