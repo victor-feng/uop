@@ -511,7 +511,7 @@ def updata_deployment_info(resource_name,env,url):
                 os_ins_list = []
                 ips=[]
                 osid_ip = [(res.get("pod_name"), res.get("pod_ip"),res.get("status"),res.get("node_name"))for res in res_list]
-                vmid_ip = osid_ip
+                vmid_ip = copy.deepcopy(osid_ip)
                 for os_ins in os_ins_ip_list:
                     cpu = getattr(os_ins, "cpu")
                     mem = getattr(os_ins, "mem")
