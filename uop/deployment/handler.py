@@ -354,7 +354,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
                                  network_id=o.network_id,networkName=match_one.get("networkName", ""),tenantName=match_one.get("tenantName", ""),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
-                                 ready_probe_path=o.ready_probe_path,lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
+                                 ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping)
             old_compute_list.insert(i, compute)
             res.save()
