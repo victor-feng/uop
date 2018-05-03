@@ -347,6 +347,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             Log.logger.info("333333333333333333333333333333{}".format(type(host_mapping)))
             if not isinstance(host_mapping,list):
                 host_mapping=eval(host_mapping)
+                host_mapping = json.dumps(host_mapping)
             else:
                 host_mapping = json.dumps(host_mapping)
             Log.logger.info("444444444444444444444444444444443{}".format(type(host_mapping)))
