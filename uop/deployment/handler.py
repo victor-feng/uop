@@ -344,14 +344,11 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             o = old_compute_list[i]
             old_compute_list.remove(old_compute_list[i])
             host_mapping=match_one.get("host_mapping",[])
-            Log.logger.info("333333333333333333333333333333{}".format(type(host_mapping)))
             if not isinstance(host_mapping,list):
                 host_mapping=eval(host_mapping)
                 host_mapping = json.dumps(host_mapping)
             else:
                 host_mapping = json.dumps(host_mapping)
-            Log.logger.info("444444444444444444444444444444443{}".format(type(host_mapping)))
-            Log.logger.info("5555555555555555555555555{}".format(host_mapping))
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port"),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
