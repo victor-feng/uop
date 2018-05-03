@@ -120,7 +120,7 @@ def get_resource_detail(resource_name,env):
 
         for vm in vms:
             detail_info = []
-            detail_info.appned([res_mapping["ip"],"ip",vm.ip])
+            detail_info.append([res_mapping["ip"],"ip",vm.ip])
             detail_info.append([res_mapping["cpu"],"cpu",vm.cpu + "核"])
             detail_info.append([res_mapping["mem"],"mem", vm.mem + "G"])
             detail_info.append([res_mapping["status"],"status", vm.status])
