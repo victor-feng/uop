@@ -487,7 +487,7 @@ class ItemInformation(db.DynamicDocument):
     user = db.StringField(required=True)
     user_id = db.StringField(required=True)
     item_id = db.StringField(required=True) # uuid
-    item_name = db.StringField(required=True, unique=True)  # toonbase, 工程名
+    item_name = db.StringField(required=True)  # toonbase, 工程名
     item_code = db.StringField(required=True) #类型：business, module, project
     item_depart = db.StringField(required=True) # 部门
     item_description = db.StringField(required=False)
