@@ -97,42 +97,41 @@ os_type_mapping={
 def get_resource_detail(resource_name,env):
 
     data = OrderedDict()
-    resource_info = OrderedDict()
+    resource_info = []
     detail_list=[]
     vms=Statusvm.objects.filter(resource_name=resource_name,env=env)
     if vms:
         vm_one=vms[0]
         domain=vm_one.domain
-        resource_info["resource_name"] = vm_one.resource_name
-        resource_info["business_name"] = vm_one.business_name
-        resource_info["module_name"] = vm_one.module_name
-        resource_info["project_name"] = vm_one.project_name
-        resource_info["department"] = vm_one.department
-        resource_info["user_id"] = vm_one.user_id
-        resource_info["os_type"] = os_type_mapping.get(vm_one.os_type, vm_one.os_type)
-        resource_info["replicas"] = len(vms)
-        resource_info["cloud"] = vm_one.cloud
-        resource_info["domain"] = domain
-        resource_info["wvip"] = vm_one.wvip
-        resource_info["rvip"] = vm_one.rvip
-        resource_info["vip"] = vm_one.vip
-        resource_info["create_time"] = str(vm_one.create_time)
+        resource_info.append([res_mapping["resource_name"],"resource_name",vm_one.resource_name])
+        resource_info.append([res_mapping["business_name"],"business_name", vm_one.business_name])
+        resource_info.append([res_mapping["module_name"],"module_name",vm_one.module_name])
+        resource_info.append([res_mapping["project_name"],"project_name",vm_one.project_name])
+        resource_info.append([res_mapping["department"],"department", vm_one.department])
+        resource_info.append([res_mapping["user_id"],"user_id", vm_one.user_id])
+        resource_info.append([res_mapping["os_type"],"os_type",os_type_mapping.get(vm_one.os_type, vm_one.os_type)])
+        resource_info.append([res_mapping["replicas"],"replicas", len(vms)])
+        resource_info.append([res_mapping["cloud"],"cloud", vm_one.cloud])
+        resource_info.append([res_mapping["domain"],"domain", domain])
+        resource_info.append([res_mapping["wvip"],"wvip",vm_one.wvip])
+        resource_info.append([res_mapping["rvip"],"rvip",vm_one.rvip])
+        resource_info.append([res_mapping["vip"],"vip", vm_one.vip])
+        resource_info.append([res_mapping["create_time"],"create_time", str(vm_one.create_time)])
 
         for vm in vms:
-            detail_info = OrderedDict()
-            detail_info["ip"] = vm.ip
-            detail_info["cpu"] = vm.cpu + "核"
-            detail_info["mem"] = vm.mem + "G"
-            detail_info["status"] = vm.status
-            detail_info["os_inst_id"] = vm.osid
-            detail_info["volume_size"] = vm.volume_size
-            detail_info["namespace"] = vm.namespace
-            detail_info["physical_server"] = vm_one.physical_server
+            detail_info = []
+            detail_info.appned([res_mapping["ip"],"ip",vm.ip])
+            detail_info.append([res_mapping["cpu"],"cpu",vm.cpu + "核"])
+            detail_info.append([res_mapping["mem"],"mem", vm.mem + "G"])
+            detail_info.append([res_mapping["status"],"status", vm.status])
+            detail_info.append([res_mapping["os_inst_id"],"os_inst_id", vm.osid])
+            detail_info.append([res_mapping["volume_size"],"volume_size",vm.volume_size])
+            detail_info.append([res_mapping["namespace"],"namespace", vm.namespace])
+            detail_info.append([res_mapping["physical_server"],"physical_server", vm_one.physical_server])
             detail_list.append(detail_info)
 
         data["resource_info"] = resource_info
         data["detail_info"] = detail_list
-        data["res_mapping"] = res_mapping
     Log.logger.info("The sorted data is {}".format(data))
     return data
 
