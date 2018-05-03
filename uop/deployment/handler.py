@@ -349,10 +349,10 @@ def attach_domain_ip(compute_list, res, cmdb_url):
             else:
                 host_mapping = json.dumps(host_mapping)
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
-                                 url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port", ""),
+                                 url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port"),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
                                  health_check=match_one.get("health_check", 0),capacity_list=o.capacity_list,
-                                 network_id=o.network_id,networkName=match_one.get("networkName", ""),tenantName=match_one.get("tenantName", ""),
+                                 network_id=o.network_id,networkName=match_one.get("networkName"),tenantName=match_one.get("tenantName"),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping)
