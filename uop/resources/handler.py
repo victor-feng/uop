@@ -118,6 +118,7 @@ def get_resource_detail(resource_name,env):
         res_info["rvip"] = [{"name": res_mapping["rvip"], "code": "rvip", "value": vm_one.rvip}]
         res_info["vip"] = [{"name": res_mapping["vip"], "code": "vip", "value": vm_one.vip}]
         res_info["create_time"] = [{"name":res_mapping["create_time"],"code":"create_time", "value":str(vm_one.create_time)}]
+        resource_info.append(res_info)
 
         for vm in vms:
             detail_info = {}
