@@ -125,7 +125,7 @@ def get_resource_detail(resource_name,env):
             detail_info["cpu"] = [{"name":res_mapping["cpu"],"code":"cpu","value":vm.cpu + "核"}]
             detail_info["append"] = [{"name":res_mapping["mem"],"code":"mem","value": vm.mem + "G"}]
             detail_info["status"] = [{"name": res_mapping["status"], "code": "status", "value": vm.status}]
-            detail_info["os_inst_id"] = [{"name": res_mapping["os_inst_id"], "code": "os_inst_id", "value": vm.os_inst_id}]
+            detail_info["os_inst_id"] = [{"name": res_mapping["os_inst_id"], "code": "os_inst_id", "value": vm.osid}]
             detail_info["volume_size"] = [{"name": res_mapping["volume_size"], "code": "volume_size", "value": vm.volume_size}]
             detail_info["namespace"] = [{"name": res_mapping["namespace"], "code": "namespace", "value": vm.namespace}]
             detail_info["physical_server"] = [{"name": res_mapping["physical_server"], "code": "physical_server", "value": vm.physical_server}]
