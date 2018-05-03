@@ -1,0 +1,4 @@
+{"_id":"dev","id":"dev","name":"开发环境"}
+{"_id":"test","id":"test","name":"测试环境"}
+{"_id":"prep","id":"prep","name":"预生产环境"}
+{"_id":"prod","id":"prod","name":"生产环境"}

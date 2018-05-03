@@ -1,0 +1,5 @@
+{"_id":"1afd7f24-0ca3-11e8-b41c-fa163e9474c9","name":"PM","description":"项目管理","updated_time":{"$date":"2018-03-22T10:32:25.876Z"},"created_time":{"$date":"2018-02-08T15:38:50.682Z"}}
+{"_id":"d7c24304-f1bb-11e7-a788-fa163e9474c9","created_time":{"$date":"2018-01-05T09:57:53.910Z"},"description":"普通用户","name":"user","updated_time":{"$date":"2018-03-27T10:24:05.743Z"}}
+{"_id":"30de3ee0-f1ba-11e7-b9d2-fa163e9474c9","created_time":{"$date":"2018-01-05T09:46:04.417Z"},"description":"管理员","name":"admin","updated_time":{"$date":"2018-03-27T10:23:54.791Z"}}
+{"_id":"9bedd900-37a8-11e8-a298-fa163e9474c9","name":"test","description":"对接测试","updated_time":{"$date":"2018-04-04T09:36:34.489Z"},"created_time":{"$date":"2018-04-04T09:36:34.489Z"}}
+{"_id":"9f0c733e-f1db-11e7-8b2f-fa163e9474c9","name":"super_admin","description":"超级管理员","updated_time":{"$date":"2018-01-12T11:50:39.166Z"},"created_time":{"$date":"2018-01-05T13:45:22.661Z"}}
