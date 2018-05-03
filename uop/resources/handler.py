@@ -663,6 +663,7 @@ def updata_deployment_info(resource_name,env,url):
                         )
                 for compute in compute_list:
                     compute.ips = ips
+                    domain = compute.domain
                     compute.save()
                 resource.os_ins_ip_list = os_ins_list
                 resource.save()
@@ -671,7 +672,7 @@ def updata_deployment_info(resource_name,env,url):
                 for vm in vms:
                     if vmid_ip:
                         one = vmid_ip.pop()
-                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3])
+                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain if domain else "")
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)

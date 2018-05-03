@@ -358,6 +358,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping)
             old_compute_list.insert(i, compute)
+            res.domain = match_one.get("domain", "")
             res.save()
         if cmdb_url:
             Log.logger.info("$$$$$$$$ Push domain info to cmdb stashvm")
