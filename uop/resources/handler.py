@@ -146,7 +146,7 @@ def get_resource_detail(resource_name,env):
             # detail_info["physical_server"] = [{"name": res_mapping["physical_server"], "code": "physical_server", "value": vm.physical_server}]
             # detail_list.append(detail_info)
             detail_info = []
-            detail_info.appned([res_mapping["ip"], "ip", vm.ip])
+            detail_info.append([res_mapping["ip"], "ip", vm.ip])
             detail_info.append([res_mapping["cpu"], "cpu", vm.cpu + "核"])
             detail_info.append([res_mapping["mem"], "mem", vm.mem + "G"])
             detail_info.append([res_mapping["status"], "status", vm.status])
