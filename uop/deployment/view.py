@@ -247,8 +247,9 @@ class DeploymentListAPI(Resource):
             #deploy_obj.save()
 
             # 将computer信息如IP，更新到数据库
-            cmdb_url = current_app.config['CMDB_URL']
-            appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+            if action == "admin_approve_allow":
+                cmdb_url = current_app.config['CMDB_URL']
+                appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
                 nginx_info = get_k8s_nginx(args.environment)
