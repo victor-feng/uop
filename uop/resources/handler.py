@@ -99,6 +99,22 @@ os_status_mapping={
     "error":u"错误"
 }
 
+base_overview_list=[
+    {u'count': 0, u'id': u'9bc4a41eb6364022b2f2c093', 'entity': 'mongodb'},
+    {u'count': 0, u'id': u'd8098981df71428784e65427', 'entity': 'Person'},
+    {u'count': 0, u'id': u'b593293378c74ba6827847d3', 'entity': 'host'},
+    {u'count': 0, u'id': u'e5024d360b924e0c8de3c6a8', 'entity': 'mysql'},
+    {u'count': 0, u'id': u'd0f338299fa34ce2bf5dd873', 'entity': 'container'},
+    {u'count': 0, u'id': u'c73339db70cc4647b515eaca', 'entity': 'yewu'},
+    {u'count': 0, u'id': u'd1b11a713e8842b2b93fe397', 'entity': 'tomcat'},
+    {u'count': 0, u'id': u'3671f248bdc74d2fb6aa590c', 'entity': 'nginx'},
+    {u'count': 0, u'id': u'de90d618f7504723b677f196', 'entity': 'redis'},
+    {u'count': 0, u'id': u'9e97b54a4a54472e9e913d4e', 'entity': 'Module'},
+    {u'count': 0, u'id': u'59c0af57133442e7b34654a3', 'entity': 'project'},
+    {u'count': 0, u'id': u'9a544097f789495e8ee4f5eb', 'entity': 'department'},
+    {u'count': 0, u'id': u'd4ad23e58f31497ca3ad2bab', 'entity': 'virtual_device'}
+]
+
 def get_resource_detail(resource_name,env):
 
     data = OrderedDict()
@@ -575,14 +591,14 @@ def get_counts():
 
     try:
         Log.logger.info("get_counts from CMDB2 data:{}".format(data))
-        ret = requests.post(url, data=json.dumps(data), timeout=5).json()
-        if ret["code"] == 0:
-            Log.logger.info("get_counts from CMDB2 ret:{}".format(ret))
-            dd = [dict(ins, entity=[k for k, v in ENTITY.items() if v == str(ins["id"])][0])
-                  for ins in ret["result"]["data"]]
-            Log.logger.info("111111111111111111111111111111111{}".format(dd))
-        else:
-            dd = ret
+        try:
+            ret = requests.post(url, data=json.dumps(data), timeout=5).json()
+            if ret["code"] == 0:
+                Log.logger.info("get_counts from CMDB2 ret:{}".format(ret))
+                dd = [dict(ins, entity=[k for k, v in ENTITY.items() if v == str(ins["id"])][0])
+                      for ins in ret["result"]["data"]]
+        except Exception as e:
+            dd = base_overview_list
         #获取部署数据库和应用数量
         res_list,msg=get_deploy_counts()
         if not msg :
