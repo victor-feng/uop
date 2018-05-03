@@ -93,6 +93,11 @@ os_type_mapping={
     "mongodb":"mongodb数据库",
 }
 
+os_status_mapping={
+    "active":u"运行中",
+    "shutoff":u"关机",
+    "error":u"错误"
+}
 
 def get_resource_detail(resource_name,env):
 
@@ -149,7 +154,7 @@ def get_resource_detail(resource_name,env):
             detail_info.append([res_mapping["ip"], "ip", vm.ip])
             detail_info.append([res_mapping["cpu"], "cpu", vm.cpu + "核"])
             detail_info.append([res_mapping["mem"], "mem", vm.mem + "G"])
-            detail_info.append([res_mapping["status"], "status", vm.status])
+            detail_info.append([res_mapping["status"], "status", os_status_mapping.get(vm.status,vm.status)])
             detail_info.append([res_mapping["os_inst_id"], "os_inst_id", vm.osid])
             detail_info.append([res_mapping["volume_size"], "volume_size", vm.volume_size])
             detail_info.append([res_mapping["namespace"], "namespace", vm.namespace])
