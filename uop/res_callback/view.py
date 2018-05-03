@@ -874,6 +874,7 @@ class ResourceStatusProviderCallBack(Resource):
                 #ins_type = mapping_type_status.get(instance_type, '')
                 #cur_instance_type = 'other' if not ins_type else ins_type
                 cur_instance_type = mapping_type_status.get(instance_type, instance_type)
+                d_instance_type = mapping_type_status.get(instance_type, "other")
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
                 if len(deps) > 0:
                     dep = deps[0]
@@ -881,7 +882,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record = StatusRecord.objects.filter(res_id=resource_id,s_type=cur_instance_type,set_flag=set_flag)
                 if status_record:
                     status_record=status_record[0]
-                    cur_instance_type_list = getattr(status_record, cur_instance_type)
+                    cur_instance_type_list = getattr(status_record, d_instance_type)
                     if quantity > 1:
                         if len(cur_instance_type_list)==(quantity-1):
                             status_record.s_type=cur_instance_type
@@ -927,7 +928,7 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
-                #setattr(status_record, cur_instance_type, cur_instance_type_list)
+                setattr(status_record, d_instance_type, cur_instance_type_list)
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()

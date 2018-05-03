@@ -573,6 +573,7 @@ class StatusRecord(db.Document):
     mongo = db.ListField(db.StringField())
     redis = db.ListField(db.StringField())
     mysql = db.ListField(db.StringField())
+    other = db.ListField(db.StringField())
     is_deleted = db.IntField(required=False, default=0)
     set_flag = db.StringField(default='')
     unique_flag = db.StringField()
