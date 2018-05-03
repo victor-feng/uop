@@ -926,7 +926,7 @@ class ResourceStatusProviderCallBack(Resource):
                             status_record.deploy_id = deploy_id
                         cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
-                setattr(status_record, cur_instance_type, cur_instance_type_list)
+                #setattr(status_record, cur_instance_type, cur_instance_type_list)
                 status_record.created_time=datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
