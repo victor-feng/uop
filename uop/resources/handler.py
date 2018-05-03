@@ -580,6 +580,7 @@ def get_counts():
             Log.logger.info("get_counts from CMDB2 ret:{}".format(ret))
             dd = [dict(ins, entity=[k for k, v in ENTITY.items() if v == str(ins["id"])][0])
                   for ins in ret["result"]["data"]]
+            Log.logger.info("111111111111111111111111111111111{}".format(dd))
         else:
             dd = ret
         #获取部署数据库和应用数量
