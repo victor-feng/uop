@@ -1078,6 +1078,9 @@ class GetDBInfo(Resource):
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             os_ins_ip_list = resource.os_ins_ip_list
+            wvip = "127.0.0.1"
+            rvip = "127.0.0.1"
+            vip = "127.0.0.1"
             for os_ins in os_ins_ip_list:
                 vip = os_ins.vip if os_ins.vip else "127.0.0.1"
                 wvip = os_ins.wvip if os_ins.wvip else "127.0.0.1"
