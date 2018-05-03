@@ -247,6 +247,7 @@ class DeploymentListAPI(Resource):
             #deploy_obj.save()
 
             # 将computer信息如IP，更新到数据库
+            appinfo = []
             if action == "admin_approve_allow":
                 cmdb_url = current_app.config['CMDB_URL']
                 appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
