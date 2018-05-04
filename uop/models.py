@@ -37,7 +37,7 @@ class ModelCache(db.Document):
     }
 
 class HostsCache(db.Document):
-    instance_id = db.StringField(default="", unique=True)
+    instance_id = db.StringField(default="")
     ip = db.StringField(required=False)
     name = db.StringField(required=False)
     cache_date = db.DateTimeField()
