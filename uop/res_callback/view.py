@@ -705,9 +705,6 @@ class ResourceProviderCallBack(Resource):
         resource.os_ins_list = os_ids
         resource.vid_list = vid_list
         resource.os_ins_ip_list = os_ip_list
-        #往vmstatus表里写入的数据
-        cmdb_p_code=resource.cmdb_p_code
-        filter_status_data(cmdb_p_code,"@", "@")
         # ---------to statusrecord
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         if len(deps) > 0:
@@ -772,6 +769,9 @@ class ResourceProviderCallBack(Resource):
         status_record.save()
         resource.reservation_status = status_record.status
         resource.save()
+        # 往vmstatus表里写入的数据
+        cmdb_p_code = resource.cmdb_p_code
+        filter_status_data(cmdb_p_code, "@", "@")
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
         if set_flag  == "increase" and status == 'ok':
             if cloud == '2' and resource_type == "app":
