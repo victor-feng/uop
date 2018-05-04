@@ -519,7 +519,7 @@ class ResourceProviderCallBack(Resource):
     """
     @async
     @classmethod
-    def write_data_cmdb1(cls,request_data,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL):
+    def write_data_cmdb1(cls,rpt,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL):
         """
         异步往cmdb1.0写入数据
         :param request_data:
@@ -531,11 +531,11 @@ class ResourceProviderCallBack(Resource):
         :param CMDB_URL:
         :return:
         """
-        Log.logger.info("Save to cmdb request data is {}".format(request_data))
-        property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                                                      request_data)
-        Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
-        rpt = ResourceProviderTransitions(property_mappers_list)
+        # Log.logger.info("Save to cmdb request data is {}".format(request_data))
+        # property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+        #                                               request_data)
+        # Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+        # rpt = ResourceProviderTransitions(property_mappers_list)
         rpt.start()
         if rpt.state == "stop":
             Log.logger.debug("完成停止")
@@ -602,7 +602,12 @@ class ResourceProviderCallBack(Resource):
             # 异步往cmdb写入数据
             CMDB_URL = current_app.config['CMDB_URL']
             if CMDB_URL:
-               cls.write_data_cmdb1(request_data,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL)
+                Log.logger.info("Save to cmdb request data is {}".format(request_data))
+                property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                               request_data)
+                Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+                rpt = ResourceProviderTransitions(property_mappers_list)
+                cls.write_data_cmdb1(rpt,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL)
             else:
                 pcode = str(uuid.uuid1())
                 resource.cmdb_p_code = pcode
