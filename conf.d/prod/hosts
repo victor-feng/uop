@@ -12,4 +12,4 @@
 172.28.26.203 mongo-3
 
 # keepalived
-172.28.26.204 cmdb-test.syswin.com uop-test.syswin.com
+172.28.26.204 uop.syswin.com
