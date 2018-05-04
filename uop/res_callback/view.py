@@ -13,7 +13,7 @@ from uop.res_callback.errors import res_callback_errors
 from uop.deploy_callback.handler import create_status_record
 from uop.res_callback.handler import *
 from transitions import Machine
-from uop.util import get_CRP_url
+from uop.util import get_CRP_url,async
 from uop.log import Log
 from uop.resources.handler import delete_cmdb1,delete_cmdb2,delete_uop
 from uop.permission.handler import api_permission_control
@@ -517,9 +517,57 @@ class ResourceProviderCallBack(Resource):
     """
     资源预留回调
     """
+    @async
+    @classmethod
+    def write_data_cmdb1(cls,request_data,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL):
+        """
+        异步往cmdb1.0写入数据
+        :param request_data:
+        :param resource:
+        :param set_flag:
+        :param cloud:
+        :param resource_type:
+        :param is_write_to_cmdb:
+        :param CMDB_URL:
+        :return:
+        """
+        Log.logger.info("Save to cmdb request data is {}".format(request_data))
+        property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
+                                                      request_data)
+        Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
+        rpt = ResourceProviderTransitions(property_mappers_list)
+        rpt.start()
+        if rpt.state == "stop":
+            Log.logger.debug("完成停止")
+        else:
+            Log.logger.debug(rpt.state)
+        if is_write_to_cmdb is True:
+            Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
+            if set_flag in ["increase", "reduce"]:
+                if cloud == "2" and resource_type == "app":
+                    resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+                else:
+                    CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
+                    old_pcode = copy.deepcopy(resource.cmdb_p_code)
+                    app_cluster_name = ""
+                    new_pcode = ""
+                    for itemid, pcode in rpt.pcode_mapper.items():
+                        if u"应用集群" in itemid:
+                            app_cluster_name = itemid[:-4]
+                            new_pcode = pcode
+                            break
+                    cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode,
+                                "app_cluster_name": app_cluster_name}
+                    Log.logger.info("increase or reduce to CMDB cmdb_req:{}".format(cmdb_req))
+                    data = json.dumps(cmdb_req)
+                    ret = requests.post(CMDB_STATUS_URL, data=data)
+                    Log.logger.info("CMDB return:{}".format(ret))
+            else:
+                resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+            resource.save()
 
     @classmethod
-    def process_cmdb1(cls, request_data):
+    def process_data(cls, request_data):
         resource_id = request_data.get('resource_id')
         status = request_data.get('status')
         error_msg = request_data.get('error_msg')
@@ -530,7 +578,6 @@ class ResourceProviderCallBack(Resource):
         cloud = resource.cloud
         is_write_to_cmdb = False
         increase_ips=[]
-        # TODO: resource.reservation_status全局硬编码("ok", "fail", "reserving", "unreserved")，后续需要统一修改
         if status == "ok":
             is_write_to_cmdb = True
             container = request_data.get('container',[])
@@ -552,42 +599,10 @@ class ResourceProviderCallBack(Resource):
                             j.url = img_url
                         j.ips = ips
                         j.quantity = len(ips)
-            # 往cmdb写入数据
+            # 异步往cmdb写入数据
             CMDB_URL = current_app.config['CMDB_URL']
             if CMDB_URL:
-                Log.logger.info("Save to cmdb request data is {}".format(request_data))
-                property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                                                              request_data)
-                Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
-                rpt = ResourceProviderTransitions(property_mappers_list)
-                rpt.start()
-                if rpt.state == "stop":
-                    Log.logger.debug("完成停止")
-                else:
-                    Log.logger.debug(rpt.state)
-                if is_write_to_cmdb is True:
-                    Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-                    if set_flag in ["increase","reduce"]:
-                        if cloud == "2" and resource_type == "app":
-                            resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-                        else:
-                            CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                            old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                            app_cluster_name = ""
-                            new_pcode = ""
-                            for itemid, pcode in rpt.pcode_mapper.items():
-                                if u"应用集群" in itemid:
-                                    app_cluster_name = itemid[:-4]
-                                    new_pcode = pcode
-                                    break
-                            cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode,
-                                        "app_cluster_name": app_cluster_name}
-                            Log.logger.info("increase or reduce to CMDB cmdb_req:{}".format(cmdb_req))
-                            data = json.dumps(cmdb_req)
-                            ret = requests.post(CMDB_STATUS_URL, data=data)
-                            Log.logger.info("CMDB return:{}".format(ret))
-                    else:
-                        resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
+               cls.write_data_cmdb1(request_data,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL)
             else:
                 pcode = str(uuid.uuid1())
                 resource.cmdb_p_code = pcode
@@ -658,6 +673,9 @@ class ResourceProviderCallBack(Resource):
         resource.os_ins_list = os_ids
         resource.vid_list = vid_list
         resource.os_ins_ip_list = os_ip_list
+        #往vmstatus表里写入的数据
+        cmdb_p_code=resource.cmdb_p_code
+        filter_status_data(cmdb_p_code,"@", "@")
         # ---------to statusrecord
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         if len(deps) > 0:
@@ -738,7 +756,7 @@ class ResourceProviderCallBack(Resource):
         code = 2002
         request_data = json.loads(request.data)
         try:
-            cls.process_cmdb1(request_data)
+            cls.process_data(request_data)
         except Exception as e:
             Log.logger.exception("[UOP to CMDB1] Resource callback failed, Excepton: %s", e.args)
             code = 500

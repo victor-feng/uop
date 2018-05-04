@@ -518,17 +518,18 @@ def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
             Log.logger.info("Save to CMDB2.0 successfully,{}".format(ret))
             db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
             if cloud == 1:
-                push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+                #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+                pass
             else:
                 # save uop and cmdb1
                 save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else: # 即便CMDB2失败，保存我的资源到UOP表
             Log.logger.info("Save to CMDB2.0 failed and save to uop and save to cmdb1.0")
-            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+            #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             Log.logger.error("[CMDB2.0 graph error]:{}".format(ret))
     except Exception as exc:
         #即使往cmdb2写入数据失败，也往uop里面写入数据
-        push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+        #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
         msg = traceback.format_exc()
         Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(msg))
 
@@ -569,7 +570,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
         CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
     else:
         CMDB_STATUS_URL = None
-    push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
+    #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
     def get_ip(ins):
         try:
             for os_ip in res.os_ins_ip_list:
