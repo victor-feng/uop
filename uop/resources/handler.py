@@ -635,18 +635,23 @@ def updata_deployment_info(resource_name,env,url):
                                 instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
                                 physical_server=one[3])
                         )
-                domain = resource.domain
+                domain = ""
                 for compute in compute_list:
                     compute.ips = ips
+                    domain = compute.domain
+                    domain_path = compute.domain_path
                     compute.save()
+                if domain_path:
+                    domain = domain + '/' + domain_path
                 resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 #更新Statusvm表数据
+                Log.logger.info("111111111111111111111111111{}".format(domain))
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
                     if vmid_ip:
                         one = vmid_ip.pop()
-                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain if domain else "")
+                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain)
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
