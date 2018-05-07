@@ -545,10 +545,6 @@ class CapacityInfoAPI(Resource):
                                 capacity_.network_id = docker_network_id.strip()
                     deployment.approve_status = "%s_success" % (
                         approval.capacity_status)
-                    if approval.capacity_status == "increase":
-                        deployment.deploy_result = "increasing"
-                    elif approval.capacity_status == "reduce":
-                        deployment.deploy_result = "reducing"
                     # 管理员审批通过后修改resource表deploy_name,更新当前版本
                     deploy_name = deployment.deploy_name
                     resource = models.ResourceModel.objects.get(
@@ -601,7 +597,7 @@ class CapacityReservation(Resource):
         approval_id = args.approval_id
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
-            #item_info = models.ItemInformation.objects.get(item_name=resource.project)
+            deployment = models.Deployment.objects.get(deploy_id=approval_id)
             approval = models.Approval.objects.get(approval_id=approval_id)
         except Exception as e:
             Log.logger.error(str(e))
@@ -743,10 +739,18 @@ class CapacityReservation(Resource):
             return ret, code
         if msg.status_code != 202:
             code = msg.status_code
-            res = "Failed to reserve resource."
+            res = "Failed to capacity resource."
+            if approval.capacity_status == "increase":
+                deployment.deploy_result = "increase_fail"
+            elif approval.capacity_status == "reduce":
+                deployment.deploy_result = "reduce_fail"
         else:
             code = 200
-            res = "Success in reserving resource."
+            res = "Success in capacity resource."
+            if approval.capacity_status == "increase":
+                deployment.deploy_result = "increasing"
+            elif approval.capacity_status == "reduce":
+                deployment.deploy_result = "reducing"
         resource.save()
         ret = {
             "code": code,
@@ -785,8 +789,6 @@ class RollBackInfoAPI(Resource):
                 if args.agree:
                     approval.approval_status = "rollback_success"
                     deployment.approve_status = "rollback_success"
-                    # 审批通过状态改为回滚中
-                    deployment.deploy_result = "rollbacking"
                 else:
                     approval.approval_status = "rollback_fail"
                     deployment.approve_status = "rollback_fail"
