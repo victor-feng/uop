@@ -308,14 +308,11 @@ class Reservation(Resource):
                     CPR_URL + "api/resource/sets",
                     data=data_str,
                     headers=headers)
-                resource.reservation_status = "configing"
             else:
                 msg = requests.post(
                     CPR_URL + "api/resource/sets",
                     data=data_str,
                     headers=headers)
-                resource.reservation_status = "reserving"
-            resource.save()
             code = 200
             res = "Success in reserving or configing resource."
         except Exception as e:
@@ -328,6 +325,17 @@ class Reservation(Resource):
                 }
             }
             return ret, code
+        if msg.status_code != 202:
+            if os_ins_ip_list:
+                resource.reservation_status = "config_fail"
+            else:
+                resource.reservation_status = "set_fail"
+        else:
+            if os_ins_ip_list:
+                resource.reservation_status = "configing"
+            else:
+                resource.reservation_status = "reserving"
+        resource.save()
         ret = {
             "code": code,
             "result": {
@@ -476,6 +484,8 @@ class ReservationAPI(Resource):
             resource.save()
             code = msg.status_code
             res = "Failed to reserve resource."
+            resource.reservation_status = "set_fail"
+            resource.save()
         else:
             resource.reservation_status = "reserving"
             resource.save()
@@ -758,10 +768,9 @@ class CapacityReservation(Resource):
             code = msg.status_code
             res = "Failed to reserve resource."
         else:
-            resource.reservation_status = "reserving"
-            resource.save()
             code = 200
             res = "Success in reserving resource."
+        resource.save()
         ret = {
             "code": code,
             "result": {
