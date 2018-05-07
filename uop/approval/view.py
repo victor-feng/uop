@@ -731,29 +731,6 @@ class CapacityReservation(Resource):
                         headers=headers)
                 elif approval.capacity_status == 'reduce':
                     msg = resource_reduce(resource, number, ips)
-                    # reduce_list = []
-                    # for os_ins in resource.os_ins_ip_list:
-                    #     if os_ins.ip in ips:
-                    #         reduce_list.append(os_ins)
-                    # reduce_list = random.sample(reduce_list, number)
-                    # os_inst_id_list = []
-                    # reduce_list = [eval(reduce_.to_json()) for reduce_ in reduce_list]
-                    # for os_ip_dict in reduce_list:
-                    #     os_inst_id = os_ip_dict["os_ins_id"]
-                    #     os_inst_id_list.append(os_inst_id)
-                    # crp_data = {
-                    #     "resource_id": resource.res_id,
-                    #     "resource_name": resource_name,
-                    #     "os_ins_ip_list": reduce_list,
-                    #     "resource_type": resource_type,
-                    #     "cloud": cloud,
-                    #     "set_flag": 'reduce',
-                    #     'syswin_project': 'uop'
-                    # }
-                    # env_ = get_CRP_url(resource.env)
-                    # crp_url = '%s%s' % (env_, 'api/resource/deletes')
-                    # crp_data = json.dumps(crp_data)
-                    # msg = requests.delete(crp_url, data=crp_data)
         except Exception as e:
             res = "failed to connect CRP service."
             code = 500
@@ -936,61 +913,6 @@ class RollBackReservation(Resource):
             deploy.deploy_result = 'rollbacking'
             deploy.approve_status = 'rollback_success'
             deploy.save()
-            # env = resource.env
-            # cloud = resource.cloud
-            # resource_name=resource.resource_name
-            # res_compute_list = resource.compute_list
-            # project_name = resource.project_name
-            # for res_compute in res_compute_list:
-            #     for compute in compute_list:
-            #         if res_compute["ins_id"] == compute["ins_id"]:
-            #             res_compute["url"] = compute["url"]
-            #             res_compute["port"] = compute["port"]
-            #             res_compute["domain"] = compute["domain"]
-            #             res_compute["domain_path"] = compute["domain_path"]
-            #             res_compute["database_config"] = compute["database_config"]
-            # resource.save()
-            # # ----------
-            # appinfo = []
-            # docker_list = []
-            # for compute in compute_list:
-            #     domain_ip = compute.get('domain_ip')
-            #     if domain_ip:
-            #         appinfo.append(compute)
-            #     docker_list.append(
-            #         {
-            #             'url': compute.get("url"),
-            #             'ins_name': compute.get("ins_name"),
-            #             'ip': compute.get("ips"),
-            #             'health_check': compute.get("health_check",0),
-            #             'host_env': compute.get("host_env"),
-            #             'language_env': compute.get("language_env"),
-            #             'deploy_source': compute.get("deploy_source"),
-            #             'database_config': compute.get("database_config")
-            #         }
-            #     )
-            # data["appinfo"] = appinfo
-            # data['docker'] = docker_list
-            # data["mysql"] = []
-            # data["mongodb"] = []
-            # data["dns"] = []
-            # data["disconf_server_info"] =[]
-            # data["deploy_id"] = deploy_id
-            # data["deploy_type"] = "rollback"
-            # data["cloud"] = cloud
-            # data["resource_name"] = resource_name
-            # data["deploy_name"] = deploy_name
-            # data["project_name"] = project_name
-            # data["environment"] = env
-            # CPR_URL = get_CRP_url(env)
-            # url = CPR_URL + "api/deploy/deploys"
-            # headers = {
-            #     'Content-Type': 'application/json',
-            # }
-            # data_str = json.dumps(data)
-            # Log.logger.debug("Data args is " + str(data))
-            # result = requests.post(url=url, headers=headers, data=data_str)
-            # Log.logger.debug("Result is " + str(result))
         except Exception as e:
             code = 500
             res = "Failed the rollback post data to crp. %s" % e
