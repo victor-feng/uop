@@ -645,7 +645,8 @@ def updata_deployment_info(resource_name,env,url):
                     compute.save()
                 if domain_path:
                     domain = domain + '/' + domain_path
-                resource.os_ins_ip_list = os_ins_list
+                if resource_type == "app":
+                    resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
