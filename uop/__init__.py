@@ -48,6 +48,13 @@ class Config(object):
                     'second': '0'
                 }
 
+        },
+        {
+            'id': 'get_cmdb2_entity',
+            'func': 'uop.scheduler_util:get_cmdb2_entity',
+            # 'args': (1, 2),
+            'trigger': 'interval',
+            'seconds': 60 * 5
         }
     ]
 

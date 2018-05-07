@@ -6,6 +6,30 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
+class EntityCache(db.DynamicDocument):
+    Person = db.StringField(default="")
+    department = db.StringField(default="")
+    yewu = db.StringField(default="")
+    Module = db.StringField(default="")
+    project = db.StringField(default="")
+    host = db.StringField(default="")
+    container = db.StringField(default="")
+    virtual_device = db.StringField(default="")
+    tomcat = db.StringField(default="")
+    mysql = db.StringField(default="")
+    redis = db.StringField(default="")
+    mongodb = db.StringField(default="")
+    nginx = db.StringField(default="")
+    rabbitmq = db.StringField(default="")
+    codis = db.StringField(default="")
+    apache = db.StringField(default="")
+    zookeeper = db.StringField(default="")
+    mycat = db.StringField(default="")
+
+    meta = {
+        'collection': 'entity_cache',
+    }
+
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)

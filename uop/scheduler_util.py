@@ -3,10 +3,11 @@
 import datetime
 
 import json
+import traceback
 import requests
 from models import db
 from uop.util import get_CRP_url
-from uop.models import ResourceModel, Deployment, Cmdb, ViewCache, Statusvm,ConfigureK8sModel
+from uop.models import ResourceModel, Deployment, Cmdb, ViewCache, Statusvm,ConfigureK8sModel, EntityCache
 from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
@@ -16,6 +17,72 @@ CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
+
+
+def get_cmdb2_entity():
+    Log.logger.info("-------start cache the entity--------")
+    uid, token = get_uid_token()
+    url = CMDB2_URL + "cmdb/openapi/entity/group/"
+    data = {
+      "uid": uid,
+      "token": token,
+      "sign": "",
+      "data": {
+        "name": ""
+      }
+    }
+    res = requests.post(url=url, data=data).json()
+    if res["code"] == 0:
+        res_data_list = res["data"]
+        for i in res_data_list:
+            if i["children"]:
+                for j in i["children"]:
+                    code = j["code"]
+                    children_id = j["id"]
+                    host = children_id if code == "host" else ""
+                    Person = children_id if  code == "Person" else ""
+                    department = children_id if code == "department" else ""
+                    yewu = children_id if code == "yewu" else ""
+                    Module = children_id if code == "Module" else ""
+                    project = children_id if code == "project" else ""
+                    container = children_id if code == "container" else ""
+                    virtual_device = children_id if code == "virtual_device" else ""
+                    tomcat = children_id if code == "tomcat" else ""
+                    mysql = children_id if code == "mysql" else ""
+                    redis = children_id if code == "redis" else ""
+                    mongodb = children_id if code == "mongodb" else ""
+                    nginx = children_id if code == "nginx" else ""
+                    rabbitmq = children_id if code == "rabbitmq" else ""
+                    codis = children_id if code == "codis" else ""
+                    apache = children_id if code == "apache" else ""
+                    zookeeper = children_id if code == "zookeeper" else ""
+                    mycat = children_id if code == "mycat" else ""
+        try:
+            entity = EntityCache(
+                host=host,
+                Person=Person,
+                department=department,
+                yewu=yewu,
+                Module=Module,
+                project=project,
+                container=container,
+                virtual_device=virtual_device,
+                tomcat=tomcat,
+                mysql=mysql,
+                redis=redis,
+                mongodb=mongodb,
+                nginx=nginx,
+                rabbitmq=rabbitmq,
+                codis=codis,
+                apache=apache,
+                zookeeper=zookeeper,
+                mycat=mycat
+            )
+            entity.save()
+        except Exception as e:
+            msg = traceback.format_exc()
+            Log.logger.info("The entity save error is {}".format(msg))
+
 
 # 删除 资源的 定时任务 调用接口
 def delete_res_handler():
