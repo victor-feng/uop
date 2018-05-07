@@ -651,6 +651,7 @@ def updata_deployment_info(resource_name,env,url):
                 for vm in vms:
                     if vmid_ip:
                         one = vmid_ip.pop()
+                        Log.logger.info("22222222222222222222222222222222222222222{} {}".format(domain,one))
                         vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain)
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
