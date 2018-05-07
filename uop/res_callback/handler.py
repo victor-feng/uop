@@ -230,6 +230,7 @@ def filter_status_data(p_code, id, num):
             meta["os_type"] = r.resource_type
             meta["status"] = "active"
             meta["cloud"] = r.cloud
+            meta["physical_server"] = oi.physical_server
             data["vm_status"].append(meta)
             vm = Statusvm.objects.filter(osid=meta["osid"])
             if not vm:
