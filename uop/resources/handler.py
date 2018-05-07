@@ -124,22 +124,6 @@ def get_resource_detail(resource_name,env):
     if vms:
         vm_one=vms[0]
         domain=vm_one.domain
-
-        # res_info["resource_name"] = [{"name":res_mapping["resource_name"],"code":"resource_name","value":vm_one.resource_name}]
-        # res_info["business_name"] = [{"name":res_mapping["business_name"],"code":"business_name", "value":vm_one.business_name}]
-        # res_info["module_name"] = [{"name":res_mapping["module_name"],"code":"module_name","value":vm_one.module_name}]
-        # res_info["project_name"] = [{"name":res_mapping["project_name"],"code":"project_name","value":vm_one.project_name}]
-        # res_info["department"] = [{"name":res_mapping["department"],"code":"department", "value":vm_one.department}]
-        # res_info["user_id"] = [{"name":res_mapping["user_id"],"code":"user_id", "value":vm_one.user_id}]
-        # res_info["os_type"] = [{"name":res_mapping["os_type"],"code":"os_type","value":os_type_mapping.get(vm_one.os_type, vm_one.os_type)}]
-        # res_info["replicas"] = [{"name":res_mapping["replicas"],"code":"replicas", "value":len(vms)}]
-        # res_info["cloud"] = [{"name":res_mapping["cloud"],"code":"cloud", "value":vm_one.cloud}]
-        # res_info["domain"] = [{"name":res_mapping["domain"],"code":"domain","value": domain}]
-        # res_info["wvip"] = [{"name":res_mapping["wvip"],"code":"wvip","value":vm_one.wvip}]
-        # res_info["rvip"] = [{"name": res_mapping["rvip"], "code": "rvip", "value": vm_one.rvip}]
-        # res_info["vip"] = [{"name": res_mapping["vip"], "code": "vip", "value": vm_one.vip}]
-        # res_info["create_time"] = [{"name":res_mapping["create_time"],"code":"create_time", "value":str(vm_one.create_time)}]
-        # resource_info.append(res_info)
         resource_info.append([res_mapping["resource_name"], "resource_name", vm_one.resource_name])
         resource_info.append([res_mapping["business_name"], "business_name", vm_one.business_name])
         resource_info.append([res_mapping["module_name"], "module_name", vm_one.module_name])
@@ -156,16 +140,6 @@ def get_resource_detail(resource_name,env):
         resource_info.append([res_mapping["create_time"], "create_time", str(vm_one.create_time)])
 
         for vm in vms:
-            # detail_info = {}
-            # detail_info["ip"] = [{"name":res_mapping["ip"],"code":"ip","value":vm.ip}]
-            # detail_info["cpu"] = [{"name":res_mapping["cpu"],"code":"cpu","value":vm.cpu + "核"}]
-            # detail_info["mem"] = [{"name":res_mapping["mem"],"code":"mem","value": vm.mem + "G"}]
-            # detail_info["status"] = [{"name": res_mapping["status"], "code": "status", "value": vm.status}]
-            # detail_info["os_inst_id"] = [{"name": res_mapping["os_inst_id"], "code": "os_inst_id", "value": vm.osid}]
-            # detail_info["volume_size"] = [{"name": res_mapping["volume_size"], "code": "volume_size", "value": vm.volume_size}]
-            # detail_info["namespace"] = [{"name": res_mapping["namespace"], "code": "namespace", "value": vm.namespace}]
-            # detail_info["physical_server"] = [{"name": res_mapping["physical_server"], "code": "physical_server", "value": vm.physical_server}]
-            # detail_list.append(detail_info)
             detail_info = []
             detail_info.append([res_mapping["ip"], "ip", vm.ip])
             detail_info.append([res_mapping["cpu"], "cpu", vm.cpu + "核"])
@@ -661,18 +635,24 @@ def updata_deployment_info(resource_name,env,url):
                                 instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
                                 physical_server=one[3])
                         )
+                domain = ""
                 for compute in compute_list:
                     compute.ips = ips
                     domain = compute.domain
+                    domain_path = compute.domain_path
                     compute.save()
+                if domain_path:
+                    domain = domain + '/' + domain_path
                 resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 #更新Statusvm表数据
+                Log.logger.info("111111111111111111111111111{}".format(domain))
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
                     if vmid_ip:
                         one = vmid_ip.pop()
-                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain if domain else "")
+                        Log.logger.info("22222222222222222222222222222222222222222{} {}".format(domain,one))
+                        vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain)
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)

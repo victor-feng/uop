@@ -1141,9 +1141,9 @@ class ResourceDeleteCallBack(Resource):
                     dep = None
                     deploy_id = None
                 if status == "success":
-                    msg = "删除资源成功"
+                    msg = "删除资源成功,%s" % os_inst_id
                 else:
-                    msg = "删除资源失败，%s" % (del_msg)
+                    msg = "删除资源失败，%s，%s" % (os_inst_id,del_msg)
                 s_type = resource_type
                 if resource_type == "app":
                     s_type = "docker"
