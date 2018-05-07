@@ -48,14 +48,21 @@ def get_cmdb2_entity():
                         project = children_id if code == "project" else ""
                         container = children_id if code == "container" else ""
                         virtual_device = children_id if code == "virtual_device" else ""
-                        if host or Person or department or yewu or Module or project or container or virtual_device:
+                        if host:
                             entity_dict['host'] = host
+                        if Person:
                             entity_dict['Person'] = Person
+                        if department:
                             entity_dict['department'] = department
+                        if yewu:
                             entity_dict['yewu'] = yewu
+                        if Module:
                             entity_dict['Module'] = Module
+                        if project:
                             entity_dict['project'] = project
+                        if container:
                             entity_dict['container'] = container
+                        if virtual_device:
                             entity_dict['virtual_device'] = virtual_device
                         if j["children"]:
                             for a in j["children"]:
@@ -71,17 +78,25 @@ def get_cmdb2_entity():
                                 apache = children_id if code == "apache" else ""
                                 zookeeper = children_id if code == "zookeeper" else ""
                                 mycat = children_id if code == "mycat" else ""
-                                if mysql or redis or tomcat or rabbitmq or mongodb or nginx or \
-                                        codis or apache or zookeeper or mycat:
+                                if mysql:
                                     entity_dict['mysql'] = mysql
+                                if redis:
                                     entity_dict['redis'] = redis
+                                if tomcat:
                                     entity_dict['tomcat'] = tomcat
+                                if rabbitmq:
                                     entity_dict['rabbitmq'] = rabbitmq
+                                if mongodb:
                                     entity_dict['mongodb'] = mongodb
+                                if nginx:
                                     entity_dict['nginx'] = nginx
+                                if codis:
                                     entity_dict['codis'] = codis
+                                if apache:
                                     entity_dict['apache'] = apache
+                                if zookeeper:
                                     entity_dict['zookeeper'] = zookeeper
+                                if mycat:
                                     entity_dict['mycat'] = mycat
 
 
