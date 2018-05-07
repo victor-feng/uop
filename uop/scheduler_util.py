@@ -32,56 +32,57 @@ def get_cmdb2_entity():
       }
     }
     res = requests.post(url=url, data=data).json()
-    if res["code"] == 0:
-        res_data_list = res["data"]
-        for i in res_data_list:
-            if i["children"]:
-                for j in i["children"]:
-                    code = j["code"]
-                    children_id = j["id"]
-                    host = children_id if code == "host" else ""
-                    Person = children_id if  code == "Person" else ""
-                    department = children_id if code == "department" else ""
-                    yewu = children_id if code == "yewu" else ""
-                    Module = children_id if code == "Module" else ""
-                    project = children_id if code == "project" else ""
-                    container = children_id if code == "container" else ""
-                    virtual_device = children_id if code == "virtual_device" else ""
-                    tomcat = children_id if code == "tomcat" else ""
-                    mysql = children_id if code == "mysql" else ""
-                    redis = children_id if code == "redis" else ""
-                    mongodb = children_id if code == "mongodb" else ""
-                    nginx = children_id if code == "nginx" else ""
-                    rabbitmq = children_id if code == "rabbitmq" else ""
-                    codis = children_id if code == "codis" else ""
-                    apache = children_id if code == "apache" else ""
-                    zookeeper = children_id if code == "zookeeper" else ""
-                    mycat = children_id if code == "mycat" else ""
-        try:
-            entity = EntityCache(
-                host=host,
-                Person=Person,
-                department=department,
-                yewu=yewu,
-                Module=Module,
-                project=project,
-                container=container,
-                virtual_device=virtual_device,
-                tomcat=tomcat,
-                mysql=mysql,
-                redis=redis,
-                mongodb=mongodb,
-                nginx=nginx,
-                rabbitmq=rabbitmq,
-                codis=codis,
-                apache=apache,
-                zookeeper=zookeeper,
-                mycat=mycat
-            )
-            entity.save()
-        except Exception as e:
-            msg = traceback.format_exc()
-            Log.logger.info("The entity save error is {}".format(msg))
+    with db.app.app_context():
+        if res["code"] == 0:
+            res_data_list = res["data"]
+            for i in res_data_list:
+                if i["children"]:
+                    for j in i["children"]:
+                        code = j["code"]
+                        children_id = j["id"]
+                        host = children_id if code == "host" else ""
+                        Person = children_id if  code == "Person" else ""
+                        department = children_id if code == "department" else ""
+                        yewu = children_id if code == "yewu" else ""
+                        Module = children_id if code == "Module" else ""
+                        project = children_id if code == "project" else ""
+                        container = children_id if code == "container" else ""
+                        virtual_device = children_id if code == "virtual_device" else ""
+                        tomcat = children_id if code == "tomcat" else ""
+                        mysql = children_id if code == "mysql" else ""
+                        redis = children_id if code == "redis" else ""
+                        mongodb = children_id if code == "mongodb" else ""
+                        nginx = children_id if code == "nginx" else ""
+                        rabbitmq = children_id if code == "rabbitmq" else ""
+                        codis = children_id if code == "codis" else ""
+                        apache = children_id if code == "apache" else ""
+                        zookeeper = children_id if code == "zookeeper" else ""
+                        mycat = children_id if code == "mycat" else ""
+            try:
+                entity = EntityCache(
+                    host=host,
+                    Person=Person,
+                    department=department,
+                    yewu=yewu,
+                    Module=Module,
+                    project=project,
+                    container=container,
+                    virtual_device=virtual_device,
+                    tomcat=tomcat,
+                    mysql=mysql,
+                    redis=redis,
+                    mongodb=mongodb,
+                    nginx=nginx,
+                    rabbitmq=rabbitmq,
+                    codis=codis,
+                    apache=apache,
+                    zookeeper=zookeeper,
+                    mycat=mycat
+                )
+                entity.save()
+            except Exception as e:
+                msg = traceback.format_exc()
+                Log.logger.info("The entity save error is {}".format(msg))
 
 
 # 删除 资源的 定时任务 调用接口

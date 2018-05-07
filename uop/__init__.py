@@ -19,6 +19,8 @@ from uop.disconf import disconf_blueprint
 from uop.configure import configure_blueprint
 from uop.pool import pool_blueprint
 from uop.permission import perm_blueprint
+
+
 class Config(object):
     JOBS = [
         # {
@@ -36,6 +38,13 @@ class Config(object):
             'seconds': 60 * 5
         },
         {
+            'id': 'get_cmdb2_entity',
+            'func': 'uop.scheduler_util:get_cmdb2_entity',
+            # 'args': (1, 2),
+            'trigger': 'interval',
+            'seconds': 60
+        },
+        {
             'id': 'get_relations',
             'func': 'uop.scheduler_util:get_relations',
             # 'args': (1, 2),
@@ -48,13 +57,6 @@ class Config(object):
                     'second': '0'
                 }
 
-        },
-        {
-            'id': 'get_cmdb2_entity',
-            'func': 'uop.scheduler_util:get_cmdb2_entity',
-            # 'args': (1, 2),
-            'trigger': 'interval',
-            'seconds': 60 * 5
         }
     ]
 
