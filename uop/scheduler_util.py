@@ -31,7 +31,7 @@ def get_cmdb2_entity():
         "name": ""
       }
     }
-    res = requests.post(url=url, data=data).json()
+    res = requests.post(url=url, data=data)
     with db.app.app_context():
         if res["code"] == 0:
             res_data_list = res["data"]
