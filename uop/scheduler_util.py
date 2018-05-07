@@ -87,24 +87,24 @@ def get_cmdb2_entity():
 
             try:
                 entity = EntityCache(
-                    host=host,
-                    Person=Person,
-                    department=department,
-                    yewu=yewu,
-                    Module=Module,
-                    project=project,
-                    container=container,
-                    virtual_device=virtual_device,
-                    tomcat=tomcat,
-                    mysql=mysql,
-                    redis=redis,
-                    mongodb=mongodb,
-                    nginx=nginx,
-                    rabbitmq=rabbitmq,
-                    codis=codis,
-                    apache=apache,
-                    zookeeper=zookeeper,
-                    mycat=mycat
+                    host=entity_dict["host"],
+                    Person=entity_dict['Person'],
+                    department=entity_dict['department'],
+                    yewu=entity_dict['yewu'],
+                    Module=entity_dict['Module'],
+                    project=entity_dict['project'],
+                    container=entity_dict['container'],
+                    virtual_device=entity_dict['virtual_device'],
+                    tomcat=entity_dict['tomcat'],
+                    mysql=entity_dict['mysql'],
+                    redis=entity_dict['redis'],
+                    mongodb=entity_dict['mongodb'],
+                    nginx=entity_dict['nginx'],
+                    rabbitmq=entity_dict['rabbitmq'],
+                    codis=entity_dict['codis'],
+                    apache=entity_dict['apache'],
+                    zookeeper=entity_dict['zookeeper'],
+                    mycat=entity_dict['mycat']
                 )
                 entity.save()
             except Exception as e:
