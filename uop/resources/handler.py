@@ -635,9 +635,9 @@ def updata_deployment_info(resource_name,env,url):
                                 instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
                                 physical_server=one[3])
                         )
+                domain = resource.domain
                 for compute in compute_list:
                     compute.ips = ips
-                    domain = compute.domain
                     compute.save()
                 resource.os_ins_ip_list = os_ins_list
                 resource.save()
