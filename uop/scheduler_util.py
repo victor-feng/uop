@@ -32,6 +32,12 @@ def get_cmdb2_entity():
       }
     }
     entity_dict = {}
+    """
+    dev not exist
+    """
+    entity_dict['codis'] = ""
+    entity_dict['apache'] = ""
+    entity_dict['zookeeper'] = ""
     res = requests.post(url, data=json.dumps(data)).json()
     with db.app.app_context():
         if res["code"] == 0:
