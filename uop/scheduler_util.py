@@ -31,33 +31,60 @@ def get_cmdb2_entity():
         "name": ""
       }
     }
+    entity_dict = {}
     res = requests.post(url, data=json.dumps(data)).json()
     with db.app.app_context():
         if res["code"] == 0:
-            res_data_list = res["data"]
-            for i in res_data_list:
+            for i in res["data"]:
                 if i["children"]:
                     for j in i["children"]:
                         code = j["code"]
                         children_id = j["id"]
                         host = children_id if code == "host" else ""
-                        Person = children_id if  code == "Person" else ""
+                        Person = children_id if code == "Person" else ""
                         department = children_id if code == "department" else ""
                         yewu = children_id if code == "yewu" else ""
                         Module = children_id if code == "Module" else ""
                         project = children_id if code == "project" else ""
                         container = children_id if code == "container" else ""
                         virtual_device = children_id if code == "virtual_device" else ""
-                        tomcat = children_id if code == "tomcat" else ""
-                        mysql = children_id if code == "mysql" else ""
-                        redis = children_id if code == "redis" else ""
-                        mongodb = children_id if code == "mongodb" else ""
-                        nginx = children_id if code == "nginx" else ""
-                        rabbitmq = children_id if code == "rabbitmq" else ""
-                        codis = children_id if code == "codis" else ""
-                        apache = children_id if code == "apache" else ""
-                        zookeeper = children_id if code == "zookeeper" else ""
-                        mycat = children_id if code == "mycat" else ""
+                        if host or Person or department or yewu or Module or project or container or virtual_device:
+                            entity_dict['host'] = host
+                            entity_dict['Person'] = Person
+                            entity_dict['department'] = department
+                            entity_dict['yewu'] = yewu
+                            entity_dict['Module'] = Module
+                            entity_dict['project'] = project
+                            entity_dict['container'] = container
+                            entity_dict['virtual_device'] = virtual_device
+                        if j["children"]:
+                            for a in j["children"]:
+                                code = a["code"]
+                                children_id = a["id"]
+                                mysql = children_id if code == "mysql" else ""
+                                redis = children_id if code == "redis" else ""
+                                tomcat = children_id if code == "tomcat" else ""
+                                rabbitmq = children_id if code == "rabbitmq" else ""
+                                mongodb = children_id if code == "mongodb" else ""
+                                nginx = children_id if code == "nginx" else ""
+                                codis = children_id if code == "codis" else ""
+                                apache = children_id if code == "apache" else ""
+                                zookeeper = children_id if code == "zookeeper" else ""
+                                mycat = children_id if code == "mycat" else ""
+                                if mysql or redis or tomcat or rabbitmq or mongodb or nginx or \
+                                        codis or apache or zookeeper or mycat:
+                                    entity_dict['mysql'] = mysql
+                                    entity_dict['redis'] = redis
+                                    entity_dict['tomcat'] = tomcat
+                                    entity_dict['rabbitmq'] = rabbitmq
+                                    entity_dict['mongodb'] = mongodb
+                                    entity_dict['nginx'] = nginx
+                                    entity_dict['codis'] = codis
+                                    entity_dict['apache'] = apache
+                                    entity_dict['zookeeper'] = zookeeper
+                                    entity_dict['mycat'] = mycat
+
+
             try:
                 entity = EntityCache(
                     host=host,
