@@ -614,6 +614,7 @@ def updata_deployment_info(resource_name,env,url):
             res_list = response["result"]["data"]["res_list"]
             if response.get('code') == 200:
                 resource = ResourceModel.objects.get(resource_name=resource_name, env=env)
+                resource_type = resource.resource_type
                 os_ins_ip_list = resource.os_ins_ip_list
                 compute_list = resource.compute_list
                 os_ins_list = []
@@ -637,7 +638,8 @@ def updata_deployment_info(resource_name,env,url):
                         )
                 domain = ""
                 for compute in compute_list:
-                    compute.ips = ips
+                    if resource_type == "app":
+                        compute.ips = ips
                     domain = compute.domain
                     domain_path = compute.domain_path
                     compute.save()
@@ -646,13 +648,13 @@ def updata_deployment_info(resource_name,env,url):
                 resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 #更新Statusvm表数据
-                Log.logger.info("111111111111111111111111111{}".format(domain))
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
                     if vmid_ip:
                         one = vmid_ip.pop()
-                        Log.logger.info("22222222222222222222222222222222222222222{} {}".format(domain,one))
                         vm.update(status=one[2], osid=one[0], ip=one[1],physical_server=one[3],domain=domain)
+                    else:
+                        vm.update(domain=domain)
     except Exception as e:
         err_msg = "Update deployment info to resource error {e}".format(e=str(e))
         Log.logger.error(err_msg)
