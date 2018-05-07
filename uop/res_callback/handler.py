@@ -584,6 +584,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
             Log.logger.error("get_ip error:{}".format(str(exc)))
         return ""
     ins_id = [ins["instance_id"] + "@_" + get_ip(ins) for ins in instances if ins["instance_id"]]
+    Log.logger.info("The ins id is {}".format(ins_id))
     if ins_id:
         try:
             with save_lock:
