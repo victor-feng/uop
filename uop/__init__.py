@@ -41,8 +41,14 @@ class Config(object):
             'id': 'get_cmdb2_entity',
             'func': 'uop.scheduler_util:get_cmdb2_entity',
             # 'args': (1, 2),
-            'trigger': 'interval',
-            'seconds': 60
+            'trigger':
+                {
+                    'type': 'cron',
+                    'day_of_week': "mon-fri",
+                    'hour': '0',
+                    'minute': '0',
+                    'second': '0'
+                }
         },
         {
             'id': 'get_relations',
