@@ -6,7 +6,7 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
-class EntityCache(db.DynamicDocument):
+class EntityCache(db.Document):
     Person = db.StringField(default="")
     department = db.StringField(default="")
     yewu = db.StringField(default="")
@@ -30,47 +30,6 @@ class EntityCache(db.DynamicDocument):
     meta = {
         'collection': 'entity_cache',
     }
-
-    @classmethod
-    def get_entity_cache(cls):
-        CMDB2_ENTITY = {}
-        CMDB2_VIEWS = {}
-        try:
-            entity = EntityCache.objects().last()
-            CMDB2_ENTITY = {
-                "Person": entity.Person,
-                "department": entity.department,
-                "yewu": entity.yewu,
-                "Module": entity.Module,
-                "project": entity.project,
-                "host": entity.host,
-                "container": entity.container,
-                "virtual_device": entity.virtual_device,
-                "tomcat": entity.tomcat,
-                "mysql": entity.mysql,
-                "redis": entity.redis,
-                "mongodb": entity.mongodb,
-                "nginx": entity.nginx,
-            }
-            CMDB2_VIEWS = {
-                # 注意：定时任务只会缓存1，2，3 三个视图下的基础模型数据
-                "1": ("B7", u"工程 --> 物理机，用于拿到各层间实体关系信息", entity.project),  # （视图名，描述，起点实体id）
-                "2": ("B6", u"部门 --> 资源，用于分级展示业务模块工程", entity.department),
-                "3": ("B5", u"人 --> 部门 --> 工程", entity.Person),
-
-                "4": ("B8", u"tomcat --> 机房，展示tomcat资源视图", entity.tomcat),
-                "5": ("B9", u"mysql --> 机房，展示mysql资源视图", entity.mysql),
-                "6": ("B10", u"mongodb--> 机房，展示mongodb资源视图", entity.mongodb),
-                "7": ("B11", u"redis --> 机房，展示redis资源视图", entity.redis),
-                "8": ("B12", u"物理机信息", entity.host),
-                "9": ("B13", u"模块 --> 物理机，用于拿到各层间实体关系信息", entity.Module),
-                "10": ("B14", u"nginx --> 机房，展示nginx资源视图", entity.nginx)
-                # "5": ("B3", u"资源 --> 机房"),
-            }
-        except Exception as e:
-            logging.info("The error is {}".format(e))
-        return CMDB2_ENTITY, CMDB2_VIEWS
-
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
