@@ -112,3 +112,10 @@ def create_app(config_name):
     app.register_blueprint(perm_blueprint, url_prefix='/api/permission')
 
     return app
+
+
+try:
+    entity = get_entity_cache()
+    print "The entity info is {}".format(entity)
+except Exception as e:
+    print e
