@@ -25,6 +25,7 @@ class EntityCache(db.DynamicDocument):
     apache = db.StringField(default="")
     zookeeper = db.StringField(default="")
     mycat = db.StringField(default="")
+    created_time = db.DateTimeField(default="")
 
     meta = {
         'collection': 'entity_cache',

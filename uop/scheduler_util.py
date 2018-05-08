@@ -125,7 +125,8 @@ def get_cmdb2_entity():
             codis=entity_dict['codis'],
             apache=entity_dict['apache'],
             zookeeper=entity_dict['zookeeper'],
-            mycat=entity_dict['mycat']
+            mycat=entity_dict['mycat'],
+            created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
         entity.save()
     except Exception as e:
