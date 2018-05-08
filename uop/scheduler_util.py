@@ -110,9 +110,9 @@ def get_cmdb2_entity():
     entity_list.append(entity_dict)
     try:
         entity_obj = EntityCache(
+            entity=json.dumps(entity_list),
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
-        entity_obj.entity = entity_list
         entity_obj.save()
     except Exception as e:
         msg = traceback.format_exc()
