@@ -5,14 +5,15 @@ import IPy
 import time
 import requests
 import json
-from log import Log
+from uop.log import Log
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from uop.models import NetWorkConfig, EntityCache
+from uop.models import db, NetWorkConfig, EntityCache
 
 
 def get_entity_cache():
+    err_msg = None
     CMDB2_ENTITY = {}
     CMDB2_VIEWS = {}
     try:
@@ -49,8 +50,8 @@ def get_entity_cache():
             # "5": ("B3", u"资源 --> 机房"),
         }
     except Exception as e:
-        Log.logger.debug("The error is {}".format(e))
-    return CMDB2_ENTITY, CMDB2_VIEWS
+        err_msg = "The error is {e}".format(e=str(e))
+    return err_msg,CMDB2_ENTITY, CMDB2_VIEWS
 
 
 def async(fun):

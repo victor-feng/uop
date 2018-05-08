@@ -7,13 +7,19 @@ db = MongoEngine()
 
 
 class EntityCache(db.Document):
+
     entity = db.ListField(required=True)
     created_time = db.DateTimeField(default="")
 
     meta = {
         'collection': 'entity_cache',
+        'indexes': [
+            {
+                'fields': [],
+                'unique': False,
+            }
+        ],
     }
-
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
