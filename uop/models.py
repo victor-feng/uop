@@ -6,9 +6,9 @@ from flask_mongoengine import MongoEngine
 db = MongoEngine()
 
 
-class EntityCache(db.DynamicDocument):
+class EntityCache(db.Document):
     entity = db.StringField(required=False, default="")
-    created_time = db.DateTimeField(default="")
+    created_time = db.DateTimeField()
 
     meta = {
         'collection': 'entity_cache',

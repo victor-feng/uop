@@ -108,9 +108,10 @@ def get_cmdb2_entity():
                                     entity_dict['mycat'] = mycat
     Log.logger.info("The entity dict is {}".format(entity_dict))
     entity_list.append(entity_dict)
+    entity_data = json.dumps(entity_list)
     try:
         entity_obj = EntityCache(
-            entity=json.dumps(entity_list),
+            entity=entity_data,
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
         entity_obj.save()
