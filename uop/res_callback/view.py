@@ -584,7 +584,6 @@ class ResourceProviderCallBack(Resource):
             for i in container:
                 for j in resource.compute_list:
                     if i.get('ins_id') == j.ins_id:
-                        # j.ips = [ins.get('ip') for ins in i.get('instance')]
                         ips=j.ips
                         if cloud == "2" and resource_type == "app":
                             ips=[]
