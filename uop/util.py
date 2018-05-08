@@ -18,7 +18,7 @@ def get_entity_cache():
     CMDB2_VIEWS = {}
     try:
         entity_obj = EntityCache.objects().last()
-        entity = entity_obj.entity
+        entity = json.loads(entity_obj.entity)[0]
         CMDB2_ENTITY = {
             "Person": entity.get("Person", ""),
             "department": entity.get("department", ""),
@@ -51,7 +51,7 @@ def get_entity_cache():
         }
     except Exception as e:
         err_msg = "The error is {e}".format(e=str(e))
-    return err_msg,CMDB2_ENTITY, CMDB2_VIEWS
+    return CMDB2_ENTITY, CMDB2_VIEWS
 
 
 def async(fun):
