@@ -5,7 +5,7 @@ import IPy
 import time
 import requests
 import json
-from log import Log
+from uop.log import Log
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
