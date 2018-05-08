@@ -50,7 +50,7 @@ def get_entity_cache():
             # "5": ("B3", u"资源 --> 机房"),
         }
     except Exception as e:
-        err_msg = "The error is {e}".format(e=str(e))
+        print "The error is {e}".format(e=str(e))
     return CMDB2_ENTITY, CMDB2_VIEWS
 
 
