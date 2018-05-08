@@ -222,32 +222,31 @@ def _delete_res(res_id):
 # 刷新 虚拟机 状态的 调用接口
 def flush_crp_to_cmdb():
     Log.logger.info('----------------flush_crp_to_cmdb job/5min----------------')
-    #resources = ResourceModel.objects.filter(approval_status="success",is_deleted=0)
     osid_status = []
     now = datetime.datetime.now()
     with db.app.app_context():
-        # for resource in resources:
-        #     env_list.add(resource.env)
         try:
             env_list = CRP_URL.keys()
             for env in env_list:
                 if not env:
                     continue
-                K8sInfos = ConfigureK8sModel.objects.filter(env=env)
-                if K8sInfos:
-                    for info in K8sInfos:
-                        namespace = info.namespace_name
+                try:
+                    K8sInfos = ConfigureK8sModel.objects.filter(env=env)
+                    if K8sInfos:
+                        for info in K8sInfos:
+                            namespace = info.namespace_name
+                            env_ = get_CRP_url(env)
+                            crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
+                            ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                            osid_status.append(ret)
+                    else:
                         env_ = get_CRP_url(env)
-                        crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
+                        crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
                         ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                        meta = {k:v for k,v in ret.items()}
-                        osid_status.append(meta)
-                else:
-                    env_ = get_CRP_url(env)
-                    crp_url = '%s%s' % (env_, 'api/openstack/nova/states')
-                    ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
-                    meta = {k:v for k, v in ret.items()}
-                    osid_status.append(meta)
+                        osid_status.append(ret)
+                except Exception as e:
+                    Log.logger.error("Get vm info from crp error {}".format(e))
+
             if osid_status:
                 for os in osid_status:
                     for k, v in os.items():
