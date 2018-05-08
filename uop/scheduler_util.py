@@ -109,11 +109,11 @@ def get_cmdb2_entity():
     Log.logger.info("The entity dict is {}".format(entity_dict))
     # entity_list.append(entity_dict)
     try:
-        entity = EntityCache(
-            entity=entity_dict,
+        entity_obj = EntityCache(
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
-        entity.save()
+        entity_obj.entity = entity_dict
+        entity_obj.save()
     except Exception as e:
         msg = traceback.format_exc()
         Log.logger.info("The entity save error is {}".format(msg))
