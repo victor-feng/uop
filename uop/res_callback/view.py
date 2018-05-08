@@ -584,7 +584,6 @@ class ResourceProviderCallBack(Resource):
             for i in container:
                 for j in resource.compute_list:
                     if i.get('ins_id') == j.ins_id:
-                        # j.ips = [ins.get('ip') for ins in i.get('instance')]
                         ips=j.ips
                         if cloud == "2" and resource_type == "app":
                             ips=[]
@@ -603,39 +602,6 @@ class ResourceProviderCallBack(Resource):
             CMDB_URL = current_app.config['CMDB_URL']
             if CMDB_URL:
                 cls.write_data_cmdb1(request_data,resource,set_flag,cloud,resource_type,is_write_to_cmdb,CMDB_URL)
-                # Log.logger.info("Save to cmdb request data is {}".format(request_data))
-                # property_mappers_list = do_transit_repo_items(items_sequence_list_config, property_json_mapper_config,
-                #                                                request_data)
-                # Log.logger.debug('property_mappers_list 的内容是：%s' % property_mappers_list)
-                # rpt = ResourceProviderTransitions(property_mappers_list)
-                # rpt.start()
-                # if rpt.state == "stop":
-                #     Log.logger.debug("完成停止")
-                # else:
-                #     Log.logger.debug(rpt.state)
-                # if is_write_to_cmdb is True:
-                #     Log.logger.debug("rpt.pcode_mapper的内容:%s" % (rpt.pcode_mapper))
-                #     if set_flag in ["increase", "reduce"]:
-                #         if cloud == "2" and resource_type == "app":
-                #             resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
-                #         else:
-                #             CMDB_STATUS_URL = CMDB_URL + 'cmdb/api/scale/'
-                #             old_pcode = copy.deepcopy(resource.cmdb_p_code)
-                #             app_cluster_name = ""
-                #             new_pcode = ""
-                #             for itemid, pcode in rpt.pcode_mapper.items():
-                #                 if u"应用集群" in itemid:
-                #                     app_cluster_name = itemid[:-4]
-                #                     new_pcode = pcode
-                #                     break
-                #             cmdb_req = {"old_pcode": old_pcode, "new_pcode": new_pcode,
-                #                         "app_cluster_name": app_cluster_name}
-                #             Log.logger.info("increase or reduce to CMDB cmdb_req:{}".format(cmdb_req))
-                #             data = json.dumps(cmdb_req)
-                #             ret = requests.post(CMDB_STATUS_URL, data=data)
-                #             Log.logger.info("CMDB return:{}".format(ret))
-                #     else:
-                #         resource.cmdb_p_code = rpt.pcode_mapper.get('deploy_instance')
             else:
                 pcode = str(uuid.uuid1())
                 resource.cmdb_p_code = pcode
