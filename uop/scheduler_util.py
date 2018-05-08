@@ -238,7 +238,7 @@ def _delete_res(res_id):
 # 刷新 虚拟机 状态的 调用接口
 def flush_crp_to_cmdb():
     Log.logger.info('----------------flush_crp_to_cmdb job/5min----------------')
-    resources = ResourceModel.objects.filter(approval_status="success",is_deleted=0)
+    #resources = ResourceModel.objects.filter(approval_status="success",is_deleted=0)
     osid_status = []
     now = datetime.datetime.now()
     with db.app.app_context():
