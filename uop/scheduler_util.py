@@ -17,6 +17,7 @@ CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
+CRP_URL = configs[APP_ENV].CRP_URL
 
 
 def get_cmdb2_entity():
@@ -237,14 +238,14 @@ def _delete_res(res_id):
 # 刷新 虚拟机 状态的 调用接口
 def flush_crp_to_cmdb():
     Log.logger.info('----------------flush_crp_to_cmdb job/5min----------------')
-    resources = ResourceModel.objects.filter(approval_status="success",is_deleted=0)
-    env_list = set([])
+    #resources = ResourceModel.objects.filter(approval_status="success",is_deleted=0)
     osid_status = []
     now = datetime.datetime.now()
     with db.app.app_context():
-        for resource in resources:
-            env_list.add(resource.env)
+        # for resource in resources:
+        #     env_list.add(resource.env)
         try:
+            env_list = CRP_URL.keys()
             for env in env_list:
                 if not env:
                     continue
@@ -263,8 +264,6 @@ def flush_crp_to_cmdb():
                     ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
                     meta = {k:v for k, v in ret.items()}
                     osid_status.append(meta)
-                #Log.logger.info("####meta:{}".format(meta))
-
             if osid_status:
                 for os in osid_status:
                     for k, v in os.items():
@@ -277,7 +276,6 @@ def flush_crp_to_cmdb():
                 if CMDB_URL:
                     cmdb_url = CMDB_URL + "cmdb/api/vmdocker/status/"
                     ret = requests.put(cmdb_url, data=json.dumps({"osid_status": osid_status})).json()
-                #Log.logger.info("flush_crp_to_cmdb result is:{}".format(ret))
             else:
                 Log.logger.info("flush_crp_to_cmdb crp->openstack result is null")
         except Exception as exc:
