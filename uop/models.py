@@ -12,13 +12,8 @@ class EntityCache(db.Document):
 
     meta = {
         'collection': 'entity_cache',
-        'indexes': [
-            {
-                'fields': [],
-                'unique': False,
-            }
-        ],
     }
+
 
 class ViewCache(db.Document):
     view_id = db.StringField(required=True)
