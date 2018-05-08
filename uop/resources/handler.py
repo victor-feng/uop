@@ -661,7 +661,6 @@ def updata_deployment_info(resource_name,env,url):
         Log.logger.error(err_msg)
 
 def delete_resource_deploy(res_id):
-    domain = None
     os_inst_ip_list = []
     try:
         resources_obj = ResourceModel.objects.filter(res_id=res_id)
@@ -669,35 +668,33 @@ def delete_resource_deploy(res_id):
             resources=resources_obj[0]
             resource_type=resources.resource_type
             cloud = resources.cloud
+            env = resources.env
             deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
+            disconfs = []
+            domain_list = []
             for deploy in deploys:
-                environment = deploy.environment
-                env_ = get_CRP_url(environment)
-                crp_url = '%s%s' % (env_, 'api/deploy/deploys')
                 disconf_list = deploy.disconf_list
-                disconfs = []
                 for dis in disconf_list:
                     dis_ = dis.to_json()
                     disconfs.append(eval(dis_))
-                crp_data = {
-                    "disconf_list": disconfs,
-                    "resource_id": res_id,
-                    "domain_list": [],
-                    "set_flag": 'res',
-                    "environment":environment,
-                }
-                compute_list = resources.compute_list
-                domain_list = []
-                for compute in compute_list:
-                    domain = compute.domain
-                    domain_ip = compute.domain_ip
-                    domain_list.append({"domain": domain, 'domain_ip': domain_ip})
-                d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
-                if d_count <= 1:
-                    crp_data['domain_list'] = domain_list
-                crp_data = json.dumps(crp_data)
-                requests.delete(crp_url, data=crp_data)
-                # deploy.delete()
+                app_image = eval(deploy.app_image)
+                for app in app_image:
+                    domain = app.get("domain","")
+                    domain_ip = app.get("domain_ip","")
+                    d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
+                    if d_count <= 1:
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+            crp_data = {
+                "disconf_list": disconfs,
+                "resource_id": res_id,
+                "domain_list": domain_list,
+                "set_flag": 'res',
+                "environment": env,
+            }
+            env_ = get_CRP_url(env)
+            crp_url = '%s%s' % (env_, 'api/deploy/deploys')
+            crp_data = json.dumps(crp_data)
+            requests.delete(crp_url, data=crp_data)
             # 调用CRP 删除资源
             namespace = None
             compute_list = resources.compute_list
