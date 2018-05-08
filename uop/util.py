@@ -9,8 +9,12 @@ import json
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from uop.models import NetWorkConfig
+from uop.models import NetWorkConfig, EntityCache
 
+
+def get_entity_cache():
+    entity = EntityCache.objects().order_by("created_time").first()
+    return entity
 
 
 def async(fun):
