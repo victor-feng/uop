@@ -8,7 +8,7 @@ db = MongoEngine()
 
 class EntityCache(db.Document):
 
-    entity = db.ListField(db.StringField(requeired=False))
+    entity = db.DictField(required=False)
     created_time = db.DateTimeField(default="")
 
     meta = {

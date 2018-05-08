@@ -107,10 +107,10 @@ def get_cmdb2_entity():
                                 if mycat:
                                     entity_dict['mycat'] = mycat
     Log.logger.info("The entity dict is {}".format(entity_dict))
-    entity_list.append(entity_dict)
+    # entity_list.append(entity_dict)
     try:
         entity = EntityCache(
-            entity=entity_list,
+            entity=entity_dict,
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
         entity.save()
