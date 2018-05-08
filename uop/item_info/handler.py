@@ -22,9 +22,8 @@ __all__ = [
     "fix_instance", "delete_instance"
 ]
 
-# entity = EntityCache.get_entity_cache()
-entity = get_entity_cache()
-print "The entity info is {}".format(entity)
+# entity = get_entity_cache()
+# print "The entity info is {}".format(entity)
 # Log.logger.info("The entity info is {}".format(entity))
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
@@ -40,6 +39,7 @@ resource = {
     "redis": filters.get("redis"),
     "mongodb": filters.get("mongodb"),
 }
+
 
 #临时从本地文件读取数据
 def get_data_from_file(td):

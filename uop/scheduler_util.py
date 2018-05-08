@@ -33,6 +33,7 @@ def get_cmdb2_entity():
       }
     }
     entity_dict = {}
+    entity_list = []
     """
     dev not exist
     """
@@ -106,27 +107,10 @@ def get_cmdb2_entity():
                                 if mycat:
                                     entity_dict['mycat'] = mycat
 
-
+    entity_list.append(entity_dict)
     try:
         entity = EntityCache(
-            host=entity_dict["host"],
-            Person=entity_dict['Person'],
-            department=entity_dict['department'],
-            yewu=entity_dict['yewu'],
-            Module=entity_dict['Module'],
-            project=entity_dict['project'],
-            container=entity_dict['container'],
-            virtual_device=entity_dict['virtual_device'],
-            tomcat=entity_dict['tomcat'],
-            mysql=entity_dict['mysql'],
-            redis=entity_dict['redis'],
-            mongodb=entity_dict['mongodb'],
-            nginx=entity_dict['nginx'],
-            rabbitmq=entity_dict['rabbitmq'],
-            codis=entity_dict['codis'],
-            apache=entity_dict['apache'],
-            zookeeper=entity_dict['zookeeper'],
-            mycat=entity_dict['mycat'],
+            entity=entity_list,
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
         entity.save()
