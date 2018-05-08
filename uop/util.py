@@ -5,7 +5,7 @@ import IPy
 import time
 import requests
 import json
-from log import Log
+# from log import Log
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -48,7 +48,7 @@ def get_entity_cache():
             # "5": ("B3", u"资源 --> 机房"),
         }
     except Exception as e:
-        Log.logger.info("The error is {}".format(e))
+        # Log.logger.info("The error is {}".format(e))
         pass
     return CMDB2_ENTITY, CMDB2_VIEWS
 
