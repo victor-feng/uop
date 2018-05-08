@@ -13,6 +13,8 @@ from uop.models import NetWorkConfig, EntityCache
 
 
 def get_entity_cache():
+    CMDB2_ENTITY = {}
+    CMDB2_VIEWS = {}
     try:
         entity = EntityCache.objects().last()
         CMDB2_ENTITY = {
@@ -46,7 +48,8 @@ def get_entity_cache():
             # "5": ("B3", u"资源 --> 机房"),
         }
     except Exception as e:
-        Log.logger.info("The error is {}".format(e))
+        # Log.logger.info("The error is {}".format(e))
+        pass
     return CMDB2_ENTITY, CMDB2_VIEWS
 
 
