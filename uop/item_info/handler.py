@@ -7,7 +7,7 @@ import requests
 import os
 import traceback
 from uop.log import Log
-from uop.util import TimeToolkit, response_data,async
+from uop.util import TimeToolkit, response_data,async, get_entity_cache
 from config import configs, APP_ENV
 from datetime import datetime
 from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation, EntityCache
@@ -22,7 +22,8 @@ __all__ = [
     "fix_instance", "delete_instance"
 ]
 
-entity = EntityCache.get_entity_cache()
+# entity = EntityCache.get_entity_cache()
+entity = get_entity_cache()
 print "The entity info is {}".format(entity)
 # Log.logger.info("The entity info is {}".format(entity))
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
