@@ -752,6 +752,7 @@ class CapacityReservation(Resource):
             elif approval.capacity_status == "reduce":
                 deployment.deploy_result = "reducing"
         resource.save()
+        deployment.save()
         ret = {
             "code": code,
             "result": {
