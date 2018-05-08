@@ -31,6 +31,7 @@ class EntityCache(db.DynamicDocument):
         'collection': 'entity_cache',
     }
 
+    @classmethod
     def get_entity_cache(cls):
         CMDB2_ENTITY = {}
         CMDB2_VIEWS = {}
