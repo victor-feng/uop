@@ -5,7 +5,7 @@ import IPy
 import time
 import requests
 import json
-from uop.log import Log
+from log import Log
 import threading
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -48,7 +48,7 @@ def get_entity_cache():
             # "5": ("B3", u"资源 --> 机房"),
         }
     except Exception as e:
-        print "The error is {}".format(e)
+        Log.logger.info("The error is {}".format(e))
         pass
     return CMDB2_ENTITY, CMDB2_VIEWS
 
@@ -197,3 +197,7 @@ def pageinit(items, offset, limit):
     else:
         page_contents = []
     return page_contents, total_pages
+
+if __name__ == "__main__":
+    r = get_entity_cache()
+    print r
