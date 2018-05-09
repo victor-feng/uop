@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from uop.util import get_entity_from_local_file
+
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -33,9 +33,6 @@ class DevelopmentConfig(BaseConfig):
     CMDB2_URL = "http://cmdb2-test.syswin.com/"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
     CMDB2_OPEN_USER = "uop"
-
-    data = get_entity_from_local_file()
-    print "The data is {}".format(data)
 
     # CMDB知识库变动时，需要改动，或添加
     CMDB2_ENTITY = {

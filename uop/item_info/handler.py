@@ -22,6 +22,8 @@ __all__ = [
     "fix_instance", "delete_instance"
 ]
 
+data = get_entity_from_local_file()
+print "The data is {}".format(data)
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
