@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-
+import os
 import json
 import traceback
 import requests
@@ -12,6 +12,8 @@ from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.util import async, TimeToolkit
+
+curdir = os.path.dirname(os.path.abspath(__file__))
 
 CMDB_URL = configs[APP_ENV].CMDB_URL
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
@@ -115,6 +117,9 @@ def get_cmdb2_entity():
             created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
         )
         entity_obj.save()
+        # 临时写入 文件
+        with open(curdir + "entity.txt", "w") as f:
+            json.dumps(entity_dict, f)
     except Exception as e:
         msg = traceback.format_exc()
         Log.logger.info("The entity save error is {}".format(msg))
