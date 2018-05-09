@@ -15,7 +15,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_entity_from_local_file():
-    with open(curdir + "entity.txt", "rb") as f:
+    with open(curdir + "/entity.txt", "rb") as f:
         entity = json.load(f)
         CMDB2_ENTITY = {
             "Person": entity.get("Person", ""),
