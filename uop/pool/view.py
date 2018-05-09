@@ -20,6 +20,17 @@ pool_api = Api(pool_blueprint, errors=pool_errors)
 K8S_NGINX_PORT = configs[APP_ENV].K8S_NGINX_PORT
 K8S_NGINX_IPS = configs[APP_ENV].K8S_NGINX_IPS
 
+
+base_statistic_info = {
+    "memory_mb_total": 0,
+    "memory_mb_use": 0,
+    "running_vms": 0,
+    "storage_gb_total": 0,
+    "storage_gb_use": 0,
+    "vcpu_total": 0,
+    "vcpu_us":0,
+}
+
 class NetworksAPI(Resource):
     # @api_permission_control(request)
     @classmethod
@@ -85,11 +96,15 @@ class StatisticAPI(Resource):
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
                 Log.logger.info('[UOP] Get the whole url: %s', url_)
                 data_str = json.dumps({"env": url.get("env")})
-                result = requests.get(url_, headers=headers, data=data_str)
-                if result.json().get('code') == 200:
-                    Log.logger.debug(url_ + ' '+json.dumps(headers))
-                    cur_res = result.json().get('result').get('res')
-                    res_list.append({url.get('env'): cur_res})
+                try:
+                    result = requests.get(url_, headers=headers, data=data_str,timeout=5)
+                    if result.json().get('code') == 200:
+                        Log.logger.debug(url_ + ' '+json.dumps(headers))
+                        cur_res = result.json().get('result').get('res')
+                        res_list.append({url.get('env'): cur_res})
+                except Exception as e:
+                    res_list.append({url.get('env'): base_statistic_info})
+                    Log.logger.info("Get info from crp error {}".format(e=str(e)))
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
