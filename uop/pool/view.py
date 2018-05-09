@@ -104,7 +104,7 @@ class StatisticAPI(Resource):
                         res_list.append({url.get('env'): cur_res})
                 except Exception as e:
                     res_list.append({url.get('env'): base_statistic_info})
-                    Log.logger.info("Get info from crp error {}".format(e=str(e)))
+                    Log.logger.info("Get info from crp error {e}".format(e=str(e)))
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
