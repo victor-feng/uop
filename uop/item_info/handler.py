@@ -7,7 +7,7 @@ import requests
 import os
 import traceback
 from uop.log import Log
-from uop.util import TimeToolkit, response_data,async, get_entity_cache
+from uop.util import TimeToolkit, response_data,async, get_entity_from_local_file
 from config import configs, APP_ENV
 from datetime import datetime
 from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation, EntityCache
@@ -22,6 +22,8 @@ __all__ = [
     "fix_instance", "delete_instance"
 ]
 
+data = get_entity_from_local_file()
+print data
 
 CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
