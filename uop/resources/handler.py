@@ -359,12 +359,9 @@ def get_from_uop(args):
             tmp_result = {}
             tmp_result['resource_ip'] = pi.ip
             tmp_result['osid'] = pi.osid
-            domain, domain_ip,namespace,domain_path = get_cloud(pi.resource_id, True) if get_cloud(pi.resource_id, True) else (pi.domain, pi.domain_ip,None,None)
-            if domain_path and "/" not in domain:
-                domain = domain + "/" + domain_path
-            tmp_result['domain'] = domain
-            tmp_result['domain_ip'] = domain_ip
-            tmp_result['namespace'] = namespace
+            tmp_result['domain'] = pi.domain
+            tmp_result['domain_ip'] = pi.domain_ip
+            tmp_result['namespace'] = pi.namespace
             tmp_result['resource_type'] = pi.os_type
             tmp_result['resource_config'] = [
                 {'name': 'CPU', 'value': str(pi.cpu) + u'核'},
