@@ -3,8 +3,8 @@ import os
 import json
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
-cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-entity_dir = cur_dir + "/uop/entity.txt"
+# cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+entity_dir = basedir + "/uop/entity.txt"
 print entity_dir
 DEV_CRP_URL = "http://172.28.32.32:8001/"
 TEST_CRP_URL = "http://172.28.32.32:8001/"
@@ -73,7 +73,7 @@ class DevelopmentConfig(BaseConfig):
 
     data = get_entity_from_local_file()
     print "The data is {}".format(data)
-    
+
     # CMDB知识库变动时，需要改动，或添加
     CMDB2_ENTITY = {
         "Person": "d8098981df71428784e65427",
