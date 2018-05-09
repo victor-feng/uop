@@ -97,7 +97,7 @@ class StatisticAPI(Resource):
                 Log.logger.info('[UOP] Get the whole url: %s', url_)
                 data_str = json.dumps({"env": url.get("env")})
                 try:
-                    result = requests.get(url_, headers=headers, data=data_str,timeout=5)
+                    result = requests.get(url_, headers=headers, data=data_str,timeout=0.1)
                     if result.json().get('code') == 200:
                         Log.logger.debug(url_ + ' '+json.dumps(headers))
                         cur_res = result.json().get('result').get('res')
@@ -108,7 +108,7 @@ class StatisticAPI(Resource):
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
-            err_msg = str(e.args)
+            err_msg = str(e)
             Log.logger.error('list az statistics err: %s' % err_msg)
             res = {
                 "code": 400,
