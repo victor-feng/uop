@@ -232,7 +232,13 @@ def flush_crp_to_cmdb():
     now = datetime.datetime.now()
     with db.app.app_context():
         try:
-            env_list = CRP_URL.keys()
+            envs = CRP_URL.items()
+            env_list = []
+            url_list = []
+            for env,url in envs:
+                if url not in url_list:
+                    env_list.append(env)
+                    url_list.append(url)
             for env in env_list:
                 if not env:
                     continue
