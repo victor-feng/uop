@@ -3,8 +3,9 @@ import os
 import json
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
-# cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 entity_dir = basedir + "/uop/entity.txt"
+print cur_dir
 print entity_dir
 DEV_CRP_URL = "http://172.28.32.32:8001/"
 TEST_CRP_URL = "http://172.28.32.32:8001/"
