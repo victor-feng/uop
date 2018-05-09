@@ -85,11 +85,14 @@ class StatisticAPI(Resource):
                 url_ = '%s%s'%(url.get('url'), 'api/az/uopStatistics')
                 Log.logger.info('[UOP] Get the whole url: %s', url_)
                 data_str = json.dumps({"env": url.get("env")})
-                result = requests.get(url_, headers=headers, data=data_str)
-                if result.json().get('code') == 200:
-                    Log.logger.debug(url_ + ' '+json.dumps(headers))
-                    cur_res = result.json().get('result').get('res')
-                    res_list.append({url.get('env'): cur_res})
+                try:
+                    result = requests.get(url_, headers=headers, data=data_str,timeout=5)
+                    if result.json().get('code') == 200:
+                        Log.logger.debug(url_ + ' '+json.dumps(headers))
+                        cur_res = result.json().get('result').get('res')
+                        res_list.append({url.get('env'): cur_res})
+                except Exception as e:
+                    Log.logger.info("Get info from crp error {}".format(e=str(e)))
             res = {'result': {'res': []}, 'code' : 200}
             res['result']['res'] = res_list
         except Exception as e:
