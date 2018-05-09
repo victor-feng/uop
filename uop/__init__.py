@@ -43,7 +43,7 @@ class Config(object):
             'func': 'uop.scheduler_util:get_cmdb2_entity',
             # 'args': (1, 2),
             'trigger': 'interval',
-            'seconds': 60
+            'seconds': 60 * 5
         },
         # {
         #     'id': 'get_cmdb2_entity',
