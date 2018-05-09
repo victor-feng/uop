@@ -118,7 +118,7 @@ def get_cmdb2_entity():
         )
         entity_obj.save()
         # 临时写入 文件
-        with open(curdir + "entity.txt", "w") as f:
+        with open(curdir + "/entity.txt", "w") as f:
             json.dumps(entity_dict, f)
     except Exception as e:
         msg = traceback.format_exc()
