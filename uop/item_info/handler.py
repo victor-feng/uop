@@ -199,7 +199,7 @@ def get_entity_from_file(data):
     sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
     assert(isinstance(filters, dict))
     whole_entity = get_entity(data)["entity"]
-    Log.logger.info("-------------------------entity is {}".format(whole_entity))
+    Log.logger.info("------------------------- the filters is ".format(filters))
     compare_entity = map(lambda  x:{"id": x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, whole_entity)
     single_entity = filter(lambda x: x["id"] in filters.values(), compare_entity)
     Log.logger.info("The single_entity is {}\n The filters keys is {}\n").\
