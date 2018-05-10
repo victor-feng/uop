@@ -478,6 +478,7 @@ def get_entity(data):
     uid, token = data.get("uid"), data.get("token")
     if not uid and not token:
         uid, token = get_uid_token()
+    Log.logger.info("The uid and token is {}".format(uid, token))
     req_data = {
         "uid": uid,
         "token": token,
@@ -507,6 +508,7 @@ def get_entity(data):
             entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
+    Log.logger.info("-------------------------")
     return entity_info
 
 
