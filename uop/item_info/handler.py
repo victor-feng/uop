@@ -202,10 +202,12 @@ def get_entity_from_file(data):
     Log.logger.info("------------------------- the filters is {}".format(filters))
 
     compare_entity = map(lambda  x:{"id": x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, whole_entity)
-    Log.logger.info("===========Compare entity is {},filters is {}".format(compare_entity, filters.values()))
+    Log.logger.info("===========Compare entity is {},\nfilters is key:{},value:{}".format(
+        compare_entity, filters.values(), filters.keys()))
     single_entity = filter(lambda x: x["id"] in filters.values(), compare_entity)
 
-    Log.logger.info("+++++++++++The single_entity is {},The filters keys is {} ").format(single_entity, filters.keys())
+    Log.logger.info("+++++++++++The single_entity is {},The filters keys is {} , values is {}").format(
+        single_entity, filters.keys(), filters.values())
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, single_entity)
         single_entity = list(
