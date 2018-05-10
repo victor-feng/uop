@@ -180,7 +180,7 @@ class PermissionList(db.Document):
             "collection": "permission_list",
             "index": [{
                 'fields': ['name', 'id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -202,7 +202,7 @@ class UserInfo(db.Document):
             "collection": "uop_userinfo",
             "indexes": [{
                 'fields': ['username', 'id', 'department', 'is_admin'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -219,7 +219,7 @@ class RoleInfo(db.Document):
             "collection": "roleinfo",
             "indexes": [{
                 'fields': ['role', 'id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -541,7 +541,7 @@ class ConfigureEnvModel(db.Document):
             "collection": "configure_env",
             "indexes": [{
                 'fields': ['id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -560,7 +560,7 @@ class ConfigureDisconfModel(db.Document):
             "collection": "configure_disconf",
             "indexes": [{
                 'fields': ['id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -578,7 +578,7 @@ class ConfigureNginxModel(db.Document):
             "collection": "configure_nginx",
             "indexes": [{
                 'fields': ['id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -667,7 +667,7 @@ class ConfigureK8sModel(db.Document):
             "collection": "configure_k8s",
             "indexes": [{
                 'fields': ['id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
@@ -692,7 +692,7 @@ class ConfOpenstackModel(db.Document):
             "collection": "configure_openstack",
             "indexes": [{
                 'fields': ['id'],
-                'unique': True,
+                'sparse': True,
                 }],
             'index_background': True
             }
