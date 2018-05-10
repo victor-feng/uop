@@ -199,10 +199,11 @@ def get_entity_from_file(data):
     sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
     assert(isinstance(filters, dict))
     whole_entity = get_entity(data)["entity"]
+    Log.logger.info("-------------------------entity is {}".format(whole_entity))
     compare_entity = map(lambda  x:{"id": x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, whole_entity)
     single_entity = filter(lambda x: x["id"] in filters.values(), compare_entity)
-    Log.logger.info("The whole_entiyt is {}\nThe single_entity is {}\n The filters keys is {}\n").\
-        format(whole_entity, single_entity, filters.keys())
+    Log.logger.info("The single_entity is {}\n The filters keys is {}\n").\
+        format(single_entity, filters.keys())
     if len(single_entity) == len(filters.keys()): # 缓存的实体id没问题，直接补充字段返回
         single_entity = map(lambda x:{'id': x["id"], "name": x["name"], "code": x["code"], "property": x["property"]}, single_entity)
         single_entity = list(
@@ -508,7 +509,6 @@ def get_entity(data):
             entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
-    Log.logger.info("-------------------------entity is {}".format(entity_info))
     return entity_info
 
 
