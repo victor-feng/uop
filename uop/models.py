@@ -394,6 +394,7 @@ class DBIns(db.EmbeddedDocument):
     image_id = db.StringField(required=False)
     image2_id = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
+    flavor2_id = db.StringField(required=False)
     volume_exp_size = db.IntField(required=False, default_value=0)
     availability_zone = db.StringField(required=False)
     meta = {
