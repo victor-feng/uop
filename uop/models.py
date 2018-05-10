@@ -218,7 +218,7 @@ class RoleInfo(db.Document):
     meta = {
             "collection": "roleinfo",
             "indexes": [{
-                'fields': ['role', 'id'],
+                'fields': ['id', 'created_time'],
                 'sparse': True,
                 }],
             'index_background': True
