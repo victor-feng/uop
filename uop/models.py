@@ -280,7 +280,7 @@ class Deployment(db.Document):
 
     meta = {
         'collection': 'deployment',
-        'index': [
+        'indexes': [
             {
                 'fields': ['deploy_id', 'deploy_name', 'created_time'],
                 'sparse': True,
@@ -394,7 +394,7 @@ class OS_ip_dic(db.EmbeddedDocument):
 
     meta = {
         'collection': 'os_ip_dic',
-        'index': [
+        'indexes': [
             {
                 'fields': ['ip'],
                 'sparse': True,
