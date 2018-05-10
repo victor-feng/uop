@@ -53,7 +53,6 @@ def get_entity_from_local_file():
             "13": ("B17", u"apache --> 机房，展示apache资源视图", entity.get("apache", "")),
             "14": ("B18", u"zookeeper --> 机房，展示zookeeper资源视图", entity.get("zookeeper", "")),
             "15": ("B19", u"mycat --> 机房，展示mycat资源视图", entity.get("mycat", "")),
-            # "5": ("B3", u"资源 --> 机房"),
         }
         return CMDB2_ENTITY, CMDB2_VIEWS
 
@@ -83,9 +82,10 @@ class DevelopmentConfig(BaseConfig):
     CMDB2_OPEN_USER = "uop"
 
     data = get_entity_from_local_file()
-    print "The data is {}".format(data)
-    # CMDB2_ENTITY = data[0]
-    # CMDB2_VIEWS = data[1]
+
+    CMDB2_ENTITY = data[0]
+    CMDB2_VIEWS = data[1]
+    print "The data is {}\n{}\n".format(CMDB2_ENTITY, CMDB2_VIEWS)
     # CMDB知识库变动时，需要改动，或添加
     CMDB2_ENTITY = {
         "Person": "d8098981df71428784e65427",
