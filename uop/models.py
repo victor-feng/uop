@@ -344,6 +344,8 @@ class ComputeIns(db.EmbeddedDocument):
     namespace = db.StringField(required=False) #k8s 命名空间
     ready_probe_path = db.StringField(required=False) #就绪探针路径
     host_mapping = db.StringField(required=False)  # 就绪探针路径
+    availability_zone = db.StringField(required=False)
+    image_id = db.StringField(required=False)
 
 
     meta = {
@@ -390,8 +392,10 @@ class DBIns(db.EmbeddedDocument):
     volume_size = db.IntField(required=False, default_value=0)
     network_id = db.StringField(required=False)
     image_id = db.StringField(required=False)
+    image2_id = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
     volume_exp_size = db.IntField(required=False, default_value=0)
+    availability_zone = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'indexes': [
