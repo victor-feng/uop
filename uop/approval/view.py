@@ -659,6 +659,10 @@ class CapacityReservation(Resource):
                         "image_id": db_res.image_id,
                         "network_id": db_res.network_id,
                         "flavor": db_res.flavor_id,
+                        "volume_exp_size": db_res.volume_exp_size,
+                        "image2_id": db_res.image2_id,
+                        "flavor2": db_res.flavo2_id,
+                        "availability_zone": db_res.availability_zone,
                     }
                 )
             data['resource_list'] = res
@@ -703,6 +707,9 @@ class CapacityReservation(Resource):
                                 "ready_probe_path": db_com.ready_probe_path,
                                 "domain_path": db_com.domain_path,
                                 "host_mapping": db_com.host_mapping,
+                                "availability_zone":db_com.availability_zone,
+                                "image_id": db_com.image_id,
+                                "flavor_id": db_com.flavor_id,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

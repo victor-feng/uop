@@ -141,10 +141,14 @@ class ResourceApplication(Resource):
                     network_id = resource.get('network_id')
                     image_id = resource.get('image_id')
                     flavor_id = resource.get('flavor_id')
+                    image2_id = resource.get('image2_id')
+                    flavor2_id = resource.get('flavor2_id')
                     volume_exp_size = resource.get("volume_exp_size",0)
+                    availability_zone = resource.get("availability_zone",0)
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
-                                   image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
+                                   image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size,image2_id=image2_id,
+                                   flavor2_id=flavor2_id,availability_zone=availability_zone)
                     resource_application.resource_list.append(db_ins)
 
             ins_name_list = []
@@ -171,11 +175,15 @@ class ResourceApplication(Resource):
                     database_config = compute.get("database_config")
                     ready_probe_path = compute.get("ready_probe_path")
                     domain_path = compute.get("domain_path")
+                    availability_zone = compute.get("availability_zone")
+                    image_id = compute.get('image_id')
+                    flavor_id = compute.get('flavor_id')
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
                                              ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
-                                             ready_probe_path=ready_probe_path,domain_path=domain_path)
+                                             ready_probe_path=ready_probe_path,domain_path=domain_path,availability_zone=availability_zone,
+                                             image_id=image_id,flavor_id=flavor_id)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -564,12 +572,16 @@ class ResourceApplication(Resource):
                         database_config = compute.get("database_config")
                         ready_probe_path = compute.get("ready_probe_path")
                         domain_path = compute.get("domain_path")
+                        availability_zone = compute.get("availability_zone")
+                        image_id = compute.get('image_id')
+                        flavor_id = compute.get('flavor_id')
                         compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                                  domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                                  health_check=health_check,network_id=network_id,networkName=networkName,
                                                  tenantName=tenantName,host_env=host_env
                                                  ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
-                                                 ready_probe_path=ready_probe_path,domain_path=domain_path)
+                                                 ready_probe_path=ready_probe_path,domain_path=domain_path,availability_zone=availability_zone,
+                                                 image_id=image_id,flavor_id=flavor_id)
                         resource.compute_list.append(compute_ins)
                 if resource_list:
                     for res in resource_list:
@@ -586,9 +598,13 @@ class ResourceApplication(Resource):
                         image_id = res.get('image_id')
                         flavor_id = res.get('flavor_id')
                         volume_exp_size = res.get('volume_exp_size',0)
+                        image2_id = resource.get('image2_id')
+                        flavor2_id = resource.get('flavor2_id')
+                        availability_zone = resource.get("availability_zone", 0)
                         db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                        quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
-                                       image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size)
+                                       image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size,image2_id=image2_id,
+                                       flavor2_id=flavor2_id,availability_zone=availability_zone)
                         resource.resource_list.append(db_ins)
                 resource.save()
             else:
@@ -731,12 +747,20 @@ class ResourceDetail(Resource):
                 image_id = db_res.image_id
                 network_id = db_res.network_id
                 flavor_id = db_res.flavor_id
+                image2_id = db_res.image_id
+                flavor2_id = db_res.flavor_id
                 if image_id:
                     opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
                     result['image_name'] = opsk_image.image_name
                 if flavor_id:
                     opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
                     result['flavor_name'] = opsk_flavor.flavor_name
+                if image2_id:
+                    opsk_image = ConfOpenstackModel.objects.filter(image_id=image2_id).first()
+                    result['image2_name'] = opsk_image.image_name
+                if flavor2_id:
+                    opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor2_id).first()
+                    result['flavor2_name'] = opsk_flavor.flavor_name
                 if network_id:
                     network = NetWorkConfig.objects.filter(vlan_id=network_id).first()
                     network_name = network.name
@@ -755,12 +779,23 @@ class ResourceDetail(Resource):
                         "network_id": db_res.network_id,
                         "image_id": image_id,
                         "flavor_id": flavor_id,
+                        "image2_id": image2_id,
+                        "flavor2_id": flavor2_id,
                         "volume_exp_size":db_res.volume_exp_size,
+                        "availability_zone": db_res.availability_zone,
                     }
                 )
         com = []
         if compute_list:
             for db_com in compute_list:
+                image_id = db_res.image_id
+                flavor_id = db_res.flavor_id
+                if image_id:
+                    opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
+                    result['image_name'] = opsk_image.image_name
+                if flavor_id:
+                    opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
+                    result['flavor_name'] = opsk_flavor.flavor_name
                 com.append(
                     {
                         "ins_name": db_com.ins_name,
@@ -785,6 +820,9 @@ class ResourceDetail(Resource):
                         "ready_probe_path" : db_com.ready_probe_path,
                         "domain_path":db_com.domain_path,
                         "host_mapping":db_com.host_mapping,
+                        "availability_zone":db_com.availability_zone,
+                        "image_id": image_id,
+                        "flavor_id": flavor_id,
                     }
                 )
         result['resource_list'] = res

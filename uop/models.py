@@ -346,6 +346,7 @@ class ComputeIns(db.EmbeddedDocument):
     host_mapping = db.StringField(required=False)  # 就绪探针路径
     availability_zone = db.StringField(required=False)
     image_id = db.StringField(required=False)
+    flavor_id = db.StringField(required=False)
 
 
     meta = {
