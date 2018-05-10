@@ -47,6 +47,20 @@ class ModelCache(db.Document):
     }
 
 
+class ModelCacheBak(db.Document):
+    entity = db.StringField(default="")
+    cache_date = db.DateTimeField()
+
+    meta = {
+        'indexes': [
+            {
+                'fields': ['cache_date'],
+            }
+        ],
+        'index_background': True
+    }
+
+
 class HostsCache(db.Document):
     instance_id = db.StringField(default="")
     ip = db.StringField(required=False)

@@ -10,7 +10,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation, EntityCache
+from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation, ModelCacheBak
 from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
 import uuid
@@ -161,6 +161,16 @@ def push_entity_to_file(data):
         model = ModelCache(entity=json.dumps(entity_list),
                          cache_date=TimeToolkit.local2utctimestamp(datetime.now()))
         model.save()
+        if entity_list:  # 如果cmdb2 正常运行 删除之前的数据 更新最新数据到modelcachebak
+            ModelCacheBak.objects.delete()
+            model_obj = ModelCacheBak(
+                entity=json.dumps(entity_list),
+                cache_date=TimeToolkit.local2utctimestamp(datetime.now())
+            )
+            model_obj.save()
+        else:
+            model_obj = ModelCacheBak.objects.first()
+            entity_list = json.loads(model_obj)
     except Exception as exc:
         Log.logger.error("push_entity_to_file error:{} ".format(str(exc)))
     # Log.logger.info("push_entity_to_file entity_list:{} ".format(entity_list))
