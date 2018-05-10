@@ -161,6 +161,7 @@ def push_entity_to_file(data):
         model = ModelCache(entity=json.dumps(entity_list),
                          cache_date=TimeToolkit.local2utctimestamp(datetime.now()))
         model.save()
+        Log.logger.info("=============".format(entity_list))
         if entity_list:  # 如果cmdb2 正常运行 删除之前的数据 更新最新数据到modelcachebak
             ModelCacheBak.objects.delete()
             model_obj = ModelCacheBak(
