@@ -197,6 +197,7 @@ def get_entity_from_file(data):
 
     sort_key = ["Person", "department", "yewu", "Module", "project"]
     sort_key.extend(list(set(filters.keys()) ^ set(sort_key)))
+    Log.logger.info("------------------------- before {}".format(filters))
     assert(isinstance(filters, dict))
     whole_entity = get_entity(data)["entity"]
     Log.logger.info("------------------------- the filters is ".format(filters))

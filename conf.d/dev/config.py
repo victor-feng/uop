@@ -29,11 +29,11 @@ def get_entity_from_local_file():
             "redis": entity.get("redis", ""),
             "mongodb": entity.get("mongodb", ""),
             "nginx": entity.get("nginx", ""),
-            # "rabbitmq": entity.get("rabbitmq", ""),
-            # "codis": entity.get("codis", ""),
-            # "apache": entity.get("apache", ""),
-            # "zookeeper": entity.get("zookeeper", ""),
-            # "mycat": entity.get("mycat", "")
+            "rabbitmq": entity.get("rabbitmq", ""),
+            "codis": entity.get("codis", ""),
+            "apache": entity.get("apache", ""),
+            "zookeeper": entity.get("zookeeper", ""),
+            "mycat": entity.get("mycat", "")
         }
         CMDB2_VIEWS = {
             # 注意：定时任务只会缓存1，2，3 三个视图下的基础模型数据
