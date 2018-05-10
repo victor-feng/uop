@@ -28,7 +28,8 @@ class ViewCache(db.Document):
                 'fields': ['cache_date'],
                 'expireAfterSeconds': 60 * 60 * 24
             }
-        ]
+        ],
+        'index_background': True
     }
 
 
@@ -41,8 +42,10 @@ class ModelCache(db.Document):
                 'fields': ['cache_date'],
                 'expireAfterSeconds': 60 * 60 * 24
             }
-        ]
+        ],
+        'index_background': True
     }
+
 
 class HostsCache(db.Document):
     instance_id = db.StringField(default="")
@@ -56,8 +59,10 @@ class HostsCache(db.Document):
                 'fields': ['cache_date'],
                 'expireAfterSeconds': 60 * 60 * 24 * 7
             }
-        ]
+        ],
+        'index_background': True
     }
+
 
 class Token(db.Document):
     token = db.StringField()
@@ -70,7 +75,8 @@ class Token(db.Document):
                 'fields': ['token_date'],
                 'expireAfterSeconds': 60 * 20
             }
-        ]
+        ],
+        'index_background': True
     }
 
 
@@ -124,6 +130,7 @@ class Statusvm(db.DynamicDocument):
                     'unique': False,
                 }
             ],
+            'index_background': True
             }
 
     @classmethod
@@ -174,7 +181,8 @@ class PermissionList(db.Document):
             "index": [{
                 'fields': ['name', 'id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
 
 
@@ -192,10 +200,11 @@ class UserInfo(db.Document):
 
     meta = {
             "collection": "uop_userinfo",
-            "index": [{
+            "indexes": [{
                 'fields': ['username', 'id', 'department', 'is_admin'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
 
 
@@ -208,10 +217,11 @@ class RoleInfo(db.Document):
 
     meta = {
             "collection": "roleinfo",
-            "index": [{
+            "indexes": [{
                 'fields': ['role', 'id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
 
 
@@ -232,7 +242,7 @@ class DisconfIns(db.EmbeddedDocument):
     disconf_app_name = db.StringField(required=False)
     meta = {
         'collection': 'disconf_ins',
-        'index': [
+        'indexes': [
             {
                 'fields': ['ins_name','ins_id'],
                 'sparse': True,
@@ -280,7 +290,7 @@ class Deployment(db.Document):
 
     meta = {
         'collection': 'deployment',
-        'index': [
+        'indexes': [
             {
                 'fields': ['deploy_id', 'deploy_name', 'created_time'],
                 'sparse': True,
@@ -324,7 +334,7 @@ class ComputeIns(db.EmbeddedDocument):
 
     meta = {
         'collection': 'compute_ins',
-        'index': [
+        'indexes': [
             {
                 'fields': ['ins_name', 'ins_id'],
                 'sparse': True,
@@ -332,6 +342,7 @@ class ComputeIns(db.EmbeddedDocument):
             ],
         'index_background': True
         }
+
 
 class Capacity(db.EmbeddedDocument):
     capacity_id = db.StringField(required=True)
@@ -343,9 +354,9 @@ class Capacity(db.EmbeddedDocument):
     network_id = db.StringField(required=False, default="")
     meta = {
         'collection': 'capacity',
-        'index': [
+        'indexes': [
             {
-                'fields': ['capacity_id'],
+                'fields': ['capacity_id', created_date],
                 'sparse': True,
                 }
             ],
@@ -369,7 +380,7 @@ class DBIns(db.EmbeddedDocument):
     volume_exp_size = db.IntField(required=False, default_value=0)
     meta = {
         'collection': 'db_ins',
-        'index': [
+        'indexes': [
             {
                 'fields': ['ins_name', 'ins_id'],
                 'sparse': True,
@@ -394,7 +405,7 @@ class OS_ip_dic(db.EmbeddedDocument):
 
     meta = {
         'collection': 'os_ip_dic',
-        'index': [
+        'indexes': [
             {
                 'fields': ['ip'],
                 'sparse': True,
@@ -481,9 +492,9 @@ class Approval(db.DynamicDocument):
 
     meta = {
         'collection': 'approval',
-        'index': [
+        'indexes': [
             {
-                'fields': ['resource_id', 'approval_status'],
+                'fields': ['resource_id', 'approval_status', 'create_date'],
                 'sparse': True,
                 }
             ],
@@ -512,9 +523,9 @@ class ItemInformation(db.DynamicDocument):
 
     meta = {
         'collection': 'item_information',
-        'index': [
+        'indexes': [
             {
-                'fields': ['item_id'],
+                'fields': ['item_id', 'create_date'],
                 'sparse': True,
                 }
             ],
@@ -528,11 +539,13 @@ class ConfigureEnvModel(db.Document):
 
     meta = {
             "collection": "configure_env",
-            "index": [{
+            "indexes": [{
                 'fields': ['id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
+
 
 class ConfigureDisconfModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
@@ -545,10 +558,11 @@ class ConfigureDisconfModel(db.Document):
 
     meta = {
             "collection": "configure_disconf",
-            "index": [{
+            "indexes": [{
                 'fields': ['id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
 
 
@@ -562,11 +576,13 @@ class ConfigureNginxModel(db.Document):
 
     meta = {
             "collection": "configure_nginx",
-            "index": [{
+            "indexes": [{
                 'fields': ['id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
+
 
 class StatusRecord(db.Document):
     deploy_id = db.StringField()
@@ -588,9 +604,9 @@ class StatusRecord(db.Document):
 
     meta = {
         'collection': 'status_record',
-        'index': [
+        'indexes': [
             {
-                'fields': ['status', 'resource_name', 'deploy_name'],
+                'fields': ['status', 'resource_name', 'deploy_name', 'created_time'],
                 'sparse': True,
             }
         ],
@@ -605,14 +621,15 @@ class OperationLog(db.Document):
 
     meta = {
         'collection': 'operation_log',
-        'index': [
+        'indexes': [
             {
-                'fields': ['res_id', 'deploy_id'],
+                'fields': ['res_id', 'deploy_id', 'created_time'],
                 'sparse': True,
             }
         ],
         'index_background': True
     }
+
 
 class NetWorkConfig(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
@@ -628,7 +645,7 @@ class NetWorkConfig(db.Document):
 
     meta = {
         'collection': 'network_config',
-        'index': [
+        'indexes': [
             {
                 'fields': ['env', 'name'],
                 'sparse': True,
@@ -648,11 +665,13 @@ class ConfigureK8sModel(db.Document):
 
     meta = {
             "collection": "configure_k8s",
-            "index": [{
+            "indexes": [{
                 'fields': ['id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
+
 
 class ConfOpenstackModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
@@ -671,8 +690,9 @@ class ConfOpenstackModel(db.Document):
 
     meta = {
             "collection": "configure_openstack",
-            "index": [{
+            "indexes": [{
                 'fields': ['id'],
                 'unique': True,
-                }]
+                }],
+            'index_background': True
             }
