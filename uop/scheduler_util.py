@@ -109,7 +109,7 @@ def get_cmdb2_entity():
                                     entity_dict['zookeeper'] = zookeeper
                                 if mycat:
                                     entity_dict['mycat'] = mycat
-    Log.logger.info("The entity dict is {}".format(entity_dict))
+    # Log.logger.info("The entity dict is {}".format(entity_dict))
     entity_list.append(entity_dict)
     entity_data = json.dumps(entity_list)
     try:
