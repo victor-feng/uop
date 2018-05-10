@@ -120,7 +120,7 @@ class Statusvm(db.DynamicDocument):
             'collection': 'status_vm',
             'indexes': [
                 {
-                    'fields': ['osid',"resource_name"],
+                    'fields': ['osid',"resource_name", 'create_time'],
                     'unique': False,
                 }
             ],
@@ -282,7 +282,7 @@ class Deployment(db.Document):
         'collection': 'deployment',
         'index': [
             {
-                'fields': ['deploy_id', 'deploy_name'],
+                'fields': ['deploy_id', 'deploy_name', 'created_time'],
                 'sparse': True,
                 }
             ],
@@ -456,7 +456,7 @@ class ResourceModel(db.DynamicDocument):
         'collection': 'resources',
         'indexes': [
             {
-                'fields': ['res_id', ('resource_name', 'env')],
+                'fields': ['res_id', ('resource_name', 'env'), 'created_date'],
                 'sparse': True,
                 }
             ],
