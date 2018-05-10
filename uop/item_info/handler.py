@@ -500,7 +500,6 @@ def get_entity(data):
             for m in modules:
                 entity_info["entity"] = json.loads(m.entity)
         else:
-            Log.logger.info("-------------------------")
             ret = requests.post(url, data=data_str, timeout=5).json()
             if ret["code"] != 0:
                 req_data["uid"], req_data["code"] = get_uid_token(True)
@@ -509,7 +508,7 @@ def get_entity(data):
             entity_info = push_entity_to_file(ret.get("data"))
     except Exception as exc:
         Log.logger.error("get entity info from CMDB2.0 error: {}".format(exc))
-    Log.logger.info("-------------------------")
+    Log.logger.info("-------------------------entity is {}".format(entity_info))
     return entity_info
 
 
