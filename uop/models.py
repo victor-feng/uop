@@ -606,7 +606,7 @@ class StatusRecord(db.Document):
         'collection': 'status_record',
         'indexes': [
             {
-                'fields': ['status', 'resource_name', 'deploy_name', 'created_time'],
+                'fields': ['status', 'created_time'],
                 'sparse': True,
             }
         ],
