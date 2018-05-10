@@ -478,7 +478,6 @@ def get_entity(data):
     uid, token = data.get("uid"), data.get("token")
     if not uid and not token:
         uid, token = get_uid_token()
-    Log.logger.info("The uid and token is {}".format(uid, token))
     req_data = {
         "uid": uid,
         "token": token,
@@ -497,9 +496,11 @@ def get_entity(data):
             "entity": []
         }
         if modules:
+            Log.logger.info("-------------------------")
             for m in modules:
                 entity_info["entity"] = json.loads(m.entity)
         else:
+            Log.logger.info("-------------------------")
             ret = requests.post(url, data=data_str, timeout=5).json()
             if ret["code"] != 0:
                 req_data["uid"], req_data["code"] = get_uid_token(True)
