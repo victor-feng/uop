@@ -214,6 +214,7 @@ def get_entity_from_file(data):
         ) # 排个序
     else:
         single_entity = u"CMDB2.0 基础模型数据有变，联系管理员解决"
+    Log.logger.info("Single entity is {}:".format(single_entity))
     return single_entity
 
 
@@ -501,6 +502,7 @@ def get_entity(data):
             "entity": []
         }
         if modules:
+            Log.logger.info(" modules is exist....")
             for m in modules:
                 entity_info["entity"] = json.loads(m.entity)
         else:
