@@ -29,6 +29,11 @@ def get_entity_from_local_file():
             "redis": entity.get("redis", ""),
             "mongodb": entity.get("mongodb", ""),
             "nginx": entity.get("nginx", ""),
+            "rabbitmq": entity.get("rabbitmq", ""),
+            "codis": entity.get("codis", ""),
+            "apache": entity.get("apache", ""),
+            "zookeeper": entity.get("zookeeper", ""),
+            "mycat": entity.get("mycat", "")
         }
         CMDB2_VIEWS = {
             # 注意：定时任务只会缓存1，2，3 三个视图下的基础模型数据
@@ -42,7 +47,12 @@ def get_entity_from_local_file():
             "7": ("B11", u"redis --> 机房，展示redis资源视图", entity.get("redis", "")),
             "8": ("B12", u"物理机信息", entity.get("host", "")),
             "9": ("B13", u"模块 --> 物理机，用于拿到各层间实体关系信息", entity.get("Module", "")),
-            "10": ("B14", u"nginx --> 机房，展示nginx资源视图", entity.get("nginx", ""))
+            "10": ("B14", u"nginx --> 机房，展示nginx资源视图", entity.get("nginx", "")),
+            "11": ("B15", u"rabbitmq --> 机房，展示rabbitmq资源视图", entity.get("rabbitmq", "")),
+            "12": ("B16", u"codis --> 机房，展示codis资源视图", entity.get("codis", "")),
+            "13": ("B17", u"apache --> 机房，展示apache资源视图", entity.get("apache", "")),
+            "14": ("B18", u"zookeeper --> 机房，展示zookeeper资源视图", entity.get("zookeeper", "")),
+            "15": ("B19", u"mycat --> 机房，展示mycat资源视图", entity.get("mycat", "")),
             # "5": ("B3", u"资源 --> 机房"),
         }
         return CMDB2_ENTITY, CMDB2_VIEWS
