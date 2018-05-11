@@ -164,10 +164,11 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         if namespace:
             data["namespace"] = namespace
     if appinfo:  # 判断nginx信息，没有则不推送dns配置
-        for app_info in res_obj.compute_list:
-            dns_info = {'domain': app_info.domain,
-                        'domain_ip': app_info.domain_ip,
-                        'certificate': app_info.certificate
+        for compute in compute_list:
+            dns_info = {'domain': compute.domain,
+                        'domain_ip': compute.domain_ip,
+                        'certificate': compute.certificate,
+                        'named_url': compute.named_url,
                         }
             data['dns'].append(dns_info)
     docker_list = []
@@ -356,7 +357,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  network_id=o.network_id,networkName=match_one.get("networkName"),tenantName=match_one.get("tenantName"),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
-                                 host_mapping=host_mapping)
+                                 host_mapping=host_mapping,named_url=match_one.get("named_url"))
             old_compute_list.insert(i, compute)
             domain = match_one.get("domain", "")
             res.domain = domain

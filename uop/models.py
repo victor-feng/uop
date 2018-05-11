@@ -347,6 +347,7 @@ class ComputeIns(db.EmbeddedDocument):
     availability_zone = db.StringField(required=False)
     image_id = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
+    named_url = db.StringField(required=False)
 
 
     meta = {
