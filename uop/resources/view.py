@@ -788,8 +788,8 @@ class ResourceDetail(Resource):
         com = []
         if compute_list:
             for db_com in compute_list:
-                image_id = db_res.image_id
-                flavor_id = db_res.flavor_id
+                image_id = db_com.image_id
+                flavor_id = db_com.flavor_id
                 if image_id:
                     opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
                     result['image_name'] = opsk_image.image_name
