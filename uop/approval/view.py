@@ -550,6 +550,7 @@ class CapacityInfoAPI(Resource):
                     resource = models.ResourceModel.objects.get(
                         res_id=approval.resource_id)
                     resource.deploy_name = deploy_name
+                    resource.updated_date = datetime.datetime.now()
                     resource.save()
                 else:
                     approval.approval_status = "%s_failed" % (
@@ -896,6 +897,8 @@ class RollBackReservation(Resource):
             database_password = deploy.database_password
             cloud = resource.cloud
             resource_type = resource.resource_type
+            resource.updated_date = datetime.datetime.now()
+            resource.save()
             # 获取disconf信息
             disconf_server_info = deal_disconf_info(deploy)
             # 将computer信息如IP，更新到数据库

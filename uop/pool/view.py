@@ -194,9 +194,11 @@ class GetImageFlavor(Resource):
         data = {}
         image_list = []
         flavor_list = []
+        availability_zone_list =[]
         try:
             opsk_images = ConfOpenstackModel.objects.filter(cloud=cloud,env=env,image_type=resource_type)
             opsk_flavors = ConfOpenstackModel.objects.filter(cloud=cloud, env=env, flavor_type=resource_type)
+            availability_zones = ConfOpenstackModel.objects.filter(cloud=cloud, env=env)
             for image in opsk_images:
                 image_info = {}
                 image_info["image_name"] = image.image_name
@@ -209,8 +211,12 @@ class GetImageFlavor(Resource):
                 flavor_info["flavor_cpu"] = flavor.flavor_cpu
                 flavor_info["flavor_memory"] = flavor.flavor_memory
                 flavor_list.append(flavor_info)
+            for zone in availability_zones:
+                availability_zone = zone.name
+                availability_zone_list.append(availability_zone)
             data["flavor_list"] = flavor_list
             data["image_list"] = image_list
+            data["availability_zone_list"] = availability_zone_list
             code = 200
             msg = "Get openstack image flavor success"
         except Exception as e:

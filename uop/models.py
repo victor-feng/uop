@@ -488,7 +488,7 @@ class ResourceModel(db.DynamicDocument):
         'collection': 'resources',
         'indexes': [
             {
-                'fields': ['res_id', ('resource_name', 'env'), 'created_date'],
+                'fields': ['res_id', ('resource_name', 'env'), 'created_date','updated_date'],
                 'sparse': True,
                 }
             ],
