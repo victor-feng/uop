@@ -705,6 +705,7 @@ class ConfOpenstackModel(db.Document):
     flavor_memory = db.IntField(required=False)
     flavor_type = db.StringField(required=False)
     cloud = db.StringField(required=False)
+    availability_zone= db.StringField(required=False)
 
 
 
@@ -716,3 +717,18 @@ class ConfOpenstackModel(db.Document):
                 }],
             'index_background': True
             }
+
+class ConfigureNamedModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    env = db.StringField(required=False, max_length=50)
+    name = db.StringField(required=False, max_length=50)
+    url = db.StringField(required=False, max_length=50)
+
+    meta = {
+        "collection": "configure_named",
+        "indexes": [{
+            'fields': ['id'],
+            'sparse': True,
+        }],
+        'index_background': True
+    }

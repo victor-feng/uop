@@ -109,7 +109,15 @@ class Configure(Resource):
                         cloud = net.cloud,
                         env = net.env,
                     ))
-
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel.objects.filter(env=env)
+            for net in ret:
+                if net.availability_zone:
+                    results.append(dict(
+                        availability_zone = net.availability_zone,
+                        cloud=net.cloud,
+                        env=net.env,
+                    ))
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret:
@@ -156,6 +164,7 @@ class Configure(Resource):
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
+        parser.add_argument('availability_zone', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -212,6 +221,11 @@ class Configure(Resource):
                                    flavor_cpu=args.flavor_cpu,
                                    flavor_memory=args.flavor_memory,
                                    cloud=cloud,env=env).save()
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel(id=id,
+                                     availability_zone=args.availability_zone,
+                                     cloud=cloud,
+                                     env=env).save()
         else:#disconf
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -258,6 +272,7 @@ class Configure(Resource):
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
+        parser.add_argument('availability_zone', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
@@ -301,6 +316,9 @@ class Configure(Resource):
                     flavor_memory=args.flavor_memory,
                     cloud=cloud,
                     env=env)
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel.objects(id=id)
+            ret.update(availability_zone=args.availability_zone, cloud=cloud, env=env)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
@@ -331,7 +349,7 @@ class Configure(Resource):
             ret = NetWorkConfig.objects.filter(id=id)
         elif category == "namespace":
             ret = ConfigureK8sModel.objects.filter(id=id)
-        elif category in ["image","flavor"]:
+        elif category in ["image","flavor","availability_zone"]:
             ret = ConfOpenstackModel.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
