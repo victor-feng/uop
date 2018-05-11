@@ -212,8 +212,9 @@ class GetImageFlavor(Resource):
                 flavor_info["flavor_memory"] = flavor.flavor_memory
                 flavor_list.append(flavor_info)
             for zone in availability_zones:
-                availability_zone = zone.name
-                availability_zone_list.append(availability_zone)
+                if zone.name:
+                    availability_zone = zone.name
+                    availability_zone_list.append(availability_zone)
             data["flavor_list"] = flavor_list
             data["image_list"] = image_list
             data["availability_zone_list"] = availability_zone_list
