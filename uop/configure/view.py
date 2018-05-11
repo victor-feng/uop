@@ -90,6 +90,7 @@ class Configure(Resource):
                 if net.image_name:
                     results.append(dict(
                         id = net.id,
+                        port = net.port,
                         image_id = net.image_id,
                         image_name = net.image_name,
                         image_type = net.image_type,
@@ -186,6 +187,7 @@ class Configure(Resource):
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         parser.add_argument('availability_zone', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -230,6 +232,7 @@ class Configure(Resource):
         elif category == "image":
             ret = ConfOpenstackModel(
                 id=id,
+                port = args.port,
                 image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
@@ -298,6 +301,7 @@ class Configure(Resource):
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         parser.add_argument('availability_zone', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
@@ -330,6 +334,7 @@ class Configure(Resource):
             ret.update(image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
+                port = args.port,
                 cloud=cloud,
                 env=env)
         elif category == "flavor":

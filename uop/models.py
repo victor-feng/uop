@@ -399,6 +399,7 @@ class DBIns(db.EmbeddedDocument):
     flavor2_id = db.StringField(required=False)
     volume_exp_size = db.IntField(required=False, default_value=0)
     availability_zone = db.StringField(required=False)
+    port = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'indexes': [
@@ -701,6 +702,7 @@ class ConfOpenstackModel(db.Document):
     image_id = db.StringField(required=False)
     image_name = db.StringField(required=False)
     image_type = db.StringField(required=False)
+    port = db.StringField(required=False)
     flavor_name = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
     flavor_cpu = db.IntField(required=False)
