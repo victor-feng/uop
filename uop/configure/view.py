@@ -9,7 +9,7 @@ from uop.configure.handler import fuzzyfinder
 from uop.models import ConfigureEnvModel
 from uop.models import ConfigureNginxModel
 from uop.models import ConfigureDisconfModel
-from uop.models import NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
+from uop.models import NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel,ConfigureNamedModel
 from uop.util import get_CRP_url,response_data
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -118,6 +118,16 @@ class Configure(Resource):
                         cloud=net.cloud,
                         env=net.env,
                     ))
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects.filter(env=env)
+            for net in ret:
+                if net.name:
+                    results.append(dict(
+                        name=net.name,
+                        utl=net.url,
+                        env=net.env,
+                    ))
+
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
             for env in ret:
@@ -214,7 +224,7 @@ class Configure(Resource):
                 image_type=args.image_type,
                 cloud=cloud,env=env).save()
         elif category == "flavor":
-            ret=ConfOpenstackModel(id=id,
+            ret = ConfOpenstackModel(id=id,
                                    flavor_id=args.flavor_id,
                                    flavor_name=args.flavor_name,
                                    flavor_type=args.flavor_type,
@@ -226,6 +236,8 @@ class Configure(Resource):
                                      availability_zone=args.availability_zone,
                                      cloud=cloud,
                                      env=env).save()
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel(id=id,name=name,env=env,url=url).save()
         else:#disconf
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -319,6 +331,9 @@ class Configure(Resource):
         elif category == "availability_zone":
             ret = ConfOpenstackModel.objects(id=id)
             ret.update(availability_zone=args.availability_zone, cloud=cloud, env=env)
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects(id=id)
+            ret.update(name=name,env=env,url=url)
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
@@ -351,6 +366,8 @@ class Configure(Resource):
             ret = ConfigureK8sModel.objects.filter(id=id)
         elif category in ["image","flavor","availability_zone"]:
             ret = ConfOpenstackModel.objects.filter(id=id)
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
         if len(ret):
