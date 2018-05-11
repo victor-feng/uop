@@ -127,7 +127,7 @@ class Configure(Resource):
                     results.append(dict(
                         id = net.id,
                         name=net.name,
-                        utl=net.url,
+                        url=net.url,
                         env=net.env,
                     ))
         elif category == "k8s_network_url":
@@ -456,13 +456,16 @@ class K8sNetworkApi(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('env', type=str, location="args")
-        parser.add_argument('network_url', type=str, location="args")
         args = parser.parse_args()
         env = args.env
-        network_url= args.network_url
         data={}
         res_list=[]
         try:
+            network_url = None
+            nets = ConfigureK8sModel.objects.filter(env=env)
+            for net in nets:
+                if net.network_url:
+                    network_url=network_url
             url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
             result = requests.get(url)
             code=result.json().get('code')
