@@ -722,7 +722,7 @@ class ConfigureNamedModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     env = db.StringField(required=False, max_length=50)
     name = db.StringField(required=False, max_length=50)
-    url = db.StringField(required=False, max_length=50)
+    named_url = db.StringField(required=False, max_length=50)
 
     meta = {
         "collection": "configure_named",
