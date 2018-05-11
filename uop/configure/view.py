@@ -114,7 +114,7 @@ class Configure(Resource):
             for net in ret:
                 if net.availability_zone:
                     results.append(dict(
-                        id=id,
+                        id=net.id,
                         availability_zone = net.availability_zone,
                         cloud=net.cloud,
                         env=net.env,
@@ -124,6 +124,7 @@ class Configure(Resource):
             for net in ret:
                 if net.name:
                     results.append(dict(
+                        id = net.id,
                         name=net.name,
                         utl=net.url,
                         env=net.env,
