@@ -681,6 +681,7 @@ class ConfigureK8sModel(db.Document):
     env = db.StringField(required=False, max_length=50)
     namespace_name = db.StringField(required=False)
     config_map_name = db.StringField(required=False)
+    network_url = db.StringField(required=False)
 
 
 

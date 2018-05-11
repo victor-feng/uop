@@ -78,7 +78,8 @@ class Configure(Resource):
         elif category == 'namespace':
             ret = ConfigureK8sModel.objects.filter(env=env)
             for net in ret:
-                results.append(dict(id=net.id,
+                if net.namespace_name:
+                    results.append(dict(id=net.id,
                                  namespace_name=net.namespace_name,
                                  config_map_name=net.config_map_name,
                                  env = net.env,
@@ -129,6 +130,14 @@ class Configure(Resource):
                         utl=net.url,
                         env=net.env,
                     ))
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel.objects.filter(env=env)
+            for net in ret:
+                if net.network_url:
+                    results.append(dict(id=net.id,
+                                    url=net.network_url,
+                                    env=net.env,
+                                    ))
 
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
@@ -240,6 +249,8 @@ class Configure(Resource):
                                      env=env).save()
         elif category == "namedmanager":
             ret = ConfigureNamedModel(id=id,name=name,env=env,url=url).save()
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel(id=id, env=env, network_url=url).save()
         else:#disconf
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -336,6 +347,10 @@ class Configure(Resource):
         elif category == "namedmanager":
             ret = ConfigureNamedModel.objects(id=id)
             ret.update(name=name,env=env,url=url)
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel.objects(id=id)
+            ret.update(env=env, network_url=url)
+
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
@@ -364,7 +379,7 @@ class Configure(Resource):
             ret = ConfigureNginxModel.objects.filter(id=id)
         elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
-        elif category == "namespace":
+        elif category in ["namespace","k8s_network_url"]:
             ret = ConfigureK8sModel.objects.filter(id=id)
         elif category in ["image","flavor","availability_zone"]:
             ret = ConfOpenstackModel.objects.filter(id=id)
@@ -441,12 +456,14 @@ class K8sNetworkApi(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('env', type=str, location="args")
+        parser.add_argument('network_url', type=str, location="args")
         args = parser.parse_args()
         env = args.env
+        network_url= args.network_url
         data={}
         res_list=[]
         try:
-            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
+            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
             result = requests.get(url)
             code=result.json().get('code')
             if code == 200:
