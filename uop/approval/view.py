@@ -662,7 +662,7 @@ class CapacityReservation(Resource):
                         "flavor": db_res.flavor_id,
                         "volume_exp_size": db_res.volume_exp_size,
                         "image2_id": db_res.image2_id,
-                        "flavor2": db_res.flavo2_id,
+                        "flavor2": db_res.flavor2_id,
                         "availability_zone": db_res.availability_zone,
                         "port":db_res.port,
                     }
