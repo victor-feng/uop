@@ -485,9 +485,10 @@ class K8sNetworkApi(Resource):
                         err_msg = result.json().get('result')['msg']
             if not err_msg:
                 msg = "Get k8s network info success"
+                code = 200
             else:
                 msg = err_msg
-            code = 200
+                code = 400
             data["res_list"] = res_list
         except Exception as e:
             code = 500
