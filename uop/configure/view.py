@@ -467,11 +467,10 @@ class K8sNetworkApi(Resource):
         res_list=[]
         err_msg = None
         try:
-            network_url = None
             nets = ConfigureK8sModel.objects.filter(env=env)
             for net in nets:
                 if net.network_url:
-                    network_url=network_url
+                    network_url=net.network_url
                     url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
                     result = requests.get(url)
                     code=result.json().get('code')
@@ -483,7 +482,7 @@ class K8sNetworkApi(Resource):
                             res["tenantName"] = r.get("tenantName")
                             res_list.append(res)
                     else:
-                        err_msg = result.json().get('msg')
+                        err_msg = result.json().get('result')['msg']
             if not err_msg:
                 msg = "Get k8s network info success"
             else:
