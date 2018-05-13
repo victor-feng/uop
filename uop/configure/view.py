@@ -471,19 +471,19 @@ class K8sNetworkApi(Resource):
             for net in nets:
                 if net.network_url:
                     network_url=network_url
-            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
-            result = requests.get(url)
-            code=result.json().get('code')
-            if code == 200:
-                result_list= result.json().get('result')['data']['res_list']
-                for r in result_list:
-                    res={}
-                    res["networkName"] = r.get("networkName")
-                    res["tenantName"] = r.get("tenantName")
-                    res_list.append(res)
-            msg = result.json().get('result')["msg"]
+                    url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
+                    result = requests.get(url)
+                    code=result.json().get('code')
+                    if code == 200:
+                        result_list= result.json().get('result')['data']['res_list']
+                        for r in result_list:
+                            res={}
+                            res["networkName"] = r.get("networkName")
+                            res["tenantName"] = r.get("tenantName")
+                            res_list.append(res)
+                    msg = result.json().get('result')["msg"]
+                    code = code
             data["res_list"] = res_list
-            code = code
         except Exception as e:
             code = 500
             data = "Error"
