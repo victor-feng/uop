@@ -465,6 +465,7 @@ class K8sNetworkApi(Resource):
         env = args.env
         data={}
         res_list=[]
+        err_msg = None
         try:
             network_url = None
             nets = ConfigureK8sModel.objects.filter(env=env)
@@ -481,7 +482,12 @@ class K8sNetworkApi(Resource):
                             res["networkName"] = r.get("networkName")
                             res["tenantName"] = r.get("tenantName")
                             res_list.append(res)
-            msg = "Get k8s network info success"
+                    else:
+                        err_msg = result.json().get('msg')
+            if not err_msg:
+                msg = "Get k8s network info success"
+            else:
+                msg = err_msg
             code = 200
             data["res_list"] = res_list
         except Exception as e:
