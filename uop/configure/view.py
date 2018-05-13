@@ -481,8 +481,8 @@ class K8sNetworkApi(Resource):
                             res["networkName"] = r.get("networkName")
                             res["tenantName"] = r.get("tenantName")
                             res_list.append(res)
-                    msg = result.json().get('result')["msg"]
-                    code = code
+            msg = "Get k8s network info success"
+            code = 200
             data["res_list"] = res_list
         except Exception as e:
             code = 500
