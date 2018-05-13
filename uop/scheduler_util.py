@@ -43,7 +43,7 @@ def get_cmdb2_entity():
     entity_dict['apache'] = ""
     entity_dict['zookeeper'] = ""
     res = requests.post(url, data=json.dumps(data)).json()
-    Log.logger.info("The cmdb2 entity res is {}".format(res))
+    #Log.logger.info("The cmdb2 entity res is {}".format(res))
     with db.app.app_context():
         if res["code"] == 0:
             for i in res["data"]:
