@@ -540,9 +540,9 @@ def subgrath_data(args):
     #####
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
     Log.logger.info("The get_pro value is {}".format(get_pro))
+    newid = str(uuid.uuid1())
     try:
         if next_model_id in code_id.keys():
-            newid = str(uuid.uuid1())
             name = get_pro("baseInfo", property)
             flag = ItemInformation.objects.filter(item_name=name,item_relation=last_instance_id)
             if flag:
