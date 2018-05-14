@@ -187,8 +187,8 @@ class DeploymentListAPI(Resource):
                     'is_deleted': deployment.is_deleted,
                     'is_rollback': deployment.is_rollback,
                     'approve_suggestion': deployment.approve_suggestion,
-                    'resource_type': deployment.resource_type
-                    "image_name" :image_name,
+                    'resource_type': deployment.resource_type,
+                    "image_name":image_name,
                     "flavor_name":flavor_name,
                     "image2_name": image2_name,
                     "flavor2_name": flavor2_name,
