@@ -599,6 +599,8 @@ class DeploymentListAPI(Resource):
             deploys = Deployment.objects.filter(resource_id=resource_id,deploy_result="deploy_fail").order_by('-created_time')
             if deploys:
                 resource = ResourceModel.objects.get(res_id=resource_id)
+                resource.updated_date = datetime.datetime.now()
+                resource.save()
                 deploy=deploys[0]
                 environment=deploy.environment
                 database_password=deploy.database_password
