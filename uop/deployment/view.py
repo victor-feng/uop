@@ -152,8 +152,8 @@ class DeploymentListAPI(Resource):
                     'approve_suggestion': deployment.approve_suggestion,
                     'resource_type': deployment.resource_type
                 })
-                if resource_id:
-                    resource = ResourceModel.objects.get(res_id=resource_id)
+                if args.resource_id:
+                    resource = ResourceModel.objects.get(res_id=args.resource_id)
                     resource_list = resource.resource_list
                     compute_list = resource.compute_list
                     if resource_list:
