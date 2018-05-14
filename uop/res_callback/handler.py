@@ -243,10 +243,10 @@ def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
-    start_time = time.time()
+    # start_time = time.time()
     data = filter_status_data(p_code, id, num)  # save to uop
-    end_time = time.time()
-    Log.logger.info("The UOP waste time is {}".format(end_time - start_time))
+    # end_time = time.time()
+    # Log.logger.info("The UOP waste time is {}".format(end_time - start_time))
     # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         if url:
@@ -517,10 +517,10 @@ def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
         ret = []
 
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
-        cmdb_start_time = time.time()
+        # cmdb_start_time = time.time()
         ret = requests.post(url, data=data_str, timeout=5).json()
-        cmdb_end_time = time.time()
-        Log.logger.info("The CMDB waste time is {}".format(cmdb_end_time - cmdb_start_time))
+        # cmdb_end_time = time.time()
+        # Log.logger.info("The CMDB waste time is {}".format(cmdb_end_time - cmdb_start_time))
         if ret["code"] == 0:
             Log.logger.info("Save to CMDB2.0 successfully,{}".format(ret))
             db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
