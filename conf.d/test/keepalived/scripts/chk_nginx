@@ -1,5 +1,5 @@
 #!/bin/bash  
-nginxpid=`netstat -ntl|grep :80|wc -l` 
+nginxpid=`netstat -ntl|grep :80|grep -v grep|wc -l` 
 if [ $nginxpid -eq 0 ];then 
 # /etc/init.d/keepalived stop 
 service keepalived stop 
