@@ -350,6 +350,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                 host_mapping = json.dumps(host_mapping)
             else:
                 host_mapping = json.dumps(host_mapping)
+            #modles.ComputeIns 字段变更时这里也要变
             compute = ComputeIns(ins_name=o.ins_name, ips=o.ips, ins_id=o.ins_id, cpu=match_one.get("cpu","2"), mem=match_one.get("mem","2"), certificate=match_one.get("certificate", ""),
                                  url=match_one.get("url",""), domain=match_one.get("domain", ""), quantity=o.quantity, port=match_one.get("port"),
                                  docker_meta=o.docker_meta, domain_ip=match_one.get("domain_ip", ""),
@@ -357,7 +358,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  network_id=o.network_id,networkName=match_one.get("networkName"),tenantName=match_one.get("tenantName"),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
-                                 host_mapping=host_mapping,named_url=match_one.get("named_url"))
+                                 host_mapping=host_mapping,named_url=match_one.get("named_url"),availability_zone=o.availability_zone,image_id=o.image_id,flavor_id=o.flavor_id)
             old_compute_list.insert(i, compute)
             domain = match_one.get("domain", "")
             res.domain = domain
