@@ -229,7 +229,7 @@ def Aquery(args):
     }
     name, code, uid, token, instance_id, model_id, self_model_id = \
         args.name, args.code, args.uid, args.token, args.instance_id, args.model_id, args.self_model_id
-    if APP_ENV == "development": # 走uop
+    if APP_ENV == "development" or "testing" or "prod": # 走uop
         '''
         instance_id 对应Iteminformation的item_id, 如果不传默认查询所有业务
         '''
@@ -586,7 +586,7 @@ def subgrath_data(args):
 
     return response_data(200, "success", [])
 
-
+@async
 def to_Cmdb2(args, exchange_project_item_id=False):
     next_model_id, last_model_id, property, uid, token, last_instance_id = \
         args.next_model_id, args.last_model_id, args.property, args.uid, args.token, args.last_instance_id
@@ -774,6 +774,7 @@ def fix_instance(args):
         "instance": instance
     })
     Log.logger.info("DATA IS {}".format(data))
+
     return data
 
 
