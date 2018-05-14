@@ -639,6 +639,11 @@ class CapacityReservation(Resource):
         data['set_flag'] = approval.capacity_status
         data['syswin_project'] = 'uop'
         data['project_name'] = resource.project_name
+        named_url_list = []
+        rets = models.ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
+        for ret in rets:
+            named_url_list.append(ret.url)
+        data["named_url_list"] = named_url_list
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         resource_type = resource.resource_type
@@ -671,10 +676,6 @@ class CapacityReservation(Resource):
         ips = []
         if compute_list:
             com = []
-            named_url_list = []
-            rets = models.ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
-            for ret in rets:
-                named_url_list.append(ret.url)
             for db_com in compute_list:
                 # for i in range(0, db_com.quantity):
                 meta = json.dumps(
@@ -716,7 +717,6 @@ class CapacityReservation(Resource):
                                 "availability_zone":db_com.availability_zone,
                                 "image_id": db_com.image_id,
                                 "flavor_id": db_com.flavor_id,
-                                "named_url_list": named_url_list,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

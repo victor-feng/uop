@@ -69,6 +69,11 @@ def deal_crp_data(resource,set_flag):
     data['syswin_project'] = 'uop'
     data['project_name'] = resource.project_name
     # data['cmdb_repo_id'] = item_info.item_id
+    named_url_list = []
+    rets = ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
+    for ret in rets:
+        named_url_list.append(ret.url)
+    data["named_url_list"] = named_url_list
     resource_list = resource.resource_list
     compute_list = resource.compute_list
     if resource_list:
@@ -99,10 +104,6 @@ def deal_crp_data(resource,set_flag):
         data['resource_list'] = res
     if compute_list:
         com = []
-        named_url_list =[]
-        rets = ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
-        for ret in rets:
-            named_url_list.append(ret.url)
         for db_com in compute_list:
             meta = json.dumps(db_com.docker_meta)
             deploy_source = db_com.deploy_source
@@ -139,7 +140,6 @@ def deal_crp_data(resource,set_flag):
                     "availability_zone": db_com.availability_zone,
                     "image_id": db_com.image_id,
                     "flavor_id": db_com.flavor_id,
-                    "named_url_list":named_url_list,
                 }
             )
         data['compute_list'] = com
