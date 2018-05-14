@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import datetime
 import json
 from flask_restful import reqparse, Api, Resource, fields
 import requests
@@ -122,7 +123,7 @@ class Configure(Resource):
                         env=net.env,
                     ))
         elif category == "namedmanager":
-            ret = ConfigureNamedModel.objects.filter(env=env)
+            ret = ConfigureNamedModel.objects.filter(env=env).order_by("-create_time")
             for net in ret:
                 if net.name:
                     results.append(dict(
@@ -251,7 +252,7 @@ class Configure(Resource):
                                      cloud=cloud,
                                      env=env).save()
         elif category == "namedmanager":
-            ret = ConfigureNamedModel(id=id,name=name,env=env,url=url).save()
+            ret = ConfigureNamedModel(id=id,name=name,env=env,url=url,create_time=datetime.datetime.now()).save()
         elif category == "k8s_network_url":
             ret = ConfigureK8sModel(id=id, env=env, network_url=url).save()
         else:#disconf

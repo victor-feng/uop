@@ -6,6 +6,7 @@ from uop.util import get_CRP_url
 import requests
 import json
 from config import configs, APP_ENV
+from uop.models import ConfigureNamedModel
 
 BASE_K8S_IMAGE = configs[APP_ENV].BASE_K8S_IMAGE
 
@@ -68,6 +69,11 @@ def deal_crp_data(resource,set_flag):
     data['syswin_project'] = 'uop'
     data['project_name'] = resource.project_name
     # data['cmdb_repo_id'] = item_info.item_id
+    named_url_list = []
+    rets = ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
+    for ret in rets:
+        named_url_list.append(ret.url)
+    data["named_url_list"] = named_url_list
     resource_list = resource.resource_list
     compute_list = resource.compute_list
     if resource_list:

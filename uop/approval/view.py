@@ -639,6 +639,11 @@ class CapacityReservation(Resource):
         data['set_flag'] = approval.capacity_status
         data['syswin_project'] = 'uop'
         data['project_name'] = resource.project_name
+        named_url_list = []
+        rets = models.ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
+        for ret in rets:
+            named_url_list.append(ret.url)
+        data["named_url_list"] = named_url_list
         resource_list = resource.resource_list
         compute_list = resource.compute_list
         resource_type = resource.resource_type
