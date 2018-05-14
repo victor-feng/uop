@@ -495,6 +495,7 @@ def get_entity(data):
     data_str = json.dumps(req_data)
     entity_info = {}
     try:
+        modules_bak = ModelCacheBak.objects.all()
         modules = ModelCache.objects.all()
         entity_info = {
             "entity": []
@@ -502,6 +503,9 @@ def get_entity(data):
         if modules:
             Log.logger.info(" modules is exist....")
             for m in modules:
+                entity_info["entity"] = json.loads(m.entity)
+        elif modules_bak:
+            for m in modules_bak:
                 entity_info["entity"] = json.loads(m.entity)
         else:
             ret = requests.post(url, data=data_str, timeout=5).json()
