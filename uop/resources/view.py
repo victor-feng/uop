@@ -749,8 +749,8 @@ class ResourceDetail(Resource):
                 image_id = db_res.image_id
                 network_id = db_res.network_id
                 flavor_id = db_res.flavor_id
-                image2_id = db_res.image_id
-                flavor2_id = db_res.flavor_id
+                image2_id = db_res.image2_id
+                flavor2_id = db_res.flavor2_id
                 if image_id:
                     opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
                     result['image_name'] = opsk_image.image_name
