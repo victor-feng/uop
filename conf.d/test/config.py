@@ -91,7 +91,7 @@ class TestingConfig(BaseConfig):
 
     CMDB2_ENTITY = data[0]
     CMDB2_VIEWS = data[1]
-    print "The data is {}\n{}\n".format(CMDB2_ENTITY, CMDB2_VIEWS)
+    # print "The data is {}\n{}\n".format(CMDB2_ENTITY, CMDB2_VIEWS)
 
     # CMDB知识库变动时，需要改动，或添加
     # CMDB2_ENTITY = {
