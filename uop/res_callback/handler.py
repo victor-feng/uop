@@ -243,7 +243,10 @@ def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
     if not p_code:
         Log.logger.info("push_vm_docker_status_to_cmdb pcode is null")
         return
+    start_time = time.time()
     data = filter_status_data(p_code, id, num)  # save to uop
+    end_time = time.time()
+    Log.logger.info("The UOP waste time is {}".format(end_time - start_time))
     # Log.logger.info("Start push vm and docker status to CMDB, data:{}".format(data))
     try:
         if url:
@@ -514,7 +517,10 @@ def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
         ret = []
 
         Log.logger.info("post 'graph data' to cmdb/openapi/graph/ request:{}".format(data))
+        cmdb_start_time = time.time()
         ret = requests.post(url, data=data_str, timeout=5).json()
+        cmdb_end_time = time.time()
+        Log.logger.info("The CMDB waste time is {}".format(cmdb_end_time - cmdb_start_time))
         if ret["code"] == 0:
             Log.logger.info("Save to CMDB2.0 successfully,{}".format(ret))
             db_flag = True if args.get("db_info") and set(args.get("db_info").keys()) & set(["mysql", "redis", "mongodb"])  else False
@@ -526,7 +532,7 @@ def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
                 save_resource_id(ret["data"]["instance"], res_id, cmdb1_url, set_flag, flag, db_flag)
         else: # 即便CMDB2失败，保存我的资源到UOP表
             Log.logger.info("Save to CMDB2.0 failed and save to uop and save to cmdb1.0")
-            #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
+            push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
             Log.logger.error("[CMDB2.0 graph error]:{}".format(ret))
     except Exception as exc:
         #即使往cmdb2写入数据失败，也往uop里面写入数据
@@ -571,7 +577,7 @@ def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
         CMDB_STATUS_URL = cmdb1_url + 'cmdb/api/vmdocker/status/'
     else:
         CMDB_STATUS_URL = None
-    #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
+    push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, view_id, view_num, res.cmdb_p_code)
     def get_ip(ins):
         try:
             for os_ip in res.os_ins_ip_list:
