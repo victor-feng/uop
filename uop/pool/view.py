@@ -203,7 +203,7 @@ class GetImageFlavor(Resource):
                 image_info = {}
                 image_info["image_name"] = image.image_name
                 image_info["image_id"] = image.image_id
-                image_info["port"] = image.port
+                image_info["port"] = image.port if image.port else '22'
                 image_list.append(image_info)
             for flavor in opsk_flavors:
                 flavor_info = {}
