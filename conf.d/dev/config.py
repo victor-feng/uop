@@ -85,6 +85,11 @@ class DevelopmentConfig(BaseConfig):
 
     CMDB2_ENTITY = data[0]
     CMDB2_VIEWS = data[1]
+    UOPCODE_CMDB2 = {
+        data[0]['yewu']: 'business',
+        data[0]['Module']: 'module',
+        data[0]['project']: 'project'
+    }
     print "The data is {}\n{}\n".format(CMDB2_ENTITY, CMDB2_VIEWS)
     # CMDB知识库变动时，需要改动，或添加
     # CMDB2_ENTITY = {
@@ -102,11 +107,11 @@ class DevelopmentConfig(BaseConfig):
     #     "mongodb": "9bc4a41eb6364022b2f2c093",
     #     "nginx": "3671f248bdc74d2fb6aa590c",
     # }
-    UOPCODE_CMDB2 = {
-        "c73339db70cc4647b515eaca": "business",
-        "9e97b54a4a54472e9e913d4e": "module",
-        "59c0af57133442e7b34654a3": "project"
-    }
+    # UOPCODE_CMDB2 = {
+    #     "c73339db70cc4647b515eaca": "business",
+    #     "9e97b54a4a54472e9e913d4e": "module",
+    #     "59c0af57133442e7b34654a3": "project"
+    # }
     # CMDB知识库变动时，改动此字典与 CMDB2_ENTITY 保持一致即可，为确保查询性能，稍有冗余，但同一起点的实体id只能有一个视图
     # CMDB2_VIEWS = {
     #     # 注意：定时任务只会缓存1，2，3 三个视图下的基础模型数据
