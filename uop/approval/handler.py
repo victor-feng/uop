@@ -6,6 +6,7 @@ from uop.util import get_CRP_url
 import requests
 import json
 from config import configs, APP_ENV
+from uop.models import ConfigureNamedModel
 
 BASE_K8S_IMAGE = configs[APP_ENV].BASE_K8S_IMAGE
 
@@ -98,6 +99,10 @@ def deal_crp_data(resource,set_flag):
         data['resource_list'] = res
     if compute_list:
         com = []
+        named_url_list =[]
+        rets = ConfigureNamedModel.objects.filter(env=resource.env).order_by("-create_time")
+        for ret in rets:
+            named_url_list.append(ret.url)
         for db_com in compute_list:
             meta = json.dumps(db_com.docker_meta)
             deploy_source = db_com.deploy_source
@@ -134,6 +139,7 @@ def deal_crp_data(resource,set_flag):
                     "availability_zone": db_com.availability_zone,
                     "image_id": db_com.image_id,
                     "flavor_id": db_com.flavor_id,
+                    "named_url_list":named_url_list,
                 }
             )
         data['compute_list'] = com
