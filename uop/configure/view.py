@@ -9,7 +9,7 @@ from uop.configure.handler import fuzzyfinder
 from uop.models import ConfigureEnvModel
 from uop.models import ConfigureNginxModel
 from uop.models import ConfigureDisconfModel
-from uop.models import NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel
+from uop.models import NetWorkConfig,ConfigureK8sModel,ConfOpenstackModel,ConfigureNamedModel
 from uop.util import get_CRP_url,response_data
 from uop.log import Log
 from uop.permission.handler import api_permission_control
@@ -78,7 +78,8 @@ class Configure(Resource):
         elif category == 'namespace':
             ret = ConfigureK8sModel.objects.filter(env=env)
             for net in ret:
-                results.append(dict(id=net.id,
+                if net.namespace_name:
+                    results.append(dict(id=net.id,
                                  namespace_name=net.namespace_name,
                                  config_map_name=net.config_map_name,
                                  env = net.env,
@@ -89,6 +90,7 @@ class Configure(Resource):
                 if net.image_name:
                     results.append(dict(
                         id = net.id,
+                        port = net.port,
                         image_id = net.image_id,
                         image_name = net.image_name,
                         image_type = net.image_type,
@@ -109,6 +111,34 @@ class Configure(Resource):
                         cloud = net.cloud,
                         env = net.env,
                     ))
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel.objects.filter(env=env)
+            for net in ret:
+                if net.availability_zone:
+                    results.append(dict(
+                        id=net.id,
+                        availability_zone = net.availability_zone,
+                        cloud=net.cloud,
+                        env=net.env,
+                    ))
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects.filter(env=env)
+            for net in ret:
+                if net.name:
+                    results.append(dict(
+                        id = net.id,
+                        name=net.name,
+                        url=net.url,
+                        env=net.env,
+                    ))
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel.objects.filter(env=env)
+            for net in ret:
+                if net.network_url:
+                    results.append(dict(id=net.id,
+                                    url=net.network_url,
+                                    env=net.env,
+                                    ))
 
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
@@ -156,6 +186,8 @@ class Configure(Resource):
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
+        parser.add_argument('availability_zone', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -200,18 +232,28 @@ class Configure(Resource):
         elif category == "image":
             ret = ConfOpenstackModel(
                 id=id,
+                port = args.port,
                 image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
                 cloud=cloud,env=env).save()
         elif category == "flavor":
-            ret=ConfOpenstackModel(id=id,
+            ret = ConfOpenstackModel(id=id,
                                    flavor_id=args.flavor_id,
                                    flavor_name=args.flavor_name,
                                    flavor_type=args.flavor_type,
                                    flavor_cpu=args.flavor_cpu,
                                    flavor_memory=args.flavor_memory,
                                    cloud=cloud,env=env).save()
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel(id=id,
+                                     availability_zone=args.availability_zone,
+                                     cloud=cloud,
+                                     env=env).save()
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel(id=id,name=name,env=env,url=url).save()
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel(id=id, env=env, network_url=url).save()
         else:#disconf
             ret = ConfigureDisconfModel(env=env,
                                         url=url,
@@ -258,6 +300,8 @@ class Configure(Resource):
         parser.add_argument('flavor_memory', type=int)
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
+        parser.add_argument('availability_zone', type=str)
+        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
@@ -290,6 +334,7 @@ class Configure(Resource):
             ret.update(image_id=args.image_id,
                 image_name=args.image_name,
                 image_type=args.image_type,
+                port = args.port,
                 cloud=cloud,
                 env=env)
         elif category == "flavor":
@@ -301,6 +346,16 @@ class Configure(Resource):
                     flavor_memory=args.flavor_memory,
                     cloud=cloud,
                     env=env)
+        elif category == "availability_zone":
+            ret = ConfOpenstackModel.objects(id=id)
+            ret.update(availability_zone=args.availability_zone, cloud=cloud, env=env)
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects(id=id)
+            ret.update(name=name,env=env,url=url)
+        elif category == "k8s_network_url":
+            ret = ConfigureK8sModel.objects(id=id)
+            ret.update(env=env, network_url=url)
+
         else:
             ret = ConfigureDisconfModel.objects(id=id)
             ret.update(name=name, url=url, ip=ip, username=username, password=password)
@@ -329,10 +384,12 @@ class Configure(Resource):
             ret = ConfigureNginxModel.objects.filter(id=id)
         elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
-        elif category == "namespace":
+        elif category in ["namespace","k8s_network_url"]:
             ret = ConfigureK8sModel.objects.filter(id=id)
-        elif category in ["image","flavor"]:
+        elif category in ["image","flavor","availability_zone"]:
             ret = ConfOpenstackModel.objects.filter(id=id)
+        elif category == "namedmanager":
+            ret = ConfigureNamedModel.objects.filter(id=id)
         else:
             ret = ConfigureDisconfModel.objects.filter(id=id)
         if len(ret):
@@ -408,20 +465,31 @@ class K8sNetworkApi(Resource):
         env = args.env
         data={}
         res_list=[]
+        err_msg = None
         try:
-            url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s' %env
-            result = requests.get(url)
-            code=result.json().get('code')
-            if code == 200:
-                result_list= result.json().get('result')['data']['res_list']
-                for r in result_list:
-                    res={}
-                    res["networkName"] = r.get("networkName")
-                    res["tenantName"] = r.get("tenantName")
-                    res_list.append(res)
-            msg = result.json().get('result')["msg"]
+            nets = ConfigureK8sModel.objects.filter(env=env)
+            for net in nets:
+                if net.network_url:
+                    network_url=net.network_url
+                    url=get_CRP_url(env)+'api/openstack/k8s/network?env=%s&url=%s' %(env,network_url)
+                    result = requests.get(url)
+                    code=result.json().get('code')
+                    if code == 200:
+                        result_list= result.json().get('result')['data']['res_list']
+                        for r in result_list:
+                            res={}
+                            res["networkName"] = r.get("networkName")
+                            res["tenantName"] = r.get("tenantName")
+                            res_list.append(res)
+                    else:
+                        err_msg = result.json().get('result')['msg']
+            if not err_msg:
+                msg = "Get k8s network info success"
+                code = 200
+            else:
+                msg = err_msg
+                code = 400
             data["res_list"] = res_list
-            code = code
         except Exception as e:
             code = 500
             data = "Error"

@@ -347,6 +347,7 @@ class ComputeIns(db.EmbeddedDocument):
     availability_zone = db.StringField(required=False)
     image_id = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
+    named_url = db.StringField(required=False)
 
 
     meta = {
@@ -398,6 +399,7 @@ class DBIns(db.EmbeddedDocument):
     flavor2_id = db.StringField(required=False)
     volume_exp_size = db.IntField(required=False, default_value=0)
     availability_zone = db.StringField(required=False)
+    port = db.StringField(required=False)
     meta = {
         'collection': 'db_ins',
         'indexes': [
@@ -487,7 +489,7 @@ class ResourceModel(db.DynamicDocument):
         'collection': 'resources',
         'indexes': [
             {
-                'fields': ['res_id', ('resource_name', 'env'), 'created_date'],
+                'fields': ['res_id', ('resource_name', 'env'), 'created_date','updated_date'],
                 'sparse': True,
                 }
             ],
@@ -680,6 +682,7 @@ class ConfigureK8sModel(db.Document):
     env = db.StringField(required=False, max_length=50)
     namespace_name = db.StringField(required=False)
     config_map_name = db.StringField(required=False)
+    network_url = db.StringField(required=False)
 
 
 
@@ -699,12 +702,14 @@ class ConfOpenstackModel(db.Document):
     image_id = db.StringField(required=False)
     image_name = db.StringField(required=False)
     image_type = db.StringField(required=False)
+    port = db.StringField(required=False)
     flavor_name = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
     flavor_cpu = db.IntField(required=False)
     flavor_memory = db.IntField(required=False)
     flavor_type = db.StringField(required=False)
     cloud = db.StringField(required=False)
+    availability_zone= db.StringField(required=False)
 
 
 
@@ -716,3 +721,18 @@ class ConfOpenstackModel(db.Document):
                 }],
             'index_background': True
             }
+
+class ConfigureNamedModel(db.Document):
+    id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
+    env = db.StringField(required=False, max_length=50)
+    name = db.StringField(required=False, max_length=50)
+    url = db.StringField(required=False, max_length=50)
+
+    meta = {
+        "collection": "configure_named",
+        "indexes": [{
+            'fields': ['id'],
+            'sparse': True,
+        }],
+        'index_background': True
+    }

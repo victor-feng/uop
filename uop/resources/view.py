@@ -144,11 +144,12 @@ class ResourceApplication(Resource):
                     image2_id = resource.get('image2_id')
                     flavor2_id = resource.get('flavor2_id')
                     volume_exp_size = resource.get("volume_exp_size",0)
-                    availability_zone = resource.get("availability_zone",0)
+                    availability_zone = resource.get("availability_zone")
+                    port = resource.get("port")
                     db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                    quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
                                    image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size,image2_id=image2_id,
-                                   flavor2_id=flavor2_id,availability_zone=availability_zone)
+                                   flavor2_id=flavor2_id,availability_zone=availability_zone,port=port)
                     resource_application.resource_list.append(db_ins)
 
             ins_name_list = []
@@ -598,13 +599,14 @@ class ResourceApplication(Resource):
                         image_id = res.get('image_id')
                         flavor_id = res.get('flavor_id')
                         volume_exp_size = res.get('volume_exp_size',0)
-                        image2_id = resource.get('image2_id')
-                        flavor2_id = resource.get('flavor2_id')
-                        availability_zone = resource.get("availability_zone", 0)
+                        image2_id = res.get('image2_id')
+                        flavor2_id = res.get('flavor2_id')
+                        availability_zone = res.get("availability_zone")
+                        port = res.get("port")
                         db_ins = DBIns(ins_name=ins_name, ins_id=ins_id, ins_type=ins_type, cpu=cpu, mem=mem, disk=disk,
                                        quantity=quantity, version=version, volume_size=volume_size,network_id=network_id,
                                        image_id=image_id,flavor_id=flavor_id,volume_exp_size=volume_exp_size,image2_id=image2_id,
-                                       flavor2_id=flavor2_id,availability_zone=availability_zone)
+                                       flavor2_id=flavor2_id,availability_zone=availability_zone,port=port)
                         resource.resource_list.append(db_ins)
                 resource.save()
             else:
@@ -783,13 +785,14 @@ class ResourceDetail(Resource):
                         "flavor2_id": flavor2_id,
                         "volume_exp_size":db_res.volume_exp_size,
                         "availability_zone": db_res.availability_zone,
+                        "port":db_res.port,
                     }
                 )
         com = []
         if compute_list:
             for db_com in compute_list:
-                image_id = db_res.image_id
-                flavor_id = db_res.flavor_id
+                image_id = db_com.image_id
+                flavor_id = db_com.flavor_id
                 if image_id:
                     opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
                     result['image_name'] = opsk_image.image_name

@@ -678,9 +678,10 @@ def delete_resource_deploy(res_id):
                 for app in app_image:
                     domain = app.get("domain","")
                     domain_ip = app.get("domain_ip","")
+                    named_url = app.get("named_url","")
                     d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
                     if d_count <= 1:
-                        domain_list.append({"domain": domain, 'domain_ip': domain_ip})
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url})
             crp_data = {
                 "disconf_list": disconfs,
                 "resource_id": res_id,
