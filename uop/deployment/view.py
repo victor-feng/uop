@@ -152,42 +152,43 @@ class DeploymentListAPI(Resource):
                     'approve_suggestion': deployment.approve_suggestion,
                     'resource_type': deployment.resource_type
                 })
-                resource = ResourceModel.objects.get(res_id=resource_id)
-                resource_list = resource.resource_list
-                compute_list = resource.compute_list
-                if resource_list:
-                    for db_res in resource_list:
-                        image_id = db_res.image_id
-                        network_id = db_res.network_id
-                        flavor_id = db_res.flavor_id
-                        image2_id = db_res.image2_id
-                        flavor2_id = db_res.flavor2_id
-                        if image_id:
-                            opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
-                            deployments['image_name'] = opsk_image.image_name
-                        if flavor_id:
-                            opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
-                            deployments['flavor_name'] = opsk_flavor.flavor_name
-                        if image2_id:
-                            opsk_image = ConfOpenstackModel.objects.filter(image_id=image2_id).first()
-                            deployments['image2_name'] = opsk_image.image_name
-                        if flavor2_id:
-                            opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor2_id).first()
-                            deployments['flavor2_name'] = opsk_flavor.flavor_name
-                        if network_id:
-                            network = NetWorkConfig.objects.filter(vlan_id=network_id).first()
-                            network_name = network.name
-                            deployments['network_name'] = network_name
-                if compute_list:
-                    for db_com in compute_list:
-                        image_id = db_com.image_id
-                        flavor_id = db_com.flavor_id
-                        if image_id:
-                            opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
-                            deployments['image_name'] = opsk_image.image_name
-                        if flavor_id:
-                            opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
-                            deployments['flavor_name'] = opsk_flavor.flavor_name
+                if resource_id:
+                    resource = ResourceModel.objects.get(res_id=resource_id)
+                    resource_list = resource.resource_list
+                    compute_list = resource.compute_list
+                    if resource_list:
+                        for db_res in resource_list:
+                            image_id = db_res.image_id
+                            network_id = db_res.network_id
+                            flavor_id = db_res.flavor_id
+                            image2_id = db_res.image2_id
+                            flavor2_id = db_res.flavor2_id
+                            if image_id:
+                                opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
+                                deployments['image_name'] = opsk_image.image_name
+                            if flavor_id:
+                                opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
+                                deployments['flavor_name'] = opsk_flavor.flavor_name
+                            if image2_id:
+                                opsk_image = ConfOpenstackModel.objects.filter(image_id=image2_id).first()
+                                deployments['image2_name'] = opsk_image.image_name
+                            if flavor2_id:
+                                opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor2_id).first()
+                                deployments['flavor2_name'] = opsk_flavor.flavor_name
+                            if network_id:
+                                network = NetWorkConfig.objects.filter(vlan_id=network_id).first()
+                                network_name = network.name
+                                deployments['network_name'] = network_name
+                    if compute_list:
+                        for db_com in compute_list:
+                            image_id = db_com.image_id
+                            flavor_id = db_com.flavor_id
+                            if image_id:
+                                opsk_image = ConfOpenstackModel.objects.filter(image_id=image_id).first()
+                                deployments['image_name'] = opsk_image.image_name
+                            if flavor_id:
+                                opsk_flavor = ConfOpenstackModel.objects.filter(flavor_id=flavor_id).first()
+                                deployments['flavor_name'] = opsk_flavor.flavor_name
 
                 res["deployments"]=deployments
         except Exception as e:
