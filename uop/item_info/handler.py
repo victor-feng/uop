@@ -6,6 +6,7 @@ import json
 import requests
 import os
 import traceback
+import time
 from uop.log import Log
 from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
@@ -690,6 +691,7 @@ def package_data(ret, ut):
 
 
 def fix_instance(args):
+    start_time = time.time()
     url = CMDB2_URL + "cmdb/openapi/graph/"
     model_id, instance_id, item, uid, token = \
         args.model_id, args.instance_id, args.property, args.uid, args.token
@@ -723,6 +725,9 @@ def fix_instance(args):
     except Exception as e:
         msg = traceback.format_exc()
         Log.logger.info("Save uop is wrong ".format(msg))
+    end_time_uop = time.time()
+    use_time_uop = end_time_uop - start_time
+    Log.logger.info("The UOP waste time is {}".format(use_time_uop))
 
     if not uid or not token:
         uid, token = get_uid_token()
@@ -774,7 +779,9 @@ def fix_instance(args):
         "instance": instance
     })
     Log.logger.info("DATA IS {}".format(data))
-
+    end_time_cmdb = time.time()
+    use_time_cmdb = end_time_cmdb - end_time_uop
+    Log.logger.info("The CMDB use time is {}".format(use_time_cmdb))
     return data
 
 
