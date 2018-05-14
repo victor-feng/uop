@@ -16,6 +16,8 @@ DB_PASS=123456
 DB_HOST=localhost
 #数据库端口
 DB_PORT=28010
+#数据库
+DATABASE=uop
 #DAYS=15代表删除15天前的备份，即只保留近15天的备份    
 DAYS=15
 #最终保存的数据库备份文件    
@@ -26,6 +28,8 @@ rm -rf $OUT_DIR/*
 mkdir -p $OUT_DIR/$DATE
 #备份全部数据库    
 $DUMP -h $DB_HOST:$DB_PORT -u $DB_USER -p $DB_PASS --authenticationDatabase "admin" -o $OUT_DIR/$DATE
+
+mkdir $TAR_DIR
 #压缩为.tar.gz格式    
 tar -zcvf $TAR_DIR/$TAR_BAK $OUT_DIR/$DATE
 #删除15天前的备份文件    
