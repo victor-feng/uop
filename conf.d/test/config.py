@@ -92,7 +92,7 @@ class TestingConfig(BaseConfig):
     CMDB2_ENTITY = data[0]
     CMDB2_VIEWS = data[1]
     UOPCODE_CMDB2 = {
-        data[0]['business']: 'business',
+        data[0]['yewu']: 'business',
         data[0]['Module']: 'module',
         data[0]['project']: 'project'
     }
