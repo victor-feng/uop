@@ -11,7 +11,7 @@ from uop.log import Log
 from uop.util import TimeToolkit, response_data,async
 from config import configs, APP_ENV
 from datetime import datetime
-from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation, ModelCacheBak
+from uop.models import Cmdb, Token, ModelCache, ResourceModel, Statusvm, ItemInformation
 from uop.res_callback.handler import get_relations, format_data_cmdb, judge_value_format
 import base64
 import uuid
