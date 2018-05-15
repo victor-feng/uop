@@ -772,7 +772,7 @@ def delete_resource_deploy(res_id):
             'code': 500,
             'result': {
                 'res': 'fail',
-                'msg': 'Delete resource application failed.'
+                'msg': 'Delete resource application failed.{e}'.format(e=str(e))
             }
         }
         return ret, 500
