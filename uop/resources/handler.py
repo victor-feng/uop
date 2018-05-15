@@ -666,7 +666,7 @@ def delete_resource_deploy(res_id):
             resource_type=resources.resource_type
             cloud = resources.cloud
             env = resources.env
-            deploys = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
+            deploys = Deployment.objects.filter(resource_id=res_id,deploy_type="deploy").order_by("-created_time")
             disconfs = []
             domain_list = []
             for deploy in deploys:
