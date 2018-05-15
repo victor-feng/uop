@@ -80,7 +80,6 @@ class ProdConfig(BaseConfig):
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
 
     data = get_entity_from_local_file()
-    print "The data is {}".format(data)
     CMDB2_ENTITY = data[0]
     CMDB2_VIEWS = data[1]
     UOPCODE_CMDB2 = {
