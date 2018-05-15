@@ -39,26 +39,12 @@ class ModelCache(db.Document):
     meta = {
         'indexes': [
             {
-                'fields': ['cache_date'],
-                'expireAfterSeconds': 60 * 60 * 24
+                'fields': ['cache_date']
             }
         ],
         'index_background': True
     }
 
-
-class ModelCacheBak(db.Document):
-    entity = db.StringField(default="")
-    cache_date = db.DateTimeField()
-
-    meta = {
-        'indexes': [
-            {
-                'fields': ['cache_date'],
-            }
-        ],
-        'index_background': True
-    }
 
 
 class HostsCache(db.Document):
