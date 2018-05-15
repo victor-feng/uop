@@ -690,8 +690,8 @@ def delete_resource_deploy(res_id):
                     domains = app.get("domain","")
                     domain_ip = app.get("domain_ip","")
                     named_url = app.get("named_url","")
-                    domain_list = domains.strip().split(',') if domains else []
-                    for domain in domain_list:
+                    domains_list = domains.strip().split(',') if domains else []
+                    for domain in domains_list:
                         d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
                         if d_count <= 1 and resource_type == "app":
                             domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
