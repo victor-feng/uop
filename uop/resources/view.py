@@ -383,7 +383,7 @@ class ResourceApplication(Resource):
                 result = dict()
                 result['name'] = resource.user_name
                 result['date'] = str(resource.created_date)
-                result['updated_date'] = str(resource.updated_daye)
+                result['updated_date'] = str(resource.updated_date)
                 result['resource'] = resource.resource_name
                 result['formStatus'] = resource.application_status
                 result['approval_status'] = resource.approval_status
