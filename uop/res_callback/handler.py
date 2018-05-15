@@ -537,8 +537,8 @@ def crp_data_cmdb(args, cmdb1_url, method, req_data=None):
     except Exception as exc:
         #即使往cmdb2写入数据失败，也往uop里面写入数据
         #push_vm_docker_status_to_cmdb(CMDB_STATUS_URL, "@", "@", resource.cmdb_p_code)
-        msg = traceback.format_exc()
-        Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(msg))
+        # msg = traceback.format_exc()
+        Log.logger.error("post 'graph data' to cmdb/openapi/graph/ error:{}".format(exc))
 
 
 def save_resource_id(instances, res_id, cmdb1_url, set_flag, flag, db_flag):
