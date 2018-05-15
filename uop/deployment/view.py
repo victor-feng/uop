@@ -268,6 +268,7 @@ class DeploymentListAPI(Resource):
             # 管理员审批通过后修改resource表deploy_name,更新当前版本
             resource = ResourceModel.objects.get(res_id=args.resource_id)
             cloud = resource.cloud
+            project_name = resource.project_name
             resource_type = resource.resource_type
             resource.deploy_name = args.deploy_name
             resource.updated_date = datetime.datetime.now()
@@ -290,10 +291,11 @@ class DeploymentListAPI(Resource):
             #deploy_obj.save()
 
             # 将computer信息如IP，更新到数据库
+            app_image = [dict(app, cloud=cloud,resource_type=resource_type,project_name=project_name) for app in args.app_image]
             appinfo = []
             if action == "admin_approve_allow":
                 cmdb_url = current_app.config['CMDB_URL']
-                appinfo = attach_domain_ip(args.app_image, resource, cmdb_url)
+                appinfo = attach_domain_ip(app_image, resource, cmdb_url)
             # 如果是k8s应用修改外层nginx信息
             if cloud == '2' and resource_type == "app":
                 nginx_info = get_k8s_nginx(args.environment)
@@ -302,7 +304,7 @@ class DeploymentListAPI(Resource):
                 appinfo = [dict(app, nginx_port=nginx_port, ips=ips) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
-            deploy_obj.app_image = str(args.app_image)
+            deploy_obj.app_image = str(app_image)
             deploy_obj.approve_status = 'success'
             message = 'approve_allow success'
             ##推送到crp

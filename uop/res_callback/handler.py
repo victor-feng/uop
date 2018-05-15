@@ -205,10 +205,19 @@ def filter_status_data(p_code, id, num):
                     if quantity > 0:
                         meta["volume_size"] = str(res.volume_size)
             if compute_list:
-                domain = compute_list[0].domain
-                domain_path = compute_list[0].domain_path
-                if domain_path:
-                    domain = domain + "/" + domain_path
+                all_domains = []
+                domains = compute_list[0].domain
+                domain_paths = compute_list[0].domain_path
+                domain_list = domains.strip().split(',') if domains else []
+                domain_path_list = domain_paths.strip().split(',') if domain_paths else []
+                domain_info_list = zip(domain_list, domain_path_list)
+                for domain_info in domain_info_list:
+                    domain = domain_info[0]
+                    domain_path = domain_info[1]
+                    if domain_path:
+                        domain = domain + "/" + domain_path
+                    all_domains.append(domain)
+                domain = ','.join(all_domains)
                 meta["domain"] = domain
                 meta["namespace"] = compute_list[0].namespace
             meta["create_time"] =  datetime.datetime.strftime(r.created_date, '%Y-%m-%d %H:%M:%S')

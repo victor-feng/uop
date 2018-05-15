@@ -633,18 +633,28 @@ def updata_deployment_info(resource_name,env,url):
                                 instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
                                 physical_server=one[3])
                         )
-                domain = ""
+                domains = ""
+                domain_paths = ""
                 for compute in compute_list:
                     if resource_type == "app":
                         compute.ips = ips
-                    domain = compute.domain
-                    domain_path = compute.domain_path
+                    domains = compute.domain
+                    domain_paths = compute.domain_path
                     compute.save()
-                if domain_path:
-                    domain = domain + '/' + domain_path
                 if resource_type == "app":
                     resource.os_ins_ip_list = os_ins_list
                 resource.save()
+                all_domains = []
+                domain_list = domains.strip().split(',') if domains else []
+                domain_path_list = domain_paths.strip().split(',') if domain_paths else []
+                domain_info_list = zip(domain_list, domain_path_list)
+                for domain_info in domain_info_list:
+                    domain = domain_info[0]
+                    domain_path = domain_info[1]
+                    if domain_path:
+                        domain = domain + "/" + domain_path
+                    all_domains.append(domain)
+                domain = ','.join(all_domains)
                 #更新Statusvm表数据
                 vms = Statusvm.objects.filter(resource_name=resource_name)
                 for vm in vms:
@@ -666,6 +676,7 @@ def delete_resource_deploy(res_id):
             resource_type=resources.resource_type
             cloud = resources.cloud
             env = resources.env
+            project_name = resources.project_name
             deploys = Deployment.objects.filter(resource_id=res_id,deploy_type="deploy").order_by("-created_time")
             disconfs = []
             domain_list = []
@@ -676,12 +687,16 @@ def delete_resource_deploy(res_id):
                     disconfs.append(eval(dis_))
                 app_image = eval(deploy.app_image)
                 for app in app_image:
-                    domain = app.get("domain","")
+                    domains = app.get("domain","")
                     domain_ip = app.get("domain_ip","")
                     named_url = app.get("named_url","")
-                    d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
-                    if d_count <= 1:
-                        domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url})
+                    domain_list = domains.strip().split(',') if domains else []
+                    for domain in domain_list:
+                        d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
+                        if d_count <= 1 and resource_type == "app":
+                            domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
+                        elif resource_type == "kvm":
+                            domain_list.append({"domain": domain, 'domain_ip': domain_ip, "named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
             crp_data = {
                 "disconf_list": disconfs,
                 "resource_id": res_id,
