@@ -21,7 +21,7 @@ mongoengine.connect(
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 
-CMDB2_URL = "http://cmdb2-test.syswin.comvictor/"
+CMDB2_URL = "http://cmdb2-test.syswin.com/"
 CMDB2_USER = "uop"
 
 
@@ -213,11 +213,12 @@ def get_cmdb2_entity():
         )
         entity_obj.save()
         # 临时写入 文件
+        print 'Start write file'
         with open(curdir + "/entity.txt", "w") as f:
             json.dump(entity_dict, f)
     except Exception as e:
         msg = traceback.format_exc()
-        pass
+        print msg
 
 if __name__ == '__main__':
     get_cmdb2_entity()
