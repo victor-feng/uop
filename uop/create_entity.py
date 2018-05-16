@@ -5,8 +5,7 @@ import json
 import traceback
 import requests
 import base64
-from models import EntityCache, Cmdb, Token
-from log import Log
+from models import EntityCache, Cmdb, Token, db
 from util import TimeToolkit
 
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -48,12 +47,12 @@ def get_uid_token(flush=False):
                 tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
                 tu.save()
     except Exception as exc:
-        Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
+        pass
     return uid, token
 
 
 def get_cmdb2_entity():
-    Log.logger.info("-------start cache the entity--------")
+
     uid, token = get_uid_token()
     url = CMDB2_URL + "cmdb/openapi/entity/group/"
     data = {
@@ -149,12 +148,11 @@ def get_cmdb2_entity():
         )
         entity_obj.save()
         # 临时写入 文件
-        Log.logger.info("Current dir is {}".format(curdir))
         with open(curdir + "/entity.txt", "w") as f:
             json.dump(entity_dict, f)
     except Exception as e:
         msg = traceback.format_exc()
-        Log.logger.info("The entity save error is {}".format(msg))
+        pass
 
 if __name__ == '__main__':
     get_cmdb2_entity()
