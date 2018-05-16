@@ -9,7 +9,14 @@ import base64
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from models import EntityCache, Cmdb, Token, db
-# from util import TimeToolkit
+import mongoengine
+mongoengine.connect(
+    'uop',
+    host='172.28.20.124',
+    port=27017,
+    username='uop',
+    password='uop'
+)
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
