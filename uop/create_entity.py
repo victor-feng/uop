@@ -4,11 +4,11 @@ import os
 import json
 import traceback
 import requests
-from uop.models import EntityCache
-from uop.item_info.handler import get_uid_token
+import base64
+from models import EntityCache, Cmdb, Token
 from config import APP_ENV, configs
-from uop.log import Log
-from uop.util import TimeToolkit
+from log import Log
+from util import TimeToolkit
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,6 +17,42 @@ CMDB2_URL = configs[APP_ENV].CMDB2_URL
 CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
 CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
 CRP_URL = configs[APP_ENV].CRP_URL
+
+
+def get_uid_token(flush=False):
+    cmdb_info = Cmdb.objects.filter(username=CMDB2_USER)
+    tu = Token.objects.all()
+    username, password, uid, token = "", "","", ""
+    for ci in cmdb_info:
+        username = ci.username
+        password = base64.b64decode(ci.password)
+    for one in tu:
+        uid, token = one.uid, one.token
+    if uid and token and not flush:
+        return uid, token
+    url = CMDB2_URL + "cmdb/openapi/login/"
+    data = {
+        "username": username,
+        "password": password,
+        "sign": "",
+        "timestamp": TimeToolkit.local2utctime(datetime.now())
+    }
+    data_str = json.dumps(data)
+    try:
+        # Log.logger.info("login data:{}".format(data))
+        ret = requests.post(url, data=data_str, timeout=5)
+        # Log.logger.info(ret.json())
+        if ret.json()["code"] == 0:
+            uid, token = ret.json()["data"]["uid"], ret.json()["data"]["token"]
+            one = Token.objects.filter(uid=uid)
+            if one:
+                Token.objects(uid=uid).update_one(token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
+            else:
+                tu = Token(uid=uid, token=token, token_date=TimeToolkit.local2utctimestamp(datetime.now()))
+                tu.save()
+    except Exception as exc:
+        Log.logger.error("get uid from CMDB2.0 error:{}".format(str(exc)))
+    return uid, token
 
 
 def get_cmdb2_entity():
