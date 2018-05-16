@@ -6,17 +6,14 @@ import traceback
 import requests
 import base64
 from models import EntityCache, Cmdb, Token
-from config import APP_ENV, configs
 from log import Log
 from util import TimeToolkit
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-CMDB_URL = configs[APP_ENV].CMDB_URL
-CMDB2_URL = configs[APP_ENV].CMDB2_URL
-CMDB2_USER = configs[APP_ENV].CMDB2_OPEN_USER
-CMDB2_VIEWS = configs[APP_ENV].CMDB2_VIEWS
-CRP_URL = configs[APP_ENV].CRP_URL
+
+CMDB2_URL = "http://cmdb2-test.syswin.comvictor/"
+CMDB2_USER = "uop"
 
 
 def get_uid_token(flush=False):
