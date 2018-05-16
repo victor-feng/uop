@@ -745,8 +745,9 @@ def delete_resource_deploy(res_id):
             else:
                 resources.reservation_status = "deleting"
                 resources.save()
-                if deploys:
-                    dep=deploys[0]
+                deployments = Deployment.objects.filter(resource_id=res_id).order_by("-created_time")
+                if deployments:
+                    dep=deployments[0]
                     dep.deploy_result = "deleting"
                     dep.save()
             #cmdb_p_code = resources.cmdb_p_code

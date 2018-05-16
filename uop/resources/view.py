@@ -660,7 +660,19 @@ class App(Resource):
         else:
             resources = ResourceModel.objects.filter(cmdb2_project_id=args.project_id, department=args.department,is_deleted=0) if  args.department != "admin" else ResourceModel.objects.filter(cmdb2_project_id=args.project_id,is_deleted=0)# 本部门的工程实例
         if resources:
-            data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status, "type": res.resource_type} for res in resources]
+            #data = [{"name": res.resource_name, "res_id": res.res_id, "status": res.reservation_status, "type": res.resource_type} for res in resources]
+            data = []
+            for res in resources:
+                tmp = {}
+                tmp["name"] = res.resource_name
+                tmp["res_id"] = res.res_id
+                tmp["type"] = res.resource_type
+                tmp["status"] = res.reservation_status
+                deploys = Deployment.objects.filter(resource_id=res.res_id).order_by("-created_time")
+                if deploys:
+                    dep = deploys[0]
+                    tmp["status"] = dep.deploy_result
+                data.append(tmp)
         response = response_data(200, "success", data)
         return jsonify(response)
 

@@ -736,9 +736,10 @@ class ResourceProviderCallBack(Resource):
         status_record.save()
         resource.reservation_status = status_record.status
         resource.save()
-        # 往vmstatus表里写入的数据
-        cmdb_p_code = resource.cmdb_p_code
-        filter_status_data(cmdb_p_code, "@", "@")
+        if status == "ok":
+            # 往vmstatus表里写入的数据
+            cmdb_p_code = resource.cmdb_p_code
+            filter_status_data(cmdb_p_code, "@", "@")
         # 判断是正常预留还是扩容set_flag=increase,扩容成功后 在nginx中添加扩容的docker
         if set_flag  == "increase" and status == 'ok':
             if cloud == '2' and resource_type == "app":
