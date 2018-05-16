@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+from uop.tools.create_entity import get_cmdb2_entity
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
@@ -13,6 +14,9 @@ PROD_CRP_URL = "http://172.28.32.32:8001/"
 
 
 def get_entity_from_local_file():
+    entity_dir = basedir + "/uop/entity.txt"
+    if not os.path.exists(entity_dir):
+        get_cmdb2_entity()
     with open(basedir + "/uop/entity.txt", "rb") as f:
         entity = json.load(f)
         CMDB2_ENTITY = {
