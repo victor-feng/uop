@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-
 APP_ENV = "development"
 basedir = os.path.abspath(os.path.dirname(__file__))
 cur_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
