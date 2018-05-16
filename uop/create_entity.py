@@ -12,7 +12,7 @@ from models import EntityCache, Cmdb, Token, db
 import mongoengine
 mongoengine.connect(
     'uop',
-    host='172.28.20.124',
+    host='172.28.20.124',  # 根据环境变动
     port=27017,
     username='uop',
     password='uop'
@@ -21,7 +21,7 @@ mongoengine.connect(
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 
-CMDB2_URL = "http://cmdb2-test.syswin.com/"
+CMDB2_URL = "http://cmdb2-test.syswin.com/"  # 根据具体环境变动
 CMDB2_USER = "uop"
 
 
