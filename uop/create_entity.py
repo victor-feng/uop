@@ -209,7 +209,7 @@ def get_cmdb2_entity():
     try:
         entity_obj = EntityCache(
             entity=entity_data,
-            created_time=TimeToolkit.local2utctimestamp(datetime.datetime.now())
+            created_time=TimeToolkit.local2utctimestamp(datetime.now())
         )
         entity_obj.save()
         # 临时写入 文件
