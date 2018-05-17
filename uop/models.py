@@ -544,6 +544,7 @@ class ItemInformation(db.DynamicDocument):
 class ConfigureEnvModel(db.Document):
     id = db.StringField(required=True, max_length=50, unique=True, primary_key=True)
     name = db.StringField(required=False, max_length=50)
+    ordering = db.StringField(required=False, max_length=32)
 
     meta = {
             "collection": "configure_env",
