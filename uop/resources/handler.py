@@ -680,6 +680,8 @@ def delete_resource_deploy(res_id):
             deploys = Deployment.objects.filter(resource_id=res_id,deploy_type="deploy").order_by("-created_time")
             disconfs = []
             domain_list = []
+            domain_existed_list = []
+            domain_info_list = []
             for deploy in deploys:
                 disconf_list = deploy.disconf_list
                 for dis in disconf_list:
@@ -697,10 +699,15 @@ def delete_resource_deploy(res_id):
                             domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
                         elif resource_type == "kvm":
                             domain_list.append({"domain": domain, 'domain_ip': domain_ip, "named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
+            for dl in domain_list:
+                domain = dl.get("domain")
+                if domain not in domain_existed_list:
+                    domain_existed_list.append(domain)
+                    domain_info_list.append(dl)
             crp_data = {
                 "disconf_list": disconfs,
                 "resource_id": res_id,
-                "domain_list": domain_list,
+                "domain_list": domain_info_list,
                 "set_flag": 'res',
                 "environment": env,
             }
