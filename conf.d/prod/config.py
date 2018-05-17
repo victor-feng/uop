@@ -5,7 +5,7 @@ APP_ENV = "prod"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEV_CRP_URL = "http://crp-dev.syswin.com/"
-TEST_CRP_URL = "http://crp.syswin.com/"
+TEST_CRP_URL = "http://crp-yanlian.syswin.com/"
 PREP_CRP_URL = "http://crp-dx.syswin.com/"
 PROD_CRP_URL = "http://crp-dx.syswin.com/"
 
@@ -75,7 +75,7 @@ class ProdConfig(BaseConfig):
         'prod': PROD_CRP_URL,
     }
     #CMDB_URL = "http://cmdb.syswin.com/" #如果是None 不走cmdb1,0
-    CMDB_URL = None
+    CMDB_URL = None #如果是None 不走cmdb1,0
     CMDB2_URL = "http://cmdb2.syswin.com/"
     CMDB2_OPEN_USER = "uop"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
