@@ -22,7 +22,7 @@ class ConfigureEnv(Resource):
     # @api_permission_control(request)
     @classmethod
     def get(cls):
-        ret = ConfigureEnvModel.objects.all()
+        ret = ConfigureEnvModel.objects.all().order_by("-ordering")
         envs = []
         for env in ret:
             envs.append(dict(id=env.id,
