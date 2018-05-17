@@ -74,7 +74,8 @@ class ProdConfig(BaseConfig):
         'prep': PREP_CRP_URL,
         'prod': PROD_CRP_URL,
     }
-    CMDB_URL = "http://cmdb.syswin.com/" #如果是None 不走cmdb1,0
+    #CMDB_URL = "http://cmdb.syswin.com/" #如果是None 不走cmdb1,0
+    CMDB_URL = None
     CMDB2_URL = "http://cmdb2.syswin.com/"
     CMDB2_OPEN_USER = "uop"
     host_instance_id = "2a4d89e3e48b471da0ea41c1"
