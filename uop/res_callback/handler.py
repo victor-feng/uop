@@ -208,8 +208,8 @@ def filter_status_data(p_code, id, num):
                 all_domains = []
                 domains = compute_list[0].domain
                 domain_paths = compute_list[0].domain_path
-                domain_list = domains.strip().split(',') if domains else []
-                domain_path_list = domain_paths.strip().split(',') if domain_paths else []
+                domain_list = domains.strip().split(',')
+                domain_path_list = domain_paths.strip().split(',')
                 domain_info_list = zip(domain_list, domain_path_list)
                 for domain_info in domain_info_list:
                     domain = domain_info[0]
