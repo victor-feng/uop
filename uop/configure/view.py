@@ -2,7 +2,8 @@
 import re
 import datetime
 import json
-from flask_restful import reqparse, Api, Resource, fields
+from collections import defaultdict
+from flask_restful import reqparse, Api, Resource, fields, marshal
 import requests
 from flask import request
 from uop.configure import configure_blueprint
@@ -31,6 +32,115 @@ class ConfigureEnv(Resource):
             'code': 200,
             'result': {
                 'res': envs,
+                'msg': u'请求成功'
+            }
+        }
+        return res
+
+
+class ConfigureV2(Resource):
+    nginx_fields = {
+        "id": fields.String,
+        "name": fields.String,
+        "nginx_type": fields.String,
+        "ip": fields.String,
+        "port": fields.String
+    }
+
+    network_fields = {
+        "id": fields.String,
+        "name": fields.String,
+        "sub_network": fields.String,
+        "vlan_id": fields.String,
+        "networkName": fields.String,
+        "tenantName": fields.String,
+        "cloud": fields.String,
+    }
+
+    k8s_fields = {
+        "id": fields.String,
+        "namespace_name": fields.String,
+        "config_map_name": fields.String,
+        "network_url": fields.String,
+    }
+
+    openstack_fields = {
+        "id": fields.String,
+        "image_id": fields.String,
+        "image_name": fields.String,
+        "image_type": fields.String,
+        "port": fields.String,
+        "flavor_name": fields.String,
+        "flavor_id": fields.String,
+        "flavor_cpu": fields.String,
+        "flavor_memory": fields.Integer,
+        "flavor_type": fields.String,
+        "cloud": fields.String,
+        "availability_zone": fields.String,
+    }
+
+    named_fields = {
+        "id": fields.String,
+        "name": fields.String,
+        "url": fields.String,
+    }
+
+    disconf_fields = {
+        "id": fields.String,
+        "name": fields.String,
+        "username": fields.String,
+        "password": fields.String,
+        "ip": fields.String,
+        "url": fields.String,
+    }
+
+    @classmethod
+    def get(cls):
+        parser = reqparse.RequestParser()
+        parser.add_argument('env', type=str,location="args")
+        args = parser.parse_args()
+        env = args.env if args.env else 'dev'
+        Log.logger.info("[UOP] Get configs, env:%s", env)
+
+        result = defaultdict(list)
+        for obj in ConfigureNginxModel.objects.filter(env=env):
+            tmp_data = marshal(obj, cls.nginx_fields)
+            if obj.nginx_type == 'k8s':
+                result['k8s_nginx'].append(tmp_data)
+            else:
+                result['nginx'].append(tmp_data)
+
+        for obj in NetWorkConfig.objects.filter(env=env):
+            result['network'].append(marshal(obj, cls.network_fields))
+
+        for obj in ConfigureK8sModel.objects.filter(env=env):
+            tmp_data = marshal(obj, cls.network_fields)
+            if obj.namespace_name:
+                result['namespace'].append(tmp_data)
+            if obj.network_url:
+                result['k8s_network_url'].append(tmp_data)
+
+        for obj in ConfOpenstackModel.objects.filter(env=env):
+            tmp_data = marshal(obj, cls.openstack_fields)
+            if obj.image_name:
+                result['image'].append(tmp_data)
+            if obj.flavor_name:
+                result['flavor'].append(tmp_data)
+            if obj.availability_zone:
+                result['availability_zone'].append(tmp_data)
+
+        for obj in ConfigureNamedModel.objects.filter(
+            env=env).order_by("-create_time"):
+            if  obj.name:
+                result['namedmanager'].append(marshal(obj, cls.named_fields))
+
+        for obj in ConfigureDisconfModel.objects.filter(env=env):
+            result['disconf'].append(marshal(obj, cls.disconf_fields))
+                
+        res = {
+            'code': 200,
+            'result': {
+                'res': result,
                 'msg': u'请求成功'
             }
         }
@@ -636,6 +746,7 @@ class ConfigureFlavor(Resource):
 
 configure_api.add_resource(ConfigureEnv, '/env')
 configure_api.add_resource(Configure, '/')
+configure_api.add_resource(ConfigureV2, '/v2')
 configure_api.add_resource(ConfigureNetwork, '/network')
 configure_api.add_resource(K8sNetworkApi, '/k8s/networks')
 configure_api.add_resource(K8sNamespaceManage, '/k8s/namespace')
