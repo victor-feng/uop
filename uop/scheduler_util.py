@@ -251,7 +251,7 @@ def flush_crp_to_cmdb():
                             namespace = info.namespace_name
                             env_ = get_CRP_url(env)
                             crp_url = '%s%s' % (env_, 'api/openstack/nova/states?namespace={}'.format(namespace))
-                            ret = requests.get(crp_url).json()["result"]["vm_info_dict"]
+                            ret = requests.get(crp_url,timeout=290).json()["result"]["vm_info_dict"]
                             osid_status.append(ret)
                     else:
                         env_ = get_CRP_url(env)
