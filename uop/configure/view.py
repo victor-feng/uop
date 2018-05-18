@@ -64,7 +64,7 @@ class ConfigureV2(Resource):
         "env": fields.String,
         "namespace_name": fields.String,
         "config_map_name": fields.String,
-        "url": fields.String,
+        "network_url": fields.String,
     }
 
     openstack_fields = {
@@ -124,6 +124,7 @@ class ConfigureV2(Resource):
             if obj.namespace_name:
                 result['namespace'].append(tmp_data)
             if obj.network_url:
+                tmp_data['url'] = tmp_data.pop('network_url', None)
                 result['k8s_network_url'].append(tmp_data)
 
         for obj in ConfOpenstackModel.objects.filter(env=env):
