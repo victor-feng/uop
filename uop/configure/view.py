@@ -66,6 +66,7 @@ class ConfigureV2(Resource):
 
     openstack_fields = {
         "id": fields.String,
+        "env": fields.String,
         "image_id": fields.String,
         "image_name": fields.String,
         "image_type": fields.String,
