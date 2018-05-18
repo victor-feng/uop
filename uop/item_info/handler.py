@@ -698,13 +698,21 @@ def fix_instance(args):
     baseInfo = get_pro(item, "baseInfo")
     # Log.logger.info("Item_name is {},instance_id is {}".format(item_name, instance_id))
     try:
-
-        ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(baseInfo))
-        ItemInformation.objects(item_id=instance_id).update_one(set__project_status=str(project_status))
-        ItemInformation.objects(item_id=instance_id).update_one(set__Chinese_name=str(Chinese_name))
-        ItemInformation.objects(item_id=instance_id).update_one(set__version=str(version))
-        ItemInformation.objects(item_id=instance_id).update_one(set__OPS=str(OPS))
-        ItemInformation.objects(item_id=instance_id).update_one(set__DEV=str(DEV))
+        item = ItemInformation.objects(item_id=instance_id)
+        item.update(
+            item_name=str(baseInfo),
+            project_status=str(project_status),
+            Chinese_name=str(Chinese_name),
+            version=str(version),
+            OPS=str(OPS),
+            DEV=str(DEV)
+        )
+        # ItemInformation.objects(item_id=instance_id).update_one(set__item_name=str(baseInfo))
+        # ItemInformation.objects(item_id=instance_id).update_one(set__project_status=str(project_status))
+        # ItemInformation.objects(item_id=instance_id).update_one(set__Chinese_name=str(Chinese_name))
+        # ItemInformation.objects(item_id=instance_id).update_one(set__version=str(version))
+        # ItemInformation.objects(item_id=instance_id).update_one(set__OPS=str(OPS))
+        # ItemInformation.objects(item_id=instance_id).update_one(set__DEV=str(DEV))
 
     except Exception as e:
         msg = traceback.format_exc()
