@@ -41,6 +41,7 @@ class ConfigureEnv(Resource):
 class ConfigureV2(Resource):
     nginx_fields = {
         "id": fields.String,
+        "env": fields.String,
         "name": fields.String,
         "nginx_type": fields.String,
         "ip": fields.String,
@@ -49,6 +50,7 @@ class ConfigureV2(Resource):
 
     network_fields = {
         "id": fields.String,
+        "env": fields.String,
         "name": fields.String,
         "sub_network": fields.String,
         "vlan_id": fields.String,
@@ -59,9 +61,10 @@ class ConfigureV2(Resource):
 
     k8s_fields = {
         "id": fields.String,
+        "env": fields.String,
         "namespace_name": fields.String,
         "config_map_name": fields.String,
-        "network_url": fields.String,
+        "url": fields.String,
     }
 
     openstack_fields = {
@@ -82,12 +85,14 @@ class ConfigureV2(Resource):
 
     named_fields = {
         "id": fields.String,
+        "env": fields.String,
         "name": fields.String,
         "url": fields.String,
     }
 
     disconf_fields = {
         "id": fields.String,
+        "env": fields.String,
         "name": fields.String,
         "username": fields.String,
         "password": fields.String,
@@ -115,7 +120,7 @@ class ConfigureV2(Resource):
             result['network'].append(marshal(obj, cls.network_fields))
 
         for obj in ConfigureK8sModel.objects.filter(env=env):
-            tmp_data = marshal(obj, cls.network_fields)
+            tmp_data = marshal(obj, cls.k8s_fields)
             if obj.namespace_name:
                 result['namespace'].append(tmp_data)
             if obj.network_url:
