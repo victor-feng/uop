@@ -268,6 +268,7 @@ def Aquery(args):
                                     instance_id=ni.item_id,
                                     model_id=model_id,
                                     name=rname,
+                                    cmdb2_project_id=ni.cmdb2_project_id,
                                     property=[
                                         {
                                            "code": "baseInfo",
@@ -616,7 +617,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
             project = ItemInformation.objects.filter(item_id=exchange_project_item_id)
             if project:
                 for pro in project:
-                    pro.item_id = cmdb2_project_id
+                    pro.cmdb2_project_id = cmdb2_project_id
                     # Log.logger.info("Project item id is {}, project is {}".format(cmdb2_project_id, project))
                     pro.save()
                 Log.logger.info(u"替换project的item_id成功：{}--->{}".format(exchange_project_item_id, cmdb2_project_id))
