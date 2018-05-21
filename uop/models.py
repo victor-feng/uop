@@ -523,7 +523,7 @@ class ItemInformation(db.DynamicDocument):
     deleted = db.IntField(required=False, default=0)
     # project_property = db.ListField(db.EmbeddedDocumentField())  # 工程下的属性
 
-    cmdb2_project_id = db.StringField(required=False)
+    cmdb2_project_id = db.StringField(required=False,default='')
     project_status = db.StringField(required=False, default='')
     Chinese_name = db.StringField(required=False, default='')
     version = db.StringField(required=False, default='')
