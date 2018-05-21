@@ -238,7 +238,7 @@ def Aquery(args):
                 for b in business:
                     # Log.logger.info("###### in ItemInformation.get")
                     rname = b.item_name
-                    tmp = dict(instance_id=b.item_id, model_id=get_model_id(code_id, "business"), name=rname, property=[{
+                    tmp = dict(instance_id=b.item_id, cmdb2_project_id=b.cmdb2_project_id, model_id=get_model_id(code_id, "business"), name=rname, property=[{
                                 "code": "baseInfo",
                                 "name": u"名称",
                                 "value": rname
