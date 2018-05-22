@@ -645,8 +645,8 @@ def updata_deployment_info(resource_name,env,url):
                     resource.os_ins_ip_list = os_ins_list
                 resource.save()
                 all_domains = []
-                domain_list = domains.strip().split(',') if domains else []
-                domain_path_list = domain_paths.strip().split(',') if domain_paths else []
+                domain_list = domains.strip().split(',')
+                domain_path_list = domain_paths.strip().split(',')
                 domain_info_list = zip(domain_list, domain_path_list)
                 for domain_info in domain_info_list:
                     domain = domain_info[0]
