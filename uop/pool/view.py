@@ -28,7 +28,7 @@ base_statistic_info = {
     "storage_gb_total": 0,
     "storage_gb_use": 0,
     "vcpu_total": 0,
-    "vcpu_us":0,
+    "vcpu_use":0,
 }
 
 class NetworksAPI(Resource):

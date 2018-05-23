@@ -108,7 +108,12 @@ class ConfigureV2(Resource):
         env = args.env if args.env else 'dev'
         Log.logger.info("[UOP] Get configs, env:%s", env)
 
-        result = defaultdict(list)
+        # result = defaultdict(list)
+        keys = ['k8s_nginx', 'nginx', 'network', 'namespace',
+                'k8s_network_url', 'image', 'flavor', 
+                'availability_zone', 'namedmanager', 'disconf']
+        result = {key: [] for key in keys}
+
         for obj in ConfigureNginxModel.objects.filter(env=env):
             tmp_data = marshal(obj, cls.nginx_fields)
             if obj.nginx_type == 'k8s':

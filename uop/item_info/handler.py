@@ -268,7 +268,7 @@ def Aquery(args):
                                     instance_id=ni.item_id,
                                     model_id=model_id,
                                     name=rname,
-                                    cmdb2_project_id=ni.cmdb2_project_id,
+                                    cmdb2_project_id=ni.cmdb2_project_id if ni.cmdb2_project_id else ni.item_id,
                                     property=[
                                         {
                                            "code": "baseInfo",
