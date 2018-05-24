@@ -689,16 +689,15 @@ def delete_resource_deploy(res_id):
                     disconfs.append(eval(dis_))
                 app_image = eval(deploy.app_image)
                 for app in app_image:
-                    domains = app.get("domain","")
+                    domain = app.get("domain","")
+                    domain_path = app.get("domain_path", "")
                     domain_ip = app.get("domain_ip","")
                     named_url = app.get("named_url","")
-                    domains_list = domains.strip().split(',') if domains else []
-                    for domain in domains_list:
-                        d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
-                        if d_count <= 1 and resource_type == "app":
-                            domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
-                        elif resource_type == "kvm":
-                            domain_list.append({"domain": domain, 'domain_ip': domain_ip, "named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name})
+                    d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0).count()
+                    if d_count <= 1 and resource_type == "app":
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name,"domain_path":domain_path})
+                    elif resource_type == "kvm":
+                        domain_list.append({"domain": domain, 'domain_ip': domain_ip, "named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name,"domain_path":domain_path})
             for dl in domain_list:
                 domain = dl.get("domain")
                 if domain not in domain_existed_list:
