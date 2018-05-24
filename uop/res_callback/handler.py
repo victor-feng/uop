@@ -899,12 +899,12 @@ def get_relations(view_id):
     :return:
     '''
     Log.logger.info("get_relations from {} view".format(view_id))
-    views = ViewCache.objects.filter(view_id=view_id)
+    views = ViewCache.objects.order_by('-cache_date').first()
     relations = []
     data  = {}
-    for view in views:
-        relations = json.loads(view.relation)
-        entity = json.loads(view.entity)
+    if views:
+        relations = json.loads(views.relation)
+        entity = json.loads(views.entity)
     if not relations:
         uid, token = get_uid_token()
         url = CMDB2_URL + "cmdb/openapi/scene_graph/list/"
