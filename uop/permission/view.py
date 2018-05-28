@@ -163,6 +163,7 @@ class PermManage(Resource):
                 res["api_delete"] = "0"
                 res["isDropdown"] = permission.isDropdown
                 res["menu_index"] = permission.menu_index
+                res["menu_module"] = permission.menu_module
                 res_list.append(res)
             for permission in role_permissions:
                 res={}
@@ -186,6 +187,7 @@ class PermManage(Resource):
                 res["api_delete"] = permission.api_delete
                 res["isDropdown"] = permission.isDropdown
                 res["menu_index"] = permission.menu_index
+                res["menu_module"] = permission.menu_module
                 role_perm_list.append(res)
             res_list=res_list + role_perm_list
             data["res_list"] = res_list
@@ -248,7 +250,8 @@ class PermManage(Resource):
                     api_put=perm.get("api_put",'0'),
                     api_delete=perm.get("api_delete",'0'),
                     isDropdown=perm.get("isDropdown"),
-                    menu_index = perm.get("menu_index"),
+                    menu_index=perm.get("menu_index"),
+                    menu_module=perm.get("menu_module"),
                     created_time=datetime.datetime.now(),
                     updated_time=datetime.datetime.now()
                 )
@@ -291,6 +294,8 @@ class PermManage(Resource):
                         Permission.isDropdown = perm.get("isDropdown")
                     if perm.get("menu_index"):
                         Permission.menu_index = perm.get("menu_index")
+                    if perm.get("menu_module"):
+                        Permission.menu_index = perm.get("menu_module")
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
@@ -342,6 +347,7 @@ class PermManage(Resource):
                     api_delete=perm.get("api_delete",'0'),
                     isDropdown=perm.get("isDropdown"),
                     menu_index=perm.get("menu_index"),
+                    menu_module=perm.get("menu_module"),
                     created_time=datetime.datetime.now(),
                     updated_time=datetime.datetime.now()
                 )
@@ -422,6 +428,7 @@ class AllPermManage(Resource):
                 res["api_delete"] = permission.api_delete
                 res["isDropdown"] = permission.isDropdown
                 res["menu_index"] = permission.menu_index
+                res["menu_module"] = permission.menu_module
                 res_list.append(res)
             data["res_list"] = res_list
             code = 200
@@ -453,6 +460,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_delete', type=str, location="json")
         parser.add_argument('isDropdown', type=bool, location="json")
         parser.add_argument('menu_index', type=int, location="json")
+        parser.add_argument('menu_module', type=int, location="json")
         args = parser.parse_args()
         try:
             code = 200
@@ -483,6 +491,7 @@ class AllPermManage(Resource):
                 api_delete=args.api_delete,
                 isDropdown=args.isDropdown,
                 menu_index=args.menu_index,
+                menu_module=args.menu_module,
                 created_time=datetime.datetime.now(),
                 updated_time=datetime.datetime.now()
                 )
@@ -538,6 +547,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_delete', type=str,  location="json")
         parser.add_argument('isDropdown', type=bool, location="json")
         parser.add_argument('menu_index', type=int, location="json")
+        parser.add_argument('menu_module', type=int, location="json")
         args = parser.parse_args()
         Log.logger.info(args)
         try:
@@ -576,6 +586,8 @@ class AllPermManage(Resource):
                     perm.isDropdown = args.isDropdown
                 if args.menu_index:
                     perm.menu_index = args.menu_index
+                if args.menu_module:
+                    perm.menu_module = args.menu_module
                 perm.updated_time = datetime.datetime.now()
                 perm.save()
 
