@@ -88,7 +88,7 @@ def sorted_menu_list(menu_list):
 
 
 
-def get_login_permission(role):
+def get_login_permission(role,menu_module=None):
     """
     根据角色获取登录时的权限
     :param role:
@@ -104,7 +104,11 @@ def get_login_permission(role):
     name2 = []
     try:
         #获取权限
-        Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"]).order_by("menu_index")
+        if menu_module:
+            Permissions=PermissionList.objects.filter(role=role,perm_type__in=["button","icon","operation","menu"],menu_module=menu_module).order_by("menu_index")
+        else:
+            Permissions = PermissionList.objects.filter(role=role,
+                                                        perm_type__in=["button", "icon", "operation", "menu"]).order_by("menu_index")
         for permission in Permissions:
             if permission.perm_type == "menu":
                 menu_dict = {}
