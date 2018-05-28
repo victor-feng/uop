@@ -183,7 +183,8 @@ class UserLogin(Resource):
         ret=response_data(code, msg, res)
         return ret,code
 
-
+class ServiceDirectory(Resource):
+    pass
 
 
 

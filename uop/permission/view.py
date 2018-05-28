@@ -460,7 +460,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_delete', type=str, location="json")
         parser.add_argument('isDropdown', type=bool, location="json")
         parser.add_argument('menu_index', type=int, location="json")
-        parser.add_argument('menu_module', type=int, location="json")
+        parser.add_argument('menu_module', type=str, location="json")
         args = parser.parse_args()
         try:
             code = 200
@@ -547,7 +547,7 @@ class AllPermManage(Resource):
         parser.add_argument('api_delete', type=str,  location="json")
         parser.add_argument('isDropdown', type=bool, location="json")
         parser.add_argument('menu_index', type=int, location="json")
-        parser.add_argument('menu_module', type=int, location="json")
+        parser.add_argument('menu_module', type=str, location="json")
         args = parser.parse_args()
         Log.logger.info(args)
         try:
