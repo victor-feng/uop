@@ -591,11 +591,11 @@ class ResourceProviderCallBack(Resource):
                             ip = ins.get('ip')
                             ips.append(ip)
                             increase_ips.append(ip)
-                            img_url = ins.get("img_url")
-                            deploy_source = ins.get("deploy_source")
-                            host_env = ins.get("host_env")
-                        if host_env == "docker" and deploy_source != "image" and set_flag == "res":
-                            j.url = img_url
+                        #     img_url = ins.get("img_url")
+                        #     deploy_source = ins.get("deploy_source")
+                        #     host_env = ins.get("host_env")
+                        # if host_env == "docker" and deploy_source != "image" and set_flag == "res":
+                        #     j.url = img_url
                         j.ips = ips
                         j.quantity = len(ips)
             # 往cmdb写入数据
