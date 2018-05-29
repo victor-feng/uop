@@ -222,4 +222,4 @@ class ServiceDirectory(Resource):
 
 
 auth_api.add_resource(UserLogin, '/userlogin')
-auth_api.add_resource(UserLogin, '/service')
+auth_api.add_resource(ServiceDirectory, '/service')
