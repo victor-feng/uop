@@ -156,7 +156,6 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         "project_name": res_obj.project_name,
         "resource_id": resource_id,
         "deploy_name": deploy_name,
-        "set_flag": res_obj.set_flag,
     }
     compute_list = res_obj.compute_list
     if compute_list:
