@@ -164,16 +164,12 @@ class UserLogin(Resource):
                     user_obj.role=role
                     user_obj.save()
                     add_person(user, user_id, department, "","")
-                    menu_list, buttons, icons, operations = get_login_permission(role)
+                    #menu_list, buttons, icons, operations = get_login_permission(role)
                 res = {
                     'user_id': user_id,
                     'username': user,
                     'department': department,
                     'role': role,
-                    'menu_list': menu_list,
-                    'buttons': buttons,
-                    'icons': icons,
-                    'operations': operations
                 }
             else:
                 msg = u'登录失败'

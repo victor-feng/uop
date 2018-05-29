@@ -717,6 +717,8 @@ class CapacityReservation(Resource):
                                 "availability_zone":db_com.availability_zone,
                                 "image_id": db_com.image_id,
                                 "flavor_id": db_com.flavor_id,
+                                "pom_path" : db_com.pom_path,
+                                "branch" : db_com.branch,
                             })
                         ips.extend([ip for ip in db_com.ips])
 

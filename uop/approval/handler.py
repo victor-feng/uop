@@ -140,6 +140,8 @@ def deal_crp_data(resource,set_flag):
                     "availability_zone": db_com.availability_zone,
                     "image_id": db_com.image_id,
                     "flavor_id": db_com.flavor_id,
+                    "pom_path": db_com.pom_path,
+                    "branch": db_com.branch,
                 }
             )
         data['compute_list'] = com

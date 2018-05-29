@@ -179,12 +179,14 @@ class ResourceApplication(Resource):
                     availability_zone = compute.get("availability_zone")
                     image_id = compute.get('image_id')
                     flavor_id = compute.get('flavor_id')
+                    pom_path = compute.get('pom_path')
+                    branch = compute.get('branch')
                     compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                              domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,health_check=health_check,
                                              network_id=network_id,networkName=networkName,tenantName=tenantName,host_env=host_env
                                              ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
                                              ready_probe_path=ready_probe_path,domain_path=domain_path,availability_zone=availability_zone,
-                                             image_id=image_id,flavor_id=flavor_id)
+                                             image_id=image_id,flavor_id=flavor_id,pom_path=pom_path,branch=branch)
                     resource_application.compute_list.append(compute_ins)
 
             if ins_name_list:
@@ -577,13 +579,15 @@ class ResourceApplication(Resource):
                         availability_zone = compute.get("availability_zone")
                         image_id = compute.get('image_id')
                         flavor_id = compute.get('flavor_id')
+                        pom_path = compute.get('pom_path')
+                        branch = compute.get('branch')
                         compute_ins = ComputeIns(ins_name=ins_name, ins_id=ins_id, cpu=cpu, mem=mem, url=url, domain=domain,
                                                  domain_ip=domain_ip, quantity=quantity, port=port, docker_meta=meta_str,
                                                  health_check=health_check,network_id=network_id,networkName=networkName,
                                                  tenantName=tenantName,host_env=host_env
                                                  ,language_env=language_env,deploy_source=deploy_source,database_config=database_config,
                                                  ready_probe_path=ready_probe_path,domain_path=domain_path,availability_zone=availability_zone,
-                                                 image_id=image_id,flavor_id=flavor_id)
+                                                 image_id=image_id,flavor_id=flavor_id,pom_path=pom_path,branch=branch)
                         resource.compute_list.append(compute_ins)
                 if resource_list:
                     for res in resource_list:
@@ -839,6 +843,8 @@ class ResourceDetail(Resource):
                         "availability_zone":db_com.availability_zone,
                         "image_id": image_id,
                         "flavor_id": flavor_id,
+                        "pom_path" : db_com.pom_path,
+                        "branch" : db_com.branch,
                     }
                 )
         result['resource_list'] = res

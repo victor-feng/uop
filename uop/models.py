@@ -334,6 +334,8 @@ class ComputeIns(db.EmbeddedDocument):
     image_id = db.StringField(required=False)
     flavor_id = db.StringField(required=False)
     named_url = db.StringField(required=False)
+    pom_path = db.StringField(required=False)
+    branch = db.StringField(required=False)
 
 
     meta = {
