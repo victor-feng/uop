@@ -183,6 +183,37 @@ class UserLogin(Resource):
         ret=response_data(code, msg, res)
         return ret,code
 
+class ServiceDirectory(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('menu_module', type=str)
+        parser.add_argument('role', type=str)
+        args = parser.parse_args()
+        role = args.role
+        menu_module = args.menu_module
+        menu_list = []
+        buttons = []
+        icons = []
+        operations = []
+        data = {}
+        code = 200
+        msg = ''
+        try:
+            menu_list, buttons, icons, operations = get_login_permission(role,menu_module)
+        except Exception as e:
+            msg = "Get service menu permission info error,error msg is %s" % str(e)
+            code = 500
+            data = "Error"
+            Log.logger.error(msg)
+        data["menu_list"] = menu_list
+        data["buttons"] = buttons
+        data["icons"] = icons
+        data["operations"] = operations
+        ret = response_data(code, msg, data)
+        return ret, code
+
+
 
 
 
@@ -193,3 +224,4 @@ class UserLogin(Resource):
 
 
 auth_api.add_resource(UserLogin, '/userlogin')
+auth_api.add_resource(ServiceDirectory, '/service')
