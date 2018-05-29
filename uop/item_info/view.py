@@ -388,7 +388,7 @@ class CheckGitUrl(Resource):
             status = 'success'
             msg = 'git url check success'
         else:
-            code = 500
+            code = 201
             status = 'fail'
             msg = 'git url check fail'
 
