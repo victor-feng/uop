@@ -197,6 +197,8 @@ class ServiceDirectory(Resource):
         icons = []
         operations = []
         data = {}
+        code = 200
+        msg = ''
         try:
             menu_list, buttons, icons, operations = get_login_permission(role,menu_module)
         except Exception as e:
