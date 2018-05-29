@@ -3,6 +3,7 @@
 import json
 import requests
 import datetime
+import re
 import traceback
 from uop.log import Log
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
@@ -371,6 +372,36 @@ class CheckWarUrl(Resource):
         return ret, code
 
 
+class CheckGitUrl(Resource):
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('git_url', type=str)
+        args = parser.parse_args()
+        git_url = args.git_url
+        code = 200
+        if re.match(r'^https?:/{2}\w.+git$', git_url):
+            status = 'success'
+            msg = 'git url check success'
+
+        elif git_url.startswith('git@') and git_url.endswith('.git'):
+            status = 'success'
+            msg = 'git url check success'
+        else:
+            code = 500
+            status = 'fail'
+            msg = 'git url check fail'
+
+        ret = {
+            'code': code,
+            'result': {
+                'msg': msg,
+                'status': status,
+            }
+        }
+        return ret, code
+
+
 class BusinessProject(Resource):
     '''
     -业务模块工程-    资源视图
@@ -509,5 +540,6 @@ iteminfo_api.add_resource(ItemInfoLoacl, '/iteminfoes/local/<string:user_id>')
 iteminfo_api.add_resource(ItemPostInfo, '/iteminfoes')
 iteminfo_api.add_resource(CheckImageUrl, '/check_image_url')
 iteminfo_api.add_resource(CheckWarUrl, '/check_war_url')
+iteminfo_api.add_resource(CheckGitUrl, '/check_git_url')
 iteminfo_api.add_resource(BusinessProject, '/cmdbinfo')
 iteminfo_api.add_resource(CmdbModels, '/cmdbmodels')
