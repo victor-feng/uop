@@ -554,25 +554,43 @@ class AllPermManage(Resource):
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
             Permissions = PermissionList.objects.filter(name=Permission.name)
             for perm in Permissions:
-                perm.menu_id = args.menu_id
-                perm.name=args.name
-                perm.button = args.button
-                perm.icon = args.icon
-                perm.operation = args.operation
-                perm.url = args.url
-                perm.perm_type = args.perm_type
-                perm.url = args.url
-                perm.level = args.level
-                perm.parent_id = args.parent_id
-                perm.api_get = args.api_get
-                perm.api_post = args.api_post
-                perm.api_put = args.api_put
-                perm.api_delete = args.api_delete
-                perm.isDropdown = args.isDropdown
-                perm.menu_index = args.menu_index
-                perm.menu_module = args.menu_module
-                perm.updated_time = datetime.datetime.now()
-                perm.save()
+                perm.update(
+                menu_id = args.menu_id,
+                name = args.name,
+                button = args.button,
+                icon = args.icon,
+                operation = args.operation,
+                url = args.url,
+                perm_type = args.perm_type,
+                level = args.level,
+                parent_id = args.parent_id,
+                api_get = args.api_get,
+                api_post = args.api_post,
+                api_put = args.api_put,
+                api_delete = args.api_delete,
+                isDropdown = args.isDropdown,
+                menu_index = args.menu_index,
+                menu_module = args.menu_module,
+                updated_time = datetime.datetime.now(),
+                )
+                # perm.menu_id = args.menu_id
+                # perm.name=args.name
+                # perm.button = args.button
+                # perm.icon = args.icon
+                # perm.operation = args.operation
+                # perm.perm_type = args.perm_type
+                # perm.url = args.url
+                # perm.level = args.level
+                # perm.parent_id = args.parent_id
+                # perm.api_get = args.api_get
+                # perm.api_post = args.api_post
+                # perm.api_put = args.api_put
+                # perm.api_delete = args.api_delete
+                # perm.isDropdown = args.isDropdown
+                # perm.menu_index = args.menu_index
+                # perm.menu_module = args.menu_module
+                # perm.updated_time = datetime.datetime.now()
+                # perm.save()
             code = 200
             msg = "Update permission success"
             data = "Success"
