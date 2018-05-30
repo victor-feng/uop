@@ -174,7 +174,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     docker_list = []
     for compute in compute_list:
         try:
-            url = compute.deploy_source
+            url = compute.url
             host_env = compute.host_env
             if compute.deploy_source == "git" and deploy_type == "rollback":
                 url = compute.git_res_url
