@@ -78,6 +78,7 @@ class DeployCallback(Resource):
             parser.add_argument('o_domain', type=str)
             parser.add_argument('o_port', type=str)
             parser.add_argument('domain_flag', type=str)
+            parser.add_argument('war_url', type=str)
             args = parser.parse_args()
             Log.logger.info("args parser info:{}".format(args))
         except Exception as e:
@@ -97,6 +98,7 @@ class DeployCallback(Resource):
         o_domain = args.o_domain
         o_port = args.o_port
         domain_flag= args.domain_flag
+        war_url = args.war_url
         resource_id = dep.resource_id
         status_record = StatusRecord()
         status_record.res_id = resource_id
@@ -171,6 +173,13 @@ class DeployCallback(Resource):
             env = dep.environment
             url = get_CRP_url(env)
             updata_deployment_info(resource_name,env,url)
+        if deploy_type == "deploy" and args.result == "success" and  war_url:
+            resource = ResourceModel.objects.get(res_id=resource_id)
+            compute_list = resource.compute_list
+            for compute in compute_list:
+                compute.git_res_url = war_url
+            resource.save()
+
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息

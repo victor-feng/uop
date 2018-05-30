@@ -295,7 +295,7 @@ class PermManage(Resource):
                     if perm.get("menu_index"):
                         Permission.menu_index = perm.get("menu_index")
                     if perm.get("menu_module"):
-                        Permission.menu_index = perm.get("menu_module")
+                        Permission.menu_module = perm.get("menu_module")
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
