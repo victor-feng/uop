@@ -562,6 +562,7 @@ class AllPermManage(Resource):
                 operation = args.operation,
                 url = args.url,
                 perm_type = args.perm_type,
+                endpoint = args.endpoint,
                 level = args.level,
                 parent_id = args.parent_id,
                 api_get = args.api_get,
