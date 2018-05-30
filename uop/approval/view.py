@@ -900,7 +900,14 @@ class RollBackReservation(Resource):
         deploy_name = args.deploy_name
         try:
             resource = models.ResourceModel.objects.get(res_id=resource_id)
+            compute_list = resource.compute_list
             deploy = models.Deployment.objects.get(deploy_id=deploy_id)
+            app_image = eval(deploy.app_image)
+            for app in app_image:
+                for compute in compute_list:
+                    if app.get("ins_id") == compute.ins_id:
+                        compute.url = app.get("url")
+                        compute.git_res_url = app.get("git_res_url")
             environment = deploy.environment
             database_password = deploy.database_password
             cloud = resource.cloud

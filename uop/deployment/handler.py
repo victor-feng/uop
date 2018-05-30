@@ -174,13 +174,18 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     docker_list = []
     for compute in compute_list:
         try:
+            url = compute.deploy_source
+            host_env = compute.host_env
+            if compute.deploy_source == "git" and deploy_type == "rollback":
+                url = compute.git_res_url
+                host_env = "war"
             docker_list.append(
                 {
-                    'url': compute.url,
+                    'url': url,
                     'insname': compute.ins_name,
                     'ip': compute.ips,
                     'health_check':compute.health_check,
-                    'host_env':compute.host_env,
+                    'host_env':host_env,
                     'language_env':compute.language_env,
                     'deploy_source':compute.deploy_source,
                     'database_config':compute.database_config,
@@ -361,7 +366,7 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
                                  host_mapping=host_mapping,named_url=match_one.get("named_url"),availability_zone=o.availability_zone,image_id=o.image_id,flavor_id=o.flavor_id,
-                                 pom_path=match_one.get("pom_path"),branch=match_one.get("branch") )
+                                 pom_path=match_one.get("pom_path"),branch=match_one.get("branch"),git_res_url = o.git_res_url )
             old_compute_list.insert(i, compute)
             domain = match_one.get("domain", "")
             res.domain = domain
