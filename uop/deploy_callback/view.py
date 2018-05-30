@@ -106,6 +106,7 @@ class DeployCallback(Resource):
         status_record.s_type = "%s_%s" % (deploy_type, res_type)
         status_record.set_flag = "res"
         status_record.created_time = datetime.datetime.now()
+        resource = ResourceModel.objects.get(res_id=resource_id)
         if cloud == "2":
             if dep.deploy_result == "success":
                 dep.deploy_result = "%s_success" % deploy_type
@@ -116,7 +117,6 @@ class DeployCallback(Resource):
                 status_record.unique_flag = unique_flag
                 status_record.msg ="%s %s失败,错误日志为%s\n" % (mapping_msg_info.get(res_type,res_type),deploy_type_dict.get(deploy_type,deploy_type),msg)
             status_record.save()
-            dep.save()
         else:
             if dep.deploy_result == "success":
                 if res_type == "docker":
@@ -151,22 +151,15 @@ class DeployCallback(Resource):
                 dep.deploy_result = "%s_fail" % deploy_type
                 create_status_record(resource_id, deploy_id, deploy_type, "%s失败\n" % deploy_type_dict.get(deploy_type,deploy_type),
                                      "%s_fail" % deploy_type, "res")
-
-            dep.save()
         # 如果回滚成功，修改部署版本
         if  args.result == "success" and deploy_type == "rollback":
-            resource = ResourceModel.objects.get(res_id=resource_id)
             resource.deploy_name = deploy_name
-            resource.save()
-
         # 如果部署失败修改domain和port
         if dep.deploy_result == "deploy_fail" and domain_flag == "True" :
-            resource = ResourceModel.objects.get(res_id=resource_id)
             compute_list = resource.compute_list
             for compute in compute_list:
                 compute.domain = o_domain
                 compute.port = o_port
-            resource.save()
         #如果k8s应用部署成功，修改resource和statusvm表
         if cloud == "2" and args.result == "success" and res_type in ["docker","kvm"]:
             resource_name = dep.resource_name
@@ -174,12 +167,17 @@ class DeployCallback(Resource):
             url = get_CRP_url(env)
             updata_deployment_info(resource_name,env,url)
         if deploy_type == "deploy" and args.result == "success" and  war_url:
-            resource = ResourceModel.objects.get(res_id=resource_id)
+            new_app_image = []
             compute_list = resource.compute_list
+            app_image = eval(dep.app_image)
+            for app in app_image:
+                app["git_res_url"] = war_url
+                new_app_image.append(app)
+                dep.app_image = str(new_app_image)
             for compute in compute_list:
                 compute.git_res_url = war_url
-            resource.save()
-
+        resource.save()
+        dep.save()
         try:
             p_code = ResourceModel.objects.get(res_id=resource_id).cmdb_p_code
             # 修改cmdb部署状态信息
