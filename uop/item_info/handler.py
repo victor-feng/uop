@@ -385,9 +385,9 @@ def Aquery(args):
         data_instance_str = json.dumps(data_instance)
         try:
             if instance_id:
-                Log.logger.info("url_instance request data:{}".format(data_instance))
+                # Log.logger.info("url_instance request data:{}".format(data_instance))
                 ret = requests.post(url_instance, data=data_instance_str, timeout=5)
-                Log.logger.info("url_instance return:{}".format(ret.json()))
+                # Log.logger.info("url_instance return:{}".format(ret.json()))
                 if ret.json()["code"] == -1:
                     return response_data(500, u"请求参数错误，查看instance_id是否和model_id对应", "")
                 else:
@@ -525,7 +525,7 @@ def subgrath_data(args):
         return response_data(200, "success", u"此业务用于存储历史数据，不能新建模块")
     #####
     get_pro = lambda k, pro: [p["value"] for p in pro if p["code"] == k][0]
-    Log.logger.info("The get_pro value is {}".format(get_pro))
+    # Log.logger.info("The get_pro value is {}".format(get_pro))
     newid = str(uuid.uuid1())
     try:
         if next_model_id in code_id.keys():
@@ -556,9 +556,9 @@ def subgrath_data(args):
                                      OPS=get_pro("OPS", property),
                                      DEV=get_pro("DEV", property)
                                      )
-            Log.logger.info("The code_id value is {}".format(code_id))
+            # Log.logger.info("The code_id value is {}".format(code_id))
             ii.save()
-            Log.logger.info("Save stop.")
+            # Log.logger.info("Save stop.")
         else:
             Log.logger.error(u"检查配置文件的实体信息，业务模块工程的实体id有变化")
 
@@ -586,7 +586,7 @@ def to_Cmdb2(args, exchange_project_item_id=False):
     if isinstance(models_list, str):
         return models_list
     model = filter(lambda x:x["entity_id"] == next_model_id, models_list)[0]
-    Log.logger.info("The model is {}".format(model))
+    # Log.logger.info("The model is {}".format(model))
     item = {}
     nouse = map(lambda pro: item.setdefault(pro["code"], pro["value"]), property)
     up_level = {

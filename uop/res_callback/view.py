@@ -882,6 +882,7 @@ class ResourceStatusProviderCallBack(Resource):
         war_dict = request_data.get('war_dict', '')
         build_image = request_data.get("build_image", '')
         push_image = request_data.get("push_image", '')
+        git_package = request_data.get("git_package", '')
         try:
             if instance:
                 resource_id = instance.get('resource_id')
@@ -1006,6 +1007,24 @@ class ResourceStatusProviderCallBack(Resource):
                     status_record.status = push_image_status
                     status_record.msg = "镜像推送完成"
                 status_record.created_time=datetime.datetime.now()
+                status_record.set_flag = set_flag
+                status_record.save()
+            if git_package:
+                resource_id = git_package.get("resource_id")
+                git_package_status = git_package.get("git_package_status")
+                status_record = StatusRecord()
+                status_record.res_id = resource_id
+                if git_package_status == "pull_code_success":
+                    status_record.msg = "拉代码成功"
+                elif git_package_status == "clone_branch_success":
+                    status_record.msg = "克隆代码成功"
+                elif git_package_status == "package_success":
+                    status_record.msg = "打包成功"
+                elif git_package_status == "pull_or_clone_error":
+                    status_record.msg = "拉代码或克隆失败"
+                elif git_package_status == "package_error":
+                    status_record.msg = "打包失败"
+                status_record.created_time = datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
 
