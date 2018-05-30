@@ -176,9 +176,10 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         try:
             url = compute.url
             host_env = compute.host_env
+            deploy_source = compute.deploy_source
             if compute.deploy_source == "git" and deploy_type == "rollback":
                 url = compute.git_res_url
-                host_env = "war"
+                deploy_source = "war"
             docker_list.append(
                 {
                     'url': url,
@@ -187,7 +188,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'health_check':compute.health_check,
                     'host_env':host_env,
                     'language_env':compute.language_env,
-                    'deploy_source':compute.deploy_source,
+                    'deploy_source':deploy_source,
                     'database_config':compute.database_config,
                     'flavor':str(compute.cpu) + str(compute.mem),
                     'host_mapping':compute.host_mapping,
