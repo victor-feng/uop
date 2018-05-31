@@ -49,6 +49,7 @@ class LogsListApi(Resource):
         condition = {k: v for k, v in dict(args).items() if v}
         condition["is_deleted"] = 0
         condition["resource_type__in"] = ["app","kvm"]
+        condition["approval_status__in"] = ["success", "failed", "revoke", "config_revoke", "config_processing"]
         if start_time and end_time:
             condition['created_time__gte'] = start_time
             condition['created_time__lte'] = end_time
