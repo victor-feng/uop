@@ -285,8 +285,9 @@ class ResourceApplication(Resource):
             condition['resource_name__icontains'] = args.resource_name
         if args.project:
             condition['project'] = args.project
-        if args.start_time and args.end_time:
+        if args.start_time:
             condition['created_date__gte'] = args.start_time
+        if args.end_time:
             condition['created_date__lt'] = args.end_time
         # if args.application_status:
         #     condition['application_status'] = args.application_status
