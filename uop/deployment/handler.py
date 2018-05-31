@@ -174,15 +174,21 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     docker_list = []
     for compute in compute_list:
         try:
+            url = compute.url
+            host_env = compute.host_env
+            deploy_source = compute.deploy_source
+            if compute.deploy_source == "git" and deploy_type == "rollback":
+                url = compute.git_res_url
+                deploy_source = "war"
             docker_list.append(
                 {
-                    'url': compute.url,
+                    'url': url,
                     'insname': compute.ins_name,
                     'ip': compute.ips,
                     'health_check':compute.health_check,
-                    'host_env':compute.host_env,
+                    'host_env':host_env,
                     'language_env':compute.language_env,
-                    'deploy_source':compute.deploy_source,
+                    'deploy_source':deploy_source,
                     'database_config':compute.database_config,
                     'flavor':str(compute.cpu) + str(compute.mem),
                     'host_mapping':compute.host_mapping,
@@ -191,6 +197,8 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
                     'replicas': compute.quantity,
                     'ready_probe_path':compute.ready_probe_path,
                     'port': compute.port,
+                    'pom_path': compute.pom_path,
+                    'branch': compute.branch,
                 }
             )
         except AttributeError as e:
@@ -358,7 +366,8 @@ def attach_domain_ip(compute_list, res, cmdb_url):
                                  network_id=o.network_id,networkName=match_one.get("networkName"),tenantName=match_one.get("tenantName"),
                                  host_env=o.host_env,language_env=o.language_env,deploy_source=o.deploy_source,database_config=match_one.get("database_config"),
                                  ready_probe_path=match_one.get("ready_probe_path"),lb_methods=match_one.get("lb_methods"),namespace=o.namespace,domain_path=match_one.get("domain_path"),
-                                 host_mapping=host_mapping,named_url=match_one.get("named_url"),availability_zone=o.availability_zone,image_id=o.image_id,flavor_id=o.flavor_id)
+                                 host_mapping=host_mapping,named_url=match_one.get("named_url"),availability_zone=o.availability_zone,image_id=o.image_id,flavor_id=o.flavor_id,
+                                 pom_path=match_one.get("pom_path"),branch=match_one.get("branch"),git_res_url = o.git_res_url )
             old_compute_list.insert(i, compute)
             domain = match_one.get("domain", "")
             res.domain = domain

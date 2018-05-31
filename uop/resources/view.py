@@ -845,6 +845,7 @@ class ResourceDetail(Resource):
                         "flavor_id": flavor_id,
                         "pom_path" : db_com.pom_path,
                         "branch" : db_com.branch,
+                        "git_res_url" : db_com.git_res_url,
                     }
                 )
         result['resource_list'] = res

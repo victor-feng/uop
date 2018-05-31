@@ -295,7 +295,7 @@ class PermManage(Resource):
                     if perm.get("menu_index"):
                         Permission.menu_index = perm.get("menu_index")
                     if perm.get("menu_module"):
-                        Permission.menu_index = perm.get("menu_module")
+                        Permission.menu_module = perm.get("menu_module")
                     Permission.updated_time = datetime.datetime.now()
                     Permission.save()
 
@@ -554,43 +554,26 @@ class AllPermManage(Resource):
             Permission = PermissionList.objects.get(perm_id=args.perm_id)
             Permissions = PermissionList.objects.filter(name=Permission.name)
             for perm in Permissions:
-                if args.menu_id:
-                    perm.menu_id = args.menu_id
-                if args.name:
-                    perm.name=args.name
-                if args.button:
-                    perm.button = args.button
-                if args.icon:
-                    perm.icon = args.icon
-                if args.operation:
-                    perm.operation = args.operation
-                if args.url:
-                    perm.url = args.url
-                if args.perm_type:
-                    perm.perm_type = args.perm_type
-                if args.endpoint:
-                    perm.url = args.url
-                if args.level:
-                    Permission.level = args.level
-                if args.parent_id:
-                    perm.parent_id = args.parent_id
-                if args.api_get:
-                    perm.api_get = args.api_get
-                if args.api_post:
-                    perm.api_post = args.api_post
-                if args.api_put:
-                    perm.api_put = args.api_put
-                if args.api_delete:
-                    perm.api_delete = args.api_delete
-                if str(args.isDropdown):
-                    perm.isDropdown = args.isDropdown
-                if args.menu_index:
-                    perm.menu_index = args.menu_index
-                if args.menu_module:
-                    perm.menu_module = args.menu_module
-                perm.updated_time = datetime.datetime.now()
-                perm.save()
-
+                perm.update(
+                menu_id = args.menu_id,
+                name = args.name,
+                button = args.button,
+                icon = args.icon,
+                operation = args.operation,
+                url = args.url,
+                perm_type = args.perm_type,
+                endpoint = args.endpoint,
+                level = args.level,
+                parent_id = args.parent_id,
+                api_get = args.api_get,
+                api_post = args.api_post,
+                api_put = args.api_put,
+                api_delete = args.api_delete,
+                isDropdown = args.isDropdown,
+                menu_index = args.menu_index,
+                menu_module = args.menu_module,
+                updated_time = datetime.datetime.now(),
+                )
             code = 200
             msg = "Update permission success"
             data = "Success"
