@@ -68,8 +68,9 @@ class DeploymentListAPI(Resource):
             condition['deploy_result'] = args.deploy_result
         if args.environment:
             condition['environment'] = args.environment
-        if args.start_time and args.end_time:
+        if args.start_time:
             condition['created_time__gte'] = args.start_time
+        if args.end_time:
             condition['created_time__lte'] = args.end_time
         if args.approve_status:
             condition['approve_status'] = args.approve_status
