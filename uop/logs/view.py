@@ -51,10 +51,10 @@ class LogsListApi(Resource):
         condition["is_deleted"] = 0
         condition["resource_type__in"] = ["app","kvm"]
         condition["approval_status__in"] = ["success", "failed", "revoke", "config_revoke", "config_processing"]
-        if start_time and end_time:
-            # condition['created_date__gte'] = datetime.datetime.strptime(start_time, "%Y-%m-%d")
-            # condition['created_date__lte'] = datetime.datetime.strptime(end_time, "%Y-%m-%d")
+
+        if start_time:
             condition['created_date__gte'] = start_time
+        if end_time:
             condition['created_date__lte'] = end_time
 
         queryset = ResourceModel.objects.filter(compute_list__deploy_source='git')
