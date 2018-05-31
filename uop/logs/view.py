@@ -2,9 +2,9 @@
 
 import json
 import requests
-from flask_restful import reqparse, Api, Resource, marshal_with, fields
+from flask_restful import reqparse, Api, Resource, fields
 from uop.logs import logs_blueprint
-from uop.models import ResourceModel
+from uop.models import ResourceModel, Deployment
 from uop.logs.errors import logs_errors
 from uop.util import get_CRP_url
 
@@ -25,10 +25,6 @@ class LogsListApi(Resource):
     """
         构建日志列表
     """
-
-    @marshal_with(resource_fileds)
-    def _format_data(self, query_list):
-        return query_list
 
     def get(self):
         parser = reqparse.RequestParser()
@@ -56,14 +52,35 @@ class LogsListApi(Resource):
             condition['created_time__lte'] = end_time
 
         queryset = ResourceModel.objects.filter(compute_list__deploy_source='git')
-        queryset = queryset.filter(**condition).order_by('-created_time')
-        q = queryset.paginate(page_num, page_size)
+
+        if page_num and page_size:
+            skip_count = (page_num - 1) * page_size
+            queryset = queryset.filter(**condition).order_by(
+                '-created_time').skip(skip_count).limit(page_size)
+        
+        result = []
+        for obj in queryset:
+            tmp = {}
+            dp = Deployment.objects.filter(
+                resource_id=obj.res_id).order_by("-created_time").first()
+
+            tmp["resource_name"] = obj.resource_name
+            tmp["project_name"] = obj.project_name
+            tmp["module_name"] = obj.module_name
+            tmp["business_name"] = obj.business_name
+            tmp["env"] = obj.env 
+            tmp["user_name"] = obj.user_name
+            tmp["created_date"] = obj.created_date.strftime("%Y-%m-%d %H:%M:%S")
+            tmp["reservation_status"] = dp.deploy_result if dp else obj.reservation_status
+            result.append(tmp)
+            
 
         return {
+            "code": 200,
             "page_num": page_num,
             "page_size": page_size,
             "total_count": queryset.count(),
-            "data": self._format_data(q.items)
+            "data": result
         }
 
 
