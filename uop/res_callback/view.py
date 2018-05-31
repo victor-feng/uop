@@ -884,13 +884,13 @@ class ResourceStatusProviderCallBack(Resource):
         push_image = request_data.get("push_image", '')
         git_package = request_data.get("git_package", '')
         try:
+            status_record = StatusRecord()
             if instance:
                 resource_id = instance.get('resource_id')
                 os_inst_id = instance.get('os_inst_id', '')
                 instance_type = instance.get('instance_type')
                 quantity = int(instance.get('quantity', '0'))
-                #ins_type = mapping_type_status.get(instance_type, '')
-                #cur_instance_type = 'other' if not ins_type else ins_type
+
                 cur_instance_type = mapping_type_status.get(instance_type, instance_type)
                 d_instance_type = mapping_type_status.get(instance_type, "other")
                 deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
@@ -947,25 +947,18 @@ class ResourceStatusProviderCallBack(Resource):
                         cur_instance_type_list = [os_inst_id]
                         status_record.s_type=cur_instance_type
                 setattr(status_record, d_instance_type, cur_instance_type_list)
-                status_record.created_time=datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
             if db_push:
                 resource_id = db_push.get('resource_id')
                 cluster_type = db_push.get('cluster_type')
-                status_record = StatusRecord()
                 status_record.res_id = resource_id
                 status_record.s_type = cluster_type
                 status_record.status = '%s_success'%(cluster_type)
                 status_record.msg='%s配置推送完成'%(cluster_type)
-                status_record.created_time=datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
+
             if war_dict:
                 Log.logger.info("This is war to image operations")
                 resource_id = war_dict.get('resource_id')
                 war_to_image_status = war_dict.get('war_to_image_status')
-                status_record = StatusRecord()
                 status_record.res_id = resource_id
                 if war_to_image_status == "war_to_image_running":
                     status_record.status = war_to_image_status
@@ -973,15 +966,12 @@ class ResourceStatusProviderCallBack(Resource):
                 elif war_to_image_status == "war_to_image_success":
                     status_record.status = war_to_image_status
                     status_record.msg = "war包转镜像完成"
-                status_record.created_time=datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
+
                 Log.logger.info("War to image operations successful")
             if build_image:
                 Log.logger.info("This is build image progress")
                 resource_id = build_image.get('resource_id')
                 build_image_status = build_image.get('build_image_status')
-                status_record = StatusRecord()
                 status_record.res_id = resource_id
 
                 if build_image_status == "build_image_running":
@@ -990,14 +980,11 @@ class ResourceStatusProviderCallBack(Resource):
                 elif build_image_status == "build_image_success":
                     status_record.status = build_image_status
                     status_record.msg = "镜像构建完成"
-                status_record.created_time=datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
+
                 Log.logger.info("Build image successfully")
             if push_image:
                 resource_id = push_image.get("resource_id")
                 push_image_status = push_image.get("push_image_status")
-                status_record = StatusRecord()
                 status_record.res_id = resource_id
                 
                 if push_image_status == "push_image_running":
@@ -1006,14 +993,11 @@ class ResourceStatusProviderCallBack(Resource):
                 elif push_image_status == "push_image_success":
                     status_record.status = push_image_status
                     status_record.msg = "镜像推送完成"
-                status_record.created_time=datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
+
             if git_package:
                 Log.logger.info("Git Package successful")
                 resource_id = git_package.get("resource_id")
                 git_package_status = git_package.get("git_package_status")
-                status_record = StatusRecord()
                 status_record.res_id = resource_id
                 if git_package_status == "pull_code_success":
                     status_record.msg = "拉代码成功"
@@ -1025,10 +1009,9 @@ class ResourceStatusProviderCallBack(Resource):
                     status_record.msg = "拉代码或克隆失败"
                 elif git_package_status == "package_error":
                     status_record.msg = "构建包失败"
-                status_record.created_time = datetime.datetime.now()
-                status_record.set_flag = set_flag
-                status_record.save()
-
+            status_record.created_time = datetime.datetime.now()
+            status_record.set_flag = set_flag
+            status_record.save()
         except Exception as e:
             msg = traceback.format_exc()
             Log.logger.error("[UOP] Resource Status callback failed, Excepton: %s" % msg)
