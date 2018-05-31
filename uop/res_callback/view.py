@@ -1010,6 +1010,7 @@ class ResourceStatusProviderCallBack(Resource):
                 status_record.set_flag = set_flag
                 status_record.save()
             if git_package:
+                Log.logger.info("Git Package successful")
                 resource_id = git_package.get("resource_id")
                 git_package_status = git_package.get("git_package_status")
                 status_record = StatusRecord()

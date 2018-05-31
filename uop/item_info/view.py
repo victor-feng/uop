@@ -380,11 +380,7 @@ class CheckGitUrl(Resource):
         args = parser.parse_args()
         git_url = args.git_url
         code = 200
-        if re.match(r'^https?:/{2}\w.+git$', git_url):
-            status = 'success'
-            msg = 'git url check success'
-
-        elif git_url.startswith('git@') and git_url.endswith('.git'):
+        if re.match(r'^https?:/{2}\w.+git$', git_url) or re.match(r'^git@github.com?:\w.+git$', git_url):
             status = 'success'
             msg = 'git url check success'
         else:
