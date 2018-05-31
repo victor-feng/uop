@@ -1019,11 +1019,11 @@ class ResourceStatusProviderCallBack(Resource):
                 elif git_package_status == "clone_branch_success":
                     status_record.msg = "克隆代码成功"
                 elif git_package_status == "package_success":
-                    status_record.msg = "打包成功"
+                    status_record.msg = "构建包成功"
                 elif git_package_status == "pull_or_clone_error":
                     status_record.msg = "拉代码或克隆失败"
                 elif git_package_status == "package_error":
-                    status_record.msg = "打包失败"
+                    status_record.msg = "构建包失败"
                 status_record.created_time = datetime.datetime.now()
                 status_record.set_flag = set_flag
                 status_record.save()
