@@ -48,6 +48,7 @@ class LogsListApi(Resource):
 
         condition = {k: v for k, v in dict(args).items() if v}
         condition["is_deleted"] = 0
+        condition["resource_type__in"] = ["app","kvm"]
         if start_time and end_time:
             condition['created_time__gte'] = start_time
             condition['created_time__lte'] = end_time
@@ -73,6 +74,8 @@ class LogsListApi(Resource):
             tmp["user_name"] = obj.user_name
             tmp["created_date"] = obj.created_date.strftime("%Y-%m-%d %H:%M:%S")
             tmp["reservation_status"] = dp.deploy_result if dp else obj.reservation_status
+            tmp["resource_type"] = obj.resource_type
+            tmp["deploy_source"] = obj.compute_list[0].deploy_source
             result.append(tmp)
             
 
