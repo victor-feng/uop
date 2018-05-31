@@ -2,6 +2,7 @@
 
 import json
 import requests
+import datetime
 from flask_restful import reqparse, Api, Resource, fields
 from uop.logs import logs_blueprint
 from uop.models import ResourceModel, Deployment
@@ -48,15 +49,20 @@ class LogsListApi(Resource):
 
         condition = {k: v for k, v in dict(args).items() if v}
         if start_time and end_time:
-            condition['created_time__gte'] = start_time
-            condition['created_time__lte'] = end_time
+            # condition['created_date__gte'] = datetime.datetime.strptime(start_time, "%Y-%m-%d")
+            # condition['created_date__lte'] = datetime.datetime.strptime(end_time, "%Y-%m-%d")
+            condition['created_date__gte'] = start_time
+            condition['created_date__lte'] = end_time
 
         queryset = ResourceModel.objects.filter(compute_list__deploy_source='git')
 
         if page_num and page_size:
             skip_count = (page_num - 1) * page_size
             queryset = queryset.filter(**condition).order_by(
-                '-created_time').skip(skip_count).limit(page_size)
+                '-created_date').skip(skip_count).limit(page_size)
+        else:
+            queryset = queryset.filter(**condition).order_by('-created_date')
+
         
         result = []
         for obj in queryset:
