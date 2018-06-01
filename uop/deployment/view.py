@@ -622,7 +622,10 @@ class DeploymentListAPI(Resource):
                 cmdb_url = current_app.config['CMDB_URL']
                 appinfo = attach_domain_ip(app_image, resource, cmdb_url)
                 if cloud == '2' and resource_type == "app":
-                    appinfo = [dict(app, nginx_port=K8S_NGINX_PORT, ips=K8S_NGINX_IPS) for app in appinfo]
+                    nginx_info = get_k8s_nginx(args.environment)
+                    ips = nginx_info.get("nginx_ips") if nginx_info.get("nginx_ips") else K8S_NGINX_IPS
+                    nginx_port = nginx_info.get("nginx_port") if nginx_info.get("nginx_port") else K8S_NGINX_PORT
+                    appinfo = [dict(app, nginx_port=nginx_port, ips=ips) for app in appinfo]
                 ##推送到crp
                 deploy.approve_status = 'success'
                 deploy_type = "deploy"

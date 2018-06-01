@@ -910,8 +910,6 @@ class RollBackReservation(Resource):
                         compute.git_res_url = app.get("git_res_url")
             environment = deploy.environment
             database_password = deploy.database_password
-            cloud = resource.cloud
-            resource_type = resource.resource_type
             resource.updated_date = datetime.datetime.now()
             resource.save()
             # 获取disconf信息

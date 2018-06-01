@@ -295,7 +295,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
                 ips=increase_ips
             docker_list.append(
                 {
-                    'url': url,
+                    'url': compute.url,
                     'insname': compute.ins_name,
                     'ip': ips,
                     'health_check': compute.health_check,
