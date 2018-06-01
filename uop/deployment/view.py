@@ -305,6 +305,7 @@ class DeploymentListAPI(Resource):
                 appinfo = [dict(app, nginx_port=nginx_port, ips=ips) for app in appinfo]
             # 2、把配置推送到disconf
             disconf_server_info = deal_disconf_info(deploy_obj)
+            app_image = appinfo if appinfo else app_image
             deploy_obj.app_image = str(app_image)
             deploy_obj.approve_status = 'success'
             message = 'approve_allow success'
@@ -1125,7 +1126,7 @@ class RollBackAPI(Resource):
                 "code": 400,
                 "result": {
                     "res": "get rollback info failed",
-                    "msg": e.args
+                    "msg": str(e)
                 }
             }
             return res, 400

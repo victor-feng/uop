@@ -7,7 +7,7 @@ import datetime
 import time
 import traceback
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm, HostsCache
-from uop.deployment.handler import attach_domain_ip
+from uop.deployment.handler import attach_domain_ip,deploy_to_crp
 from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
 from config import configs, APP_ENV
@@ -273,6 +273,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         resource_name = resource.resource_name
         deploy_name = resource.deploy_name
         project_name = resource.project_name
+        resource_type = resource.resource_type
         env = resource.env
         deps = Deployment.objects.filter(resource_id=resource_id).order_by('-created_time')
         dep = deps[0]
@@ -283,21 +284,34 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         Log.logger.debug(appinfo)
         data = {}
         docker_list=[]
+        if compute_list:
+            compute = compute_list[0]
+            namespace = compute.namespace
+            if namespace:
+                data["namespace"] = namespace
         for compute in compute_list:
             ips = compute.ips
             if increase_ips:
                 ips=increase_ips
             docker_list.append(
                 {
-                    'url': compute.url,
-                    'ins_name': compute.ins_name,
+                    'url': url,
+                    'insname': compute.ins_name,
                     'ip': ips,
                     'health_check': compute.health_check,
                     'host_env': compute.host_env,
                     'language_env': compute.language_env,
                     'deploy_source': compute.deploy_source,
-                    'database_config': compute.database_config
-
+                    'database_config': compute.database_config,
+                    'flavor': str(compute.cpu) + str(compute.mem),
+                    'host_mapping': compute.host_mapping,
+                    'networkName': compute.networkName,
+                    'tenantName': compute.tenantName,
+                    'replicas': compute.quantity,
+                    'ready_probe_path': compute.ready_probe_path,
+                    'port': compute.port,
+                    'pom_path': compute.pom_path,
+                    'branch': compute.branch,
                 }
             )
         data["deploy_id"] = deploy_id
@@ -318,7 +332,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("URL args is " + url)
-        if cloud == '2' and set_flag == "increase":
+        if cloud == '2' and set_flag == "increase" and resource_type == "kvm":
             result = requests.post(url=url, headers=headers, data=data_str)
         else:
             result = requests.put(url=url, headers=headers, data=data_str)
