@@ -33,6 +33,7 @@ class LogsListApi(Resource):
         parser.add_argument('project_name', type=str, location='args')
         parser.add_argument('module_name', type=str, location='args')
         parser.add_argument('business_name', type=str, location='args')
+        parser.add_argument('resource_type', type=str, location='args')
         parser.add_argument('env', type=str, location='args')
         parser.add_argument('user_name', type=str, location='args')
         parser.add_argument('page_num', type=int, location='args')
