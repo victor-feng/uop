@@ -310,7 +310,6 @@ class Configure(Resource):
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         parser.add_argument('availability_zone', type=str)
-        parser.add_argument('port', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
