@@ -694,9 +694,9 @@ def delete_resource_deploy(res_id):
                     domain_ip = app.get("domain_ip","")
                     named_url = app.get("named_url","")
                     d_count = ResourceModel.objects.filter(domain=domain, is_deleted=0,resource_type=resource_type).count()
-                    if d_count <= 1 and resource_type == "app":
+                    if d_count <= 1 and resource_type == "app" and domain_ip:
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip,"named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name,"domain_path":domain_path})
-                    elif resource_type == "kvm":
+                    elif resource_type == "kvm" and domain_ip:
                         domain_list.append({"domain": domain, 'domain_ip': domain_ip, "named_url": named_url,"cloud":cloud,"resource_type":resource_type,"project_name":project_name,"domain_path":domain_path})
             for dl in domain_list:
                 domain = dl.get("domain")
