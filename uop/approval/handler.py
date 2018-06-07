@@ -142,6 +142,7 @@ def deal_crp_data(resource,set_flag):
                     "flavor_id": db_com.flavor_id,
                     "pom_path": db_com.pom_path,
                     "branch": db_com.branch,
+                    "git_res_url":db_com.git_res_url
                 }
             )
         data['compute_list'] = com
