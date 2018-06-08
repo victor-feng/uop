@@ -268,6 +268,7 @@ def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
 @async
 def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
     try:
+        Log.logger.info("1111111111111111111111111111111111111111111111111111111111111111111")
         resource = ResourceModel.objects.get(res_id=resource_id)
         compute_list = resource.compute_list
         resource_name = resource.resource_name
@@ -294,7 +295,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
             deploy_source = compute.deploy_source
             if increase_ips:
                 ips=increase_ips
-            if compute.deploy_source == "git":
+            if deploy_source == "git":
                 url = compute.git_res_url
                 deploy_source = "war"
             docker_list.append(
@@ -341,6 +342,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         else:
             result = requests.put(url=url, headers=headers, data=data_str)
         Log.logger.debug(result)
+        Log.logger.info("222222222222222222222222222222222222222222222222")
     except Exception as e:
         Log.logger.error("[UOP] Resource deploy_nginx_to_crp failed, Excepton: %s", e.args)
 
