@@ -177,7 +177,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
             url = compute.url
             host_env = compute.host_env
             deploy_source = compute.deploy_source
-            if compute.deploy_source == "git" and deploy_type == "rollback":
+            if compute.deploy_source == "git" and deploy_type in ["rollback","increase","reduce"]:
                 url = compute.git_res_url
                 deploy_source = "war"
             docker_list.append(

@@ -719,6 +719,7 @@ class CapacityReservation(Resource):
                                 "flavor_id": db_com.flavor_id,
                                 "pom_path" : db_com.pom_path,
                                 "branch" : db_com.branch,
+                                "git_res_url": db_com.git_res_url,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
@@ -910,8 +911,6 @@ class RollBackReservation(Resource):
                         compute.git_res_url = app.get("git_res_url")
             environment = deploy.environment
             database_password = deploy.database_password
-            cloud = resource.cloud
-            resource_type = resource.resource_type
             resource.updated_date = datetime.datetime.now()
             resource.save()
             # 获取disconf信息
@@ -922,12 +921,6 @@ class RollBackReservation(Resource):
                 app["domain_ip"] = None
             cmdb_url = current_app.config['CMDB_URL']
             appinfo = attach_domain_ip(app_image, resource, cmdb_url)
-            if cloud == '2' and resource_type == "app":
-                appinfo = [
-                    dict(
-                        app,
-                        nginx_port=K8S_NGINX_PORT,
-                        ips=K8S_NGINX_IPS) for app in appinfo]
             # 推送到crp
             deploy.approve_status = 'success'
             deploy_type = "rollback"
