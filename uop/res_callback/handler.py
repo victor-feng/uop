@@ -291,8 +291,12 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
                 data["namespace"] = namespace
         for compute in compute_list:
             ips = compute.ips
+            deploy_source = compute.deploy_source
             if increase_ips:
                 ips=increase_ips
+            if compute.deploy_source == "git":
+                url = compute.git_res_url
+                deploy_source = "war"
             docker_list.append(
                 {
                     'url': compute.url,
@@ -301,7 +305,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
                     'health_check': compute.health_check,
                     'host_env': compute.host_env,
                     'language_env': compute.language_env,
-                    'deploy_source': compute.deploy_source,
+                    'deploy_source': deploy_source,
                     'database_config': compute.database_config,
                     'flavor': str(compute.cpu) + str(compute.mem),
                     'host_mapping': compute.host_mapping,
