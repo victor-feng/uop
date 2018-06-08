@@ -36,6 +36,7 @@ class LogsListApi(Resource):
         parser.add_argument('resource_type', type=str, location='args')
         parser.add_argument('env', type=str, location='args')
         parser.add_argument('user_name', type=str, location='args')
+        parser.add_argument('department', type=str, location='args')
         parser.add_argument('page_num', type=int, location='args')
         parser.add_argument('page_size', type=int, location='args')
         parser.add_argument('start_time', type=str, location='args')
