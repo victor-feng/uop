@@ -214,7 +214,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
     result = None
     try:
         CPR_URL = get_CRP_url(res_obj['env'])
-        url = CPR_URL + "api/deploy/deploys"
+        crp_url = CPR_URL + "api/deploy/deploys"
         headers = {
             'Content-Type': 'application/json',
         }
@@ -240,7 +240,7 @@ def deploy_to_crp(deploy_item, environment, database_password, appinfo,
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
         Log.logger.debug("Data args is " + str(data_str))
-        result = requests.post(url=url, headers=headers, data=data_str)
+        result = requests.post(url=crp_url, headers=headers, data=data_str)
         result = json.dumps(result.json())
     except requests.exceptions.ConnectionError as rq:
         err_msg = str(rq)

@@ -266,7 +266,7 @@ def push_vm_docker_status_to_cmdb(url, id, num, p_code=None):
 
 
 @async
-def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
+def deploy_to_crp(resource_id,crp_url,set_flag,cloud,increase_ips=[]):
     try:
         Log.logger.info("1111111111111111111111111111111111111111111111111111111111111111111")
         resource = ResourceModel.objects.get(res_id=resource_id)
@@ -292,6 +292,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
                 data["namespace"] = namespace
         for compute in compute_list:
             ips = compute.ips
+            url = compute.url
             deploy_source = compute.deploy_source
             if increase_ips:
                 ips=increase_ips
@@ -300,7 +301,7 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
                 deploy_source = "war"
             docker_list.append(
                 {
-                    'url': compute.url,
+                    'url': url,
                     'insname': compute.ins_name,
                     'ip': ips,
                     'health_check': compute.health_check,
@@ -336,11 +337,11 @@ def deploy_to_crp(resource_id,url,set_flag,cloud,increase_ips=[]):
         headers = {'Content-Type': 'application/json',}
         data_str = json.dumps(data)
         Log.logger.debug("Data args is " + str(data))
-        Log.logger.debug("URL args is " + url)
+        Log.logger.debug("URL args is " + crp_url)
         if cloud == '2' and set_flag == "increase" and resource_type == "kvm":
-            result = requests.post(url=url, headers=headers, data=data_str)
+            result = requests.post(url=crp_url, headers=headers, data=data_str)
         else:
-            result = requests.put(url=url, headers=headers, data=data_str)
+            result = requests.put(url=crp_url, headers=headers, data=data_str)
         Log.logger.debug(result)
         Log.logger.info("222222222222222222222222222222222222222222222222")
     except Exception as e:
