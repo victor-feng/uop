@@ -337,6 +337,7 @@ class ComputeIns(db.EmbeddedDocument):
     pom_path = db.StringField(required=False)
     branch = db.StringField(required=False)
     git_res_url = db.StringField(required=False)
+    scheduler_zone = db.StringField(required=False)
 
 
     meta = {
