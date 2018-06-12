@@ -674,6 +674,7 @@ class ConfigureK8sModel(db.Document):
     namespace_name = db.StringField(required=False)
     config_map_name = db.StringField(required=False)
     network_url = db.StringField(required=False)
+    node_label = db.StringField(required=False) # 节点标签
 
 
 

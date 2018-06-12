@@ -67,6 +67,13 @@ class ConfigureV2(Resource):
         "network_url": fields.String,
     }
 
+
+    label_fields = {
+        "id": fields.String,
+        "env": fields.String,
+        "node_label": fields.String,
+    }
+
     openstack_fields = {
         "id": fields.String,
         "env": fields.String,
@@ -110,7 +117,7 @@ class ConfigureV2(Resource):
 
         # result = defaultdict(list)
         keys = ['k8s_nginx', 'nginx', 'network', 'namespace',
-                'k8s_network_url', 'image', 'flavor', 
+                'k8s_network_url', 'image', 'flavor', 'node_label',
                 'availability_zone', 'namedmanager', 'disconf']
         result = {key: [] for key in keys}
 
@@ -125,6 +132,11 @@ class ConfigureV2(Resource):
             result['network'].append(marshal(obj, cls.network_fields))
 
         for obj in ConfigureK8sModel.objects.filter(env=env):
+            # node_label
+            if obj.node_label:
+                result['node_label'].append(marshal(obj, cls.label_fields))
+
+            # namespace
             tmp_data = marshal(obj, cls.k8s_fields)
             if obj.namespace_name:
                 result['namespace'].append(tmp_data)
@@ -310,6 +322,7 @@ class Configure(Resource):
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         parser.add_argument('availability_zone', type=str)
+        parser.add_argument('node_label', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         url = args.url if args.url else ''
@@ -325,6 +338,7 @@ class Configure(Resource):
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
         cloud = args.cloud if args.cloud else '2'
+        node_label = args.node_label if args.node_label else ''
         Log.logger.info("[UOP] Create configs, env:%s, category: %s", env, category)
         import uuid
         id = str(uuid.uuid1())
@@ -350,6 +364,12 @@ class Configure(Resource):
                 env = env,
                 namespace_name = namespace_name,
                 config_map_name = config_map_name,
+            ).save()
+        elif category == "node_label":
+            ret = ConfigureK8sModel(
+                id = id,
+                env = env,
+                node_label = node_label,
             ).save()
         elif category == "image":
             ret = ConfOpenstackModel(
@@ -423,6 +443,7 @@ class Configure(Resource):
         parser.add_argument('nginx_type', type=str)
         parser.add_argument('port', type=str)
         parser.add_argument('availability_zone', type=str)
+        parser.add_argument('node_label', type=str)
         args = parser.parse_args()
         env = args.env if args.env else 'dev'
         id = args.id if args.id else ''
@@ -439,6 +460,7 @@ class Configure(Resource):
         namespace_name = args.namespace_name if args.namespace_name else ''
         config_map_name = args.config_map_name if args.config_map_name else ''
         cloud = args.cloud if args.cloud else '2'
+        node_label = args.node_label if args.node_label else ''
         Log.logger.info("[UOP] Modify configs, env:%s, category: %s,args: %s", env, category,args)
 
         if category == 'nginx':
@@ -450,6 +472,9 @@ class Configure(Resource):
         elif category == "namespace":
             ret = ConfigureK8sModel.objects(id = id)
             ret.update(env=env,namespace_name=namespace_name,config_map_name=config_map_name)
+        elif category == "node_label":
+            ret = ConfigureK8sModel.objects(id = id)
+            ret.update(env=env, node_label=node_label)
         elif category == "image":
             ret = ConfOpenstackModel.objects(id=id)
             ret.update(image_id=args.image_id,
@@ -505,7 +530,7 @@ class Configure(Resource):
             ret = ConfigureNginxModel.objects.filter(id=id)
         elif category  in ['network','k8s_network']:
             ret = NetWorkConfig.objects.filter(id=id)
-        elif category in ["namespace","k8s_network_url"]:
+        elif category in ["namespace","k8s_network_url", "node_label"]:
             ret = ConfigureK8sModel.objects.filter(id=id)
         elif category in ["image","flavor","availability_zone"]:
             ret = ConfOpenstackModel.objects.filter(id=id)
