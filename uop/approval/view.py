@@ -111,6 +111,7 @@ class ApprovalInfo(Resource):
             parser.add_argument('lb_methods', type=str)
             parser.add_argument('namespace', type=str)
             parser.add_argument('host_mapping', type=list, location='json')
+            parser.add_argument('scheduler_zone', type=str)
             args = parser.parse_args()
 
             docker_network_id = args.docker_network_id
@@ -123,6 +124,7 @@ class ApprovalInfo(Resource):
             namespace = args.namespace
             host_mapping = args.host_mapping
             network_id = args.network_id
+            scheduler_zone = args.scheduler_zone
             if host_mapping is not None:
                 host_mapping = json.dumps(host_mapping)
             network_id_dict = {
@@ -172,6 +174,7 @@ class ApprovalInfo(Resource):
                         com.lb_methods = lb_methods
                         com.namespace = namespace
                         com.host_mapping = host_mapping
+                        com.scheduler_zone = scheduler_zone
                 if resource_list:
                     for res_obj in resource_list:
                         if network_id:
@@ -720,6 +723,7 @@ class CapacityReservation(Resource):
                                 "pom_path" : db_com.pom_path,
                                 "branch" : db_com.branch,
                                 "git_res_url": db_com.git_res_url,
+                                "scheduler_zone": db_com.scheduler_zone,
                             })
                         ips.extend([ip for ip in db_com.ips])
 
