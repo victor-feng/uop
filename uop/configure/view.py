@@ -274,6 +274,14 @@ class Configure(Resource):
                                     url=net.network_url,
                                     env=net.env,
                                     ))
+        elif category == "scheduler_zone":
+            ret = ConfigureK8sModel.objects.filter(env=env)
+            for sz in ret:
+                if sz.scheduler_zone:
+                    results.append(dict(id=sz.id,
+                                    scheduler_zone=sz.scheduler_zone,
+                                    env=sz.env,
+                                    ))
 
         else:  # disconf
             ret = ConfigureDisconfModel.objects.filter(env=env)
