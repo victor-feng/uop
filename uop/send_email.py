@@ -10,8 +10,8 @@ from email.utils import parseaddr, formataddr
 email_server = 'casarray.syswin.com'
 sender = 'zhanghai@syswin.com'
 subjects = {
-    '100': u'创建虚机成功',
-    '200': u'申请虚机成功'
+    '100': u'创建虚机资源成功',
+    '200': u'申请虚机资源成功'
 }
 
 
@@ -27,11 +27,12 @@ def _format_addr(s):
 
 class SendEmail(object):
 
-    def __init__(self, username, content, email_address, subject_type):
+    def __init__(self, username, content, email_address,cc_email_address, subject_type):
         self.email_server = email_server
         self.username = username
         self.content = content
         self.email_address = email_address
+        self.cc_email_address = cc_email_address
         self.sender = sender
         self.subjects = subjects
         self.subject = self.subjects.get(subject_type)
@@ -47,7 +48,6 @@ class SendEmail(object):
             smtpObj = smtplib.SMTP(self.email_server)
             for e in self.email_address:
                 message['To'] = Header(e)
-                print '---', e
                 smtpObj.sendmail(
                     self.sender, [str(e)], message.as_string()
                 )

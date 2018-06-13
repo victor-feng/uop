@@ -467,6 +467,7 @@ def format_put_data_cmdb(data, req_data):
 @async
 def send_email_res(resource_id, code):
     email_list = []
+    email_content = ""
     resource_obj = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
     if resource_obj:
         admin_emails = resource_obj.admin_emails
@@ -476,9 +477,11 @@ def send_email_res(resource_id, code):
         if not admin_emails:
             return
         if code == 200:
+            user_name = resource_obj[0].user_name
             email_content = resource_obj[0].mail_content
             email_list = admin_emails
         elif code == 100:
+            user_name = "UOP"
             email_list = user_emails
             cc_emails = cc_emails + admin_emails
             business_name = resource_obj.business_name
@@ -499,6 +502,7 @@ def send_email_res(resource_id, code):
             username=user_name,
             content=email_content,
             email_address=email_list,
+            cc_email_address=cc_emails,
             subject_type=code
         )
         if email_list:
