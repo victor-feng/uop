@@ -1156,8 +1156,6 @@ class ResourceDeleteCallBack(Resource):
                     resource.compute_list=new_compute_list
                     resource.os_ins_list=new_os_ins_list
                     resource.os_ins_ip_list=new_os_ins_ip_list
-                    Log.logger.info("333333333333333333333333333333333 {}".format(new_compute_list))
-                    Log.logger.info("444444444444444444444444444444444444444444 {}".format(new_os_ins_ip_list))
                     resource.save()
                     if len(status_records) == del_count and "fail" not in status_list:
                         #create_status_record(resource_id, deploy_id, "reduce", "资源缩容成功", "reduce_success",set_flag)
