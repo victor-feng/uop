@@ -18,6 +18,7 @@ from config import configs, APP_ENV
 from uop.permission.handler import api_permission_control
 from uop.deployment.handler import attach_domain_ip, deploy_to_crp, deal_disconf_info
 from uop.approval.handler import resource_reduce, deal_crp_data
+from uop.res_callback.handler import send_email_res
 
 approval_api = Api(approval_blueprint, errors=approval_errors)
 
@@ -71,6 +72,9 @@ class ApprovalList(Resource):
                 resource.reservation_status = approval_status
                 resource.save()
                 code = 200
+                # async send email
+                res_data = {'resource_id': resource_id}
+                send_email_res(res_data, '200')
         except Exception as e:
             Log.logger.exception(
                 "[UOP] ApprovalList failed, Exception: %s", e.args)

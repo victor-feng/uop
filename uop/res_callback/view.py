@@ -12,6 +12,7 @@ from uop.res_callback import res_callback_blueprint
 from uop.res_callback.errors import res_callback_errors
 from uop.deploy_callback.handler import create_status_record
 from uop.res_callback.handler import *
+from uop.res_callback.handler import send_email_res
 from transitions import Machine
 from uop.util import get_CRP_url,async
 from uop.log import Log
@@ -767,6 +768,10 @@ class ResourceProviderCallBack(Resource):
                 }
             }
             return ret, code
+        # async send email
+
+        send_email_res(request_data, '100')
+
         # 异步存到CMDB2
         Log.logger.info("Start save to CMDB2")
         CMDB_URL = current_app.config['CMDB_URL']

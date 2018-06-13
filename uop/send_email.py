@@ -11,7 +11,7 @@ email_server = 'casarray.syswin.com'
 sender = 'zhanghai@syswin.com'
 subjects = {
     '100': u'创建虚机成功',
-    '200': u'部署成功'
+    '200': u'申请虚机成功'
 }
 
 
@@ -38,8 +38,8 @@ class SendEmail(object):
 
     def send_email(self):
         message = MIMEText(
-            '尊敬的 %s ：%s' %
-            (self.username, self.content), 'plain', 'utf-8'
+            '%s' %
+            self.content, 'plain', 'utf-8'
         )
         message['From'] = _format_addr(u"UOP <%s>" % self.sender)
         message['Subject'] = Header(self.subject, 'utf-8')

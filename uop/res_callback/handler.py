@@ -8,6 +8,7 @@ import time
 import traceback
 from uop.models import ResourceModel, StatusRecord,OS_ip_dic,Deployment, Cmdb, ViewCache, Statusvm, HostsCache
 from uop.deployment.handler import attach_domain_ip,deploy_to_crp
+from uop.send_email import SendEmail
 from uop.util import async, response_data, TimeToolkit
 from uop.log import Log
 from config import configs, APP_ENV
@@ -461,6 +462,37 @@ def format_put_data_cmdb(data, req_data):
     request_data['db_info'] = db_info_dict
     Log.logger.info("The request data is {}".format(request_data))
     return request_data
+
+
+@async
+def send_email_res(request_data, code):
+    ip_list = []
+    email_list = []
+    content = ''
+    res_id = request_data.get('resource_id')
+    resource_obj = ResourceModel.objects.filter(res_id=res_id)
+    if resource_obj:
+        user_name = resource_obj[0].user_name
+        email_obj = resource_obj[0].cc_emails
+        os_ins_ip_list = resource_obj[0].os_ins_ip_list
+        email_content = resource_obj[0].mail_content
+        if email_obj:
+            for email_address in email_obj:
+                email_address.append(email_address)
+        if os_ins_ip_list:
+            for ip in os_ins_ip_list:
+                ip_list.append(ip.ip)
+            content = ip_list
+        if email_content:
+            content = email_content
+        send = SendEmail(
+            username=user_name,
+            content=content,
+            email_address=email_list,
+            subject_type=code
+        )
+        if email_list:
+            send.send_email()
 
 
 # 解析crp传回来的数据录入CMDB2.0

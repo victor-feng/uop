@@ -11,11 +11,6 @@ from uop.models import ConfigureNamedModel
 BASE_K8S_IMAGE = configs[APP_ENV].BASE_K8S_IMAGE
 
 
-
-
-
-
-
 def resource_reduce(resource,number,ips):
     reduce_list = []
     for os_ins in resource.os_ins_ip_list:
