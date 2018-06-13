@@ -470,7 +470,8 @@ class ResourceModel(db.DynamicDocument):
     resource_type = db.StringField(required=False) #资源的类型是应用app，数据库 database
 
     expiry_date = db.StringField(required=False) #其他资源过期时间
-    leader_emails = db.ListField(db.StringField(requeired=False)) #其他资源领导邮件
+    user_emails = db.ListField(db.StringField(requeired=False))  # 其他资源申请人邮件
+    admin_emails = db.ListField(db.StringField(requeired=False)) #其他资源管理员邮件
     cc_emails = db.ListField(db.StringField(requeired=False)) #其他资源抄送邮件
     mail_content = db.StringField(required=False)
     updated_date = db.DateTimeField(required=False)

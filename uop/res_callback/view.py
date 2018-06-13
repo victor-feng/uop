@@ -773,8 +773,11 @@ class ResourceProviderCallBack(Resource):
             return ret, code
         # async send email
         resource_id = request_data.get("resource_id")
-        send_email_res(resource_id, '100')
-
+        status = request_data.get('status')
+        set_flag = request_data.get('set_flag')
+        if status == "ok"  and set_flag == "res":
+            #其他资源创建成功，异步发邮件
+            send_email_res(resource_id, '100')
         # 异步存到CMDB2
         Log.logger.info("Start save to CMDB2")
         CMDB_URL = current_app.config['CMDB_URL']

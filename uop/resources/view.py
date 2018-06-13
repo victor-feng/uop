@@ -107,7 +107,8 @@ class ResourceApplication(Resource):
             resource_type = info.get("resource_type","")
             domain = info.get("domain", "")
             expiry_date = info.get("expiry_date","long")
-            leader_emails = info.get("leader_emails",[])
+            admin_emails = info.get("admin_emails",[])
+            user_emails = info.get("user_emails", [])
             cc_emails = info.get("cc_emails",[])
             mail_content = info.get("mail_content","")
             res_info_dict["resource_id"] = res_id
@@ -126,7 +127,7 @@ class ResourceApplication(Resource):
                                                  application_status=application_status, approval_status=approval_status,
                                                  reservation_status="unreserved", created_date=created_date,
                                                  cloud = cloud,resource_type = resource_type,domain=domain,is_deleted=0,
-                                                 expiry_date=expiry_date,leader_emails=leader_emails,cc_emails=cc_emails,mail_content=mail_content,updated_date=created_date)
+                                                 expiry_date=expiry_date,admin_emails=admin_emails,user_emails=user_emails,cc_emails=cc_emails,mail_content=mail_content,updated_date=created_date)
             if resource_list:
                 for resource in resource_list:
                     ins_name = resource.get('res_name', '未知名称')
@@ -408,7 +409,8 @@ class ResourceApplication(Resource):
                 result['user_id'] = resource.user_id
                 result['department'] = resource.department
                 result['expiry_date'] = resource.expiry_date
-                result['leader_emails'] = resource.leader_emails
+                result['admin_emails'] = resource.admin_emails
+                result['user_emails'] = resource.user_emails
                 result['cc_emails'] = resource.cc_emails
                 result['mail_content'] = resource.mail_content
                 result['is_expired'] = 0
@@ -498,7 +500,8 @@ class ResourceApplication(Resource):
         parser.add_argument('domain', type=str)
         parser.add_argument('expiry_date', type=str)
         parser.add_argument('mail_content', type=str)
-        parser.add_argument('leader_emails', type=list, location='json')
+        parser.add_argument('admin_emails', type=list, location='json')
+        parser.add_argument('user_emails', type=list, location='json')
         parser.add_argument('cc_emails', type=list, location='json')
         args = parser.parse_args()
         res_id = args.res_id
@@ -524,8 +527,9 @@ class ResourceApplication(Resource):
         domain = args.domain
         expiry_date = args.expiry_date
         mail_content = args.mail_content
-        leader_emails = args.leader_emails
+        admin_emails = args.admin_emails
         cc_emails = args.cc_emails
+        user_emails = args.uesr_emails
         try:
             resource = ResourceModel.objects.get(res_id=res_id)
             if resource:
@@ -553,7 +557,8 @@ class ResourceApplication(Resource):
                     cc_emails=cc_emails,
                     expiry_date=expiry_date,
                     mail_content=mail_content,
-                    leader_emails=leader_emails,
+                    admin_emails=admin_emails,
+                    user_emails=user_emails,
                     updated_date = datetime.datetime.now(),
                 )
                 resource.compute_list = []
@@ -737,7 +742,8 @@ class ResourceDetail(Resource):
         result['resource_type'] = resource.resource_type
         result['cloud'] = resource.cloud
         result['expiry_date'] = resource.expiry_date
-        result['leader_emails'] = resource.leader_emails
+        result['admin_emails'] = resource.admin_emails
+        result['user_emails'] = resource.user_emails
         result['cc_emails'] = resource.cc_emails
         result['mail_content'] = resource.mail_content
         result['image_name'] = ""
