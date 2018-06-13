@@ -46,12 +46,12 @@ class SendEmail(object):
         message['Subject'] = Header(self.subject, 'utf-8')
         try:
             smtpObj = smtplib.SMTP(self.email_server)
-            for e in self.email_address:
-                message['To'] = Header(e)
-                smtpObj.sendmail(
-                    self.sender, [str(e)], message.as_string()
-                )
-                logging.info("[EMAIL] Send email successful.")
+            message['To'] = ";".join(self.email_address)
+            message['Cc'] = ";".join(self.cc_email_address)
+            smtpObj.sendmail(
+                self.sender, self.email_address + self.cc_email_address, message.as_string()
+            )
+            logging.info("[EMAIL] Send email successful.")
             res = True
         except Exception as e:
             logging.exception(
@@ -67,7 +67,8 @@ if __name__ == '__main__':
     send = SendEmail(
         username='victor',
         content='create virtual machine successful.',
-        email_address=['fengyukai@syswin.com', 'yangyang@syswin.com'],
+        email_address=['yangyang@syswin.com'],
+        cc_email_address=['fengyukai@syswin.com'],
         subject_type='100'
     )
     send.send_email()
