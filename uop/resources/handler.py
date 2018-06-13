@@ -621,6 +621,8 @@ def updata_deployment_info(resource_name,env,url):
                 for os_ins in os_ins_ip_list:
                     cpu = getattr(os_ins, "cpu")
                     mem = getattr(os_ins, "mem")
+                    username = getattr(os_ins, "username")
+                    password = getattr(os_ins, "password")
                     if osid_ip:
                         one = osid_ip.pop()
                         ips.append(one[1])
@@ -631,7 +633,10 @@ def updata_deployment_info(resource_name,env,url):
                                 cpu=cpu,
                                 mem=mem,
                                 instance_id=os_ins.instance_id if getattr(os_ins, "instance_id") else "",
-                                physical_server=one[3])
+                                physical_server=one[3],
+                                username = username,
+                                password = password,
+                        )
                         )
                 domains = ""
                 domain_paths = ""

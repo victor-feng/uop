@@ -411,6 +411,7 @@ class ResourceApplication(Resource):
                 result['leader_emails'] = resource.leader_emails
                 result['cc_emails'] = resource.cc_emails
                 result['mail_content'] = resource.mail_content
+                result['is_expired'] = 0
 
                 if resource.resource_type in ['app', 'kvm']:
                     deploy_source_list = resource.compute_list
@@ -419,7 +420,9 @@ class ResourceApplication(Resource):
                         # Log.logger.debug("the resource compute deploy_source is:{}".format(i.deploy_source))
                 else:
                     result['deploy_source'] = ""
-
+                expiry_date = resource.expiry_date
+                if expiry_date and expiry_date != "long" and  datetime.datetime.now() - expiry_date > 0:
+                    result['is_expired'] = 1
                 resource_id = resource.res_id
                 deploys = Deployment.objects.filter(resource_id=resource_id).order_by("-created_time")
                 if deploys:
