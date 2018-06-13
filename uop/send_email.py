@@ -11,6 +11,7 @@ email_server = 'casarray.syswin.com'
 sender = 'zhanghai@syswin.com'
 subjects = {
     '100': u'创建虚机成功',
+    '200': u'部署成功'
 }
 
 
@@ -41,14 +42,16 @@ class SendEmail(object):
             (self.username, self.content), 'plain', 'utf-8'
         )
         message['From'] = _format_addr(u"UOP <%s>" % self.sender)
-        message['To'] = Header(self.email_address)
         message['Subject'] = Header(self.subject, 'utf-8')
         try:
             smtpObj = smtplib.SMTP(self.email_server)
-            smtpObj.sendmail(
-                self.sender, [str(self.email_address)], message.as_string()
-            )
-            logging.info("[EMAIL] Send email successful.")
+            for e in self.email_address:
+                message['To'] = Header(e)
+                print '---', e
+                smtpObj.sendmail(
+                    self.sender, [str(e)], message.as_string()
+                )
+                logging.info("[EMAIL] Send email successful.")
             res = True
         except Exception as e:
             logging.exception(
@@ -64,7 +67,7 @@ if __name__ == '__main__':
     send = SendEmail(
         username='victor',
         content='create virtual machine successful.',
-        email_address='fengyukai@syswin.com',
+        email_address=['fengyukai@syswin.com', 'yangyang@syswin.com'],
         subject_type='100'
     )
     send.send_email()
