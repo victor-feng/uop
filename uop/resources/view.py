@@ -847,6 +847,7 @@ class ResourceDetail(Resource):
                         "pom_path" : db_com.pom_path,
                         "branch" : db_com.branch,
                         "git_res_url" : db_com.git_res_url,
+                        "scheduler_zone": db_com.scheduler_zone,
                     }
                 )
         result['resource_list'] = res
