@@ -465,24 +465,17 @@ def format_put_data_cmdb(data, req_data):
 
 
 @async
-def send_email_res(request_data, code):
-    ip_list = []
+def send_email_res(resource_id, code):
     email_list = []
     content = ''
-    res_id = request_data.get('resource_id')
-    resource_obj = ResourceModel.objects.filter(res_id=res_id)
+    resource_obj = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
     if resource_obj:
         user_name = resource_obj[0].user_name
         email_obj = resource_obj[0].cc_emails
-        os_ins_ip_list = resource_obj[0].os_ins_ip_list
         email_content = resource_obj[0].mail_content
         if email_obj:
             for email_address in email_obj:
-                email_address.append(email_address)
-        if os_ins_ip_list:
-            for ip in os_ins_ip_list:
-                ip_list.append(ip.ip)
-            content = ip_list
+                email_list.append(email_address)
         if email_content:
             content = email_content
         send = SendEmail(

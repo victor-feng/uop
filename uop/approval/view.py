@@ -73,8 +73,7 @@ class ApprovalList(Resource):
                 resource.save()
                 code = 200
                 # async send email
-                res_data = {'resource_id': resource_id}
-                send_email_res(res_data, '200')
+                send_email_res(resource_id, '200')
         except Exception as e:
             Log.logger.exception(
                 "[UOP] ApprovalList failed, Exception: %s", e.args)

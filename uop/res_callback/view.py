@@ -772,8 +772,8 @@ class ResourceProviderCallBack(Resource):
             }
             return ret, code
         # async send email
-
-        send_email_res(request_data, '100')
+        resource_id = request_data.get("resource_id")
+        send_email_res(resource_id, '100')
 
         # 异步存到CMDB2
         Log.logger.info("Start save to CMDB2")
