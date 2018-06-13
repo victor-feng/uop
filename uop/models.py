@@ -414,6 +414,8 @@ class OS_ip_dic(db.EmbeddedDocument):
     vip = db.StringField(required=False)
     port = db.StringField(required=False)
     physical_server = db.StringField(required=False)
+    username = db.StringField(required=False)
+    password = db.StringField(required=False)
 
     meta = {
         'collection': 'os_ip_dic',
