@@ -23,5 +23,4 @@ yum install openldap-devel -y
 yum install ipvsadm kernel-devel popt-devel libnl-devel -y
 yum install nmap -y
 yum install openssh-server openssh-clients -y
-yum install keepalived nginx ansible nodejs -y
 
