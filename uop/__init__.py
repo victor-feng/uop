@@ -72,6 +72,19 @@ class Config(object):
                     'second': '0'
                 }
 
+        },
+        {
+            'id': 'expire_resource_warn',
+            'func': 'uop.scheduler_util:expire_resource_warn',
+            # 'args': (1, 2),
+            'trigger':
+                {
+                    'type': 'cron',
+                    'day_of_week': "mon-sun",
+                    'hour': '9',
+                    'minute': '0',
+                    'second': '0'
+                }
         }
     ]
 

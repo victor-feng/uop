@@ -12,6 +12,7 @@ from uop.item_info.handler import get_uid_token
 from config import APP_ENV, configs
 from uop.log import Log
 from uop.util import async, TimeToolkit
+from uop.send_email import SendEmail
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -341,6 +342,34 @@ def get_one_view(uid, token, view_id):
             Log.logger.info("get_relations data:{}".format(ret))
     except Exception as exc:
         Log.logger.error("get_relations error: {}".format(str(exc)))
+
+
+def expire_resource_warn():
+    Log.logger.info('----------------expiry_resouce_handler----------------')
+    now = datetime.datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    ten_day = (now + datetime.timedelta(days=10)).strftime("%Y-%m-%d")
+
+    resources = ResourceModel.objects.filter(
+        is_deleted=0, leader_emails__exists=True, leader_emails__ne=[]).filter(
+            expiry_date__gt=today, expiry_date__lte=ten_day, expiry_date__nin=['long', '', None])
+
+    for res in resources:
+        ips = [i.ip for i in res.os_ins_ip_list]
+        content = u"您的资源：{r_name} \nip地址：\n{ip} \n将要到期。".format(r_name=res.resource_name, ip='\t\n'.join(ips))
+
+        try:
+            send = SendEmail(
+                username=res.user_name,
+                content=content,
+                email_address=res.leader_emails,
+                cc_email_address = res.cc_emails,
+                subject_type='300',
+            )
+            send.send_email()
+        except Exception as e:
+            Log.logger.error('Expire warn error: {}'.format(str(e)))
+            continue
 
 if __name__ == "__main__":
     #get_relations()

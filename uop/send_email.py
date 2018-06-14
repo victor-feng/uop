@@ -11,7 +11,8 @@ email_server = 'casarray.syswin.com'
 sender = 'zhanghai@syswin.com'
 subjects = {
     '100': u'创建虚机资源成功',
-    '200': u'申请虚机资源成功'
+    '200': u'申请虚机资源成功',
+    '300': u'资源到期提醒'
 }
 
 
@@ -27,7 +28,7 @@ def _format_addr(s):
 
 class SendEmail(object):
 
-    def __init__(self, username, content, email_address,cc_email_address, subject_type):
+    def __init__(self, username, content, email_address, cc_email_address, subject_type):
         self.email_server = email_server
         self.username = username
         self.content = content
