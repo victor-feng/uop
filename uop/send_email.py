@@ -57,7 +57,6 @@ class SendEmail(object):
             logging.exception(
                 "[EMAIL] Send email faild. Exception: %s", e.args
             )
-            print "Error: 无法发送邮件"
             res = False
         return res
 
