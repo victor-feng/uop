@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-import logging
-
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import parseaddr, formataddr
+from uop.log import Log
 email_server = 'casarray.syswin.com'
 sender = 'zhanghai@syswin.com'
 subjects = {
@@ -51,11 +50,11 @@ class SendEmail(object):
             smtpObj.sendmail(
                 self.sender, self.email_address + self.cc_email_address, message.as_string()
             )
-            logging.info("[EMAIL] Send email successful.")
+            Log.logger.info("[EMAIL] Send email successful.")
             res = True
         except Exception as e:
-            logging.exception(
-                "[EMAIL] Send email faild. Exception: %s", e.args
+            Log.logger.info.exception(
+                "[EMAIL] Send email faild. Exception: %s", str(e)
             )
             res = False
         return res
