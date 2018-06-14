@@ -470,27 +470,23 @@ def send_email_res(resource_id, code):
     email_content = ""
     resource_obj = ResourceModel.objects.filter(res_id=resource_id,is_deleted=0)
     if resource_obj:
-        admin_emails = resource_obj.admin_emails
         user_name = resource_obj[0].user_name
         cc_emails = resource_obj[0].cc_emails
         user_emails = resource_obj[0].user_emails
-        if not admin_emails:
+        if not user_emails:
             return
         if code == 200:
             user_name = resource_obj[0].user_name
             email_content = resource_obj[0].mail_content
-            email_list = admin_emails
         elif code == 100:
             user_name = "UOP"
-            email_list = user_emails
-            cc_emails = cc_emails + admin_emails
             business_name = resource_obj.business_name
             module_name = resource_obj.module_name
             resource_name = resource_obj.resource_name
             resource_type = resource_obj.resource_type
             os_ins_ip_list = resource_obj.os_ins_ip_list
-            content = """您好：
-            %s资源：%s已经创建成功，业务：%s，模块：%s。""" % (resource_type, resource_name, business_name, module_name)
+            content = """您好 %s：
+            %s资源：%s已经创建成功，业务：%s，模块：%s。""" % (user_name,resource_type, resource_name, business_name, module_name)
             for os_ins in os_ins_ip_list:
                 ip = getattr(os_ins, "ip")
                 username = getattr(os_ins, "username")
